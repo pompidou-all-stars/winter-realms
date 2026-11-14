@@ -1,9 +1,12 @@
 """Spectre (CR spectre, invisible) : fantôme encapuchonné, voile pâle aux bords déchirés, visage d'ombre
 et yeux cyan. Flotte au ras du sol (le jeu le rend translucide quand il est caché)."""
 import math
-from outils import collection, dans, pivot, peindre, sphere, cone, cylindre, prisme
-from animations import flotte
-from echelles import hauteur
+from communs.outils import collection, dans, pivot, peindre, sphere, cone, cylindre, prisme
+from communs.animations import flotte
+from communs.echelles import hauteur
+from communs.export_jeu import preparer
+
+INFOS = {'categorie': 'monstre', 'titre': "Spectre"}
 
 def fabriquer():
     c = collection('spectre'); dans(c)
@@ -26,4 +29,5 @@ def fabriquer():
     flotte(r, duree=1.6, ampl=H * .08)
     return r
 
-if __name__ == '__main__': fabriquer()
+def construire(ctx):
+    preparer(fabriquer())

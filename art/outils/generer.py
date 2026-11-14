@@ -35,7 +35,7 @@ def scripts_assets():
     ids = []
     for dossier, sous, fichiers in os.walk(ART):
         rel = os.path.relpath(dossier, ART).replace('\\', '/')
-        if rel.split('/')[0] in ('outils', 'communs', '__pycache__'):
+        if rel.split('/')[0] in ('outils', 'communs', '__pycache__') or rel.endswith('__pycache__'):
             continue
         for f in fichiers:
             if f.endswith('.py') and not f.startswith('_'):
@@ -121,10 +121,15 @@ def generer(bpy, id_, dossier, jeu, apercus=None):
         ev = o.evaluated_get(dg); me = ev.to_mesh(); me.calc_loop_triangles(); triangles += len(me.loop_triangles); ev.to_mesh_clear()
     fichier = os.path.join(dossier, id_ + '.glb')
     os.makedirs(os.path.dirname(fichier), exist_ok=True)
+    # maillages ET objets vides : les vides sont les pivots nommés que le jeu anime (Tourelle, Tete, BrasG…)
     for o in bpy.context.scene.objects:
-        o.select_set(o.type == 'MESH')
+        o.select_set(o.type in ('MESH', 'EMPTY'))
+    animee = any(o.animation_data and o.animation_data.nla_tracks for o in bpy.context.scene.objects)
+    # animations : une par piste NLA (« marche », « vol ») ; compression meshopt (fichiers 2 à 3 fois plus légers)
     bpy.ops.export_scene.gltf(filepath=fichier, export_format='GLB', use_selection=True, export_apply=True,
-                              export_cameras=False, export_lights=False)
+                              export_cameras=False, export_lights=False,
+                              export_animations=animee, export_animation_mode='NLA_TRACKS', export_force_sampling=True,
+                              export_meshopt_compression_enable=True)
     if apercus:
         rendre_apercu(bpy, maillages, os.path.join(apercus, id_.replace('/', '-') + '.png'))
     return {'id': id_, 'categorie': infos.get('categorie', 'exemple'), 'titre': infos.get('titre', id_),

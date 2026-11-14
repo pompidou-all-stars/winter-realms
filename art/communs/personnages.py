@@ -13,7 +13,7 @@ Options (dict o) : peau, peau2 (nez, mâchoire), tissu, cuir, metal, botte, acce
   lunettes, bonnet, arme (fonction).
 """
 import math
-from outils import cylindre, boite, sphere, cone, prisme, pivot, anneau
+from .outils import cylindre, boite, sphere, cone, prisme, pivot, anneau
 
 def humanoide(racine, o, H):
     cr = o.get('carrure', 1.0)

@@ -4,7 +4,7 @@ Pièces nommées utilisées par les animations :
   Corps, Tete, Queue, JambeAG / JambeAD / JambePG / JambePD (avant/arrière, gauche/droite),
   AileG / AileD (battent autour de l'axe Y). Les bêtes regardent vers -Y, pieds en z = 0."""
 import math
-from outils import pivot, cylindre, boite, sphere, cone, prisme, anneau
+from .outils import pivot, cylindre, boite, sphere, cone, prisme, anneau
 
 def yeux_bete(T, r, y, z, ecart, col, pupille=True):
     for s in (-1, 1):

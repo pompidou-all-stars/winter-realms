@@ -1,7 +1,7 @@
 """Rendus de validation (EEVEE) : éclairage doux de maquette, caméra orthographique."""
 import bpy, math
 from mathutils import Vector
-from outils import lin
+from .outils import lin
 
 def studio(fond='#3b4a52'):
     sc = bpy.context.scene

@@ -1,7 +1,7 @@
 """Palettes et socles des factions (couleurs reprises de drawFactionTower et draw() dans index.html,
 avivées pour la 3D)."""
 import math
-from outils import cylindre, boite, sphere, pivot, anneau
+from .outils import cylindre, boite, sphere, pivot, anneau
 
 # stone, mid, dark, glow, accent
 PAL = {
@@ -41,14 +41,14 @@ def socle_horde(racine):
     cylindre('Dessus', '#8a5a33', .36, .35, .04, 12, (0, 0, .08), racine, biseau=.01)
     for q in range(5):
         a = q * 2 * math.pi / 5 + .3
-        from outils import cone
+        from .outils import cone
         cone(f'Defense{q}', '#f0e6cc', .03, .16, 6, (math.cos(a) * .4, math.sin(a) * .4, .06), racine,
              (math.cos(a + math.pi / 2) * .5, math.sin(a + math.pi / 2) * .5, 0))
     return HAUT_SOCLE
 
 def socle_sylvestres(racine):
     """Souche moussue et racines noueuses, champignons luisants."""
-    from outils import cone
+    from .outils import cone
     cylindre('Souche', '#6b4a2f', .38, .32, .08, 10, (0, 0, 0), racine, biseau=.02)
     cylindre('Mousse', '#4f9a4a', .33, .31, .04, 10, (0, 0, .08), racine, biseau=.01)
     for q in range(5):

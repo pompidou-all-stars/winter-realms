@@ -11,10 +11,10 @@ Pièces animées / orientées par le jeu (noms d'objets) :
   Orbe       pulse (mage)
 """
 import math
-import outils
-from outils import pivot, cylindre, boite, sphere, cone, prisme, anneau, peindre, collection, dans
-from factions import PAL, SOCLES
-from personnages import (humanoide, arc_court, epee, marteau, gourdin, baton, bouclier, hache, lame_courbe, baguette)
+from . import outils
+from .outils import pivot, cylindre, boite, sphere, cone, prisme, anneau, peindre, collection, dans
+from .factions import PAL, SOCLES
+from .personnages import (humanoide, arc_court, epee, marteau, gourdin, baton, bouclier, hache, lame_courbe, baguette)
 
 # ---------------------------------------------------------------- styles des factions
 STYLE = {
