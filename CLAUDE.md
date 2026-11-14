@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.10)
+# Winter Realms — Tower Wars (Édition 2.9)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -106,7 +106,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 
 ## 2. Déroulement d'une partie
 
-1. **Écran d'accueil** : on choisit une **faction** (5 au choix), puis une **difficulté** (Normal, Difficile ou Brutal). Les boutons de difficulté restent grisés tant qu'aucune faction n'est choisie (en pratique, les Humains sont présélectionnés). Depuis la 2.10, les cinq factions sont, dans l'ordre : **Humains**, **Créatures**, **Végétaux**, **Robots** et **Magiques** (anciennement Alliance, Horde, Sylvestres, Nains et Légion des ombres, dont elles reprennent les règles).
+1. **Écran d'accueil** : on choisit une **faction** (5 au choix), puis une **difficulté** (Normal, Difficile ou Brutal). Les boutons de difficulté restent grisés tant qu'aucune faction n'est choisie (en pratique, l'Alliance est présélectionnée).
 2. **Les 4 terrains** : celui du joueur (« Toi ») et ceux de IA 1 (rouge), IA 2 (bleu) et IA 3 (violet). Les IA jouent automatiquement les factions suivantes dans la liste : `(faction du joueur + 1, + 2, + 3) % 5`.
 3. **Victoire** : toutes les IA sont éliminées. **Défaite** : le joueur est éliminé.
 4. Un joueur est **éliminé** quand ses vies tombent à 0. Son terrain est alors vidé et grisé, et il ne reçoit plus de vagues.
@@ -153,7 +153,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 
 - Les tours « magiques » (Givre, Mage) **n'ont aucun effet sur le Briseur de runes**.
 - **Ciblage** : chaque tour vise, dans sa portée, le monstre visible **le plus proche de la sortie**.
-- **Ralentissement** : le Givre multiplie la vitesse par `0,5 − 0,05 × (niveau − 1)`, soit ×0,5 au niveau 1 et ×0,3 au niveau 5, pendant 1,5 s. Les racines des Végétaux multiplient la vitesse par ×0,82 (`T.sf`). Si un monstre est déjà ralenti, c'est le ralentissement **le plus fort** qui reste appliqué, et la durée retenue est la plus longue.
+- **Ralentissement** : le Givre multiplie la vitesse par `0,5 − 0,05 × (niveau − 1)`, soit ×0,5 au niveau 1 et ×0,3 au niveau 5, pendant 1,5 s. Les racines des Sylvestres multiplient la vitesse par ×0,82 (`T.sf`). Si un monstre est déjà ralenti, c'est le ralentissement **le plus fort** qui reste appliqué, et la durée retenue est la plus longue.
 
 ### 4.2 Les 10 emplacements par faction (`ARCH`, `ROLE`)
 Chaque faction a 10 tours. L'emplacement `j` détermine l'archétype, un multiplicateur de puissance (qui s'applique au coût et aux dégâts) et quelques retouches :
@@ -208,86 +208,86 @@ Principe d'équilibrage (commentaire dans le code) : *des coefficients volontair
 
 | Faction | Icône | Coût | Dégâts | Portée | Recharge | Bonus propre |
 |---|---|---|---|---|---|---|
-| Humains | 🏹 | ×1,04 | ×0,97 | **×1,10** | ×1,03 | **Anti-aérien** : +18 % de dégâts contre les volants |
-| Créatures | 🦎 | ×1,02 | ×0,96 | ×0,93 | ×1,04 | **Frénésie** : +30 % de dégâts sur les cibles à moins de 35 % de PV |
-| Végétaux | 🌳 | ×1,00 | ×0,96 | ×1,00 | ×1,02 | **Racines** : *toutes* leurs tours ralentissent les monstres (vitesse ×0,82 pendant 0,72 s). Leurs tours Givre gardent le ralentissement normal du Givre |
-| Robots | 🤖 | ×1,07 | **×1,08** | ×1,02 | ×1,08 | **Perforant** : ignorent 55 % de l'armure |
-| Magiques | 🔮 | ×1,01 | ×1,01 | ×0,99 | ×1,01 | **Malédiction** : une cible touchée est marquée 1,35 s, et chaque coup suivant sur elle fait +14 % |
+| Alliance | 🛡️ | ×1,04 | ×0,97 | **×1,10** | ×1,03 | **Anti-aérien** : +18 % de dégâts contre les volants |
+| Horde | 🪓 | ×1,02 | ×0,96 | ×0,93 | ×1,04 | **Frénésie** : +30 % de dégâts sur les cibles à moins de 35 % de PV |
+| Sylvestres | 🌿 | ×1,00 | ×0,96 | ×1,00 | ×1,02 | **Racines** : *toutes* leurs tours ralentissent les monstres (vitesse ×0,82 pendant 0,72 s). Leurs tours Givre gardent le ralentissement normal du Givre |
+| Nains | ⚒️ | ×1,07 | **×1,08** | ×1,02 | ×1,08 | **Perforant** : ignorent 55 % de l'armure |
+| Légion des ombres | ☠️ | ×1,01 | ×1,01 | ×0,99 | ×1,01 | **Malédiction** : une cible touchée est marquée 1,35 s, et chaque coup suivant sur elle fait +14 % |
 
 Chaque faction a aussi un style visuel qui lui est propre : socle (pierre et créneaux, rondins, racines, hexagone riveté, anneaux flottants), couleur du sol de son terrain et palette.
 
 ### 5.1 Statistiques au niveau 1 (calculées)
 Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter les bonus de faction ni les explosions.
 
-#### Humains
+#### Alliance
 | # | Tour | Type | Coût | Dégâts | Recharge | DPS | Portée |
 |---|---|---|---|---|---|---|---|
-| 0 | Archer du rempart | Archer | 20 | 7,8 | 0,515 | 15 | 3,08 |
-| 1 | Chevalier du lion | Garde | 35 | 21 | 0,567 | 37 | 1,65 |
-| 2 | Mage de givre | Givre | 40 | 3,7 | 0,927 | 4 | 2,75 |
-| 3 | Bombardier royal | Canon | 60 | 21,7 | 1,236 | 18 | 2,75 |
-| 4 | Pyromancien | Flammes | 85 | 3,4 | 0,124 | 27 | 2,2 |
-| 5 | Prêtre solaire | Mage | 85 | 40,2 | 1,442 | 28 | 3,52 |
-| 6 | Rôdeur d’élite | Archer | 25 | 8,3 | 0,443 | 19 | 3,45 |
-| 7 | Paladin | Garde | 40 | 27,2 | 0,634 | 43 | 1,65 |
-| 8 | Enchanteur du froid | Givre | 50 | 4,1 | 0,927 | 4 | 2,75 |
-| 9 | Archimage humain | Mage | 130 | 65,1 | 1,442 | 45 | 3,8 |
+| 0 | Tour des archers | Archer | 20 | 7,8 | 0,515 | 15 | 3,08 |
+| 1 | Bastion du chevalier | Garde | 35 | 21 | 0,567 | 37 | 1,65 |
+| 2 | Obélisque de givre | Givre | 40 | 3,7 | 0,927 | 4 | 2,75 |
+| 3 | Bombarde royale | Canon | 60 | 21,7 | 1,236 | 18 | 2,75 |
+| 4 | Brasier du griffon | Flammes | 85 | 3,4 | 0,124 | 27 | 2,2 |
+| 5 | Sanctuaire solaire | Mage | 85 | 40,2 | 1,442 | 28 | 3,52 |
+| 6 | Tour des sentinelles | Archer | 25 | 8,3 | 0,443 | 19 | 3,45 |
+| 7 | Garde du lion | Garde | 40 | 27,2 | 0,634 | 43 | 1,65 |
+| 8 | Cristal hivernal | Givre | 50 | 4,1 | 0,927 | 4 | 2,75 |
+| 9 | Arcaniste royal | Mage | 130 | 65,1 | 1,442 | 45 | 3,8 |
 
-#### Créatures
+#### Horde
 | # | Tour | Type | Coût | Dégâts | Recharge | DPS | Portée |
 |---|---|---|---|---|---|---|---|
-| 0 | Cracheur d’épines | Archer | 20 | 7,7 | 0,52 | 15 | 2,6 |
-| 1 | Griffeur alpha | Garde | 35 | 20,7 | 0,572 | 36 | 1,4 |
-| 2 | Gelée glaciale | Givre | 40 | 3,7 | 0,936 | 4 | 2,33 |
-| 3 | Bombardier chitineux | Canon | 55 | 21,5 | 1,248 | 17 | 2,33 |
-| 4 | Salamandre ardente | Flammes | 85 | 3,4 | 0,125 | 27 | 1,86 |
-| 5 | Oracle tentaculaire | Mage | 85 | 39,7 | 1,456 | 27 | 2,98 |
-| 6 | Rapace venimeux | Archer | 25 | 8,2 | 0,447 | 18 | 2,92 |
-| 7 | Brute carapace | Garde | 40 | 27 | 0,641 | 42 | 1,4 |
-| 8 | Mante de givre | Givre | 45 | 4 | 0,936 | 4 | 2,33 |
-| 9 | Reine des essaims | Mage | 125 | 64,4 | 1,456 | 44 | 3,21 |
+| 0 | Tour des chasseurs | Archer | 20 | 7,7 | 0,52 | 15 | 2,6 |
+| 1 | Totem du berserker | Garde | 35 | 20,7 | 0,572 | 36 | 1,4 |
+| 2 | Totem de glace | Givre | 40 | 3,7 | 0,936 | 4 | 2,33 |
+| 3 | Canon des clans | Canon | 55 | 21,5 | 1,248 | 17 | 2,33 |
+| 4 | Fourneau de guerre | Flammes | 85 | 3,4 | 0,125 | 27 | 1,86 |
+| 5 | Chaman des flammes | Mage | 85 | 39,7 | 1,456 | 27 | 2,98 |
+| 6 | Tour des éclaireurs | Archer | 25 | 8,2 | 0,447 | 18 | 2,92 |
+| 7 | Garde-lame | Garde | 40 | 27 | 0,641 | 42 | 1,4 |
+| 8 | Totem des esprits | Givre | 45 | 4 | 0,936 | 4 | 2,33 |
+| 9 | Grand sorcier orc | Mage | 125 | 64,4 | 1,456 | 44 | 3,21 |
 
-#### Végétaux
+#### Sylvestres
 | # | Tour | Type | Coût | Dégâts | Recharge | DPS | Portée |
 |---|---|---|---|---|---|---|---|
-| 0 | Arbre archer | Archer | 20 | 7,7 | 0,51 | 15 | 2,8 |
-| 1 | Gardien de l’écorce | Garde | 30 | 20,7 | 0,561 | 37 | 1,5 |
-| 2 | Fleur de gel | Givre | 40 | 3,7 | 0,918 | 4 | 2,5 |
-| 3 | Graine explosive | Canon | 55 | 21,5 | 1,224 | 18 | 2,5 |
-| 4 | Ronce brûlante | Flammes | 85 | 3,4 | 0,122 | 28 | 2 |
-| 5 | Druide des mousses | Mage | 85 | 39,7 | 1,428 | 28 | 3,2 |
-| 6 | Saule tireur | Archer | 25 | 8,2 | 0,439 | 19 | 3,14 |
-| 7 | Ent ancestral | Garde | 40 | 27 | 0,628 | 43 | 1,5 |
-| 8 | Lotus hivernal | Givre | 45 | 4 | 0,918 | 4 | 2,5 |
-| 9 | Esprit de la forêt | Mage | 125 | 64,4 | 1,428 | 45 | 3,46 |
+| 0 | Arbre sentinelle | Archer | 20 | 7,7 | 0,51 | 15 | 2,8 |
+| 1 | Gardien des racines | Garde | 30 | 20,7 | 0,561 | 37 | 1,5 |
+| 2 | Pierre de rosée | Givre | 40 | 3,7 | 0,918 | 4 | 2,5 |
+| 3 | Fleur explosive | Canon | 55 | 21,5 | 1,224 | 18 | 2,5 |
+| 4 | Cœur ardent | Flammes | 85 | 3,4 | 0,122 | 28 | 2 |
+| 5 | Cercle druidique | Mage | 85 | 39,7 | 1,428 | 28 | 3,2 |
+| 6 | Nid des faucons | Archer | 25 | 8,2 | 0,439 | 19 | 3,14 |
+| 7 | Dryade protectrice | Garde | 40 | 27 | 0,628 | 43 | 1,5 |
+| 8 | Cristal lunaire | Givre | 45 | 4 | 0,918 | 4 | 2,5 |
+| 9 | Ancien arcanique | Mage | 125 | 64,4 | 1,428 | 45 | 3,46 |
 
-#### Robots
+#### Nains
 | # | Tour | Type | Coût | Dégâts | Recharge | DPS | Portée |
 |---|---|---|---|---|---|---|---|
-| 0 | Drone arbalète | Archer | 20 | 8,6 | 0,54 | 16 | 2,86 |
-| 1 | Mécha sentinelle | Garde | 35 | 23,3 | 0,594 | 39 | 1,53 |
-| 2 | Cryobot | Givre | 40 | 4,1 | 0,972 | 4 | 2,55 |
-| 3 | Canon à impulsion | Canon | 60 | 24,2 | 1,296 | 19 | 2,55 |
-| 4 | Lance-flammes MK2 | Flammes | 90 | 3,8 | 0,13 | 29 | 2,04 |
-| 5 | Technomancien | Mage | 90 | 44,7 | 1,512 | 30 | 3,26 |
-| 6 | Drone sniper | Archer | 25 | 9,3 | 0,464 | 20 | 3,2 |
-| 7 | Titan d’acier | Garde | 40 | 30,3 | 0,665 | 46 | 1,53 |
-| 8 | Noyau cryogénique | Givre | 50 | 4,5 | 0,972 | 5 | 2,55 |
-| 9 | Colosse plasma | Mage | 135 | 72,4 | 1,512 | 48 | 3,53 |
+| 0 | Tourelle de guet | Archer | 20 | 8,6 | 0,54 | 16 | 2,86 |
+| 1 | Automate garde | Garde | 35 | 23,3 | 0,594 | 39 | 1,53 |
+| 2 | Cryo-forge | Givre | 40 | 4,1 | 0,972 | 4 | 2,55 |
+| 3 | Mortier runique | Canon | 60 | 24,2 | 1,296 | 19 | 2,55 |
+| 4 | Forge incandescente | Flammes | 90 | 3,8 | 0,13 | 29 | 2,04 |
+| 5 | Canon arcanique | Mage | 90 | 44,7 | 1,512 | 30 | 3,26 |
+| 6 | Baliste naine | Archer | 25 | 9,3 | 0,464 | 20 | 3,2 |
+| 7 | Sentinelle d'acier | Garde | 40 | 30,3 | 0,665 | 46 | 1,53 |
+| 8 | Générateur runique | Givre | 50 | 4,5 | 0,972 | 5 | 2,55 |
+| 9 | Maître ingénieur | Mage | 135 | 72,4 | 1,512 | 48 | 3,53 |
 
-#### Magiques
+#### Légion des ombres
 | # | Tour | Type | Coût | Dégâts | Recharge | DPS | Portée |
 |---|---|---|---|---|---|---|---|
-| 0 | Spectre archer | Archer | 20 | 8,1 | 0,505 | 16 | 2,77 |
-| 1 | Chevalier astral | Garde | 35 | 21,8 | 0,556 | 39 | 1,48 |
-| 2 | Cristal de stase | Givre | 40 | 3,9 | 0,909 | 4 | 2,48 |
-| 3 | Orbe du chaos | Canon | 55 | 22,6 | 1,212 | 19 | 2,48 |
-| 4 | Phénix arcanique | Flammes | 85 | 3,6 | 0,121 | 30 | 1,98 |
-| 5 | Sorcière des runes | Mage | 85 | 41,8 | 1,414 | 30 | 3,17 |
-| 6 | Œil éthéré | Archer | 25 | 8,7 | 0,434 | 20 | 3,1 |
-| 7 | Golem spectral | Garde | 40 | 28,4 | 0,622 | 46 | 1,48 |
-| 8 | Prisme maudit | Givre | 45 | 4,2 | 0,909 | 5 | 2,48 |
-| 9 | Archimage du néant | Mage | 125 | 67,7 | 1,414 | 48 | 3,42 |
+| 0 | Tour des damnés | Archer | 20 | 8,1 | 0,505 | 16 | 2,77 |
+| 1 | Chevalier funeste | Garde | 35 | 21,8 | 0,556 | 39 | 1,48 |
+| 2 | Obélisque maudit | Givre | 40 | 3,9 | 0,909 | 4 | 2,48 |
+| 3 | Mortier infernal | Canon | 55 | 22,6 | 1,212 | 19 | 2,48 |
+| 4 | Puits de lave | Flammes | 85 | 3,6 | 0,121 | 30 | 1,98 |
+| 5 | Nexus du néant | Mage | 85 | 41,8 | 1,414 | 30 | 3,17 |
+| 6 | Œil démoniaque | Archer | 25 | 8,7 | 0,434 | 20 | 3,1 |
+| 7 | Gardien spectral | Garde | 40 | 28,4 | 0,622 | 46 | 1,48 |
+| 8 | Cristal corrupteur | Givre | 45 | 4,2 | 0,909 | 5 | 2,48 |
+| 9 | Archimage noir | Mage | 125 | 67,7 | 1,414 | 48 | 3,42 |
 
 ---
 
@@ -325,7 +325,7 @@ Vitesse en cases par seconde.
 | Azh'Khar, seigneur des lames | Spécial (héros) | 900 | +59 | 1900 | 1,02 | 6:00 | **Boss** : armure 4 et étourdissement |
 
 ### 6.3 Détails des capacités
-- **Armure** : chaque coup perd un montant fixe de dégâts (`armure × multiplicateur de temps`), mais garde toujours au moins **20 %** des dégâts. Les Robots réduisent cette armure de 55 %.
+- **Armure** : chaque coup perd un montant fixe de dégâts (`armure × multiplicateur de temps`), mais garde toujours au moins **20 %** des dégâts. Les Nains réduisent cette armure de 55 %.
 - **Étourdissement** : toutes les **3,5 s** (premier essai 2 s après l'apparition), le monstre étourdit pendant **2 s** la tour la plus proche dans un rayon de **2,3 cases**. Une tour déjà étourdie ne peut pas être ciblée.
 - **Invisibilité** : un Spectre caché ne peut être ni ciblé, ni touché par les explosions ou les flammes.
 - **Hâte et soin** : un monstre n'en profite pas pour lui-même. Les zones d'effet sont affichées en cercles colorés (jaune pour la hâte, vert pour le soin).
@@ -520,7 +520,7 @@ Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en
 - `simulation/` : les tests du moteur (`sim.js`). Ils vérifient que le jeu fonctionne (mécaniques, formules, parties qui se terminent). **Il n'y a pas de moteur figé ni de parties enregistrées** (supprimés en 2.5) : un changement d'équilibrage ou d'IA ne fait échouer que les tests qui décrivent précisément la mécanique modifiée, et on met ces tests à jour dans le même commit.
   - `tables` : forme des tables (50 tours, 18 monstres…), statistiques valides, et chaque tour recalculée à partir des formules. Les chiffres eux-mêmes peuvent changer librement.
   - `construction`, `chantier` (temps de construction, depuis la 2.4), `deplacements`, `combats`, `economie`, `vagues` (avec l'IA), `fin-de-partie` : les mécaniques. Les tests qui ont besoin d'une tour active appellent `pret(b)`, qui fait avancer le terrain jusqu'à la fin des chantiers.
-  - `parties-ia` : **une partie complète par difficulté** (Humains en Normal, Créatures en Difficile, Végétaux en Brutal ; les 15 avec `--complet`) qui doit se terminer en moins de 30 min de jeu, sans valeur invalide, avec des tours construites et des attaques ; plus les 2 premières minutes d'une partie rejouées deux fois avec la même graine, qui doivent être identiques.
+  - `parties-ia` : **une partie complète par difficulté** (Alliance en Normal, Horde en Difficile, Sylvestres en Brutal ; les 15 avec `--complet`) qui doit se terminer en moins de 30 min de jeu, sans valeur invalide, avec des tours construites et des attaques ; plus les 2 premières minutes d'une partie rejouées deux fois avec la même graine, qui doivent être identiques.
 - `simulation/modeles-3d.test.js` (2.7) : un modèle 3D pour chaque tour (`tours/<faction>-<j>`) et chaque clé de monstre (`monstres/<g>`), portail et château présents, monstres animés (`marche` ou `vol`), pièce `Tourelle` sur les tours qui visent, compression meshopt.
 - `navigateur/parcours-3d.test.js` (2.7) : le même parcours avec `?rendu=3d` (portrait et paysage) : chargement de WebGL et des modèles, plateau dessiné, construction en deux touchers avec tour fantôme et portée, refus, panneau et amélioration, monstres en 3D chez l'adversaire, zoom et déplacement à deux doigts, pose exacte en mode zoomé, aucune erreur JavaScript. WebGL y tourne en **rendu logiciel SwiftShader** (`lancer({webgl:true})`), sans carte graphique.
 - Variable `WR_CANAL` : utiliser un navigateur déjà installé à la place du Chromium de Playwright (par exemple `WR_CANAL=msedge` sur Windows). `NODE_PATH` peut pointer vers un Playwright installé hors du dépôt.
@@ -547,7 +547,7 @@ Chaque évolution est présentée avec trois bilans **séparés** (`node tests/b
 
 ### 12.6 Conditions de la comparaison visuelle (contre les fausses différences)
 - **Même machine, même navigateur, même séance** : l'« avant » (extrait de git) et l'« après » sont capturés l'un après l'autre par le même Chromium. On ne compare **jamais** des images faites sur deux machines différentes, ni des images enregistrées dans le dépôt.
-- **Même scénario** : graine 12345, Humains, Normal, 4 tours posées en (5,6), (7,6), (5,10) et (7,10), capture à 35 s de jeu, puis panneau de la tour (5,6), puis zoom à deux doigts autour de la case (6,7).
+- **Même scénario** : graine 12345, Alliance, Normal, 4 tours posées en (5,6), (7,6), (5,10) et (7,10), capture à 35 s de jeu, puis panneau de la tour (5,6), puis zoom à deux doigts autour de la case (6,7).
 - **Horloge figée** : le temps du navigateur est en pause et n'avance que sur commande. Sans cela, les animations (pointillés du chemin, barre de revenu) diffèrent d'une capture à l'autre. Au chargement, l'horloge est en plus **alignée sur exactement 200 ms** : l'horloge simulée de Playwright démarre avec 1 ou 2 ms de décalage selon les passages, ce qui suffisait à décaler les animations.
 - **Écran fixé** : 390 × 844 et 844 × 390, densité ×2, mode mobile tactile, langue `fr-FR`, fuseau `Europe/Paris`.
 - **Rendu reproductible** : Chromium est lancé en rendu logiciel (`--disable-gpu`), sans lissage sous-pixel du texte (`--disable-lcd-text`, `--font-render-hinting=none`), avec un profil de couleur fixe (`--force-color-profile=srgb`) et sans optimisations variables. Sans ces options, le texte en gras pouvait être dessiné légèrement différemment d'une capture à l'autre (jusqu'à 0,4 % de faux écarts).
@@ -649,8 +649,6 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 - **Pièces nommées** utilisées par le jeu : `Tourelle` (pivote vers la cible), `Cristal`, `Eclats`, `Flamme`, `Anneaux`, `Orbe`, `AnneauFlottant`, portail `Anneau1..3` (animées en code), `Drapeau` (couleur du joueur) ; animations glTF `marche` (au sol) et `vol` (volants).
 - **Concevoir dans Blender ouvert (MCP)** : `exec(open(r'<dépôt>\art\outils\atelier.py', encoding='utf-8').read())` recharge les pièces communes ; `atelier_asset('tours/alliance-0')` construit un asset dans la scène ; `art/outils/planches.py` fait les planches de validation (une par faction, trois pour les monstres).
 
-- **Factions renommées (2.10) et modèles 3D** : les modèles 3D n'ont pas encore été refaits pour les nouvelles identités. Chaque faction garde, par son numéro, les modèles et les noms de fichiers de l'ancienne : Humains → `alliance`, Créatures → `horde`, Végétaux → `sylvestres`, Robots → `nains`, Magiques → `ombres`. En 3D, les Créatures ont donc encore les tours de la Horde, les Robots celles des Nains, etc. Les nouveaux modèles restent à concevoir.
-
 - **Neige sur les modèles** (thème « Winter Realms », depuis la 2.9) : `communs/neige.py`, `enneiger(racine)`, appelé à la fin de chaque tour (`tour()`), du portail et du château. Une couche blanc bleuté (`#eef4fb`) recouvre les faces tournées vers le ciel : les surfaces planes (créneaux, socles, plates-formes, chapiteaux) presque entièrement, les **pentes** (toits, dômes) seulement sur leur partie haute (55 % depuis le sommet), pour que l'avant-toit garde la couleur de la faction. Pas de neige sur les personnages, les pièces animées ni les pièces lumineuses. Le nombre de triangles ajoutés est plafonné pour rester sous le budget (2 990 pour une tour) : les plus grandes faces passent en premier. Les monstres n'ont pas de neige.
 
 ### 15.2 Rendu 3D dans le jeu (`rendu3d.js`, depuis la 2.7)
@@ -698,4 +696,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-14 | 2.8 | **La 3D devient le rendu par défaut** : l'adresse normale du jeu ouvre la vue 3D ; `?rendu=2d` (ou le lien « Jouer en vue 2D (classique) » de l'accueil) garde la 2D, qui reste inchangée. Tests 2D et captures ouverts avec `?rendu=2d` ; nouveau test de l'adresse par défaut. **Règles du jeu inchangées** (`sim.js` non modifié). |
 | 2026-11-14 | 2.9 | **Thème hiver plus présent** (§15.1, §15.2), en 3D : plateau enneigé (damier de neige teinté par la faction, roche givrée), décor d'hiver (sapins enneigés, rochers coiffés de neige, congères, cristaux de glace), flocons qui tombent, lumière d'hiver froide ; chemin et portée en bleu nuit. **Neige sur les tours**, le portail et le château (`art/communs/neige.py`) : calottes de neige sur les créneaux, socles et plates-formes, haut des toits et des dômes enneigé, couleurs de faction gardées. Les 70 assets ont été régénérés. La 2D est inchangée. **Règles du jeu inchangées** (`sim.js` non modifié). |
 | 2026-11-14 | 2.9 | Correctif outillage : **compression des modèles dans le cloud**. Le Blender du cloud et de GitHub (`bpy`) exportait sans compression meshopt, sans le signaler : l'action « Assets 3D » mesurait des fichiers 2 à 3 fois trop lourds et refusait à tort trois tours du thème hiver, et une régénération en ligne aurait produit des fichiers refusés par `modeles-3d`. `generer.py` compresse désormais avec gltf-transform quand Blender ne l'a pas fait. Rendu identique vérifié en 3D. **Aucun changement de jeu.** |
-| 2026-11-14 | 2.10 | **Cinq nouvelles identités de factions** (PR de Thibaut, conflits résolus) : Humains 🏹, Créatures 🦎, Végétaux 🌳, Robots 🤖 et Magiques 🔮 remplacent Alliance, Horde, Sylvestres, Nains et Légion des ombres, en gardant **chacune les règles et les bonus de l'ancienne faction de même rang** (anti-aérien, frénésie, racines, perforant, malédiction). 50 nouveaux noms de tours, nouvelles descriptions, icônes et couleurs (Créatures violettes, Robots bleu acier, Magiques violet clair). En 2D, silhouettes propres à chaque faction (archers humains, visière et antenne des robots, yeux et mandibules des créatures, ramures des végétaux). Modèles 3D inchangés (§15). `sim.js` modifié (noms et couleurs seulement : redéploiement automatique du serveur). Tests renommés en conséquence. |
+| 2026-11-14 | 2.9 | **Retour à la version 2.9** à la demande du concepteur : la 2.10 (cinq nouvelles identités de factions, PR 22, reprise de la PR 19) est annulée et **mise en pause**. Les factions redeviennent Alliance, Horde, Sylvestres, Nains et Légion des ombres. Le travail de la 2.10 reste dans l'historique (commit `ef01c65`, étiquette `v2.10`) et pourra être repris après décision du concepteur. `sim.js` modifié (redéploiement automatique du serveur). |

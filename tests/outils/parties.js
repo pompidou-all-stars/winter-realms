@@ -6,7 +6,7 @@ const crypto=require('crypto');
 const {charger}=require('./moteur');
 
 /* les 15 parties entre IA : 5 factions × 3 difficultés, une graine fixe chacune ;
-   par défaut, les tests n'en jouent qu'une par difficulté (COURTS : Humains en Normal, Créatures en Difficile, Végétaux en Brutal) */
+   par défaut, les tests n'en jouent qu'une par difficulté (COURTS : Alliance en Normal, Horde en Difficile, Sylvestres en Brutal) */
 const SCENARIOS=[];for(let d=0;d<3;d++)for(let f=0;f<5;f++)SCENARIOS.push({nom:`faction ${f}, difficulté ${d}`,faction:f,difficulte:d,graine:1000+d*10+f});
 const COURTS=SCENARIOS.filter(s=>s.faction==s.difficulte);
 const DT=.05,DUREE_MAX=1800,POINTS_CONTROLE=30;

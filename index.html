@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.10</title>
+<title>Winter Realms — Tower Wars · Édition 2.9</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -106,9 +106,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 #factions button.selected{border-color:#ffe08a;background:linear-gradient(145deg,#526c45,#293e31);box-shadow:0 0 0 3px #f2c14e55,0 8px 20px #0008;filter:brightness(1.16)}
 #factions button.selected:after{content:'✓ SÉLECTIONNÉ';color:#ffe08a;opacity:1}
 #factions button[data-faction='0']{--sigil:#7fc4ee}
-#factions button[data-faction='1']{--sigil:#b66add}
-#factions button[data-faction='2']{--sigil:#69bd83}
-#factions button[data-faction='3']{--sigil:#69bde1}
+#factions button[data-faction='1']{--sigil:#f07850}
+#factions button[data-faction='2']{--sigil:#8fd47d}
+#factions button[data-faction='3']{--sigil:#e2ad68}
 #factions button[data-faction='4']{--sigil:#c19aff}
 #factions .ficon{border:2px solid var(--sigil);box-shadow:inset 0 0 12px color-mix(in srgb,var(--sigil) 40%,transparent),0 0 12px color-mix(in srgb,var(--sigil) 20%,transparent)}
 #lv button:disabled{opacity:.35;cursor:not-allowed}
@@ -150,11 +150,11 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
  <p id="sub">Choisis ta faction, bâtis ton réseau de défense et envoie des vagues contre trois adversaires. Un univers fantasy original en relief 2.5D : arènes en diorama, reliefs sculptés, décors vivants, éclairages doux, créatures expressives et machines de guerre propres à chaque faction. Chaque faction possède 10 tours à silhouette propre.</p>
  <p id="hint">Carte agrandie : 13 × 17 cases. En Difficile et en Brutal, les IA touchent 25 % et 50 % de revenu en plus.</p>
  <div id="classPick"><h2>Choisis ta faction</h2><div id="factions">
- <button type="button" data-faction="0" aria-pressed="false" onclick="window.chooseFaction(0)"><span class="ficon">🏹</span><span><strong>Humains</strong><small>Archers, chevaliers et mages ; défense anti-aérienne.</small></span></button>
- <button type="button" data-faction="1" aria-pressed="false" onclick="window.chooseFaction(1)"><span class="ficon">🦎</span><span><strong>Créatures</strong><small>Mutants et prédateurs ; exécution des blessés.</small></span></button>
- <button type="button" data-faction="2" aria-pressed="false" onclick="window.chooseFaction(2)"><span class="ficon">🌳</span><span><strong>Végétaux</strong><small>Arbres, fleurs et dryades ; racines.</small></span></button>
- <button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">🤖</span><span><strong>Robots</strong><small>Drones, automates et canons ; tirs perforants.</small></span></button>
- <button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">🔮</span><span><strong>Magiques</strong><small>Spectres, sorciers et cristaux ; malédictions.</small></span></button>
+ <button type="button" data-faction="0" aria-pressed="false" onclick="window.chooseFaction(0)"><span class="ficon">🛡️</span><span><strong>Alliance</strong><small>Défense équilibrée · portée et anti-aérien</small></span></button>
+ <button type="button" data-faction="1" aria-pressed="false" onclick="window.chooseFaction(1)"><span class="ficon">🪓</span><span><strong>Horde</strong><small>Agressivité · exécution des ennemis affaiblis</small></span></button>
+ <button type="button" data-faction="2" aria-pressed="false" onclick="window.chooseFaction(2)"><span class="ficon">🌿</span><span><strong>Peuples sylvestres</strong><small>Contrôle · racines et ralentissements</small></span></button>
+ <button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">⚒️</span><span><strong>Clans nains</strong><small>Artillerie · perforation des armures</small></span></button>
+ <button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">☠️</span><span><strong>Légion des ombres</strong><small>Malédictions · amplification des dégâts</small></span></button>
  </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><p id="difficultyLabel" hidden>Choisis la difficulté</p><div id="lv"><button id="go0" disabled>Normal</button><button id="go1" disabled>Difficile</button><button id="go2" disabled>Brutal</button></div><p id="vue3d"><a id="mode3d" href="?rendu=2d">Jouer en vue 2D (classique)</a></p>
  <div id="online"><h2>Jouer entre amis</h2><input id="pname" maxlength="16" placeholder="Ton pseudo" autocomplete="nickname">
   <div class="orow"><button id="mkRoom" type="button">Créer un salon</button><input id="rcode" maxlength="4" placeholder="CODE" autocapitalize="characters"><button id="joinRoom" type="button">Rejoindre</button></div></div>
@@ -313,26 +313,26 @@ function merlons(g,x,ty,rx,ry,s,col){for(const px of[-.66,0,.66]){g.beginPath();
 function drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun){
  const T=TW[k],f=T.faction,j=k%10,pal=[
   ['#e9e2cf','#9da9b6','#647487','#d9b45e','#355b83'],
-  ['#c58bdb','#78469a','#402a57','#e59cff','#8fe4bd'],
+  ['#bd7042','#6b3e2b','#33251f','#d34d36','#e5b24e'],
   ['#8dcf8b','#397c57','#244b3c','#d8e99b','#8c70bd'],
-  ['#a9d8e8','#4786a5','#263c56','#4de0ff','#f2b957'],
+  ['#c6b5a0','#766b60','#3d4148','#e0a34d','#5f91a8'],
   ['#b8a0d9','#5c477d','#282039','#a879c9','#7ff3ff']
  ][f],[stone,mid,dark,glow,accent]=pal;
  const bob=f===4?Math.sin(t*2.6)*s*.035:0,baseY=y+s*.25;
  g.save();g.translate(x,y+bob);g.lineJoin='round';g.lineCap='round';g.lineWidth=Math.max(1,s*.035);g.strokeStyle=OUT;
  /* Ombre portée et socle : la forme du socle suffit déjà à identifier la faction. */
  g.fillStyle='rgba(0,0,0,.34)';g.beginPath();g.ellipse(s*.04,s*.31,s*.43,s*.16,0,0,7);g.fill();
- if(f===0){ // Humains : pierre taillée, créneaux et or
+ if(f===0){ // Alliance : pierre taillée, créneaux et or
   g.beginPath();g.ellipse(0,s*.25,s*.4,s*.15,0,0,7);fs(g,mid);g.beginPath();g.ellipse(0,s*.21,s*.36,s*.13,0,0,7);fs(g,stone);
   for(let q=0;q<4;q++){let an=q*Math.PI/2;g.save();g.translate(Math.cos(an)*s*.29,s*.23+Math.sin(an)*s*.09);g.rotate(an);g.fillStyle=glow;g.fillRect(-s*.055,-s*.06,s*.11,s*.12);g.strokeRect(-s*.055,-s*.06,s*.11,s*.12);g.restore()}
- }else if(f===1){ // Créatures : nid organique et crocs
+ }else if(f===1){ // Horde : plateforme de rondins, clous et défenses
   g.beginPath();g.ellipse(0,s*.25,s*.41,s*.15,0,0,7);fs(g,dark);for(let q=-1;q<=1;q++){g.beginPath();g.moveTo(q*s*.25,s*.18);g.lineTo(q*s*.25,s*.34);g.strokeStyle=stone;g.lineWidth=s*.045;g.stroke()}
   for(let q of[-1,1])pg(g,stone,q*s*.25,s*.2,q*s*.43,s*.03,q*s*.34,s*.31);
- }else if(f===2){ // Végétaux : racines nouées et feuillage
+ }else if(f===2){ // Sylvestres : racines nouées et feuillage
   g.beginPath();g.ellipse(0,s*.25,s*.4,s*.14,0,0,7);fs(g,dark);
   for(let q=-2;q<=2;q++){g.beginPath();g.moveTo(q*s*.12,s*.32);g.quadraticCurveTo(q*s*.2,s*.12,q*s*(.2+q*.04),-s*.02);g.strokeStyle=mid;g.lineWidth=s*.07;g.stroke()}
   for(let q=-1;q<=1;q++)el(g,q*s*.25,s*.13,s*.09,s*.05,glow);
- }else if(f===3){ // Robots : base hexagonale rivetée
+ }else if(f===3){ // Nains : base hexagonale rivetée
   g.beginPath();for(let q=0;q<6;q++){let an=Math.PI/3*q-Math.PI/6,xx=Math.cos(an)*s*.4,yy=s*.24+Math.sin(an)*s*.15;q?g.lineTo(xx,yy):g.moveTo(xx,yy)}g.closePath();fs(g,dark);g.beginPath();g.ellipse(0,s*.22,s*.31,s*.105,0,0,7);fs(g,mid);
   for(let q=0;q<8;q++){let an=q*Math.PI/4;el(g,Math.cos(an)*s*.34,s*.24+Math.sin(an)*s*.11,s*.025,s*.025,glow)}
  }else{ // Ombres : anneaux flottants et énergie spectrale
@@ -367,28 +367,7 @@ function drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun){
   el(g,0,top+s*.02,s*.13,s*.13,f===4?'#e5d8ff':'#e5c9a0');el(g,s*.22,top-s*.17,s*.085,s*.085,accent);g.strokeStyle=glow;g.lineWidth=s*.035;g.beginPath();g.moveTo(s*.1,top+s*.02);g.lineTo(s*.22,top-s*.17);g.stroke();
   if(j===9){pg(g,glow,-s*.18,top-s*.05,-s*.3,top-s*.28,0,top-s*.18,s*.3,top-s*.28,s*.18,top-s*.05)}
  }
- /* Identité de faction : chaque unité reste lisible même à faible zoom. */
- if(f===0&&(j===0||j===6)){ // Archer humain : tête, capuche et arc tendu
-   el(g,0,top-s*.12,s*.105,s*.12,'#f4c69c');
-   pg(g,'#365b83',-s*.13,top-s*.13,0,top-s*.29,s*.13,top-s*.13);
-   g.strokeStyle='#f1d9a5';g.lineWidth=s*.04;g.beginPath();g.arc(s*.18,top-s*.03,s*.16,-1.3,1.3);g.stroke();
-   g.beginPath();g.moveTo(s*.22,top-s*.18);g.lineTo(s*.22,top+s*.12);g.stroke();
- }
- if(f===3){ // Robot : visière, antenne et diodes
-   g.fillStyle='#243b51';g.fillRect(-s*.16,top-s*.19,s*.32,s*.16);
-   el(g,-s*.075,top-s*.11,s*.035,s*.035,'#55f7ff');el(g,s*.075,top-s*.11,s*.035,s*.035,'#55f7ff');
-   g.strokeStyle='#c2e5ec';g.lineWidth=s*.035;g.beginPath();g.moveTo(0,top-s*.2);g.lineTo(0,top-s*.34);g.stroke();el(g,0,top-s*.36,s*.035,s*.035,'#ffba50');
- }
- if(f===1){ // Créature : yeux expressifs, mandibules et épines
-   el(g,0,top-s*.12,s*.2,s*.14,'#70438e');
-   for(const q of[-1,1]){pg(g,'#e1a4ff',q*s*.13,top-s*.17,q*s*.26,top-s*.36,q*s*.03,top-s*.24);el(g,q*s*.085,top-s*.14,s*.045,s*.055,'#fff6a9')}
-   pg(g,'#f5d7ff',-s*.12,top-s*.01,0,top+s*.08,s*.12,top-s*.01);
- }
- if(f===2){ // Végétal : ramures et feuilles
-   g.strokeStyle='#4b8352';g.lineWidth=s*.065;g.beginPath();g.moveTo(0,top+s*.08);g.lineTo(0,top-s*.29);g.stroke();
-   for(const q of[-1,1]){el(g,q*s*.16,top-s*.23,s*.14,s*.085,'#85d47a');el(g,q*s*.22,top-s*.1,s*.09,s*.055,'#b7ed8e')}
- }
- /* Marques de faction : bannière, crocs, feuilles, engrenages ou halo. */
+ /* Marques de faction : bannière, défenses, feuilles, engrenages ou halo. */
  if(f===0){g.strokeStyle=glow;g.lineWidth=s*.035;g.beginPath();g.moveTo(0,top+s*.1);g.lineTo(0,top-s*.36);g.stroke();pg(g,glow,0,top-s*.34,s*.2,top-s*.27,0,top-s*.19)}
  if(f===1){for(let q of[-1,1])pg(g,stone,q*s*.22,s*.08,q*s*.34,-s*.08,q*s*.3,s*.17)}
  if(f===2){for(let q=0;q<3;q++){let an=t*1.5+q*2.1;el(g,Math.cos(an)*s*.28,top+s*.12+Math.sin(an)*s*.08,s*.045,s*.07,glow)}}
