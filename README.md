@@ -44,6 +44,12 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.10 — 2026-11-14
+- Five new faction identities (from Thibaut's pull request): Humans 🏹, Creatures 🦎, Plants 🌳, Robots 🤖 and Magic 🔮 replace Alliance, Horde, Sylvestres, Dwarves and Shadow Legion. Each keeps the rules and bonus of the faction in the same position (anti-air, frenzy, roots, armour-piercing, curse).
+- 50 new tower names, new descriptions, icons and colours; faction-specific 2D silhouettes (human archers, robot visors and antennas, creature eyes and mandibles, plant branches).
+- The 3D models are not yet redone: each new faction still uses the models of the old one in the same position.
+- `sim.js` changed (names and colours only): the server is redeployed automatically.
+
 ### 2.9 — 2026-11-14
 - Stronger "Winter Realms" theme in the 3D view: snowy board (snow checkerboard lightly tinted by the faction, frosted rock edges), winter scenery (snowy pines, snow-capped rocks, snowdrifts, ice crystals), falling snowflakes and cold winter lighting. The path and range rings turn night blue to stay readable on snow.
 - Snow on every tower, the spawn portal and the castle: snow caps on battlements, bases and platforms, snowy roof tops while the faction colours stay visible below. All 3D assets were regenerated.

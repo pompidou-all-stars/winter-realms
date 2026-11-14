@@ -16,13 +16,13 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
   assert.match(await p.title(),/Winter Realms/);assert.equal(await val(()=>document.getElementById('ov').hidden),false);
   assert.deepEqual(o.erreurs,[]);
  });
- test('À l\'ouverture, l\'Alliance est présélectionnée et les boutons de difficulté sont actifs',async()=>{
+ test('À l\'ouverture, les Humains sont présélectionnés et les boutons de difficulté sont actifs',async()=>{
   assert.equal(await p.getAttribute('[data-faction="0"]','aria-pressed'),'true');
   for(const l of [0,1,2])assert.equal(await p.isDisabled('#go'+l),false);
  });
  test('Choisir une faction la sélectionne',async()=>{
   await N.toucher(p,'[data-faction="2"]');assert.equal(await p.getAttribute('[data-faction="2"]','aria-pressed'),'true');
-  assert.equal(await p.getAttribute('[data-faction="0"]','aria-pressed'),'false');assert.match(await p.textContent('#factionStatus'),/Sylvestres/);
+  assert.equal(await p.getAttribute('[data-faction="0"]','aria-pressed'),'false');assert.match(await p.textContent('#factionStatus'),/Végétaux/);
  });
  test('Lancer une partie en Normal : l\'accueil disparaît et l\'horloge tourne',async()=>{
   await N.toucher(p,'#go0');assert.equal(await val(()=>document.getElementById('ov').hidden),true);
@@ -61,10 +61,10 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
   assert.equal(await val(()=>document.getElementById('chips').hidden),true,'le panneau se referme');await N.toucher(p,'#banner');assert.equal((await N.etat(p)).vue,0);assert.equal(await val(()=>document.getElementById('banner').hidden),true);
  });
  test('Fiche de construction (2.1) : la tour sélectionnée est décrite en clair',async()=>{
-  let e=await N.etat(p);assert.match(e.fiche,/Arbre sentinelle/);assert.match(e.fiche,/Dégâts\/s/);assert.match(e.fiche,/Portée/);assert.match(e.fiche,/sol et air/);assert.match(e.fiche,/Racines/);
-  await N.toucher(p,'#bar button:has-text("Gardien des racines")');e=await N.etat(p);assert.match(e.fiche,/Gardien des racines/);assert.match(e.fiche,/sol uniquement/);assert.match(e.fiche,/corps à corps/);
-  await N.toucher(p,'#bar button:has-text("Arbre sentinelle")');
-  assert.ok((await p.textContent('#bar button:has-text("Arbre sentinelle") em')).includes('/s'),'la carte affiche les dégâts par seconde');
+  let e=await N.etat(p);assert.match(e.fiche,/Arbre archer/);assert.match(e.fiche,/Dégâts\/s/);assert.match(e.fiche,/Portée/);assert.match(e.fiche,/sol et air/);assert.match(e.fiche,/Racines/);
+  await N.toucher(p,'#bar button:has-text("Gardien de l’écorce")');e=await N.etat(p);assert.match(e.fiche,/Gardien de l’écorce/);assert.match(e.fiche,/sol uniquement/);assert.match(e.fiche,/corps à corps/);
+  await N.toucher(p,'#bar button:has-text("Arbre archer")');
+  assert.ok((await p.textContent('#bar button:has-text("Arbre archer") em')).includes('/s'),'la carte affiche les dégâts par seconde');
  });
  test('Fiche d\'une tour posée (2.1) : niveau et gain du niveau suivant',async()=>{
   await N.construire(p,3,5);await N.avancer(p,1500);await N.toucherCase(p,3,5);const e=await N.etat(p);assert.equal(e.panneauOuvert,true);assert.match(e.fiche,/niveau 1\/5/);assert.match(e.fiche,/Niveau 2 :/);
