@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.5.1</title>
+<title>Winter Realms — Tower Wars · Édition 2.5.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#16221a;--panel:#27382b;--panel2:#33483a;--ink:#f6ecd0;--dim:#b9c4ab;--gold:#f2c14e;--red:#e4572e;color-scheme:dark}
@@ -286,12 +286,23 @@ const DRAW={
   g.beginPath();g.ellipse(-u*.14,-u*.14,u*.06,u*.1,-.5,0,7);g.fillStyle='rgba(255,255,255,.6)';g.fill();eyes(g,u,.0,.11,.08);
   g.beginPath();g.moveTo(-u*.12,u*.18);g.quadraticCurveTo(0,u*.3,u*.12,u*.18);g.stroke();g.restore()}};
 for(const k in HUM)DRAW[k]=(g,u,t)=>hum(g,u,t,HUM[k]);
+/* Grandes vagues (2.5.2, performances) : au-delà de CREEP_LOD monstres sur le terrain affiché, le corps des monstres est copié depuis une petite image
+   précalculée (SPR_F images par cycle d'animation) au lieu d'être redessiné trait par trait. En dessous de ce seuil, le dessin ne change pas.
+   SPR_W : fréquence de l'animation de chaque silhouette (Dragon et héros, à deux animations, restent toujours dessinés en direct). */
+const CREEP_LOD=150,SPR_F=12,SPR_W={wolf:14,bat:13,griffon:13,spectre:6,turtle:8,slime:9},SPR=new Map();let creepLOD=false,sprQ=0;
+function sprite(T,u,t){const w=SPR_W[T.g]||(HUM[T.g]?10:0);if(!w)return null;const k=dpr(),q=Math.round(Math.log(u*k/T.z)*16);
+ if(q!==sprQ){SPR.clear();sprQ=q}
+ const P=2*Math.PI/w,fr=Math.floor((t/P%1+1)%1*SPR_F)%SPR_F,key=T.g+fr;let o=SPR.get(key);
+ if(!o){const U=Math.exp(q/16)*T.z,c=document.createElement('canvas'),W=Math.ceil(U*1.9),H=Math.ceil(U*1.7),cx=c.getContext('2d');c.width=W;c.height=H;
+  o={c,W,H,ox:W/2,oy:Math.round(U*1.1),U};cx.translate(o.ox,o.oy);cx.lineWidth=Math.max(k,U*.05);cx.strokeStyle=OUT;cx.lineJoin='round';DRAW[T.g](cx,U,(fr+.5)/SPR_F*P);SPR.set(key,o)}
+ return o}
 function drawCreep(g,k,x,y,s,t,f,slow,hp,glow,alpha){const T=CR[k],u=s*T.z,lift=T.fly?u*.35:0;g.save();
  if(T.hero){g.globalAlpha=.28+.12*Math.sin(t*4);g.fillStyle='#a77cff';g.beginPath();g.ellipse(x,y+u*.34,u*.62,u*.25,0,0,7);g.fill();g.globalAlpha=alpha||1}g.globalAlpha=alpha||1;
  if(glow){g.fillStyle=glow;g.beginPath();g.ellipse(x,y+u*.38,u*.4,u*.15,0,0,7);g.fill()}
  g.fillStyle='rgba(0,0,0,.34)';g.beginPath();g.ellipse(x+s*.035,y+u*.42,u*(T.fly?.23:.31),u*.105,0,0,7);g.fill();
  g.save();g.translate(x,y-lift+(T.fly||T.inv?Math.sin(t*5)*u*.05:-Math.abs(Math.sin(t*10))*u*.04));g.scale(f,1);
- g.lineWidth=Math.max(1,u*.05);g.strokeStyle=OUT;g.lineJoin='round';DRAW[T.g](g,u,t);
+ const sp=creepLOD&&sprite(T,u,t);if(sp){const r=u/sp.U;g.drawImage(sp.c,-sp.ox*r,-sp.oy*r,sp.W*r,sp.H*r)}
+ else{g.lineWidth=Math.max(1,u*.05);g.strokeStyle=OUT;g.lineJoin='round';DRAW[T.g](g,u,t)}
  if(slow){g.globalAlpha*=.4;g.beginPath();g.arc(0,0,u*.36,0,7);g.fillStyle='#8fdcff';g.fill()}
  g.restore();g.restore();
  if(hp<1){const w=s*.6,by=y-lift-u*.72;g.fillStyle='rgba(0,0,0,.6)';g.fillRect(x-w/2,by,w,s*.09);g.fillStyle=slow?'#5dc8ff':hp>.4?'#7cdc6a':'#ff6b4a';g.fillRect(x-w/2,by,w*Math.max(0,hp),s*.09)}}
@@ -459,13 +470,15 @@ function draw(b,g,s,t){
  if(projet&&b===P){const T=TW[projet.k],cx=(projet.x+.5)*s,cy=(projet.y+.5)*s,ok=!peutConstruire(projet.x,projet.y,projet.k);
   g.beginPath();g.arc(cx,cy,T.r*s,0,7);g.fillStyle=ok?'rgba(255,255,255,.1)':'rgba(255,77,61,.12)';g.fill();g.strokeStyle='rgba(255,255,255,.7)';g.lineWidth=1.5;g.setLineDash([6,5]);g.stroke();g.setLineDash([]);
   g.strokeStyle=ok?'#ffd95e':'#ff6b5a';g.lineWidth=2+Math.sin(t*6);g.strokeRect(projet.x*s+2,projet.y*s+2,s-4,s-4)}
- const ents=[],fl=[],cre=c=>drawCreep(g,c.k,(c.x+.5+c.ox)*s,(c.y+.5+c.oy)*s,s,t+c.ph,CR[c.k].fly?1:c.f,c.sl>0,c.hp/c.max,c.h?'rgba(255,228,94,.5)':c.hl?'rgba(111,207,151,.55)':0,CR[c.k].inv?(c.hid?.35:.85):1);
+ /* monstres hors de la partie visible (carte zoomée) : non dessinés ; marge d'une case et demie pour la barre de vie et le halo */
+ const vx0=-VUE.ox/s-1.5,vx1=(VUE.w-VUE.ox)/s+1.5,vy0=-VUE.oy/s-1.5,vy1=(VUE.h-VUE.oy)/s+1.5,vis=c=>c.x>=vx0&&c.x<=vx1&&c.y>=vy0&&c.y<=vy1;creepLOD=b.cr.length>CREEP_LOD;
+ const ents=[],fl=[],cre=c=>vis(c)&&drawCreep(g,c.k,(c.x+.5+c.ox)*s,(c.y+.5+c.oy)*s,s,t+c.ph,CR[c.k].fly?1:c.f,c.sl>0,c.hp/c.max,c.h?'rgba(255,228,94,.5)':c.hl?'rgba(111,207,151,.55)':0,CR[c.k].inv?(c.hid?.35:.85):1);
  for(const w of b.t)ents.push([w.y+.32,w]);for(const c of b.cr)CR[c.k].fly?fl.push(c):ents.push([c.y+c.oy+.1,c]);ents.sort((a,c)=>a[0]-c[0]);
  for(const[,o]of ents){if(o.lv){g.save();g.shadowColor='rgba(0,0,0,.55)';g.shadowBlur=s*.2;g.shadowOffsetX=s*.07;g.shadowOffsetY=s*.15;if(o.b>0)g.globalAlpha=.5;drawTower(g,o.k,(o.x+.5)*s,(o.y+.5)*s,s,o.a,t,o.lv,o.sw,o.stun>0);g.restore();if(o.b>0)chantier(g,o,s,t)}else cre(o)}
  if(projet&&b===P){g.save();g.globalAlpha=.55+.15*Math.sin(t*6);drawTower(g,projet.k,(projet.x+.5)*s,(projet.y+.5)*s,s,.7,t,1,0,0);g.restore()}
  for(const p of b.pr)drawProj(g,p,s);
  for(const c of fl)cre(c);
- for(const f of b.fx)drawFx(g,f,s);
+ for(const f of b.fx)drawFx(g,f,s);creepLOD=false;
  if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,C*s,R*s);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',C*s/2,R*s/2)}}
 /* sur la vignette du terrain affiché, un cadre montre la partie visible quand on a zoomé */
 function cadreMini(g){const s=cell*VUE.z,m=MINI;g.strokeStyle='#fff';g.lineWidth=1;g.strokeRect(Math.max(0,-VUE.ox/s*m)+.5,Math.max(0,-VUE.oy/s*m)+.5,Math.min(C,VUE.w/s)*m-1,Math.min(R,VUE.h/s)*m-1)}

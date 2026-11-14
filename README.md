@@ -44,6 +44,10 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.5.2 — 2026-11-14
+- Late-game performance, with no rule change. Simulation: towers, flames, explosions, haste and healing now only check monsters in nearby cells, and distances are compared squared. At minute 16 of an AI game a simulation step goes from 12.6 ms to 3.4 ms, and the 15 AI-vs-AI games end exactly as in 2.5.1.
+- Drawing: above 150 monsters on the displayed board, monster bodies are copied from pre-rendered images (12 per animation cycle), about 3× faster with 900 monsters. Off-screen monsters are skipped when zoomed in. Below 150 monsters, drawing is unchanged.
+
 ### 2.5.1 — 2026-11-14
 - Fixes multiplayer: after 2–3 minutes (as soon as a ground monster reached your board), tapping the board crashed the page, the board froze and towers could no longer be built. Monsters received from the server now carry an approximate target cell. Client-only fix (no server redeploy).
 
