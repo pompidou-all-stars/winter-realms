@@ -4,7 +4,9 @@ A browser tower-defense game in a single HTML file.
 
 ## Play
 
-Open `index.html` in a browser.
+Online: **https://pompidou-all-stars.github.io/winter-realms/** (updated automatically on every push to `main`).
+
+Offline: open `index.html` in a browser.
 
 ## Contributing
 
