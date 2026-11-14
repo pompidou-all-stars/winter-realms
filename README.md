@@ -8,6 +8,12 @@ Open `index.html` in a browser.
 
 ## Contributing
 
+The project is hosted by the [pompidou-all-stars](https://github.com/pompidou-all-stars) organization. Get a copy with:
+
+```bash
+git clone https://github.com/pompidou-all-stars/winter-realms.git
+```
+
 1. `git pull` before you start.
 2. Make your changes, then `git add -A` and `git commit -m "what you changed"`.
 3. `git push`.
