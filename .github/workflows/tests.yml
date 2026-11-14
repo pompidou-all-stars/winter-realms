@@ -14,11 +14,11 @@ jobs:
   simulation:
     name: Tests de simulation
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Tests de simulation (mécaniques et 15 parties entre IA)
+      - name: Tests de simulation (mécaniques et une partie entre IA par difficulté)
         run: node tests/tout.js --simulation
