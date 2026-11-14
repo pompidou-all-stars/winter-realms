@@ -1,0 +1,15 @@
+{
+ "blender": "5.3",
+ "assets": {
+  "exemples/caisse": {
+   "id": "exemples/caisse",
+   "categorie": "exemple",
+   "titre": "Caisse de démonstration",
+   "fichier": "assets/3d/exemples/caisse.glb",
+   "triangles": 404,
+   "octets": 13032,
+   "empreinte_source": "24808384ef7cf4816df459085eab9929db7d098f17e91caee394e8a4dbd1b7ee",
+   "blender": "5.3"
+  }
+ }
+}

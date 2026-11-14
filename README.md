@@ -49,6 +49,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 - While building or upgrading, a tower does not shoot, does not reveal Spectres and cannot be upgraded again. It still blocks the path and can be sold (70 %).
 - A building tower is drawn faded, with scaffolding, a hammer and a gold progress bar. The info panel shows the build time and the countdown.
 
+### Tooling — 2026-11-14 (3D assets)
+- Groundwork for 3D: one Blender Python script per asset in `art/`, generated identically on a PC (Blender 5.3) or in the cloud (`bpy==5.3.0`) by `art/outils/generer.py`; GLB files and a manifest in `assets/3d/`; size/triangle budgets; a consistency test on every pull request and an "Assets 3D" GitHub Action that regenerates everything and attaches preview images. See `art/LISEZMOI.md` (French).
+- `.gitattributes` enforces LF line endings (needed on Windows) and marks 3D/image files as binary.
+- No game change.
+
 ### 2.3 — 2026-11-14
 - Bigger board on phones: the four player thumbnails leave the top bar and open in a floating panel over the board, from a map icon in the top-left corner. Tap a thumbnail to watch that board; tap the banner to come back.
 - Your lives now show in the top bar (❤).
