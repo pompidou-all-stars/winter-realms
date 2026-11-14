@@ -44,6 +44,12 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.4 — 2026-11-14
+- Smarter AI mazes: at the start of each game, every AI draws its own target maze (serpentines, vertical combs or organic labyrinths, refined by a local search), so each AI board looks different and the monster path grows with almost every tower (about 100 cells when complete, against 16 for a straight line).
+- The AI builds its maze in an order that keeps the path long at every stage, starting near the centre to hit both the straight path and the flyers early on.
+- Frost towers are spread evenly along the maze. Mages are placed to detect Spectres along the whole path, only once an opponent can afford to send them. Anti-air towers sit on the flyers' line, more of them when flyers arrive.
+- Fixes a bug where the AI stopped building after about 36 towers.
+
 ### 2.3 — 2026-11-14
 - Bigger board on phones: the four player thumbnails leave the top bar and open in a floating panel over the board, from a map icon in the top-left corner. Tap a thumbnail to watch that board; tap the banner to come back.
 - Your lives now show in the top bar (❤).

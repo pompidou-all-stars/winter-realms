@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.3)
+# Winter Realms — Tower Wars (Édition 2.4)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -326,11 +326,26 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 - **défense**, qui reçoit 15 % à 80 % des gains selon la **pression** subie (`pen` : jusqu'où les monstres avancent sur son terrain), si elle a perdu une vie récemment, ou si sa défense est trop faible par rapport au revenu de ses adversaires ;
 - **attaque** pour le reste. Si elle est en danger avec moins de 12 vies, la moitié de sa réserve d'attaque passe en défense.
 
+**Labyrinthe** (depuis la 2.4) : chaque IA reçoit un **plan cible** (`A.mz`) au début de la partie.
+- **Génération** (`mzStep`) : 4 candidats. Chacun part d'une forme tirée au hasard (serpentin horizontal à couloirs de 1 ou 2, serpentin vertical, semis aléatoire), puis il est affiné par une recherche locale avec recuit léger : on ajoute ou retire une case ou un petit segment. Score = longueur du chemin − 0,3 × nombre de tours.
+  - Itérations par candidat : 2 000 / 2 500 / 3 200 selon la difficulté.
+  - Le plan retenu est tiré parmi les 3 meilleurs en Normal (50/30/20 %), parmi les 2 meilleurs en Difficile (60/40 %), et c'est le meilleur en Brutal.
+  - Un plan complet fait environ 100 cases de chemin, contre 16 en ligne droite.
+- **Hasard propre** : la graine est tirée une fois de `Math.random`, ce qui rend la génération indépendante du découpage dans le temps.
+- **Découpage** : la génération avance de 600 essais par pas de jeu (≈ 1 à 2,5 ms) ; elle dure environ 20 ms au total. Elle est terminée avant la première action, ou bien elle est finie d'un coup à la première action. Un parcours en largeur sur grille plate (`plen`) prend environ 1,3 µs.
+- **Ordre de construction** : à partir du plan complet, on retire une à une la tour qui raccourcit le moins le chemin (à égalité, la moins utile au chemin actuel et au couloir des volants). On construit dans l'ordre inverse, si bien que le chemin s'allonge presque à chaque tour. En début de partie, les premières tours vont près du chemin droit et du couloir aérien (colonne 6).
+- **Rôles des cases** (`mzRoles`) :
+  - **Givre** : 2 à 6 emplacements (`L/15`), répartis à intervalles réguliers le long du chemin final. Ils sont construits en Givre seulement tant que leur nombre reste sous `1 + 15 % des tours` ; sinon un Archer est posé, puis transformé plus tard.
+  - **Mage** : jusqu'à 6 emplacements choisis pour que leur détection couvre tout le chemin. Ce sont des Archers tant qu'il n'y a pas de **menace de Spectres** : temps ≥ 2:30 et un adversaire avec un revenu ≥ 35, ou un Spectre déjà reçu (`specSeen`). Dès la menace, ils sont transformés en Mages (prix réel du Mage de la faction).
+  - **Couloir aérien** (|x − 6| ≤ 2) : Archer, ou Flammes au centre s'il y a beaucoup de chemin autour. Jamais de Canon ni de Garde.
+  - **Ailleurs** : Canon dans les virages, Garde entre deux couloirs, Archer sinon, avec un peu de hasard.
+  - Si plus de 35 % des PV reçus volent (`flyIn/hpIn`), les Canons et Gardes prévus près du centre deviennent des Archers, et les améliorations favorisent le couloir aérien.
+  - Les versions renforcées (emplacements 6 à 9) sont utilisées quand l'IA a assez de tours et d'or.
+
 **Défense** (`aiDefend`), jusqu'à 3 actions par tour :
-- elle place ses tours selon un plan fixe (`PLAN`), dans l'ordre des rangées 8, 6, 10, 4, 12, 2, 14, en partant du centre ;
-- elle choisit la tour selon ce qu'elle a déjà : Archer ou Garde au début, puis Givre, Flammes et Mage au centre, Canon ailleurs ;
-- à partir de 10 tours, ou quand il n'y a plus de place, elle **améliore** la tour la plus rentable, celle qui couvre le plus de chemin et de couloir aérien par pièce d'or ;
-- après **2:20**, elle **transforme** des tours faibles du centre en Mages, jusqu'à `min(5, 2 + minutes/5)` Mages.
+- d'abord, une **transformation** si besoin (Mage ou Givre sur sa case, seulement pour une tour de niveau 1 ou 2) ;
+- sinon, elle **améliore** la tour la plus rentable (celle qui couvre le plus de chemin et de couloir aérien par pièce d'or), dès que le plan est terminé, ou par hasard à partir de 10 tours (35 %, puis 60 % à partir de 24 tours) ;
+- sinon, elle **construit** la prochaine case du plan. Si un monstre l'occupe, elle essaie les 3 suivantes, mais ne saute jamais une case faute d'or. L'IA ne pose jamais de tour hors de son plan, ce qui corrige le blocage d'avant la 2.4 (l'IA cessait de construire vers 36 tours).
 
 **Attaque** (`aiAttack`) :
 - rien pendant les **25 premières secondes** (`GRACE`) ;
@@ -449,7 +464,7 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 - Le texte d'accueil annonce « +25 % / +50 % de revenu » pour les IA : c'est cohérent avec `DIFF`.
 - **Constaté par les tests** (2.0.1). Ce sont des comportements réels du code, **non corrigés**, qui attendent une décision du concepteur :
   - plusieurs monstres qui sortent au même instant peuvent faire passer les vies **sous zéro** en interne (l'affichage montre 0) ;
-  - l'IA décide de transformer une tour en Mage avec un prix de Mage **fixé à 90** dans le code, alors que le vrai prix varie de 85 à 90 selon la faction ;
+  - ~~prix du Mage fixé à 90 pour la transformation~~ : disparu en 2.4 (l'IA utilise le vrai prix de la faction) ;
   - dès sa première action, chaque IA pose **jusqu'à 3 tours** (règle « jusqu'à 3 actions par tour ») ;
   - le §1 dit « aucun `localStorage` », mais depuis la v2.0 la page y garde le pseudo et le jeton multijoueur (§9 bis) ;
   - les tableaux chiffrés de ce document (§4.1, §5.1, §6.2, §7) correspondent exactement au code (vérifié par `node tests/outils/audit-doc.js`).
@@ -600,3 +615,4 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 | 2026-11-14 | 2.1 | **Interface plus claire** : fiche d'information de la tour (dégâts/s, portée, cibles, effets, bonus de faction chiffré, gain du niveau suivant), cartes de tours avec dégâts/s, portée et ✈, prix en rouge si l'or manque, monstres verrouillés avec heure de déblocage. **Zoom (1× à 3×) et déplacement à deux doigts**, molette, bouton « Vue d'ensemble », cadre de la partie visible sur la vignette. Pose au doigt au relâcher. Correction du paysage sur téléphone (haut et bas coupés). Tests navigateur complétés (19 vérifications par orientation), 5ᵉ capture (zoom). **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
 | 2026-11-14 | 2.2 | **Construction en deux touchers** : le 1er toucher montre un aperçu (tour fantôme, portée, prix), le 2e sur la même case construit ; une case impossible est signalée dès le 1er toucher ; glisser le doigt ne construit plus rien. Tests navigateur complétés (22 vérifications par orientation). **Règles du jeu inchangées** (`sim.js` non modifié). |
 | 2026-11-14 | 2.3 | **Carte plus grande sur téléphone et pastilles de rôle des tours**. Carte : les 4 vignettes des joueurs quittent le HUD et s'ouvrent dans un panneau flottant par-dessus le terrain, depuis un bouton-icône en haut à gauche. Vies du joueur ajoutées dans le HUD (❤). Bannière « ↩ revenir au tien » cliquable. Mini-cartes un peu plus grandes. Tours : pastilles de rôle (flèche, épée, flocon, bombe, flamme, étoile), de cibles (sol ou sol et air) et de magie dans des cadres dorés biseautés dessinés en code ; texte des cartes « ⚔ N dégâts/s » et « ◎ portée N » ; appui long (ou survol) sur une carte pour voir sa fiche sans la sélectionner. Interface uniquement : `sim.js` inchangé. Test du parcours mobile adapté (ouvrir le panneau avant de toucher une vignette). |
+| 2026-11-14 | 2.4 | **IA : labyrinthes optimisés et variés**. Plan cible par IA (formes tirées au hasard puis affinées par recherche locale, environ 100 cases de chemin une fois complet), ordre de construction qui allonge le chemin presque à chaque tour, Givre répartis le long du chemin, Mages détecteurs placés seulement quand un adversaire peut envoyer des Spectres, tours anti-aériennes sur le couloir des volants, adaptation aux volants reçus. Corrige le blocage de l'IA vers 36 tours. Génération découpée dans le temps (≈ 20 ms en tout, ≤ 2,5 ms par pas). `sim.js` modifié (redéploiement du serveur). Nouveau test `labyrinthe` ; le test « première tour de l'IA » suit désormais son plan. |
