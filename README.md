@@ -44,6 +44,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.8 — 2026-11-14
+- Stronger "Winter Realms" theme in the 3D view: snowy board (snow checkerboard lightly tinted by the faction, frosted rock edges), winter scenery (snowy pines, snow-capped rocks, snowdrifts, ice crystals), falling snowflakes and cold winter lighting. The path and range rings turn night blue to stay readable on snow.
+- Snow on every tower, the spawn portal and the castle: snow caps on battlements, bases and platforms, snowy roof tops while the faction colours stay visible below. All 3D assets were regenerated.
+- The 2D view is unchanged. Game rules unchanged (`sim.js` untouched, no server redeploy).
+
 ### 2.7 — 2026-11-14
 - Playable 3D view (prototype): add `?rendu=3d` to the address, or tap "Essayer la vue 3D (prototype)" on the home screen. Diorama board, animated towers and monsters, scaffolding while towers are built, projectiles and effects, same controls as 2D (two-tap building with a ghost tower, two-finger zoom and pan, tower panel).
 - 3D models for the whole game, one Blender script per asset in `art/`: all 50 towers (5 factions × 10, heroic-fantasy cartoon style, one look per faction), 17 animated monsters (sizes follow their in-game size), spawn portal and castle. `generer.py` now also exports pivots and animations and compresses with meshopt.
