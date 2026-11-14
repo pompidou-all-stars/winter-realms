@@ -1,11 +1,11 @@
 /* Parties complètes entre IA (5 factions × 3 difficultés), rejouées avec une graine fixe.
-   Chaque partie doit se dérouler EXACTEMENT comme la référence 1.7 : mêmes états toutes les 30 s de jeu, même fin.
+   Chaque partie doit se dérouler EXACTEMENT comme la référence 2.4 : mêmes états toutes les 30 s de jeu, même fin.
    Mode rapide (WR_RAPIDE=1) : seulement les 5 parties en difficulté Normal. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const {RACINE,MOTEURS}=require('../outils/moteur');
 const {SCENARIOS,jouer}=require('../outils/parties');
-const REF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','parties-v1.7.json'),'utf8'));
+const REF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','parties-v2.4.json'),'utf8'));
 const rapide=process.env.WR_RAPIDE=='1';
 
 for(const sc of SCENARIOS){if(rapide&&sc.difficulte>0)continue;
