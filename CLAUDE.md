@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.0.1)
+# Winter Realms — Tower Wars (Édition 2.1)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -77,6 +77,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 - **Pour jouer en local**, il faut un petit serveur web : `npx http-server` à la racine, puis ouvrir http://localhost:8080. Un `file://` ne charge pas toujours `sim.js`, surtout dans les aperçus intégrés. **Pour tester**, voir §12 : `node tests/tout.js`.
 - **Seule ressource externe** : la police Google Fonts *Fredoka*.
 - **Rendu** : Canvas 2D. Tous les visuels (tours, monstres, effets) sont **dessinés en code**, sans images. La netteté s'adapte à l'écran (`devicePixelRatio`, plafonné à 3).
+- **Vue du terrain** (depuis la 2.1) : le canevas `#main` couvre toute la zone de jeu. Le plateau y est dessiné par `dessinerVue()` avec un zoom et un décalage (`VUE.z`, `VUE.ox`, `VUE.oy`), et son cadre est dessiné dans le canevas. `caseVersEcran(x, y)` donne la position d'une case à l'écran (elle sert aussi aux tests).
 - **Sons** : synthétisés avec Web Audio (oscillateurs et bruit), **aucun fichier audio**.
 - **Pas de sauvegarde** : aucun `localStorage`. Chaque partie repart de zéro.
 - **Style de code** : JavaScript compact, presque minifié (noms courts, une logique par ligne). Les **tables de données sont en tête de `sim.js`** et c'est là qu'on règle l'équilibrage :
@@ -343,9 +344,17 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 ## 9. Interface et commandes
 
 - **HUD** : or, revenu toutes les 10 s, horloge, faction, bouton son, bouton plein écran. On y trouve aussi 4 vignettes avec une mini-carte, les vies et le revenu (bonus de difficulté compris) de chaque terrain. **Toucher une vignette** affiche le terrain correspondant (en lecture seule).
-- **Onglets** : « Construire » ou « Envoyer » (Sol, Volants, Spéciaux). Les boutons trop chers ou pas encore débloqués sont grisés.
-- **Poser une tour** : toucher une case. **Glisser** le doigt permet d'en poser plusieurs d'affilée.
-- **Toucher une tour** : affiche ses DPS, sa portée, son rôle et ses bonus, avec les boutons Améliorer, Vendre et Fermer.
+- **Onglets** : « Construire » ou « Envoyer » (Sol, Volants, Spéciaux). Les boutons trop chers ou pas encore débloqués sont grisés, et leur prix passe en rouge quand l'or manque.
+- **Fiche d'information** (depuis la 2.1), entre les onglets et les boutons :
+  - **Construire** : la tour sélectionnée est décrite en clair : nom, type, rôle, ⚔ dégâts par seconde, ◎ portée en cases, cibles (« sol et air » ou « sol uniquement »), effets (explosion de zone, ralentissement, souffle en cône, corps à corps, révèle les Spectres, magique), bonus de faction chiffré (calculé à partir de `FACTION_BALANCE`) ;
+  - **tour posée** : les mêmes informations au niveau actuel, avec le gain du niveau suivant et son prix ;
+  - **Envoyer** : rappel de la règle (chaque envoi attaque tous les adversaires et augmente le revenu).
+  - En portrait, la fiche a une hauteur fixe pour que le terrain ne change pas de taille.
+- **Cartes de tours** : prix, puis `⚔ dégâts/s ◎ portée`, et `✈` si la tour touche les volants. **Cartes de monstres** : prix et revenu gagné ; un monstre verrouillé affiche « 🔒 dès m:ss ».
+- **Poser une tour** : toucher une case. Au doigt, la tour est posée **au relâcher** (pour qu'un geste à deux doigts ne pose rien). **Glisser** le doigt vers d'autres cases en pose plusieurs d'affilée. À la souris, la pose est immédiate.
+- **Zoom et déplacement** (depuis la 2.1) : **deux doigts** pour zoomer (de 1× à 3×) et pour faire glisser la carte ; **molette** à la souris. Le bouton « Vue d'ensemble » apparaît quand on a zoomé et ramène au zoom normal. Sur la vignette du terrain affiché, un cadre blanc montre la partie visible. Une astuce l'annonce au lancement d'une partie solo.
+- **Toucher une tour** : ouvre sa fiche (voir plus haut), avec les boutons Améliorer, Vendre et Fermer.
+- **Paysage** (depuis la 2.1) : la colonne de droite défile si elle est trop haute ; avant, le haut de l'écran et le bas du terrain étaient coupés sur téléphone.
 - **Retours visuels** : case rouge si la pose est refusée, textes flottants (+or, −1 vie, niveau), et un message en bas de l'écran (« Pas assez d'or », « le chemin serait bloqué », etc.).
 
 ---
@@ -441,7 +450,7 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 | `node tests/tout.js --simulation` | Simulation seule. C'est ce que GitHub lance à chaque Pull Request. | ≈ 35 s |
 | `node tests/tout.js --rapide` | Simulation avec 5 parties au lieu de 15, pour les petites retouches | ≈ 20 s |
 | `node tests/bilan.js [version]` | Les **trois bilans** dans `rapports/bilan.html`, avec la comparaison visuelle par rapport à `version` (par défaut `origin/main`) | ≈ 3 min |
-| `node tests/captures.js` | 8 captures (4 écrans × portrait et paysage) dans `captures/actuel/` | ≈ 1 min |
+| `node tests/captures.js` | 10 captures (5 écrans × portrait et paysage) dans `captures/actuel/` | ≈ 1 min |
 | `node tests/comparer-visuel.js [version]` | Avant/après visuel seul, dans `captures/comparaison/` | ≈ 2 min 30 |
 | `node tests/outils/audit-doc.js` | Compare les tableaux chiffrés de ce document au code et liste les écarts, sans rien corriger | 1 s |
 
@@ -453,7 +462,7 @@ Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en
   - `tables` : les 50 tours, les 18 monstres, les archétypes, les factions et la difficulté, comparés à la référence et recalculés à partir des formules.
   - `construction`, `deplacements`, `combats`, `economie`, `vagues` (avec l'IA), `fin-de-partie` : les mécaniques.
   - `parties-ia` : 15 parties complètes (5 factions × 3 difficultés) rejouées à l'identique et comparées, état par état, à la référence.
-- `navigateur/parcours.test.js` : le **parcours automatisé** d'un joueur dans Chromium au format téléphone (390 × 844 en portrait, 844 × 390 en paysage) : accueil, faction, difficulté, pose et refus, panneau de tour, envoi, vignettes, revenu, mise en page. **Ce n'est pas une garantie de compatibilité avec tous les téléphones** : Safari sur iPhone, les anciens Android et les vrais écrans tactiles ne sont pas testés.
+- `navigateur/parcours.test.js` : le **parcours automatisé** d'un joueur dans Chromium au format téléphone (390 × 844 en portrait, 844 × 390 en paysage) : accueil, faction, difficulté, pose et refus, panneau de tour, envoi, vignettes, fiche d'information, monstres verrouillés, zoom et déplacement à deux doigts (sans pose accidentelle), pose exacte en mode zoomé, « Vue d'ensemble », revenu, mise en page. **Ce n'est pas une garantie de compatibilité avec tous les téléphones** : Safari sur iPhone, les anciens Android et les vrais écrans tactiles ne sont pas testés.
 - `moteurs/v1.7/` : une **copie figée** du moteur, extraite du commit `c868ff9` (empreinte SHA-256 `e0cd2f78…615f6f`, voir `PROVENANCE.md`). Le `sim.js` des versions 2.0 et 2.0.1 lui est identique octet pour octet.
 - `references/` : les valeurs de référence (statistiques, parties), **produites à partir du moteur figé**, jamais à partir de `main`.
 - `outils/` : chargement du moteur dans un environnement isolé, hasard à graine, serveur web local, pilotage du navigateur, affichage en français, audit de la documentation.
@@ -479,7 +488,7 @@ Chaque évolution est présentée avec trois bilans **séparés** (`node tests/b
 
 ### 12.6 Conditions de la comparaison visuelle (contre les fausses différences)
 - **Même machine, même navigateur, même séance** : l'« avant » (extrait de git) et l'« après » sont capturés l'un après l'autre par le même Chromium. On ne compare **jamais** des images faites sur deux machines différentes, ni des images enregistrées dans le dépôt.
-- **Même scénario** : graine 12345, Alliance, Normal, 4 tours posées en (5,6), (7,6), (5,10) et (7,10), capture à 35 s de jeu, puis panneau de la tour (5,6).
+- **Même scénario** : graine 12345, Alliance, Normal, 4 tours posées en (5,6), (7,6), (5,10) et (7,10), capture à 35 s de jeu, puis panneau de la tour (5,6), puis zoom à deux doigts autour de la case (6,7).
 - **Horloge figée** : le temps du navigateur est en pause et n'avance que sur commande. Sans cela, les animations (pointillés du chemin, barre de revenu) diffèrent d'une capture à l'autre.
 - **Écran fixé** : 390 × 844 et 844 × 390, densité ×2, mode mobile tactile, langue `fr-FR`, fuseau `Europe/Paris`.
 - **Rendu reproductible** : Chromium est lancé en rendu logiciel (`--disable-gpu`), sans lissage sous-pixel du texte (`--disable-lcd-text`, `--font-render-hinting=none`), avec un profil de couleur fixe (`--force-color-profile=srgb`) et sans optimisations variables. Sans ces options, le texte en gras pouvait être dessiné légèrement différemment d'une capture à l'autre (jusqu'à 0,4 % de faux écarts).
@@ -573,3 +582,4 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 | 2026-11-14 | 2.0.1 | Outillage : tests automatiques (`tests/`, 116 vérifications : mécaniques, 15 parties entre IA rejouées à l'identique, parcours mobile portrait et paysage), moteur 1.7 figé comme référence, captures et comparaison visuelle avant/après, trois bilans (technique, gameplay, visuel), vérification GitHub à chaque PR, procédure de validation et protection de `main` (§12, §13). **Aucune modification de `sim.js` ni d'`index.html`.** |
 | 2026-11-14 | 2.0.1 | Outillage : **versions et retour arrière** (§14). Étiquette automatique à chaque fusion dans `main` (`vX.Y.Z`, ou `vX.Y.Z.N` sans changement du jeu), Releases GitHub, versions historiques 1.4 à 2.0.1 étiquetées, procédure « reviens à la version … ». **Aucun changement de jeu.** |
 | 2026-11-14 | 2.0.1 | Correctif outillage : le déploiement automatique du serveur passe de Node 20 à **Node 22** (Wrangler 4 refuse Node 20 ; le premier déploiement automatique avait échoué). **Aucun changement de jeu.** |
+| 2026-11-14 | 2.1 | **Interface plus claire** : fiche d'information de la tour (dégâts/s, portée, cibles, effets, bonus de faction chiffré, gain du niveau suivant), cartes de tours avec dégâts/s, portée et ✈, prix en rouge si l'or manque, monstres verrouillés avec heure de déblocage. **Zoom (1× à 3×) et déplacement à deux doigts**, molette, bouton « Vue d'ensemble », cadre de la partie visible sur la vignette. Pose au doigt au relâcher. Correction du paysage sur téléphone (haut et bas coupés). Tests navigateur complétés (19 vérifications par orientation), 5ᵉ capture (zoom). **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |

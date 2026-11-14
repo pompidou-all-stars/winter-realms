@@ -50,6 +50,40 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
   await N.toucher(p,'#chips .chip >> nth=1');assert.equal((await N.etat(p)).vue,1);assert.equal(await val(()=>document.getElementById('banner').hidden),false);
   await N.toucher(p,'#chips .chip >> nth=0');assert.equal((await N.etat(p)).vue,0);assert.equal(await val(()=>document.getElementById('banner').hidden),true);
  });
+ test('Fiche de construction (2.1) : la tour sélectionnée est décrite en clair',async()=>{
+  let e=await N.etat(p);assert.match(e.fiche,/Arbre sentinelle/);assert.match(e.fiche,/Dégâts\/s/);assert.match(e.fiche,/Portée/);assert.match(e.fiche,/sol et air/);assert.match(e.fiche,/Racines/);
+  await N.toucher(p,'#bar button:has-text("Gardien des racines")');e=await N.etat(p);assert.match(e.fiche,/Gardien des racines/);assert.match(e.fiche,/sol uniquement/);assert.match(e.fiche,/corps à corps/);
+  await N.toucher(p,'#bar button:has-text("Arbre sentinelle")');
+  assert.ok((await p.textContent('#bar button:has-text("Arbre sentinelle") em')).includes('/s'),'la carte affiche les dégâts par seconde');
+ });
+ test('Fiche d\'une tour posée (2.1) : niveau et gain du niveau suivant',async()=>{
+  await N.toucherCase(p,3,5);await N.toucherCase(p,3,5);const e=await N.etat(p);assert.equal(e.panneauOuvert,true);assert.match(e.fiche,/niveau 1\/5/);assert.match(e.fiche,/Niveau 2 :/);
+  await N.toucher(p,'#bar button:has-text("Vendre")');
+ });
+ test('Onglet « Spéciaux » (2.1) : les monstres verrouillés affichent leur heure de déblocage',async()=>{
+  await N.toucher(p,'#tabs button[data-t="s"]');assert.match(await p.textContent('#bar button:has-text("Tortue") em'),/🔒 dès 1:30/);
+  assert.match((await N.etat(p)).fiche,/augmente ton revenu/);await N.toucher(p,'#tabs button[data-t="t"]');
+ });
+ test('Deux doigts (2.1) : écarter les doigts zoome, sans poser de tour',async()=>{
+  const avant=await N.etat(p),c=await N.centreCase(p,6,8);
+  await N.deuxDoigts(p,{de:[{x:c.x-30,y:c.y},{x:c.x+30,y:c.y}],vers:[{x:c.x-90,y:c.y},{x:c.x+90,y:c.y}]});
+  const e=await N.etat(p);assert.ok(e.zoom>2.5,'zoom obtenu : '+e.zoom);assert.equal(e.tours.length,avant.tours.length,'aucune tour posée par le geste');assert.equal(e.or,avant.or);
+  assert.equal(await p.isVisible('#zoomReset'),true,'le bouton « Vue d\'ensemble » apparaît');
+ });
+ test('Deux doigts (2.1) : déplacer les deux doigts fait glisser la carte',async()=>{
+  const c0=await N.centreCase(p,6,8);await N.deuxDoigts(p,{de:[{x:c0.x-40,y:c0.y},{x:c0.x+40,y:c0.y}],vers:[{x:c0.x-40,y:c0.y-60},{x:c0.x+40,y:c0.y-60}]});
+  const c1=await N.centreCase(p,6,8);assert.ok(c0.y-c1.y>40,'la case (6,8) est remontée à l\'écran');
+ });
+ test('Zoomé (2.1) : toucher une case pose la tour exactement sur cette case',async()=>{
+  const b=await p.locator('#stage').boundingBox();let cible=null;
+  for(let y=0;y<17&&!cible;y++)for(let x=0;x<13;x++){const c=await N.centreCase(p,x,y);if(x!=6&&c.x>b.x+20&&c.x<b.x+b.width-20&&c.y>b.y+50&&c.y<b.y+b.height-20){cible={x,y};break}}
+  assert.ok(cible,'une case visible');const avant=(await N.etat(p)).or;await N.toucherCase(p,cible.x,cible.y);
+  const e=await N.etat(p);assert.ok(e.tours.some(t=>t.x==cible.x&&t.y==cible.y),'tour posée en ('+cible.x+','+cible.y+')');assert.equal(e.or,avant-20);
+  await N.toucherCase(p,cible.x,cible.y);await N.toucher(p,'#bar button:has-text("Vendre")');
+ });
+ test('« Vue d\'ensemble » (2.1) : revient au zoom normal',async()=>{
+  await N.toucher(p,'#zoomReset');assert.equal((await N.etat(p)).zoom,1);assert.equal(await p.isVisible('#zoomReset'),false);
+ });
  test('Le revenu tombe à 10 s de jeu',async()=>{
   const avant=(await N.etat(p)).or;await N.avancer(p,10000);const e=await N.etat(p);assert.ok(e.temps>10);assert.equal(e.or,avant+11);
  });

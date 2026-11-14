@@ -40,11 +40,19 @@ async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='ree
 }
 
 /* toucher le centre d'une case du terrain */
-async function toucherCase(page,x,y){const b=await page.locator('#main').boundingBox();
- await page.touchscreen.tap(b.x+(x+.5)*b.width/13,b.y+(y+.5)*b.height/17);await page.clock.runFor(50)}
+/* depuis la 2.1 le terrain peut être zoomé : la page fournit caseVersEcran ; les versions plus anciennes n'ont pas de zoom */
+async function centreCase(page,x,y){return page.evaluate(([x,y])=>{if(typeof caseVersEcran=='function')return caseVersEcran(x,y);
+ const r=document.getElementById('main').getBoundingClientRect();return {x:r.left+(x+.5)*r.width/13,y:r.top+(y+.5)*r.height/17}},[x,y])}
+async function toucherCase(page,x,y){const c=await centreCase(page,x,y);await page.touchscreen.tap(c.x,c.y);await page.clock.runFor(50)}
+/* geste à deux doigts (pincer / écarter / déplacer), envoyé comme de vrais événements tactiles */
+async function deuxDoigts(page,{de,vers,etapes=8}){const cdp=await page.context().newCDPSession(page);const pts=(p,q)=>[{x:p.x,y:p.y,id:1},{x:q.x,y:q.y,id:2}];
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:pts(de[0],de[1])});
+ for(let i=1;i<=etapes;i++){const k=i/etapes,l=(a,b)=>({x:a.x+(b.x-a.x)*k,y:a.y+(b.y-a.y)*k});
+  await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:pts(l(de[0],vers[0]),l(de[1],vers[1]))})}
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();await page.clock.runFor(50)}
 async function toucher(page,selecteur){await page.locator(selecteur).first().tap();await page.clock.runFor(50)}
 async function avancer(page,ms){await page.clock.runFor(ms)}
 async function etat(page){return page.evaluate(()=>({or:P.gold,revenu:P.inc,vies:P.lives,tours:P.t.map(t=>({x:t.x,y:t.y,k:t.k,lv:t.lv})),temps:time,horloge:document.getElementById('clock').textContent,
- vue:view,fin:over,faction:chosenClass,panneauOuvert:!!document.querySelector('#bar .info'),boutons:[...document.querySelectorAll('#bar button')].map(b=>b.textContent)}))}
+ vue:view,fin:over,faction:chosenClass,panneauOuvert:!!document.querySelector('#bar .info')||document.getElementById('fiche')?.dataset.mode=='tour',fiche:document.getElementById('fiche')?.innerText||'',zoom:typeof VUE=='object'?VUE.z:1,boutons:[...document.querySelectorAll('#bar button')].map(b=>b.textContent)}))}
 
-module.exports={disponible,lancer,ouvrir,toucherCase,toucher,avancer,etat,FORMATS};
+module.exports={disponible,lancer,ouvrir,toucherCase,centreCase,deuxDoigts,toucher,avancer,etat,FORMATS};
