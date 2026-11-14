@@ -1,0 +1,24 @@
+# Lance les tests de simulation à chaque Pull Request vers main.
+# Ne publie rien, ne fusionne rien : le résultat s'affiche dans la PR (« Tests de simulation »).
+name: Tests
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  simulation:
+    name: Tests de simulation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tests de simulation (mécaniques et 15 parties entre IA)
+        run: node tests/tout.js --simulation
