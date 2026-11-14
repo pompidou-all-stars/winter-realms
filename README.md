@@ -30,6 +30,9 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### Workflow — 2026-11-14
+- New branch rule (see CLAUDE.md): no direct commits to `main`. One branch per change (`<type>/<topic>`), then a pull request reviewed by another member before merging. No game changes.
+
 ### 2.0 — 2026-11-14
 - Online multiplayer: 2–4 players in a room (AIs fill free seats), invite link or code, room leader picks AI difficulty, spectators, reconnection.
 - Game server on Cloudflare Workers + Durable Objects (free plan).
