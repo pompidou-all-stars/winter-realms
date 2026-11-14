@@ -1,4 +1,4 @@
-/* Labyrinthe de l'IA (2.4) : plan cible généré au début de la partie, ordre de construction, rôles des tours. */
+/* Labyrinthe de l'IA (2.5) : plan cible généré au début de la partie, ordre de construction, rôles des tours. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const {charger,partie,avancer}=require('../outils/moteur');

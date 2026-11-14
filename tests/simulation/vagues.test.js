@@ -27,7 +27,7 @@ test('Le Petit limon ne peut pas être envoyé (« bad »)',()=>{const G=partie(
 test('IA : chaque IA agit pour la première fois à 1 s + 0,2 s × son numéro de terrain, avec jusqu\'à 3 actions',()=>{const G=partie(S,{ia:[0,1,1,1]});
  avancer(G,1.15);assert.equal(G.B[1].t.length,0);avancer(G,.1);assert.equal(G.B[1].t.length,3,'IA 1 à 1,2 s : jusqu\'à 3 actions, donc 3 tours');assert.equal(G.B[2].t.length,0);avancer(G,.2);assert.equal(G.B[2].t.length,3,'IA 2 à 1,4 s');
 });
-/* depuis la 2.4 (avant : un Archer au centre de la rangée 8) */
+/* depuis la 2.5 (avant : un Archer au centre de la rangée 8) */
 test('IA : sa première tour est une tour de sa faction, posée sur une case de son plan de labyrinthe',()=>{const G=partie(S,{ia:[0,1,1,1],factions:[0,1,2,3]});avancer(G,2);
  for(const b of G.B.slice(1)){const t=b.t[0];assert.ok(t,'aucune tour');assert.equal(Math.floor(t.k/10),b.classId);assert.equal(b.mz.w[t.y*13+t.x],1);assert.equal(t.y*13+t.x,b.mz.ord[0])}
 });

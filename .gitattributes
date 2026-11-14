@@ -1,0 +1,15 @@
+# Fins de ligne : toujours LF dans le dépôt, quel que soit l'ordinateur (Windows compris).
+# Indispensable pour les empreintes vérifiées par les tests (moteur figé 1.7, manifeste des assets 3D).
+* text=auto eol=lf
+
+# Fichiers binaires : jamais convertis, jamais fusionnés ligne à ligne.
+*.glb binary
+*.gltf -text
+*.bin binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ktx2 binary
+*.blend binary
+*.bundle binary

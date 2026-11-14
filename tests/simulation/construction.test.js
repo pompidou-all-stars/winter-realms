@@ -1,7 +1,7 @@
 /* Construction : pose, refus, chemin, revente, améliorations — tel que le moteur actuel le fait. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {charger,partie,apparaitre,avancerTerrain}=require('../outils/moteur');
+const {charger,partie,apparaitre,avancerTerrain,pret}=require('../outils/moteur');
 const S=charger('actuel');
 const nouveau=()=>{const G=partie(S);return {G,b:G.B[0]}};
 const chemin=b=>b.d[S.SP[1]][S.SP[0]];
@@ -50,13 +50,13 @@ test('Revente : 70 % de l\'or investi, arrondi à l\'inférieur, et la case est 
 });
 test('Améliorations : coût = arrondi(coût × 1,5 × 2^(niveau−1) / 5) × 5, investissement cumulé, revente à 70 %',()=>{const {G,b}=nouveau();b.gold=1e6;
  G.action(0,{type:'place',x:3,y:3,k:0});const t=b.t[0],c0=S.TW[0].c;let inv=c0;
- for(let lv=1;lv<5;lv++){const cout=Math.round(c0*1.5*2**(lv-1)/5)*5,or=b.gold;assert.equal(G.action(0,{type:'upgrade',x:3,y:3}),'');
+ for(let lv=1;lv<5;lv++){const cout=Math.round(c0*1.5*2**(lv-1)/5)*5,or=b.gold;pret(b);assert.equal(G.action(0,{type:'upgrade',x:3,y:3}),'');
   assert.equal(or-b.gold,cout,`passage au niveau ${lv+1}`);inv+=cout;assert.equal(t.lv,lv+1);assert.equal(t.inv,inv)}
- assert.equal(G.action(0,{type:'upgrade',x:3,y:3}),'max');
+ pret(b);assert.equal(G.action(0,{type:'upgrade',x:3,y:3}),'max');
  const or=b.gold;G.action(0,{type:'sell',x:3,y:3});assert.equal(b.gold-or,Math.floor(inv*.7));
 });
 test('Amélioration refusée quand l\'or manque (« poor »), action sur une case vide (« bad »)',()=>{const {G,b}=nouveau();
- G.action(0,{type:'place',x:3,y:3,k:0});b.gold=0;assert.equal(G.action(0,{type:'upgrade',x:3,y:3}),'poor');
+ G.action(0,{type:'place',x:3,y:3,k:0});pret(b);b.gold=0;assert.equal(G.action(0,{type:'upgrade',x:3,y:3}),'poor');
  assert.equal(G.action(0,{type:'upgrade',x:4,y:4}),'bad');assert.equal(G.action(0,{type:'sell',x:4,y:4}),'bad');
  assert.equal(G.action(0,{type:'danse'}),'bad');assert.equal(G.action(0,{type:'place',x:1,y:1,k:99}),'bad');
 });

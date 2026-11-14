@@ -1,7 +1,7 @@
 /* Combats : ciblage, restrictions sol/air/magie, armure, bonus de faction, capacités des monstres, primes. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {charger,partie,apparaitre,avancerTerrain}=require('../outils/moteur');
+const {charger,partie,apparaitre,avancerTerrain,pret}=require('../outils/moteur');
 const S=charger('actuel');
 const proche=(a,b,msg,eps=1e-9)=>assert.ok(Math.abs(a-b)<=eps,`${msg||''} attendu ${b}, obtenu ${a}`);
 const terrain=(f=0)=>{const b=partie(S,{factions:[f,(f+1)%5,(f+2)%5,(f+3)%5]}).B[0];b.gold=1e6;return b};
@@ -14,7 +14,7 @@ test('Une tour Archer tue un Sapeur gobelin et gagne la prime de 1 or',()=>{cons
 test('Prime = max(1, arrondi(coût / 10)), versée au terrain où le monstre meurt',()=>{const b=terrain();
  for(const k of [0,1,3,5,8,16]){const c=apparaitre(S,b,k),or=b.gold;c.hp=0;b.update(0);assert.equal(b.gold-or,Math.max(1,Math.round(S.CR[k].c/10)),S.CR[k].n);b.cr=[]}
 });
-test('Ciblage : la tour vise le monstre visible le plus proche de la sortie',()=>{const b=terrain();b.place(5,4,0);
+test('Ciblage : la tour vise le monstre visible le plus proche de la sortie',()=>{const b=terrain();b.place(5,4,0);pret(b);
  const a=fort(apparaitre(S,b,0)),c=fort(apparaitre(S,b,0));Object.assign(a,{x:6,y:3,tx:6,ty:3});Object.assign(c,{x:6,y:5,tx:6,ty:5});
  b.update(.01);assert.equal(b.pr.length,1);assert.equal(b.pr[0].tg,c);
 });
@@ -28,7 +28,7 @@ test('Archer et Flammes touchent les volants',()=>{for(const k of [0,4]){const b
 test('Anti-magie : Givre et Mage n\'ont aucun effet sur le Briseur de runes, et ne le ciblent pas',()=>{const b=terrain();
  const c=apparaitre(S,b,S.BRK);for(const k of [2,5,8,9])assert.equal(perte(b,c,50,k,.5),0,S.TW[k].n);assert.equal(c.sl,0);
  assert.ok(perte(b,c,1,0)>0,'un Archer le touche');
- const b2=terrain();b2.place(5,2,5);fort(apparaitre(S,b2,S.BRK));b2.update(.01);assert.equal(b2.pr.length,0);
+ const b2=terrain();b2.place(5,2,5);pret(b2);fort(apparaitre(S,b2,S.BRK));b2.update(.01);assert.equal(b2.pr.length,0);
 });
 test('Armure : retire un montant fixe par coup mais garde au moins 20 % des dégâts',()=>{const b=terrain(1);const c=fort(apparaitre(S,b,S.TURT));
  assert.equal(c.arm,5);proche(perte(b,c,10,10),5,'10 dégâts − 5');proche(perte(b,c,3,10),.6,'3 dégâts → plancher de 20 %');
@@ -56,9 +56,9 @@ test('Canon : explosion de rayon 1,1, 60 % des dégâts autour, sol uniquement',
  proche(hp[0]-a.hp,10,'cible');proche(hp[1]-v.hp,6,'voisin');assert.equal(loin.hp,hp[2],'trop loin');assert.equal(vol.hp,hp[3],'volant épargné');
 });
 test('Spectre : invisible sauf à portée d\'une tour Mage ; un Spectre caché n\'est ni ciblé ni touché par les explosions',()=>{const b=terrain();
- b.place(5,2,0);const s=fort(apparaitre(S,b,S.SPEC));b.update(.01);assert.equal(s.hid,true);assert.equal(b.pr.length,0);
+ b.place(5,2,0);pret(b);const s=fort(apparaitre(S,b,S.SPEC));b.update(.01);assert.equal(s.hid,true);assert.equal(b.pr.length,0);
  const a=fort(apparaitre(S,b,0));Object.assign(a,{x:s.x,y:s.y});const pv=s.hp;b.impact({k:3,tg:a,d:10,tx:s.x+.5,ty:s.y+.5,sf:.5});assert.equal(s.hp,pv);
- const b2=terrain();b2.place(5,2,5);const s2=fort(apparaitre(S,b2,S.SPEC));b2.update(.01);assert.equal(s2.hid,false);assert.equal(b2.pr.length,1);
+ const b2=terrain();b2.place(5,2,5);pret(b2);const s2=fort(apparaitre(S,b2,S.SPEC));b2.update(.01);assert.equal(s2.hid,false);assert.equal(b2.pr.length,1);
 });
 test('Saboteur : 2 s après son apparition, étourdit 2 s la tour la plus proche (rayon 2,3)',()=>{const b=terrain();b.place(5,3,1);b.place(9,9,0);
  const s=fort(apparaitre(S,b,S.SAP));avancerTerrain(b,1.9);assert.ok(!(b.t[0].stun>0));
@@ -72,6 +72,6 @@ test('Prêtresse : soigne de 5 % des PV max par seconde les alliés proches, pas
  const p=apparaitre(S,b,S.HEAL),g=fort(apparaitre(S,b,3));g.hp=g.max/2;p.hp=p.max/2;b.update(.1);
  proche(g.hp,g.max/2+g.max*.05*.1,'allié soigné',1e-6);assert.equal(p.hp,p.max/2,'la prêtresse seule n\'est pas soignée');
 });
-test('Garde : frappe directe au corps à corps, sans projectile',()=>{const b=terrain();b.place(5,1,1);const c=fort(apparaitre(S,b,3));
+test('Garde : frappe directe au corps à corps, sans projectile',()=>{const b=terrain();b.place(5,1,1);pret(b);const c=fort(apparaitre(S,b,3));
  avancerTerrain(b,.6);assert.ok(c.hp<c.max);assert.equal(b.pr.length,0);
 });
