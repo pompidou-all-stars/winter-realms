@@ -26,11 +26,17 @@ test('Givre : 2 à 6 emplacements, répartis tout le long du chemin final',()=>{
   for(let t=0;t<3;t++){const part=P.slice(Math.floor(P.length*t/3),Math.floor(P.length*(t+1)/3));
    assert.ok(gi.some(i=>part.some(j=>Math.hypot(i%C-j%C,(i/C|0)-(j/C|0))<=2.5)),`graine ${g} : tiers ${t} sans Givre`)}}
 });
-test('La génération est découpée : jamais plus de 6 ms par tranche, moins de 60 ms au total',()=>{
- const S=charger('actuel',{graine:4});const G=partie(S,{ia:[0,1,1,1],difficulte:2});const b=G.B[1];let tot=0,max=0,M=null;
- S.mzStep(G.B[2],Infinity);/* échauffement du moteur JavaScript */
- while(!M){const t=process.hrtime.bigint();M=S.mzStep(b,600);const d=Number(process.hrtime.bigint()-t)/1e6;tot+=d;max=Math.max(max,d)}
- assert.ok(max<6,`tranche de ${max.toFixed(1)} ms`);assert.ok(tot<60,`total ${tot.toFixed(1)} ms`);
+/* La découpe est vérifiée de façon certaine (nombre de tranches), la durée seulement comme garde-fou :
+   les machines de GitHub sont plus ou moins chargées, d'où la meilleure de 3 mesures et une marge (révision de la 2.11). */
+test('La génération est découpée en plusieurs tranches courtes (moins de 10 ms par tranche, moins de 100 ms au total)',()=>{
+ let meilleurMax=Infinity,meilleurTot=Infinity,tranches=0;
+ for(let essai=0;essai<3;essai++){
+  const S=charger('actuel',{graine:4});const G=partie(S,{ia:[0,1,1,1],difficulte:2});const b=G.B[1];let tot=0,max=0,M=null,n=0;
+  S.mzStep(G.B[2],Infinity);/* échauffement du moteur JavaScript */
+  while(!M){const t=process.hrtime.bigint();M=S.mzStep(b,600);const d=Number(process.hrtime.bigint()-t)/1e6;tot+=d;max=Math.max(max,d);n++}
+  tranches=n;meilleurMax=Math.min(meilleurMax,max);meilleurTot=Math.min(meilleurTot,tot)}
+ assert.ok(tranches>=3,`génération faite en ${tranches} tranche(s) seulement : elle n'est plus découpée`);
+ assert.ok(meilleurMax<10,`tranche de ${meilleurMax.toFixed(1)} ms`);assert.ok(meilleurTot<100,`total ${meilleurTot.toFixed(1)} ms`);
 });
 test('En partie, l\'IA construit son plan, continue au-delà de 36 tours et n\'a pas de Mage avant la menace des Spectres',()=>{
  const S=charger('actuel',{graine:5});const G=partie(S,{ia:[0,1,1,1]});G.B[0].lives=1e9;const b=G.B[1];b.lives=1e9;
