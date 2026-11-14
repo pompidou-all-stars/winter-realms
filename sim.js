@@ -8,11 +8,101 @@ const BASE_TW=[
  {n:'Garde',c:30,r:1.5,d:20,cd:.55,me:1,gr:1,col:'#c0392b',s:'slash',tag:'sol'},
  {n:'Flammes',c:70,r:2,d:3,cd:.12,fl:1,col:'#e67e22',s:'flame'}];
 const FACTIONS=[
- {name:'Humains',icon:'🏹',color:'#d8b45c',dark:'#59451f',desc:'Archers, chevaliers et mages : longue portée et défense anti-aérienne.',towers:['Archer du rempart','Chevalier du lion','Mage de givre','Bombardier royal','Pyromancien','Prêtre solaire','Rôdeur d'élite','Paladin','Enchanteur du froid','Archimage humain']},
- {name:'Robots',icon:'🤖',color:'#69bde1',dark:'#203e58',desc:'Automates, drones et canons : puissance perforante et armures mécaniques.',towers:['Drone arbalète','Mécha sentinelle','Cryobot','Canon à impulsion','Lance-flammes MK2','Technomancien','Drone sniper','Titan d'acier','Noyau cryogénique','Colosse plasma']},
- {name:'Créatures',icon:'🦎',color:'#b66add',dark:'#44234f',desc:'Bestioles mutantes et prédateurs : frénésie et exécution des ennemis blessés.',towers:['Cracheur d'épines','Griffeur alpha','Gelée glaciale','Bombardier chitineux','Salamandre ardente','Oracle tentaculaire','Rapace venimeux','Brute carapace','Mante de givre','Reine des essaims']},
- {name:'Végétaux',icon:'🌳',color:'#69bd83',dark:'#214b38',desc:'Arbres vivants, fleurs et dryades : racines et ralentissement.',towers:['Arbre archer','Gardien de l'écorce','Fleur de gel','Graine explosive','Ronce brûlante','Druide des mousses','Saule tireur','Ent ancestral','Lotus hivernal','Esprit de la forêt']},
- {name:'Magiques',icon:'🔮',color:'#a879e9',dark:'#39204d',desc:'Spectres, sorciers et cristaux : malédictions qui amplifient les dégâts.',towers:['Spectre archer','Chevalier astral','Cristal de stase','Orbe du chaos','Phénix arcanique','Sorcière des runes','Œil éthéré','Golem spectral','Prisme maudit','Archimage du néant']}
+ {
+  "name": "Humains",
+  "icon": "🏹",
+  "color": "#d8b45c",
+  "dark": "#59451f",
+  "desc": "Archers, chevaliers et mages ; défense anti-aérienne.",
+  "towers": [
+   "Archer du rempart",
+   "Chevalier du lion",
+   "Mage de givre",
+   "Bombardier royal",
+   "Pyromancien",
+   "Prêtre solaire",
+   "Rôdeur d'élite",
+   "Paladin",
+   "Enchanteur du froid",
+   "Archimage humain"
+  ]
+ },
+ {
+  "name": "Robots",
+  "icon": "🤖",
+  "color": "#69bde1",
+  "dark": "#203e58",
+  "desc": "Drones, automates et canons ; tirs perforants.",
+  "towers": [
+   "Drone arbalète",
+   "Mécha sentinelle",
+   "Cryobot",
+   "Canon à impulsion",
+   "Lance-flammes MK2",
+   "Technomancien",
+   "Drone sniper",
+   "Titan d'acier",
+   "Noyau cryogénique",
+   "Colosse plasma"
+  ]
+ },
+ {
+  "name": "Créatures",
+  "icon": "🦎",
+  "color": "#b66add",
+  "dark": "#44234f",
+  "desc": "Mutants et prédateurs ; exécution des blessés.",
+  "towers": [
+   "Cracheur d'épines",
+   "Griffeur alpha",
+   "Gelée glaciale",
+   "Bombardier chitineux",
+   "Salamandre ardente",
+   "Oracle tentaculaire",
+   "Rapace venimeux",
+   "Brute carapace",
+   "Mante de givre",
+   "Reine des essaims"
+  ]
+ },
+ {
+  "name": "Végétaux",
+  "icon": "🌳",
+  "color": "#69bd83",
+  "dark": "#214b38",
+  "desc": "Arbres, fleurs et dryades ; racines.",
+  "towers": [
+   "Arbre archer",
+   "Gardien de l'écorce",
+   "Fleur de gel",
+   "Graine explosive",
+   "Ronce brûlante",
+   "Druide des mousses",
+   "Saule tireur",
+   "Ent ancestral",
+   "Lotus hivernal",
+   "Esprit de la forêt"
+  ]
+ },
+ {
+  "name": "Magiques",
+  "icon": "🔮",
+  "color": "#a879e9",
+  "dark": "#39204d",
+  "desc": "Spectres, sorciers et cristaux ; malédictions.",
+  "towers": [
+   "Spectre archer",
+   "Chevalier astral",
+   "Cristal de stase",
+   "Orbe du chaos",
+   "Phénix arcanique",
+   "Sorcière des runes",
+   "Œil éthéré",
+   "Golem spectral",
+   "Prisme maudit",
+   "Archimage du néant"
+  ]
+ }
 ];
 const ARCH=[0,4,2,1,5,3,0,4,2,3];
 /* Coefficients volontairement proches en rendement global : chaque avantage a une vraie contrepartie. */
@@ -20,7 +110,7 @@ const FACTION_BALANCE=[
  {cost:1.04,dmg:.97,range:1.10,cd:1.03,airBonus:1.18,tag:'anti-aérien'},
  {cost:1.07,dmg:1.08,range:1.02,cd:1.08,pierce:.55,tag:'perforant'},
  {cost:1.02,dmg:.96,range:.93,cd:1.04,execute:1.30,tag:'frénésie'},
- {cost:1.00,dmg:.96,range:1.00,cd:1.02,root:.72,rootFactor:.82,tag:'racines'},
+ {cost:1,dmg:.96,range:1,cd:1.02,root:.72,rootFactor:.82,tag:'racines'},
  {cost:1.01,dmg:1.01,range:.99,cd:1.01,mark:1.14,tag:'malédiction'}
 ];
 const ROLE=[
