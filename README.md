@@ -44,6 +44,10 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.8 — 2026-11-14
+- The 3D view is now the default: the normal game address opens it. The classic 2D view stays available with `?rendu=2d`, or the "Jouer en vue 2D (classique)" link on the home screen.
+- Game rules unchanged (`sim.js` untouched, no server redeploy).
+
 ### 2.7 — 2026-11-14
 - Playable 3D view (prototype): add `?rendu=3d` to the address, or tap "Essayer la vue 3D (prototype)" on the home screen. Diorama board, animated towers and monsters, scaffolding while towers are built, projectiles and effects, same controls as 2D (two-tap building with a ghost tower, two-finger zoom and pan, tower panel).
 - 3D models for the whole game, one Blender script per asset in `art/`: all 50 towers (5 factions × 10, heroic-fantasy cartoon style, one look per faction), 17 animated monsters (sizes follow their in-game size), spawn portal and castle. `generer.py` now also exports pivots and animations and compresses with meshopt.

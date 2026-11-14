@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.7</title>
+<title>Winter Realms — Tower Wars · Édition 2.8</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
-<!-- 2.7 : three.js (copie figée dans vendor/three), chargé seulement en mode ?rendu=3d -->
+<!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
 <style>
 :root{--bg:#16221a;--panel:#27382b;--panel2:#33483a;--ink:#f6ecd0;--dim:#b9c4ab;--gold:#f2c14e;--red:#e4572e;color-scheme:dark}
@@ -155,7 +155,7 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
  <button type="button" data-faction="2" aria-pressed="false" onclick="window.chooseFaction(2)"><span class="ficon">🌿</span><span><strong>Peuples sylvestres</strong><small>Contrôle · racines et ralentissements</small></span></button>
  <button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">⚒️</span><span><strong>Clans nains</strong><small>Artillerie · perforation des armures</small></span></button>
  <button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">☠️</span><span><strong>Légion des ombres</strong><small>Malédictions · amplification des dégâts</small></span></button>
- </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><p id="difficultyLabel" hidden>Choisis la difficulté</p><div id="lv"><button id="go0" disabled>Normal</button><button id="go1" disabled>Difficile</button><button id="go2" disabled>Brutal</button></div><p id="vue3d"><a id="mode3d" href="?rendu=3d">Essayer la vue 3D (prototype)</a></p>
+ </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><p id="difficultyLabel" hidden>Choisis la difficulté</p><div id="lv"><button id="go0" disabled>Normal</button><button id="go1" disabled>Difficile</button><button id="go2" disabled>Brutal</button></div><p id="vue3d"><a id="mode3d" href="?rendu=2d">Jouer en vue 2D (classique)</a></p>
  <div id="online"><h2>Jouer entre amis</h2><input id="pname" maxlength="16" placeholder="Ton pseudo" autocomplete="nickname">
   <div class="orow"><button id="mkRoom" type="button">Créer un salon</button><input id="rcode" maxlength="4" placeholder="CODE" autocapitalize="characters"><button id="joinRoom" type="button">Rejoindre</button></div></div>
  <div id="lobby" hidden><h2>Salon <b id="lcode"></b></h2><p id="lhelp">Partage ce lien à tes amis :</p><div class="orow"><input id="llink" readonly><button id="lcopy" type="button">Copier</button></div>
@@ -560,10 +560,10 @@ function setup(cv,w,h){const r=dpr();cv.width=Math.round(w*r);cv.height=Math.rou
 /* ---------- vue du terrain : zoom (1× à 3×) et déplacement ----------
    Le canevas couvre toute la zone de jeu ; le plateau y est dessiné avec un décalage (VUE.ox, VUE.oy) et une taille de case cell × VUE.z. */
 const VUE={z:1,ox:0,oy:0,w:0,h:0},ZMAX=3;let cadre='#27382b';
-/* 2.7 : rendu 3D (prototype), activé par ?rendu=3d. Le module rendu3d.js est chargé à la demande.
+/* 2.7 : rendu 3D, chargé à la demande (module rendu3d.js). Depuis la 2.8, c'est le rendu par défaut ; ?rendu=2d garde la 2D.
    En 3D, la caméra est orthographique et inclinée : à l'écran, les rangées du terrain sont tassées d'un facteur KY,
    et TOPM cases sont gardées libres au-dessus du plateau pour les tours hautes. En 2D, KY = 1 et TOPM = 0 (rien ne change). */
-const R3D={on:QS.get('rendu')=='3d',api:null,KY:1,TOPM:0,echec:false};
+const R3D={on:QS.get('rendu')!='2d',api:null,KY:1,TOPM:0,echec:false};
 function fit(){const r=stage.getBoundingClientRect();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);cell=Math.max(16,Math.floor(Math.min((r.width-6)/C,(r.height-6)/(R*R3D.KY+R3D.TOPM))));mx=setup(main,VUE.w,VUE.h);if(R3D.api)R3D.api.taille(VUE.w,VUE.h,dpr());borner()}
 /* garde le plateau dans la zone visible : centré s'il est plus petit, sinon jamais plus de 8 px de vide au bord */
 function borner(){const s=cell*VUE.z,W=C*s,H=(R*R3D.KY+R3D.TOPM)*s,m=8,hm=R3D.TOPM*s;
@@ -817,8 +817,8 @@ function loop(now){const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;
 
 fit();if(typeof ResizeObserver!='undefined')new ResizeObserver(fit).observe(stage);else addEventListener('resize',fit);
 G=new Game(soloSeats(chosenClass),0);G.over=true;LV=0;useBoards(G.B,0);started=true;over=true;requestAnimationFrame(loop);
-/* 2.7 : lien vers l'autre rendu (2D ↔ 3D) sur l'écran d'accueil, puis chargement du rendu 3D si demandé */
-{const a=$('mode3d');if(a){const q=new URLSearchParams(location.search);if(R3D.on)q.delete('rendu');else q.set('rendu','3d');a.href=location.pathname+(q.toString()?'?'+q:'');a.textContent=R3D.on?'Revenir à la vue 2D':'Essayer la vue 3D (prototype)'}}
+/* lien vers l'autre rendu (2D ↔ 3D) sur l'écran d'accueil, puis chargement du rendu 3D (par défaut depuis la 2.8) */
+{const a=$('mode3d');if(a){const q=new URLSearchParams(location.search);if(R3D.on)q.set('rendu','2d');else q.delete('rendu');a.href=location.pathname+(q.toString()?'?'+q:'');a.textContent=R3D.on?'Jouer en vue 2D (classique)':'Revenir à la vue 3D'}}
 charger3D();
 /* lien d'invitation ?salon=CODE : on rejoint directement si le pseudo est déjà connu */
 if(QS.get('salon')){$('rcode').value=QS.get('salon').toUpperCase().slice(0,4);if(store.get('wr-name'))NET.join($('rcode').value);else{$('pname').focus();$('sub').textContent='Tu es invité·e dans le salon '+$('rcode').value+' : choisis un pseudo puis touche « Rejoindre ».'}}

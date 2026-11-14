@@ -8,7 +8,7 @@ const N=require('../outils/navigateur'),{demarrer}=require('../outils/serveur'),
 if(!N.disponible()){test('Parcours navigateur',{skip:'Playwright n\'est pas installé sur cette machine : tests navigateur ignorés'},()=>{})}
 else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile — ${format}`,()=>{
  let srv,nav,o,p;
- test.before(async()=>{srv=await demarrer(RACINE);nav=await N.lancer();o=await N.ouvrir(nav,srv.url,{format});p=o.page});
+ test.before(async()=>{srv=await demarrer(RACINE);nav=await N.lancer();o=await N.ouvrir(nav,srv.url+'?rendu=2d',{format});p=o.page});
  test.after(async()=>{if(o)await o.fermer();if(nav)await nav.close();if(srv)await srv.fermer()});
  const val=f=>p.evaluate(f);
 

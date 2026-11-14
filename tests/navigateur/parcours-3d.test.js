@@ -16,7 +16,7 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile e
   assert.equal(await N.attendre3D(p),true,'rendu 3D prêt');
   const e=await r3d();assert.equal(e.on,true);assert.ok(e.KY<1,'rangées tassées par la caméra inclinée');
   assert.equal(await p.locator('#main3d').count(),1,'canevas WebGL présent');assert.deepEqual(o.erreurs,[]);
-  assert.equal(await p.textContent('#mode3d'),'Revenir à la vue 2D');
+  assert.equal(await p.textContent('#mode3d'),'Jouer en vue 2D (classique)');
  });
  test('Une partie démarre : le plateau, le portail et le château sont dessinés',async()=>{
   await N.toucher(p,'#go0');await N.avancer(p,600);const e=await r3d();
@@ -65,3 +65,12 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile e
  });
  test('Aucune erreur JavaScript pendant tout le parcours',()=>assert.deepEqual(o.erreurs,[]));
 });
+
+/* 2.8 : la 3D est le rendu par défaut ; ?rendu=2d garde la 2D classique */
+if(N.disponible())test('Adresse par défaut : la 3D ; avec ?rendu=2d : la 2D',async()=>{
+ const srv=await demarrer(RACINE),nav=await N.lancer({webgl:true});
+ try{let o=await N.ouvrir(nav,srv.url);assert.equal(await N.attendre3D(o.page),true,'3D chargée sans paramètre');
+  assert.equal(await o.page.textContent('#mode3d'),'Jouer en vue 2D (classique)');assert.deepEqual(o.erreurs,[]);await o.fermer();
+  o=await N.ouvrir(nav,srv.url+'?rendu=2d');const e=await o.page.evaluate(()=>R3D_ETAT());assert.equal(e.on,false);assert.equal(await o.page.locator('#main3d').count(),0);
+  assert.equal(await o.page.textContent('#mode3d'),'Revenir à la vue 3D');assert.deepEqual(o.erreurs,[]);await o.fermer()}
+ finally{await nav.close();await srv.fermer()}});
