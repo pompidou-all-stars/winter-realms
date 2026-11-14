@@ -2,6 +2,11 @@
 
 A browser tower-wars game: the game itself is `index.html` (interface, drawing, sounds) plus `sim.js` (the simulation, also used by the multiplayer server). No build step, no dependencies.
 
+## Changelog — 2.8 (2026-11-14)
+- Cinq factions originales : Humains, Robots, Créatures, Végétaux et Magiques, avec 10 tours/personnages chacune.
+- Nouveaux noms, couleurs, icônes et détails de silhouettes 2D ; bonus de gameplay réaffectés à chaque identité.
+- Les anciens modèles 3D devront être adaptés lors d'une prochaine passe graphique.
+
 ## Play
 
 Online: **https://pompidou-all-stars.github.io/winter-realms/** (updated automatically on every push to `main`).
