@@ -44,6 +44,13 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.3 — 2026-11-14
+- Bigger board on phones: the four player thumbnails leave the top bar and open in a floating panel over the board, from a map icon in the top-left corner. Tap a thumbnail to watch that board; tap the banner to come back.
+- Your lives now show in the top bar (❤).
+- Tower cards get role badges in bevelled gold frames (arrow, sword, snowflake, bomb, flame, star), a target badge (ground only / ground and air) and a magic marker, all drawn in code. Card text now reads "⚔ 15 dégâts/s" and "◎ portée 3,1".
+- Long-press a tower card (or hover with the mouse) to preview its info panel without selecting it.
+- Interface only (`sim.js` untouched, no server redeploy).
+
 ### 2.2 — 2026-11-14
 - Building a tower now takes two taps: the first tap shows a preview (ghost tower, range, price), the second tap on the same tile builds it. Invalid tiles are reported on the first tap. Dragging a finger no longer builds towers.
 - Game rules unchanged (`sim.js` untouched).

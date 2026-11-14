@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.2</title>
+<title>Winter Realms — Tower Wars · Édition 2.3</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#16221a;--panel:#27382b;--panel2:#33483a;--ink:#f6ecd0;--dim:#b9c4ab;--gold:#f2c14e;--red:#e4572e;color-scheme:dark}
@@ -16,15 +16,22 @@ button{font:inherit;color:inherit;cursor:pointer}
 #row1 .big{font-size:20px;color:var(--gold);display:inline-block}
 #row1 .coin{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid #9a6b12;margin-right:-3px}
 #row1 .sp{flex:1}
+#lives{color:#ff9a8a}#lives b{color:var(--ink)}
 #gold.pop{animation:pop .35s}
 @keyframes pop{40%{transform:scale(1.35)}}
 .ib{width:34px;height:30px;border:0;border-radius:9px;background:var(--panel2);display:grid;place-items:center;padding:0}
 .ib svg{width:18px;height:18px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .ib.off{opacity:.45}
-#chips{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.chip{display:flex;align-items:center;gap:4px;min-width:0;padding:2px 3px;border:2px solid transparent;border-radius:9px;background:var(--panel2);font-size:11px;line-height:1.2;text-align:left;white-space:pre-line;color:var(--dim)}
+/* 2.3 : les vignettes des joueurs flottent au-dessus du terrain (bouton en haut à gauche) pour agrandir la carte */
+#cartesBtn{position:absolute;left:8px;top:8px;z-index:3;display:flex;align-items:center;gap:6px;height:36px;min-width:36px;justify-content:center;padding:0 7px;border:2px solid var(--c,#71836c);border-radius:99px;background:#000b;color:var(--ink);font-size:12px;font-weight:700}
+#cartesBtn svg{width:18px;height:18px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#cartesTxt:empty{display:none}
+#cartesBtn.on{background:var(--panel2)}
+#chips{position:absolute;left:8px;top:50px;z-index:3;display:grid;grid-template-columns:repeat(2,auto);gap:6px;padding:6px;border-radius:12px;background:#0b140fee;box-shadow:0 10px 28px #000b}
+#chips[hidden]{display:none}
+.chip{display:flex;align-items:center;gap:6px;min-width:0;padding:4px 8px 4px 4px;border:2px solid transparent;border-radius:9px;background:var(--panel2);font-size:11px;line-height:1.2;text-align:left;white-space:pre-line;color:var(--dim)}
 .chip canvas{flex:0 0 auto;border-radius:3px}
-.chip b{display:block;font-size:12px;font-weight:700;color:var(--c)}
+.chip b{display:block;font-size:13px;font-weight:700;color:var(--c)}
 .chip.on{border-color:var(--c);background:#0004}
 .chip.dead{opacity:.35}
 #tbar{position:absolute;left:0;right:0;bottom:0;height:4px;background:#0004}
@@ -34,7 +41,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 #zoomReset{position:absolute;right:8px;top:8px;width:auto;padding:0 10px;gap:5px;display:flex;align-items:center;font-size:12px;font-weight:700;background:#000a;color:var(--ink);border:0;border-radius:99px;height:30px}
 #zoomReset svg{width:16px;height:16px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #banner,#toast{position:absolute;left:50%;transform:translateX(-50%);padding:5px 12px;border-radius:99px;font-size:13px;white-space:nowrap;pointer-events:none}
-#banner{top:8px;color:#fff;font-weight:700}
+#banner{bottom:48px;color:#fff;font-weight:700;pointer-events:auto;box-shadow:0 4px 14px #0008}
 #toast{bottom:10px;background:#000c}
 [hidden]{display:none!important}
 #ctl{grid-area:ctl;display:flex;flex-direction:column;gap:5px;min-width:0}
@@ -57,13 +64,14 @@ button{font:inherit;color:inherit;cursor:pointer}
 #fiche .st i{font-style:normal;color:var(--ink);font-weight:700}
 #fiche .ex{margin-top:2px;font-size:11px;line-height:1.3;color:#9be7ff;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 #fiche .next{color:#a8e07a}
+#fiche.apercu{box-shadow:inset 0 0 0 2px #f2c14e88}
 #fiche.envoyer{background:#3a2622;color:#ffcfc4}
 #bar{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
 #bar::-webkit-scrollbar{display:none}
-#bar button{position:relative;flex:0 0 auto;min-width:62px;padding:2px 5px 4px;border:2px solid transparent;border-radius:10px;background:var(--panel);display:flex;flex-direction:column;align-items:center;line-height:1.15;white-space:nowrap}
+#bar button{-webkit-touch-callout:none;position:relative;flex:0 0 auto;min-width:62px;padding:2px 5px 4px;border:2px solid transparent;border-radius:10px;background:var(--panel);display:flex;flex-direction:column;align-items:center;line-height:1.15;white-space:nowrap}
 #bar button b{font-size:12px;font-weight:700}
 #bar button small{font-size:11px;color:var(--gold)}
-#bar button em{display:block;min-height:11px;font-style:normal;font-size:9px;font-weight:700;color:#9be7ff}
+#bar button em{display:block;min-height:11px;white-space:pre-line;font-style:normal;font-size:10px;line-height:1.2;font-weight:700;color:#9be7ff}
 #bar button.sel{border-color:var(--gold);background:var(--panel2)}
 #bar button.dis{opacity:.45}
 #bar button.dis small{color:#ff8a7a}
@@ -76,7 +84,6 @@ button{font:inherit;color:inherit;cursor:pointer}
 #ov button{font-size:18px;font-weight:700;padding:10px 18px;border:0;border-radius:12px;background:var(--gold);color:#3a2a05}
 @media (orientation:landscape) and (min-width:560px){
  #app{grid-template:"stage hud" auto "stage ctl" 1fr / 1fr minmax(230px,310px)}
- #chips{grid-template-columns:repeat(2,1fr)}
  #tabs{flex-wrap:wrap}
  #tabs .tw{flex:1 1 100%}
  #bar{flex-wrap:wrap;overflow:visible;align-content:flex-start}
@@ -124,13 +131,12 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
 </style></head><body>
 <div id="app">
  <div id="hud">
-  <div id="row1"><span class="coin"></span><b class="big" id="gold">0</b><span><b id="inc">+0</b> / 10 s</span><span id="clock">0:00</span><span id="factionBadge" style="font-size:11px;color:#f2c14e"></span><span class="sp"></span>
+  <div id="row1"><span class="coin"></span><b class="big" id="gold">0</b><span><b id="inc">+0</b> / 10 s</span><span id="clock">0:00</span><span id="lives">❤ <b>40</b></span><span id="factionBadge" style="font-size:11px;color:#f2c14e"></span><span class="sp"></span>
    <button class="ib" id="snd" aria-label="Couper ou remettre le son"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9a4 4 0 0 1 0 6"/></svg></button>
    <button class="ib" id="fs" aria-label="Plein écran"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></div>
-  <div id="chips"></div>
   <div id="tbar"><i id="tfill"></i></div>
  </div>
- <div id="stage"><canvas id="main"></canvas><div id="banner" hidden></div><div id="toast" hidden></div><button id="zoomReset" type="button" hidden aria-label="Revenir à la vue d'ensemble"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>Vue d'ensemble</button></div>
+ <div id="stage"><canvas id="main"></canvas><button id="cartesBtn" type="button" aria-expanded="false" aria-label="Voir les terrains des autres joueurs"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span id="cartesTxt"></span></button><div id="chips" hidden></div><div id="banner" hidden></div><div id="toast" hidden></div><button id="zoomReset" type="button" hidden aria-label="Revenir à la vue d'ensemble"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>Vue d'ensemble</button></div>
  <div id="ctl">
   <div id="tabs"><button data-t="t" class="tw on">Construire</button><div class="mon"><span>Envoyer</span><button data-t="n">Sol</button><button data-t="f">Volants</button><button data-t="s">Spéciaux</button></div></div>
   <div id="fiche"></div>
@@ -462,7 +468,7 @@ function drawMini(b,g,m){g.fillStyle=b.dead?'#333':'#426c3e';g.fillRect(0,0,C*m,
  for(const c of b.cr){g.fillStyle=CR[c.k].fly?'#fff':'#ffd23f';g.fillRect((c.x+.5)*m-1,(c.y+.5)*m-1,2,2)}}
 
 /* ---------- interface ---------- */
-const $=id=>document.getElementById(id),main=$('main'),stage=$('stage'),bar=$('bar'),MINI=3;
+const $=id=>document.getElementById(id),main=$('main'),stage=$('stage'),bar=$('bar'),MINI=4;
 if(typeof CanvasRenderingContext2D!='undefined'&&!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 /* G : partie locale (solo). B, P, time, tick, over, LV : vue courante, recopiée de G à chaque image. */
 let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',sel=0,view=0,mx,hudK='',tt=0,pick=null;
@@ -559,7 +565,7 @@ function dessinerVue(t){const g=mx,s=cell*VUE.z,W=C*s,H=R*s,rr=Math.min(10*VUE.z
  g.save();g.shadowColor='rgba(0,0,0,.56)';g.shadowBlur=32;g.shadowOffsetY=14;g.fillStyle=cadre;g.beginPath();g.roundRect(-3,-3,W+6,H+6,rr+3);g.fill();g.restore();
  g.beginPath();g.roundRect(0,0,W,H,rr);g.fillStyle='#18251c';g.fill();g.clip();draw(VB(),g,s,t);g.restore()}
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true},1900)}
-function setView(v){view=v;projet=null;const b=B[v],bn=$('banner');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · touche « '+P.name+' » pour revenir';bn.style.background=b.col;cadre=v!=me?b.col:'#27382b';hudK=''}
+function setView(v){view=v;projet=null;const b=B[v],bn=$('banner'),cb=$('cartesBtn');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · ↩ revenir au tien';cb.style.setProperty('--c',v==me?'#71836c':b.col);$('cartesTxt').textContent=v==me?'':b.name;cartes(false);bn.style.background=b.col;cadre=v!=me?b.col:'#27382b';hudK=''}
 const SOLO_COL=['#e4572e','#4aa3df','#b06ad0'];
 function soloSeats(f){return [{name:'Toi',col:FACTIONS[f].color,ai:0,classId:f}].concat([1,2,3].map(i=>({name:'IA '+i,col:SOLO_COL[i-1],ai:1,classId:(f+i)%5})))}
 /* installe une partie (locale ou reçue du serveur) : vignettes, joueur, vue */
@@ -569,12 +575,49 @@ function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=P.classId*10;projet
  $('factionBadge').textContent=FACTIONS[P.classId].icon+' '+FACTIONS[P.classId].name;hudK='';pick=null;setView(me);render()}
 function newSolo(lv){G=new Game(soloSeats(chosenClass),lv);LV=lv;useBoards(G.B,0);syncSolo()}
 function syncSolo(){time=G.time;tick=G.tick;over=G.over}
-function icon(fn){const c=document.createElement('canvas'),g=setup(c,40,40);fn(g);return c}
+function icon(fn,w=40,h=40){const c=document.createElement('canvas'),g=setup(c,w,h);fn(g);return c}
 function add(ic,name,sub,cost,fn,on,tag,at){const b=document.createElement('button'),n=document.createElement('b'),s=document.createElement('small');n.textContent=name;s.textContent=sub;b.append(ic,n,s);
  const e=document.createElement('em');e.textContent=tag||'';b.append(e);b.dataset.c=cost;b.dataset.at=at||0;b.className=on?'sel':'';b.onclick=fn;bar.appendChild(b)}
 const IC={coin(g){g.lineWidth=2;g.strokeStyle='#9a6b12';g.beginPath();g.arc(20,20,12,0,7);fs(g,'#f2c14e');g.beginPath();g.arc(20,20,6,0,7);g.stroke()},
  up(g){g.lineWidth=2;g.strokeStyle=OUT;g.lineJoin='round';pg(g,'#7cdc6a',20,7,32,21,25,21,25,33,15,33,15,21,8,21)},
  x(g){g.lineWidth=4;g.lineCap='round';g.strokeStyle='#b9c4ab';g.beginPath();g.moveTo(12,12);g.lineTo(28,28);g.moveTo(28,12);g.lineTo(12,28);g.stroke()}};
+/* 2.2 : pastilles de rôle des cartes de tours. Cadre carré biseauté façon « carte de commande » de jeu de stratégie, glyphes dessinés ici (aucune image). */
+const BADGE={arrow:'#5fb04a',slash:'#c0392b',frost:'#3d9be0',canon:'#b0703a',flame:'#e67e22',mage:'#9b59d0',sol:'#8a6a3a',air:'#6fb6e8',magie:'#8e44ad'};
+function glyphFill(g,c){const l=g.createLinearGradient(0,-1,0,1);l.addColorStop(0,'#fff');l.addColorStop(.45,c);l.addColorStop(1,c);return l}
+const GLYPH={
+ arrow(g){g.rotate(-Math.PI/4);g.fillStyle=glyphFill(g,'#d9c7a0');g.fillRect(-.75,-.07,1.2,.14);g.strokeRect(-.75,-.07,1.2,.14);
+  g.beginPath();g.moveTo(.85,0);g.lineTo(.4,-.32);g.lineTo(.48,0);g.lineTo(.4,.32);g.closePath();g.fillStyle=glyphFill(g,'#c9d3dc');g.fill();g.stroke();
+  g.beginPath();g.moveTo(-.55,0);g.lineTo(-.85,-.3);g.lineTo(-.7,0);g.lineTo(-.85,.3);g.closePath();g.fillStyle=glyphFill(g,'#7cdc6a');g.fill();g.stroke()},
+ slash(g){g.rotate(Math.PI/4);g.beginPath();g.moveTo(0,-.9);g.lineTo(.15,-.7);g.lineTo(.15,.3);g.lineTo(-.15,.3);g.lineTo(-.15,-.7);g.closePath();g.fillStyle=glyphFill(g,'#c9d3dc');g.fill();g.stroke();
+  g.fillStyle=glyphFill(g,'#e0a93a');g.fillRect(-.45,.3,.9,.14);g.strokeRect(-.45,.3,.9,.14);g.fillStyle='#7a3b1a';g.fillRect(-.08,.44,.16,.32);g.strokeRect(-.08,.44,.16,.32);
+  g.beginPath();g.arc(0,.84,.11,0,7);g.fillStyle='#e0a93a';g.fill();g.stroke()},
+ frost(g){g.lineCap='round';for(let i=0;i<3;i++){g.save();g.rotate(i*Math.PI/3);g.beginPath();g.moveTo(0,-.85);g.lineTo(0,.85);
+  for(const s of[-1,1]){g.moveTo(0,s*.5);g.lineTo(.25,s*.75);g.moveTo(0,s*.5);g.lineTo(-.25,s*.75)}
+  const w=g.lineWidth;g.lineWidth=w*2.6;g.strokeStyle='#0b1a2a';g.stroke();g.lineWidth=w*1.2;g.strokeStyle='#e8f6ff';g.stroke();g.restore()}},
+ canon(g){g.beginPath();g.arc(-.1,.15,.6,0,7);const r=g.createRadialGradient(-.3,-.1,.05,-.1,.15,.6);r.addColorStop(0,'#8a8f99');r.addColorStop(1,'#1d2026');g.fillStyle=r;g.fill();g.stroke();
+  g.beginPath();g.moveTo(.3,-.3);g.quadraticCurveTo(.5,-.6,.65,-.55);g.stroke();
+  g.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4,q=i%2?.12:.3;g.lineTo(.7+Math.cos(a)*q,-.6+Math.sin(a)*q)}g.closePath();g.fillStyle='#ffd34a';g.fill()},
+ flame(g){g.beginPath();g.moveTo(0,-.9);g.bezierCurveTo(.25,-.5,.75,-.2,.6,.35);g.bezierCurveTo(.5,.8,-.5,.8,-.6,.35);g.bezierCurveTo(-.7,-.1,-.3,-.2,-.2,-.5);g.bezierCurveTo(-.05,-.3,0,-.55,0,-.9);g.closePath();
+  const l=g.createLinearGradient(0,-.9,0,.8);l.addColorStop(0,'#ffe27a');l.addColorStop(.5,'#ff8a1f');l.addColorStop(1,'#c0291b');g.fillStyle=l;g.fill();g.stroke();
+  g.beginPath();g.moveTo(0,-.1);g.bezierCurveTo(.3,.2,.3,.6,0,.62);g.bezierCurveTo(-.3,.6,-.3,.2,0,-.1);g.fillStyle='#fff3b0';g.fill()},
+ mage(g){g.beginPath();for(let i=0;i<8;i++){const a=i*Math.PI/4-Math.PI/2,q=i%2?.28:.9;g.lineTo(Math.cos(a)*q,Math.sin(a)*q)}g.closePath();
+  const r=g.createRadialGradient(0,0,.05,0,0,.9);r.addColorStop(0,'#fff');r.addColorStop(.35,'#e3b8ff');r.addColorStop(1,'#8e44ad');g.fillStyle=r;g.fill();g.stroke()},
+ sol(g){g.beginPath();g.moveTo(-.9,.6);g.lineTo(-.35,-.35);g.lineTo(-.1,0);g.lineTo(.25,-.6);g.lineTo(.9,.6);g.closePath();g.fillStyle=glyphFill(g,'#9a7444');g.fill();g.stroke();
+  g.beginPath();g.moveTo(.25,-.6);g.lineTo(.42,-.3);g.lineTo(.08,-.3);g.closePath();g.fillStyle='#fff';g.fill()},
+ air(g){g.beginPath();g.moveTo(-.8,.5);g.bezierCurveTo(-.6,-.4,.2,-.8,.9,-.7);g.bezierCurveTo(.6,-.45,.7,-.35,.45,-.2);g.bezierCurveTo(.55,-.1,.45,0,.25,.1);g.bezierCurveTo(.3,.25,.1,.35,-.1,.35);g.closePath();
+  g.fillStyle=glyphFill(g,'#cfe6f5');g.fill();g.stroke()},
+ magie(g){GLYPH.mage(g)}};
+function drawBadge(g,x,y,s,kind){const c=BADGE[kind];g.save();
+ g.fillStyle='#000';g.fillRect(x-.5,y-.5,s+1,s+1);
+ const b=g.createLinearGradient(x,y,x+s,y+s);b.addColorStop(0,'#fbe39a');b.addColorStop(.5,'#b98a2e');b.addColorStop(1,'#4d3510');g.fillStyle=b;g.fillRect(x,y,s,s);
+ const p=s>11?2:1.5,r=g.createRadialGradient(x+s*.4,y+s*.35,0,x+s/2,y+s/2,s*.75);r.addColorStop(0,c);r.addColorStop(1,'#07080c');g.fillStyle=r;g.fillRect(x+p,y+p,s-2*p,s-2*p);
+ g.strokeStyle='#0008';g.lineWidth=.6;g.strokeRect(x+p,y+p,s-2*p,s-2*p);
+ g.beginPath();g.rect(x+p,y+p,s-2*p,s-2*p);g.clip();
+ const h=(s-2*p)/2;g.translate(x+s/2,y+s/2);g.scale(h*.92,h*.92);g.lineWidth=1.1/(h*.92);g.lineJoin='round';g.strokeStyle='#0b0b10';GLYPH[kind](g);g.restore()}
+/* pastilles d'une tour dans une icône 40×40 : rôle en haut à droite, cibles en bas à gauche, magie à côté */
+function drawTowerBadges(g,k,w=56,h=46){const T=TW[k];drawBadge(g,w-21,1,20,T.s);drawBadge(g,1,h-18,17,T.gr?'sol':'air');if(T.mag)drawBadge(g,20,h-14,13,'magie')}
+/* icône de carte de tour (2.2) : plus large que haute pour loger les pastilles autour de la tour */
+const towerIcon=(k,lv)=>icon(g=>{drawTower(g,k,28,27,30,.7,0,lv,0);drawTowerBadges(g,k)},56,46);
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 /* messages d'erreur renvoyés par Game.action */
 const ERR={poor:"Pas assez d'or",blocked:'Impossible ici : le chemin serait bloqué',max:'Niveau maximum atteint',over:'Partie terminée',bad:'Action impossible'};
@@ -603,7 +646,7 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
  const bf=bonusFaction(T.faction);if(bf)part(bf);
  txt.append(tt,st,ex);
- f.append(icon(g=>drawTower(g,k,20,25,30,.7,0,lv,0)),txt)}
+ f.append(towerIcon(k,lv),txt)}
 function ficheEnvoi(){const f=$('fiche');f.textContent='';f.className='envoyer';f.dataset.mode='envoyer';
  const d=document.createElement('div');d.className='txt';const b=document.createElement('b');b.textContent='Envoyer des monstres';
  d.append(b,document.createElement('br'),'Chaque envoi attaque tous tes adversaires (4 monstres chacun) et augmente ton revenu pour toute la partie.');f.appendChild(d)}
@@ -612,8 +655,17 @@ function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P
   if(t.lv<5)add(icon(IC.up),'Améliorer',upCost(t)+' or',upCost(t),()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()},1,'niveau '+(t.lv+1));
   add(icon(IC.coin),'Vendre','+'+Math.floor(t.inv*.7)+' or',0,()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()});
   add(icon(IC.x),'Fermer',' ',0,()=>{pick=null;render()});return}
- if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(icon(g=>drawTower(g,k,20,25,30,.7,0,1,0)),T.n,T.c+' or',T.c,()=>{sel=k;if(projet)projet.k=k;render()},sel==k,'⚔'+dps(k,1)+'/s ◎'+fr(T.r)+(T.gr?'':' ✈'))})}
+ if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(towerIcon(k,1),T.n,T.c+' or',T.c,()=>{sel=k;if(projet)projet.k=k;render()},sel==k,'⚔ '+dps(k,1)+' dégâts/s\n◎ portée '+fr(T.r));apercu(bar.lastChild,k)})}
  else{ficheEnvoi();byCat(tab).forEach(k=>{const T=CR[k],lock=time<(T.at||0);add(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.n,T.c+' or · +'+T.i+' revenu',T.c,()=>playerSend(k),0,lock?'🔒 dès '+mmss(T.at):T.tag||'',T.at);bar.lastChild.dataset.tag=T.tag||''})}}
+/* 2.2 : aperçu de la fiche sans changer la sélection. Appui long (400 ms) au doigt, survol à la souris. */
+let apT=0;
+function apercu(b,k){const voir=()=>{if(tab=='t'&&!pick){remplirFiche('construire',k);$('fiche').classList.add('apercu')}},
+  rendre=()=>{clearTimeout(apT);if($('fiche').classList.contains('apercu')&&tab=='t'&&!pick)remplirFiche('construire',sel)},clic=b.onclick;
+ b.addEventListener('pointerdown',e=>{if(e.pointerType=='mouse')return;b.lp=0;clearTimeout(apT);apT=setTimeout(()=>{b.lp=1;voir();try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}},400)});
+ b.addEventListener('pointerup',e=>{if(e.pointerType!='mouse')rendre()});b.addEventListener('pointercancel',rendre);
+ b.addEventListener('pointerenter',e=>{if(e.pointerType=='mouse')voir()});b.addEventListener('pointerleave',e=>{if(e.pointerType=='mouse')rendre();else clearTimeout(apT)});
+ b.addEventListener('contextmenu',e=>e.preventDefault());
+ b.onclick=e=>{if(b.lp){b.lp=0;return}clic(e)}}
 function setTab(t){tab=t;pick=null;projet=null;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==t));render()}
 function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(time<(T.at||0)){showErr('locked',a);return}if(!NET.on&&P.gold<T.c){showErr('poor',a);return}if(doAction(a)==='')sfx('send')}
 
@@ -686,6 +738,11 @@ for(const n of['pointerup','pointercancel'])main.addEventListener(n,e=>{const ta
  DOIGTS.delete(e.pointerId);if(geste){geste=null;gesteFini=DOIGTS.size>0}if(!DOIGTS.size)gesteFini=false});
 main.addEventListener('wheel',e=>{e.preventDefault();zoomer(VUE.z*Math.exp(-e.deltaY*.0015),e.clientX,e.clientY)},{passive:false});
 $('zoomReset').onclick=vueEnsemble;
+/* 2.3 : panneau flottant des terrains. Bouton = ouvrir/fermer ; toucher ailleurs le ferme sans poser de tour ; la bannière ramène à son terrain. */
+function cartes(o){const c=$('chips'),cb=$('cartesBtn');c.hidden=!o;cb.classList.toggle('on',o);cb.setAttribute('aria-expanded',o?'true':'false')}
+$('cartesBtn').onclick=()=>cartes($('chips').hidden);
+$('banner').onclick=()=>setView(me);
+stage.addEventListener('pointerdown',e=>{if(!$('chips').hidden&&!e.target.closest('#chips,#cartesBtn')){cartes(false);e.stopPropagation();e.preventDefault()}},true);
 $('snd').onclick=()=>{muted=!muted;$('snd').classList.toggle('off',muted);audio();if(!muted)sfx('income')};
 $('fs').onclick=()=>{const d=document,e=d.documentElement,no=()=>toast("Plein écran refusé ici : ouvre le jeu dans ton navigateur");
  try{if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return}
@@ -702,7 +759,7 @@ function onLog(l){
  else if(l.type=='out'){if(l.i!==me){toast(B[l.i].name+' est éliminé·e');sfx('out')}else if(NET.on){over=true;toast('Tu es éliminé·e : tu peux regarder la fin de la partie');sfx('lose')}}
  else if(l.type=='end')end(l.winner)}
 function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.dead).join('|')+'|'+Math.floor(time);
- if(k!=hudK){hudK=k;$('gold').textContent=Math.floor(P.gold);$('inc').textContent='+'+P.inc;$('clock').textContent=mmss(time);
+ if(k!=hudK){hudK=k;$('gold').textContent=Math.floor(P.gold);$('inc').textContent='+'+P.inc;$('clock').textContent=mmss(time);$('lives').lastChild.textContent=Math.max(0,P.lives);
   for(const b of B){b.ui.s.textContent=b.dead?'éliminé':Math.max(0,b.lives)+' vies\n+'+eff(b);b.ui.e.className='chip'+(b.i==view?' on':'')+(b.dead?' dead':'')}}
  $('tfill').style.transform='scaleX('+(1-tick/10).toFixed(3)+')';
  for(const b of bar.children){b.classList.toggle('dis',+b.dataset.c>P.gold||time<+b.dataset.at);

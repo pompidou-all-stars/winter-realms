@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.2)
+# Winter Realms — Tower Wars (Édition 2.3)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -343,14 +343,23 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 
 ## 9. Interface et commandes
 
-- **HUD** : or, revenu toutes les 10 s, horloge, faction, bouton son, bouton plein écran. On y trouve aussi 4 vignettes avec une mini-carte, les vies et le revenu (bonus de difficulté compris) de chaque terrain. **Toucher une vignette** affiche le terrain correspondant (en lecture seule).
+- **HUD** : or, revenu toutes les 10 s, horloge, **vies du joueur** (❤, depuis la 2.3), faction, bouton son, bouton plein écran.
+- **Terrains des joueurs** (flottants depuis la 2.3, pour agrandir la carte sur téléphone) : un **bouton rond avec une icône de carte**, en haut à gauche du terrain (`#cartesBtn`), ouvre un panneau posé **par-dessus le terrain** (`#chips`) avec les 4 vignettes : mini-carte, vies et revenu (bonus de difficulté compris) de chaque terrain.
+  - **Toucher une vignette** affiche le terrain correspondant (en lecture seule) et referme le panneau ; le bouton prend alors la couleur et le nom de ce joueur.
+  - Toucher le terrain pendant que le panneau est ouvert le referme **sans poser de tour**.
+  - La bannière en bas du terrain (« Terrain de … · ↩ revenir au tien ») se touche pour revenir à son propre terrain.
 - **Onglets** : « Construire » ou « Envoyer » (Sol, Volants, Spéciaux). Les boutons trop chers ou pas encore débloqués sont grisés, et leur prix passe en rouge quand l'or manque.
 - **Fiche d'information** (depuis la 2.1), entre les onglets et les boutons :
   - **Construire** : la tour sélectionnée est décrite en clair : nom, type, rôle, ⚔ dégâts par seconde, ◎ portée en cases, cibles (« sol et air » ou « sol uniquement »), effets (explosion de zone, ralentissement, souffle en cône, corps à corps, révèle les Spectres, magique), bonus de faction chiffré (calculé à partir de `FACTION_BALANCE`) ;
   - **tour posée** : les mêmes informations au niveau actuel, avec le gain du niveau suivant et son prix ;
   - **Envoyer** : rappel de la règle (chaque envoi attaque tous les adversaires et augmente le revenu).
   - En portrait, la fiche a une hauteur fixe pour que le terrain ne change pas de taille.
-- **Cartes de tours** : prix, puis `⚔ dégâts/s ◎ portée`, et `✈` si la tour touche les volants. **Cartes de monstres** : prix et revenu gagné ; un monstre verrouillé affiche « 🔒 dès m:ss ».
+- **Cartes de tours** : prix, puis deux lignes en clair, « ⚔ N dégâts/s » et « ◎ portée N » (depuis la 2.3 ; avant, `⚔N/s ◎N ✈`). Le `✈` est remplacé par la pastille de cibles. **Cartes de monstres** : prix et revenu gagné ; un monstre verrouillé affiche « 🔒 dès m:ss ».
+- **Pastilles de rôle** (depuis la 2.3) : sur l'icône de chaque carte de tour (56 × 46 px, fonction `towerIcon`) et dans la fiche, des pastilles carrées à cadre doré biseauté, dans l'esprit des icônes de commande des jeux de stratégie (glyphes dessinés en code, fonctions `drawBadge` et `drawTowerBadges`, table `BADGE`) :
+  - **en haut à droite, le rôle** (archétype `T.s`) : flèche (Archer), épée (Garde), flocon (Givre), bombe (Canon), flamme (Flammes), étoile (Mage) ;
+  - **en bas à gauche, les cibles** : montagne = sol uniquement (`T.gr`), aile = sol et air ;
+  - **petite étoile violette** à côté : tour magique (`T.mag`), sans effet sur le Briseur de runes.
+- **Aperçu sans sélectionner** (depuis la 2.3) : un **appui long** (400 ms) sur une carte de tour affiche sa fiche (liseré doré) sans changer la tour sélectionnée ; en relâchant, la fiche revient à la tour sélectionnée. À la souris, le **survol** fait la même chose. Un simple toucher sélectionne la tour, comme avant.
 - **Construire une tour : deux touchers** (depuis la 2.2, pour éviter les constructions par erreur) :
   - **1er toucher** sur une case libre : **aperçu** (tour fantôme, cercle de portée en pointillés, case surlignée en or) et message « Touchez encore la case pour construire (prix) ». Rien n'est construit ni payé ;
   - **2e toucher sur la même case** : construction. Il n'y a pas de délai imposé entre les deux touchers ;
@@ -590,3 +599,4 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 | 2026-11-14 | 2.0.1 | Correctif outillage : le déploiement automatique du serveur passe de Node 20 à **Node 22** (Wrangler 4 refuse Node 20 ; le premier déploiement automatique avait échoué). **Aucun changement de jeu.** |
 | 2026-11-14 | 2.1 | **Interface plus claire** : fiche d'information de la tour (dégâts/s, portée, cibles, effets, bonus de faction chiffré, gain du niveau suivant), cartes de tours avec dégâts/s, portée et ✈, prix en rouge si l'or manque, monstres verrouillés avec heure de déblocage. **Zoom (1× à 3×) et déplacement à deux doigts**, molette, bouton « Vue d'ensemble », cadre de la partie visible sur la vignette. Pose au doigt au relâcher. Correction du paysage sur téléphone (haut et bas coupés). Tests navigateur complétés (19 vérifications par orientation), 5ᵉ capture (zoom). **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
 | 2026-11-14 | 2.2 | **Construction en deux touchers** : le 1er toucher montre un aperçu (tour fantôme, portée, prix), le 2e sur la même case construit ; une case impossible est signalée dès le 1er toucher ; glisser le doigt ne construit plus rien. Tests navigateur complétés (22 vérifications par orientation). **Règles du jeu inchangées** (`sim.js` non modifié). |
+| 2026-11-14 | 2.3 | **Carte plus grande sur téléphone et pastilles de rôle des tours**. Carte : les 4 vignettes des joueurs quittent le HUD et s'ouvrent dans un panneau flottant par-dessus le terrain, depuis un bouton-icône en haut à gauche. Vies du joueur ajoutées dans le HUD (❤). Bannière « ↩ revenir au tien » cliquable. Mini-cartes un peu plus grandes. Tours : pastilles de rôle (flèche, épée, flocon, bombe, flamme, étoile), de cibles (sol ou sol et air) et de magie dans des cadres dorés biseautés dessinés en code ; texte des cartes « ⚔ N dégâts/s » et « ◎ portée N » ; appui long (ou survol) sur une carte pour voir sa fiche sans la sélectionner. Interface uniquement : `sim.js` inchangé. Test du parcours mobile adapté (ouvrir le panneau avant de toucher une vignette). |
