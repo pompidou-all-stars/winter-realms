@@ -11,8 +11,9 @@ const INTERNES=['aiAct','aiDefend','aiAttack','PLAN','pathCells','invest','airIn
 
 function sha256(fichier){return crypto.createHash('sha256').update(fs.readFileSync(fichier)).digest('hex')}
 
-/* source : 'actuel', 'v1.7', un chemin de fichier, ou {code} (texte d'un sim.js, par exemple extrait de git) */
-function charger(source='actuel',{graine=null}={}){
+/* source : 'actuel', 'v1.7', un chemin de fichier, ou {code} (texte d'un sim.js, par exemple extrait de git).
+   graine : 1 par défaut, pour que chaque test soit reproductible ; graine:null redonne le vrai hasard (Math.random). */
+function charger(source='actuel',{graine=1}={}){
  const code=typeof source=='object'?source.code:fs.readFileSync(MOTEURS[source]||source,'utf8');
  const M={};for(const n of Object.getOwnPropertyNames(Math))M[n]=Math[n];M.random=graine==null?Math.random:mulberry32(graine);
  const ctx={module:{exports:{}},Math:M,console};vm.createContext(ctx);

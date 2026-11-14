@@ -14,7 +14,9 @@ const DEBUT=new Date('2026-01-01T12:00:00Z');
 
 function disponible(){return !!playwright}
 
-async function lancer(){return playwright.chromium.launch()}
+/* options de Chromium pour un rendu reproductible : rendu logiciel, pas de lissage sous-pixel ni d'optimisations variables */
+const OPTIONS_STABLES=['--disable-gpu','--disable-lcd-text','--font-render-hinting=none','--force-color-profile=srgb','--disable-partial-raster','--disable-skia-runtime-opts','--disable-threaded-animation','--disable-threaded-scrolling','--disable-checker-imaging'];
+async function lancer(){return playwright.chromium.launch({args:OPTIONS_STABLES})}
 
 /* ouvre le jeu ; options : format, graine, police ('reelle' ou 'bloquee'), echelle (densité de pixels) */
 async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='reelle',echelle=2}={}){
