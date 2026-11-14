@@ -30,6 +30,9 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### Workflow — 2026-11-14
+- New branch rule (see CLAUDE.md): no direct commits to `main`. One branch per change (`<type>/<topic>`), then a pull request reviewed by another member before merging. No game changes.
+
 ### 2.0.1 — 2026-11-14
 - Online play is restricted to France (the server checks the player's country). Players elsewhere get a clear message; solo play still works everywhere.
 

@@ -24,12 +24,36 @@ On commite **souvent, par petites étapes**, pour que tout le monde suive l'avan
 
 1. **Un commit par amélioration** (une nouvelle tour, un monstre, une retouche d'équilibrage, un correctif, une évolution visuelle…). On ne mélange pas plusieurs sujets dans un même commit.
 2. Chaque commit contient **à la fois** le changement dans `index.html` **et** la mise à jour de `CLAUDE.md`.
-3. **Nouvelle version reçue** (fichier HTML partagé par un membre du groupe) : la copier dans `index.html`, lire le diff (`git diff`), mettre à jour `CLAUDE.md`, puis faire un commit nommé `Version X.Y : <résumé>`.
+3. **Nouvelle version reçue** (fichier HTML partagé par un membre du groupe) : créer une branche, y copier le fichier dans `index.html`, lire le diff (`git diff`), mettre à jour `CLAUDE.md`, puis faire un commit nommé `Version X.Y : <résumé>`.
 4. **Messages de commit** en français, au présent, courts et précis : `Ajoute la tour …`, `Corrige …`, `Rééquilibre …`, `Version 1.6 : plateau diorama`.
-5. Faire `git pull` avant de commencer et `git push` juste après chaque commit, pour que les autres récupèrent les changements.
+5. Faire `git push` juste après chaque commit **sur sa branche**, pour que les autres voient l'avancement.
 6. Ne jamais laisser une modification qui marche sans la commiter à la fin d'une séance de travail.
 
-Claude : après chaque amélioration terminée, propose (ou fais, si on te l'a demandé) le commit et le push correspondants.
+Claude : après chaque amélioration terminée, propose (ou fais, si on te l'a demandé) le commit et le push correspondants, **toujours sur une branche, jamais sur `main`**.
+
+## ⚠️ Règle des branches (obligatoire)
+
+Plusieurs personnes travaillent en même temps, souvent depuis un téléphone, sur deux gros fichiers (`index.html`, `sim.js`). Pour éviter les conflits et les régressions :
+
+1. **Interdit de commiter ou de pousser directement sur `main`.** Toute modification passe par une branche, puis une *pull request* (PR) sur GitHub.
+2. **Une branche par sujet**, créée à partir d'un `main` à jour :
+   ```bash
+   git checkout main
+   git pull
+   git checkout -b <type>/<sujet-court>
+   ```
+3. **Nom de branche** : `<type>/<sujet-court>`, en minuscules, avec des tirets et sans accents. Types :
+   - `tour/` : nouvelle tour ou modification d'une tour (`tour/baliste-glace`) ;
+   - `monstre/` : nouveau monstre ou capacité (`monstre/necromancien`) ;
+   - `equilibrage/` : retouche de chiffres (`equilibrage/cout-mage`) ;
+   - `correctif/` : correction de bug (`correctif/racines-sylvestres`) ;
+   - `visuel/`, `son/`, `ia/`, `interface/`, `serveur/`, `doc/` : selon le sujet.
+4. **Petites branches, courte durée** : une branche = une amélioration, fusionnée dans les jours qui suivent. Si `main` a bougé entretemps, y récupérer les changements (`git pull origin main`) et régler les conflits **avant** la fusion.
+5. **Pull request** : titre en français au même format que les commits. La description dit ce qui change et comment le tester. Elle signale si `sim.js` ou `server/` est modifié (le serveur devra être redéployé).
+6. **Fusion dans `main`** : seulement après **relecture par une autre personne** du groupe et un test rapide du jeu (solo, et multijoueur si `sim.js` ou `server/` a changé). Après la fusion, on supprime la branche.
+7. **Après une fusion qui touche `sim.js` ou `server/`** : redéployer le serveur (voir §9 bis, « Déployer »).
+
+Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu es sur `main`, crée d'abord une branche selon ces règles. Ne fusionne jamais dans `main` et ne pousse jamais sur `main` toi-même : ouvre une PR.
 
 ---
 
@@ -349,7 +373,7 @@ Tout tient dans le plan gratuit Cloudflare Workers, sans carte bancaire :
 Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul type autorisé sur le plan gratuit. Le salon reste en mémoire tant qu'un joueur est connecté. Quand tout le monde part, il se vide.
 
 ### ⚠️ Déployer
-- **Le site** (`index.html`, `sim.js`) est mis à jour **automatiquement** par GitHub Pages à chaque push sur `main`.
+- **Le site** (`index.html`, `sim.js`) est mis à jour **automatiquement** par GitHub Pages à chaque fusion dans `main`.
 - **Le serveur, lui, ne se met pas à jour tout seul.** Après **toute modification de `sim.js`** (règles, équilibrage, IA) ou de `server/`, il faut le redéployer :
   ```bash
   cd server
@@ -396,3 +420,4 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 | 2026-11-14 | 1.7 | Technique : la simulation passe dans `sim.js` (classe `Game`, sons notés sous forme d'événements, actions via `Game.action`), en préparation du multijoueur. La fin de partie survient quand il ne reste qu'un terrain, ou plus aucun humain. **Aucun changement de règles en solo.** |
 | 2026-11-14 | 2.0 | **Multijoueur en ligne** : salons de 2 à 4 humains (IA sur les places libres), code ou lien d'invitation, chef de salon, spectateurs, reconnexion. Serveur Cloudflare Workers et Durable Objects (`server/`, plan gratuit). Site publié sur GitHub Pages. |
 | 2026-11-14 | 2.0.1 | Jeu en ligne **réservé à la France** (`ALLOWED_COUNTRIES`, contrôlé par le serveur), avec un message clair côté page. Le solo reste disponible partout. |
+| 2026-11-14 | 2.0.1 | Organisation : nouvelle **règle des branches**. Plus de commit direct sur `main` : une branche par sujet (`<type>/<sujet>`), pull request, relecture par un autre membre, puis fusion. **Aucun changement de jeu.** |
