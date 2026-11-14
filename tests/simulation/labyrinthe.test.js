@@ -39,3 +39,14 @@ test('En partie, l\'IA construit son plan, continue au-delà de 36 tours et n\'a
  assert.ok(b.t.length>36,`seulement ${b.t.length} tours`);
  for(const t of b.t)assert.equal(b.mz.w[t.y*C+t.x],1,`tour hors du plan en (${t.x},${t.y})`);
 });
+
+/* depuis la 2.6 */
+test('Aucun mur inutile : chaque tour qui ne touche pas le chemin est nécessaire à sa longueur',()=>{
+ for(let g=1;g<=6;g++){const {S,M}=plan(g);const w=M.w.slice(),L=S.plen(w),P=S.mzPath(w);
+  for(const i of M.ord){const x=i%C,y=i/C|0;if(P.some(j=>Math.abs(j%C-x)<=1&&Math.abs((j/C|0)-y)<=1))continue;
+   w[i]=0;assert.ok(S.plen(w)<L,`graine ${g} : tour inutile en (${x},${y})`);w[i]=1}}
+});
+test('Milieu de partie : avec 40 tours du plan, le chemin dépasse 50 cases',()=>{
+ for(let g=1;g<=8;g++){const {S,M}=plan(g);const w=new Uint8Array(13*17);M.ord.slice(0,40).forEach(i=>w[i]=1);
+  const L=S.plen(w);assert.ok(L>=50,`graine ${g} : chemin de ${L} cases à 40 tours`);assert.equal(M.pre[2],L)}
+});

@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.5.1)
+# Winter Realms — Tower Wars (Édition 2.6)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -351,10 +351,12 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 **Labyrinthe** (depuis la 2.5) : chaque IA reçoit un **plan cible** (`A.mz`) au début de la partie.
 - **Génération** (`mzStep`) : 4 candidats. Chacun part d'une forme tirée au hasard (serpentin horizontal à couloirs de 1 ou 2, serpentin vertical, semis aléatoire), puis il est affiné par une recherche locale avec recuit léger : on ajoute ou retire une case ou un petit segment. Score = longueur du chemin − 0,3 × nombre de tours.
   - Itérations par candidat : 2 000 / 2 500 / 3 200 selon la difficulté.
-  - Le plan retenu est tiré parmi les 3 meilleurs en Normal (50/30/20 %), parmi les 2 meilleurs en Difficile (60/40 %), et c'est le meilleur en Brutal.
-  - Un plan complet fait environ 100 cases de chemin, contre 16 en ligne droite.
+  - **Murs inutiles retirés** (depuis la 2.6) : une tour qui ne touche pas le chemin (les 8 cases autour) et dont le retrait ne le raccourcit pas est enlevée du plan. Il ne reste loin du chemin que les tours nécessaires à sa longueur.
+  - **Note de milieu de partie** (depuis la 2.6) : chaque candidat est noté sur la longueur moyenne du chemin après 15, 25, 40 et 60 tours de son ordre de construction, et une fois complet (`MZ_AT`). Avant, seule comptait la longueur finale, ce qui favorisait les serpentins classiques, très longs une fois finis mais courts tant qu'un mur n'est pas fermé.
+  - Le plan retenu est tiré parmi les 3 meilleures notes en Normal (50/30/20 %), parmi les 2 meilleures en Difficile (60/40 %), et c'est la meilleure en Brutal.
+  - Un plan complet fait 80 à 100 cases de chemin, contre 16 en ligne droite, avec 57 à 74 tours ; avec 40 tours, le chemin fait déjà 56 à 78 cases.
 - **Hasard propre** : la graine est tirée une fois de `Math.random`, ce qui rend la génération indépendante du découpage dans le temps.
-- **Découpage** : la génération avance de 600 essais par pas de jeu (≈ 1 à 2,5 ms) ; elle dure environ 20 ms au total. Elle est terminée avant la première action, ou bien elle est finie d'un coup à la première action. Un parcours en largeur sur grille plate (`plen`) prend environ 1,3 µs.
+- **Découpage** : la génération avance de 600 essais par pas de jeu (≈ 1 à 3 ms) ; elle dure environ 25 à 40 ms au total. Elle est terminée avant la première action, ou bien elle est finie d'un coup à la première action. Un parcours en largeur sur grille plate (`plen`) prend environ 1,3 µs.
 - **Ordre de construction** : à partir du plan complet, on retire une à une la tour qui raccourcit le moins le chemin (à égalité, la moins utile au chemin actuel et au couloir des volants). On construit dans l'ordre inverse, si bien que le chemin s'allonge presque à chaque tour. En début de partie, les premières tours vont près du chemin droit et du couloir aérien (colonne 6).
 - **Rôles des cases** (`mzRoles`) :
   - **Givre** : 2 à 6 emplacements (`L/15`), répartis à intervalles réguliers le long du chemin final. Ils sont construits en Givre seulement tant que leur nombre reste sous `1 + 15 % des tours` ; sinon un Archer est posé, puis transformé plus tard.
@@ -656,3 +658,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-14 | 2.5 | Outillage : **fin du moteur figé** (`tests/moteurs/`, `tests/references/`, `creer-references.js`, test `integrite` supprimés, y compris le moteur 2.4 figé). Les tests vérifient le bon fonctionnement sans comparer à des parties enregistrées ; le bilan gameplay compare directement au `sim.js` de `main` (statistiques et 15 parties). Plus de « gel » à faire après chaque changement de gameplay. |
 | 2026-11-14 | 2.5 | Outillage : **tests plus courts**. Par défaut, une seule partie entre IA par difficulté au lieu de 15, et la vérification de reproductibilité ne rejoue que 2 minutes. Les 15 parties restent disponibles avec `--complet` (tests et bilan). La vérification GitHub passe de 9 min à environ 1 min 30 (délai maximal ramené à 10 min). **Aucun changement de jeu.** |
 | 2026-11-14 | 2.5.1 | **Correctif multijoueur** : après 2 ou 3 minutes, dès qu'un monstre au sol arrivait sur le terrain du joueur, `peutConstruire` lisait la case visée `tx`/`ty`, absente des instantanés du serveur. L'erreur arrêtait la boucle de dessin : terrain figé et grisé, plus aucune tour posable. La page donne maintenant à chaque monstre reçu la case la plus proche de sa position. `index.html` seul (pas de redéploiement du serveur). |
+| 2026-11-14 | 2.6 | **IA : labyrinthes efficaces dès le milieu de partie**. Les candidats sont notés sur la longueur du chemin après 15, 25, 40 et 60 tours (et une fois complets), plus seulement à la fin. Les murs qui ne touchent pas le chemin et ne l'allongent pas sont retirés du plan. Avec 40 tours, le chemin passe d'une médiane de 57 à 66 cases (minimum 40 → 56) ; plans de 57 à 74 tours au lieu de 66 à 89. Génération ≈ 25 à 40 ms (≤ 3 ms par pas). `sim.js` modifié (redéploiement du serveur). Deux tests ajoutés à `labyrinthe`. |
