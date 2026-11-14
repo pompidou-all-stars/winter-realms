@@ -6,7 +6,7 @@ const vm=require('vm'),fs=require('fs'),path=require('path'),crypto=require('cry
 const {mulberry32}=require('./hasard');
 const RACINE=path.join(__dirname,'..','..');
 /* WR_MOTEUR permet de faire passer toute la suite de tests à un autre moteur (vérification, comparaison de versions) */
-const MOTEURS={actuel:process.env.WR_MOTEUR?path.resolve(process.env.WR_MOTEUR):path.join(RACINE,'sim.js'),'v1.7':path.join(RACINE,'tests','moteurs','v1.7','sim.js')};
+const MOTEURS={actuel:process.env.WR_MOTEUR?path.resolve(process.env.WR_MOTEUR):path.join(RACINE,'sim.js'),'v1.7':path.join(RACINE,'tests','moteurs','v1.7','sim.js'),'v2.4':path.join(RACINE,'tests','moteurs','v2.4','sim.js')};
 const INTERNES=['aiAct','aiDefend','aiAttack','PLAN','pathCells','invest','airInv','mages','BASE_TW','FACTION_BALANCE','ARCH','ROLE','ORDER','HPK','GRACE','GROUP','AURA_R','DIRS','dmg','rng','upCost','topY','flyH','NORM','FLY','AURA','SPEC','HEAL','SPLIT','TURT','BRK','SAP','KID'];
 
 function sha256(fichier){return crypto.createHash('sha256').update(fs.readFileSync(fichier)).digest('hex')}
@@ -34,5 +34,8 @@ function apparaitre(S,b,k,m=1){b.q.push({k,m,t:0});const avant=b.cr.length;b.upd
 function avancer(G,secondes,dt=.05){const n=Math.round(secondes/dt);for(let i=0;i<n;i++)G.step(dt)}
 /* Avance un seul terrain (sans revenu ni IA). */
 function avancerTerrain(b,secondes,dt=.05){const n=Math.round(secondes/dt);for(let i=0;i<n;i++)b.update(dt)}
+/* Depuis la 2.4, une tour posée ou améliorée est d'abord en chantier (t.b > 0) et ne tire pas.
+   Fait avancer le terrain jusqu'à la fin de tous les chantiers (sans effet sur un moteur plus ancien). */
+function pret(b,dt=.05){for(let i=0;i<1000&&b.t.some(t=>t.b>0);i++)b.update(dt)}
 
-module.exports={charger,partie,apparaitre,avancer,avancerTerrain,sha256,MOTEURS,RACINE};
+module.exports={charger,partie,apparaitre,avancer,avancerTerrain,pret,sha256,MOTEURS,RACINE};

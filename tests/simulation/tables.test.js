@@ -1,10 +1,10 @@
-/* Tables d'équilibrage : le moteur actuel a exactement les mêmes chiffres que la référence 1.7,
+/* Tables d'équilibrage : le moteur actuel a exactement les mêmes chiffres que la référence 2.4,
    et les tours calculées respectent les formules écrites dans le code (vérification indépendante). */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
 const {charger,RACINE}=require('../outils/moteur');
 const S=charger('actuel');
-const REF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','statistiques-v1.7.json'),'utf8'));
+const REF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','statistiques-v2.4.json'),'utf8'));
 const clone=o=>JSON.parse(JSON.stringify(o));
 
 test('Constantes du terrain et du jeu identiques à la référence',()=>{

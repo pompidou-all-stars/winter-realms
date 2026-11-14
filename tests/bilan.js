@@ -11,7 +11,7 @@ const N=require('./outils/navigateur');
 
 const args=process.argv.slice(2),avant=args.find(a=>!a.startsWith('--'))||'origin/main',sansVisuel=args.includes('--sans-visuel');
 const DOSSIER=path.join(RACINE,'rapports');fs.rmSync(DOSSIER,{recursive:true,force:true});fs.mkdirSync(DOSSIER,{recursive:true});
-const EMPREINTE_V17='e0cd2f786b5a3aa616d7446a787436b77d1e30b1bd930e7849a1f1a2a0615f6f';
+const REF_V='2.4',EMPREINTE_REF='1d2b8ad6a567bf4478615f7bb7920a38334dd4b8eab76ef7160975aa6398ad36'; // moteur figé de référence (tests/moteurs/v2.4)
 const FICHIERS_TECHNIQUES=['integrite.test.js','parcours.test.js','assets3d.test.js'];
 const FACTIONS=['Alliance','Horde','Sylvestres','Nains','Légion'],NIVEAUX=['Normal','Difficile','Brutal'];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -42,19 +42,19 @@ async function main(){
   echecs:T.ko};
 
  /* ---------- 🎮 gameplay ---------- */
- const S=charger('actuel'),REF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','statistiques-v1.7.json'),'utf8'));
+ const S=charger('actuel'),REF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','statistiques-v'+REF_V+'.json'),'utf8'));
  const clone=o=>JSON.parse(JSON.stringify(o)),diffs=[];
  const cmp=(nom,a,b)=>{for(const k of new Set([...Object.keys(a),...Object.keys(b)]))if(JSON.stringify(a[k])!==JSON.stringify(b[k]))diffs.push({nom,champ:k,avant:b[k],apres:a[k]})};
  S.TW.forEach((t,k)=>{const r=REF.tours[k];if(!r){diffs.push({nom:t.n,champ:'(nouvelle tour)',avant:'—',apres:'ajoutée'});return}const {k:_,niveaux,...f}=r;cmp(t.n,clone(t),f)});
  S.CR.forEach((t,k)=>{const r=REF.monstres[k];if(!r){diffs.push({nom:t.n,champ:'(nouveau monstre)',avant:'—',apres:'ajouté'});return}const {k:_,...f}=r;cmp(t.n,clone(t),f)});
  cmp('Constantes',clone({C:S.C,R:S.R,SP:S.SP,EX:S.EX,HPK:S.HPK,GRACE:S.GRACE,GROUP:S.GROUP,AURA_R:S.AURA_R}),REF.constantes);
  const parties=fs.existsSync(fParties)?fs.readFileSync(fParties,'utf8').trim().split('\n').filter(Boolean).map(l=>JSON.parse(l)):[];
- const PREF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','parties-v1.7.json'),'utf8')).parties;
- const audit=auditer(S),moteurV17=sha256(MOTEURS.actuel)===EMPREINTE_V17;
+ const PREF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','parties-v'+REF_V+'.json'),'utf8')).parties;
+ const audit=auditer(S),moteurRef=sha256(MOTEURS.actuel)===EMPREINTE_REF;
  const jeuIdentique=J.ko.length==0&&diffs.length==0&&parties.length==15;
  const gameplay={verdict:jeuIdentique?'identique':'change',
-  resume:jeuIdentique?'Identique à la référence 1.7 : aucun changement de gameplay détecté':`Différent de la référence 1.7 : à examiner et à valider par vous`,
-  details:[`Moteur de jeu (sim.js) : ${moteurV17?'identique octet pour octet à la version 1.7 figée':'modifié par rapport à la version 1.7 figée'}.`,
+  resume:jeuIdentique?'Identique à la référence '+REF_V+' : aucun changement de gameplay détecté':`Différent de la référence ${REF_V} : à examiner et à valider par vous`,
+  details:[`Moteur de jeu (sim.js) : ${moteurRef?'identique octet pour octet à la version '+REF_V+' figée':'modifié par rapport à la version '+REF_V+' figée'}.`,
    `Mécaniques caractérisées (construction, déplacements, combats, économie, vagues, fin de partie, IA, tables) : ${J.ok} conformes, ${J.ko.length} différentes.`,
    `Statistiques des tours et monstres : ${diffs.length?diffs.length+' valeur(s) changée(s)':'aucune valeur changée'}.`,
    `Parties de référence entre IA : ${parties.length} jouées, ${parties.filter(p=>{const r=PREF.find(x=>x.graine==p.graine);return r&&r.final==p.final}).length} identiques à la référence.`,
@@ -112,7 +112,7 @@ td,th{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;white-
  if(technique.echecs.length)h+=`<h3>Échecs</h3><ul>${technique.echecs.map(e=>`<li>${esc(e.nom)} → ${esc(e.message)}</li>`).join('')}</ul>`;h+='</section>';
  h+=boite('🎮 Gameplay — mécaniques, statistiques, équilibrage',gameplay,coul[gameplay.verdict]);
  if(gameplay.echecs.length)h+=`<h3>Mécaniques différentes de la référence</h3><ul>${gameplay.echecs.map(e=>`<li>${esc(e.nom)} → ${esc(e.message)}</li>`).join('')}</ul>`;
- if(gameplay.diffs.length)h+=`<h3>Valeurs changées</h3><table><tr><th>Élément</th><th>Valeur</th><th>Référence 1.7</th><th>Maintenant</th></tr>${gameplay.diffs.map(d=>`<tr><td>${esc(d.nom)}</td><td>${esc(d.champ)}</td><td>${esc(JSON.stringify(d.avant))}</td><td>${esc(JSON.stringify(d.apres))}</td></tr>`).join('')}</table>`;
+ if(gameplay.diffs.length)h+=`<h3>Valeurs changées</h3><table><tr><th>Élément</th><th>Valeur</th><th>Référence ${REF_V}</th><th>Maintenant</th></tr>${gameplay.diffs.map(d=>`<tr><td>${esc(d.nom)}</td><td>${esc(d.champ)}</td><td>${esc(JSON.stringify(d.avant))}</td><td>${esc(JSON.stringify(d.apres))}</td></tr>`).join('')}</table>`;
  if(gameplay.parties.length){const m=l=>l.reduce((s,p)=>s+p.duree,0)/l.length/60;
   h+=`<h3>Parties entre IA (le siège « joueur » est joué par l'IA)</h3><p class="note">Durée moyenne : ${m(gameplay.parties).toFixed(1)} min (référence : ${m(gameplay.PREF).toFixed(1)} min). « Joueur éliminé » = la partie s'arrête quand le siège joueur tombe, comme en solo.</p><table><tr><th>Faction joueur</th><th>Difficulté</th><th>Durée</th><th>Issue</th><th>Revenus finaux</th><th>Réf.</th></tr>`;
   for(const p of gameplay.parties){const r=gameplay.PREF.find(x=>x.graine==p.graine)||{};h+=`<tr><td>${FACTIONS[p.faction]}</td><td>${NIVEAUX[p.difficulte]}</td><td>${(p.duree/60).toFixed(1)} min</td><td>${p.gagnant==0?'Joueur gagne':'Joueur éliminé'}</td><td>${p.revenus.join(' / ')}</td><td>${r.final==p.final?'= identique':'≠ différente'}</td></tr>`}h+='</table>'}

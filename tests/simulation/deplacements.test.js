@@ -1,7 +1,7 @@
 /* Déplacements : chemin au sol, vol en ligne droite, sortie, ralentissements, hâte. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {charger,partie,apparaitre,avancerTerrain}=require('../outils/moteur');
+const {charger,partie,apparaitre,avancerTerrain,pret}=require('../outils/moteur');
 const S=charger('actuel');
 const proche=(a,b,msg,eps=1e-9)=>assert.ok(Math.abs(a-b)<=eps,`${msg||''} attendu ${b}, obtenu ${a}`);
 const terrain=(factions=[0,1,2,3])=>partie(S,{factions}).B[0];
@@ -29,7 +29,7 @@ test('Givre : ralentit à ×0,5 au niveau 1 et ×0,3 au niveau 5, pendant 1,5 s'
  const c2=apparaitre(S,b,3);b.hit(c2,0,T,.5-.05*4);assert.equal(c2.sf,.5-.05*4);
 });
 test('Givre : le facteur de ralentissement vient du niveau de la tour qui tire',()=>{const G=partie(S),b=G.B[0];b.gold=1e6;
- b.place(5,3,2);const t=b.t[0];for(let i=0;i<4;i++)b.upgrade(t);const c=apparaitre(S,b,3);c.hp=c.max=1e9;
+ b.place(5,3,2);const t=b.t[0];pret(b);for(let i=0;i<4;i++){b.upgrade(t);pret(b)}const c=apparaitre(S,b,3);c.hp=c.max=1e9;
  avancerTerrain(b,3);assert.ok(c.sl>0);assert.equal(c.sf,.5-.05*4);
 });
 test('Racines sylvestres : toutes leurs tours ralentissent à ×0,82 pendant 0,72 s',()=>{const b=terrain([2,0,1,3]);

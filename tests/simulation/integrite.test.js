@@ -16,3 +16,17 @@ test('Les références 1.7 ont été produites par ce moteur figé',()=>{
   assert.equal(ref.moteur.sha256,EMPREINTE_V17,f+' ne provient pas du moteur figé 1.7');
  }
 });
+
+const EMPREINTE_V24='1d2b8ad6a567bf4478615f7bb7920a38334dd4b8eab76ef7160975aa6398ad36'; // git show b309a25:sim.js | sha256sum
+
+test('Le moteur figé 2.4 est intact (empreinte SHA-256 du commit b309a25)',()=>{
+ assert.equal(sha256(MOTEURS['v2.4']),EMPREINTE_V24,'Le fichier tests/moteurs/v2.4/sim.js a été modifié : il ne doit jamais l\'être.');
+});
+
+test('Les références 2.4 ont été produites par ce moteur figé',()=>{
+ for(const f of ['statistiques-v2.4.json','parties-v2.4.json']){
+  const ref=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references',f),'utf8'));
+  assert.equal(ref.moteur.version,'v2.4');
+  assert.equal(ref.moteur.sha256,EMPREINTE_V24,f+' ne provient pas du moteur figé 2.4');
+ }
+});

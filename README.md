@@ -44,6 +44,13 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.4 — 2026-11-14
+- Towers now take time to build: 1 second per 50 gold spent, between 0.5 and 8 seconds (on Normal, an Archer takes 0.5 s, a Mage 1.7 s, an Archmage 2.6 s). Upgrades work the same way, based on the upgrade price.
+- Difficulty slows human builders: ×1 on Normal, ×1.25 on Difficile, ×1.5 on Brutal. AIs always build at ×1.
+- Tests: the 2.4 engine is frozen as the new test reference (`tests/moteurs/v2.4/`, `tests/references/*-v2.4.json`); the 1.7 references are kept.
+- While building or upgrading, a tower does not shoot, does not reveal Spectres and cannot be upgraded again. It still blocks the path and can be sold (70 %).
+- A building tower is drawn faded, with scaffolding, a hammer and a gold progress bar. The info panel shows the build time and the countdown.
+
 ### Tooling — 2026-11-14 (3D assets)
 - Groundwork for 3D: one Blender Python script per asset in `art/`, generated identically on a PC (Blender 5.3) or in the cloud (`bpy==5.3.0`) by `art/outils/generer.py`; GLB files and a manifest in `assets/3d/`; size/triangle budgets; a consistency test on every pull request and an "Assets 3D" GitHub Action that regenerates everything and attaches preview images. See `art/LISEZMOI.md` (French).
 - `.gitattributes` enforces LF line endings (needed on Windows) and marks 3D/image files as binary.
