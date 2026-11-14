@@ -1,3 +1,6 @@
 node_modules/
 .wrangler/
 .claude/
+# sorties des tests (régénérées à chaque lancement)
+captures/
+rapports/
