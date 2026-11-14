@@ -149,13 +149,11 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
 <div id="ov"><h1 id="msg">Winter Realms</h1>
  <p id="sub">Choisis ta faction, bâtis ton réseau de défense et envoie des vagues contre trois adversaires. Un univers fantasy original en relief 2.5D : arènes en diorama, reliefs sculptés, décors vivants, éclairages doux, créatures expressives et machines de guerre propres à chaque faction. Chaque faction possède 10 tours à silhouette propre.</p>
  <p id="hint">Carte agrandie : 13 × 17 cases. En Difficile et en Brutal, les IA touchent 25 % et 50 % de revenu en plus.</p>
- <div id="classPick"><h2>Choisis ta faction</h2><div id="factions">
- <button type="button" data-faction="0" aria-pressed="false" onclick="window.chooseFaction(0)"><span class="ficon">🏹</span><span><strong>Humains</strong><small>Archers, chevaliers et mages : longue portée et défense anti-aérienne.</small></span></button>
- <button type="button" data-faction="1" aria-pressed="false" onclick="window.chooseFaction(1)"><span class="ficon">🤖</span><span><strong>Robots</strong><small>Automates, drones et canons : puissance perforante et armures mécaniques.</small></span></button>
- <button type="button" data-faction="2" aria-pressed="false" onclick="window.chooseFaction(2)"><span class="ficon">🦎</span><span><strong>Créatures</strong><small>Bestioles mutantes et prédateurs : frénésie et exécution des ennemis blessés.</small></span></button>
- <button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">🌳</span><span><strong>Végétaux</strong><small>Arbres vivants, fleurs et dryades : racines et ralentissement.</small></span></button>
- <button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">🔮</span><span><strong>Magiques</strong><small>Spectres, sorciers et cristaux : malédictions qui amplifient les dégâts.</small></span></button>
-</div>
+ <div id="classPick"><h2>Choisis ta faction</h2><div id="factions"><button type="button" data-faction="0" aria-pressed="false" onclick="window.chooseFaction(0)"><span class="ficon">🏹</span><span><strong>Humains</strong><small>Archers, chevaliers et mages ; défense anti-aérienne.</small></span></button>
+<button type="button" data-faction="1" aria-pressed="false" onclick="window.chooseFaction(1)"><span class="ficon">🤖</span><span><strong>Robots</strong><small>Drones, automates et canons ; tirs perforants.</small></span></button>
+<button type="button" data-faction="2" aria-pressed="false" onclick="window.chooseFaction(2)"><span class="ficon">🦎</span><span><strong>Créatures</strong><small>Mutants et prédateurs ; exécution des blessés.</small></span></button>
+<button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">🌳</span><span><strong>Végétaux</strong><small>Arbres, fleurs et dryades ; racines.</small></span></button>
+<button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">🔮</span><span><strong>Magiques</strong><small>Spectres, sorciers et cristaux ; malédictions.</small></span></button></div>
  <p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><p id="difficultyLabel" hidden>Choisis la difficulté</p><div id="lv"><button id="go0" disabled>Normal</button><button id="go1" disabled>Difficile</button><button id="go2" disabled>Brutal</button></div><p id="vue3d"><a id="mode3d" href="?rendu=3d">Essayer la vue 3D (prototype)</a></p>
  <div id="online"><h2>Jouer entre amis</h2><input id="pname" maxlength="16" placeholder="Ton pseudo" autocomplete="nickname">
   <div class="orow"><button id="mkRoom" type="button">Créer un salon</button><input id="rcode" maxlength="4" placeholder="CODE" autocapitalize="characters"><button id="joinRoom" type="button">Rejoindre</button></div></div>
@@ -316,7 +314,7 @@ function drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun){
   ['#e9e2cf','#9da9b6','#647487','#d9b45e','#355b83'],
   ['#a9d8e8','#4786a5','#263c56','#4de0ff','#f2b957'],
   ['#c58bdb','#78469a','#402a57','#e59cff','#8fe4bd'],
-  ['#8dcf8b','#397c57','#244b3c','#d8e99b','#8c70bd'],
+  ['#c58bdb','#78469a','#402a57','#e59cff','#8fe4bd'],
   ['#b8a0d9','#5c477d','#282039','#a879c9','#7ff3ff']
  ][f],[stone,mid,dark,glow,accent]=pal;
  const bob=f===4?Math.sin(t*2.6)*s*.035:0,baseY=y+s*.25;
@@ -326,14 +324,14 @@ function drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun){
  if(f===0){ // Alliance : pierre taillée, créneaux et or
   g.beginPath();g.ellipse(0,s*.25,s*.4,s*.15,0,0,7);fs(g,mid);g.beginPath();g.ellipse(0,s*.21,s*.36,s*.13,0,0,7);fs(g,stone);
   for(let q=0;q<4;q++){let an=q*Math.PI/2;g.save();g.translate(Math.cos(an)*s*.29,s*.23+Math.sin(an)*s*.09);g.rotate(an);g.fillStyle=glow;g.fillRect(-s*.055,-s*.06,s*.11,s*.12);g.strokeRect(-s*.055,-s*.06,s*.11,s*.12);g.restore()}
- }else if(f===2){ // Créatures : nid organique et crocs
+ }else if(f===1){ // Créatures : nid organique et crocs
   g.beginPath();g.ellipse(0,s*.25,s*.41,s*.15,0,0,7);fs(g,dark);for(let q=-1;q<=1;q++){g.beginPath();g.moveTo(q*s*.25,s*.18);g.lineTo(q*s*.25,s*.34);g.strokeStyle=stone;g.lineWidth=s*.045;g.stroke()}
   for(let q of[-1,1])pg(g,stone,q*s*.25,s*.2,q*s*.43,s*.03,q*s*.34,s*.31);
- }else if(f===3){ // Végétaux : racines nouées et feuillage
+ }else if(f===1){ // Végétaux : racines nouées et feuillage
   g.beginPath();g.ellipse(0,s*.25,s*.4,s*.14,0,0,7);fs(g,dark);
   for(let q=-2;q<=2;q++){g.beginPath();g.moveTo(q*s*.12,s*.32);g.quadraticCurveTo(q*s*.2,s*.12,q*s*(.2+q*.04),-s*.02);g.strokeStyle=mid;g.lineWidth=s*.07;g.stroke()}
   for(let q=-1;q<=1;q++)el(g,q*s*.25,s*.13,s*.09,s*.05,glow);
- }else if(f===1){ // Robots : base hexagonale rivetée
+ }else if(f===2){ // Robots : base hexagonale rivetée
   g.beginPath();for(let q=0;q<6;q++){let an=Math.PI/3*q-Math.PI/6,xx=Math.cos(an)*s*.4,yy=s*.24+Math.sin(an)*s*.15;q?g.lineTo(xx,yy):g.moveTo(xx,yy)}g.closePath();fs(g,dark);g.beginPath();g.ellipse(0,s*.22,s*.31,s*.105,0,0,7);fs(g,mid);
   for(let q=0;q<8;q++){let an=q*Math.PI/4;el(g,Math.cos(an)*s*.34,s*.24+Math.sin(an)*s*.11,s*.025,s*.025,glow)}
  }else{ // Ombres : anneaux flottants et énergie spectrale
@@ -343,28 +341,28 @@ function drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun){
  /* Silhouette spécifique à chaque tour : guetteur, héros, cristal, artillerie, forge, mage… */
  const top=-s*(.32+.035*(lv-1)),w=s*.29;
  if(j===0||j===6){ // tour de guet / baliste
-  if(f===3){g.beginPath();g.moveTo(-w*.6,s*.2);g.quadraticCurveTo(-w*.9,-s*.1,-w*.35,top);g.quadraticCurveTo(0,top-s*.22,w*.35,top);g.quadraticCurveTo(w*.9,-s*.1,w*.6,s*.2);g.closePath();fs(g,mid);for(let q=-1;q<=1;q++)el(g,q*s*.13,top+s*.12,s*.07,s*.1,glow)}
+  if(f===1){g.beginPath();g.moveTo(-w*.6,s*.2);g.quadraticCurveTo(-w*.9,-s*.1,-w*.35,top);g.quadraticCurveTo(0,top-s*.22,w*.35,top);g.quadraticCurveTo(w*.9,-s*.1,w*.6,s*.2);g.closePath();fs(g,mid);for(let q=-1;q<=1;q++)el(g,q*s*.13,top+s*.12,s*.07,s*.1,glow)}
   else if(f===4){g.beginPath();g.moveTo(-w*.65,s*.2);g.quadraticCurveTo(-w*.8,-s*.1,-w*.2,top);g.quadraticCurveTo(0,top-s*.26,w*.2,top);g.quadraticCurveTo(w*.8,-s*.1,w*.65,s*.2);g.closePath();fs(g,'#47345f');el(g,0,top+s*.04,s*.13,s*.2,accent);g.globalAlpha=.65;el(g,0,top-s*.12,s*.19,s*.24,'#c7aaff');g.globalAlpha=1}
-  else{g.beginPath();g.moveTo(-w*.65,s*.2);g.lineTo(-w*.5,top+s*.12);g.lineTo(-w*.28,top);g.lineTo(w*.28,top);g.lineTo(w*.5,top+s*.12);g.lineTo(w*.65,s*.2);g.closePath();fs(g,mid);g.fillStyle=glow;g.fillRect(-s*.035,top+s*.08,s*.07,s*.22);if(f===2){pg(g,stone,-w*.5,top+s*.05,-w*.8,top-s*.1,-w*.48,top-s*.24);pg(g,stone,w*.5,top+s*.05,w*.8,top-s*.1,w*.48,top-s*.24)}}
+  else{g.beginPath();g.moveTo(-w*.65,s*.2);g.lineTo(-w*.5,top+s*.12);g.lineTo(-w*.28,top);g.lineTo(w*.28,top);g.lineTo(w*.5,top+s*.12);g.lineTo(w*.65,s*.2);g.closePath();fs(g,mid);g.fillStyle=glow;g.fillRect(-s*.035,top+s*.08,s*.07,s*.22);if(f===1){pg(g,stone,-w*.5,top+s*.05,-w*.8,top-s*.1,-w*.48,top-s*.24);pg(g,stone,w*.5,top+s*.05,w*.8,top-s*.1,w*.48,top-s*.24)}}
   if(j===6){g.save();g.translate(0,top+s*.02);g.rotate(a);g.strokeStyle=glow;g.lineWidth=s*.055;g.beginPath();g.moveTo(-s*.28,0);g.lineTo(s*.28,0);g.stroke();g.beginPath();g.moveTo(-s*.24,-s*.16);g.quadraticCurveTo(0,-s*.34,s*.24,-s*.16);g.stroke();g.restore()}
  }else if(j===1||j===7){ // statue de champion / gardien
-  g.beginPath();g.roundRect(-s*.19,top+s*.08,s*.38,s*.48,s*.07);fs(g,f===2?'#6f4a35':f===4?'#59416e':stone);
-  el(g,0,top,s*.17,s*.17,f===3?'#b6d99a':f===4?'#d9c6ff':'#d7c7aa');
-  if(f===2){pg(g,glow,-s*.12,top-s*.05,-s*.3,top-s*.28,-s*.17,top+s*.04);pg(g,glow,s*.12,top-s*.05,s*.3,top-s*.28,s*.17,top+s*.04)}
+  g.beginPath();g.roundRect(-s*.19,top+s*.08,s*.38,s*.48,s*.07);fs(g,f===1?'#6f4a35':f===4?'#59416e':stone);
+  el(g,0,top,s*.17,s*.17,f===1?'#b6d99a':f===4?'#d9c6ff':'#d7c7aa');
+  if(f===1){pg(g,glow,-s*.12,top-s*.05,-s*.3,top-s*.28,-s*.17,top+s*.04);pg(g,glow,s*.12,top-s*.05,s*.3,top-s*.28,s*.17,top+s*.04)}
   else if(f===4){g.fillStyle=accent;g.fillRect(-s*.1,top-s*.01,s*.2,s*.035);g.beginPath();g.arc(0,top+s*.03,s*.045,0,7);g.fill()}
   else{pg(g,glow,-s*.18,top+s*.06,-s*.24,top-s*.18,0,top-s*.11,s*.24,top-s*.18,s*.18,top+s*.06)}
   g.fillStyle=accent;g.fillRect(-s*.13,top+s*.2,s*.26,s*.035);
  }else if(j===2||j===8){ // obélisque / cristal
-  const pulse=.75+.25*Math.sin(t*4);g.beginPath();g.moveTo(0,top-s*.3*pulse);g.lineTo(s*.2,top+s*.04);g.lineTo(s*.13,s*.17);g.lineTo(-s*.13,s*.17);g.lineTo(-s*.2,top+s*.04);g.closePath();fs(g,f===4?'#8f70c7':f===3?'#b8e5a8':f===1?'#80b4c7':'#d4d8e1');
+  const pulse=.75+.25*Math.sin(t*4);g.beginPath();g.moveTo(0,top-s*.3*pulse);g.lineTo(s*.2,top+s*.04);g.lineTo(s*.13,s*.17);g.lineTo(-s*.13,s*.17);g.lineTo(-s*.2,top+s*.04);g.closePath();fs(g,f===4?'#8f70c7':f===1?'#b8e5a8':f===2?'#80b4c7':'#d4d8e1');
   g.strokeStyle=glow;g.lineWidth=s*.045;g.beginPath();g.moveTo(0,top-s*.22);g.lineTo(0,s*.12);g.stroke();el(g,0,top+s*.02,s*.055,s*.055,accent);
   if(j===8){for(let q=-1;q<=1;q+=2){g.beginPath();g.moveTo(q*s*.2,top+s*.1);g.lineTo(q*s*.34,top-s*.08);g.strokeStyle=glow;g.lineWidth=s*.04;g.stroke()}}
  }else if(j===3){ // artillerie
-  g.beginPath();g.roundRect(-s*.28,top+s*.08,s*.56,s*.32,s*.08);fs(g,dark);g.save();g.translate(0,top+s*.18);g.rotate(a*.35);g.lineCap='round';g.lineWidth=s*.2;g.strokeStyle=OUT;g.beginPath();g.moveTo(-s*.04,0);g.lineTo(s*.34,-s*.18);g.stroke();g.lineWidth=s*.13;g.strokeStyle=f===1?'#d6a35d':f===2?'#9b5636':f===4?'#9d78cb':'#b5b9c1';g.stroke();el(g,s*.34,-s*.18,s*.08,s*.08,glow);g.restore();
+  g.beginPath();g.roundRect(-s*.28,top+s*.08,s*.56,s*.32,s*.08);fs(g,dark);g.save();g.translate(0,top+s*.18);g.rotate(a*.35);g.lineCap='round';g.lineWidth=s*.2;g.strokeStyle=OUT;g.beginPath();g.moveTo(-s*.04,0);g.lineTo(s*.34,-s*.18);g.stroke();g.lineWidth=s*.13;g.strokeStyle=f===2?'#d6a35d':f===1?'#9b5636':f===4?'#9d78cb':'#b5b9c1';g.stroke();el(g,s*.34,-s*.18,s*.08,s*.08,glow);g.restore();
  }else if(j===4){ // forge / brasier
   g.beginPath();g.moveTo(-s*.27,s*.18);g.lineTo(-s*.2,top+s*.08);g.lineTo(s*.2,top+s*.08);g.lineTo(s*.27,s*.18);g.closePath();fs(g,dark);el(g,0,top+s*.03,s*.18,s*.09,'#211c22');
   const flame=s*(.12+.04*Math.sin(t*12));pg(g,glow,-flame*.8,top+s*.02,0,top-s*.3-flame*.3,flame*.8,top+s*.02);el(g,0,top-s*.02,flame*.28,flame*.4,'#fff0b2');
  }else{ // mage / archimage : silhouette de héros et orbe
-  g.beginPath();g.moveTo(-s*.2,s*.18);g.lineTo(-s*.15,top+s*.08);g.lineTo(0,top-s*.13);g.lineTo(s*.15,top+s*.08);g.lineTo(s*.2,s*.18);g.closePath();fs(g,f===3?'#4e9b6d':f===4?'#4b315f':mid);
+  g.beginPath();g.moveTo(-s*.2,s*.18);g.lineTo(-s*.15,top+s*.08);g.lineTo(0,top-s*.13);g.lineTo(s*.15,top+s*.08);g.lineTo(s*.2,s*.18);g.closePath();fs(g,f===1?'#4e9b6d':f===4?'#4b315f':mid);
   el(g,0,top+s*.02,s*.13,s*.13,f===4?'#e5d8ff':'#e5c9a0');el(g,s*.22,top-s*.17,s*.085,s*.085,accent);g.strokeStyle=glow;g.lineWidth=s*.035;g.beginPath();g.moveTo(s*.1,top+s*.02);g.lineTo(s*.22,top-s*.17);g.stroke();
   if(j===9){pg(g,glow,-s*.18,top-s*.05,-s*.3,top-s*.28,0,top-s*.18,s*.3,top-s*.28,s*.18,top-s*.05)}
  }
@@ -375,25 +373,25 @@ function drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun){
    g.strokeStyle='#f1d9a5';g.lineWidth=s*.04;g.beginPath();g.arc(s*.18,top-s*.03,s*.16,-1.3,1.3);g.stroke();
    g.beginPath();g.moveTo(s*.22,top-s*.18);g.lineTo(s*.22,top+s*.12);g.stroke();
  }
- if(f===1){ // Robot : visière, antenne et diodes
+ if(f===2){ // Robot : visière, antenne et diodes
    g.fillStyle='#243b51';g.fillRect(-s*.16,top-s*.19,s*.32,s*.16);
    el(g,-s*.075,top-s*.11,s*.035,s*.035,'#55f7ff');el(g,s*.075,top-s*.11,s*.035,s*.035,'#55f7ff');
    g.strokeStyle='#c2e5ec';g.lineWidth=s*.035;g.beginPath();g.moveTo(0,top-s*.2);g.lineTo(0,top-s*.34);g.stroke();el(g,0,top-s*.36,s*.035,s*.035,'#ffba50');
  }
- if(f===2){ // Créature : yeux expressifs, mandibules et épines
+ if(f===1){ // Créature : yeux expressifs, mandibules et épines
    el(g,0,top-s*.12,s*.2,s*.14,'#70438e');
    for(const q of[-1,1]){pg(g,'#e1a4ff',q*s*.13,top-s*.17,q*s*.26,top-s*.36,q*s*.03,top-s*.24);el(g,q*s*.085,top-s*.14,s*.045,s*.055,'#fff6a9')}
    pg(g,'#f5d7ff',-s*.12,top-s*.01,0,top+s*.08,s*.12,top-s*.01);
  }
- if(f===3){ // Végétal : ramures et feuilles
+ if(f===1){ // Végétal : ramures et feuilles
    g.strokeStyle='#4b8352';g.lineWidth=s*.065;g.beginPath();g.moveTo(0,top+s*.08);g.lineTo(0,top-s*.29);g.stroke();
    for(const q of[-1,1]){el(g,q*s*.16,top-s*.23,s*.14,s*.085,'#85d47a');el(g,q*s*.22,top-s*.1,s*.09,s*.055,'#b7ed8e')}
  }
  /* Marques de faction : bannière, crocs, feuilles, engrenages ou halo. */
  if(f===0){g.strokeStyle=glow;g.lineWidth=s*.035;g.beginPath();g.moveTo(0,top+s*.1);g.lineTo(0,top-s*.36);g.stroke();pg(g,glow,0,top-s*.34,s*.2,top-s*.27,0,top-s*.19)}
- if(f===2){for(let q of[-1,1])pg(g,stone,q*s*.22,s*.08,q*s*.34,-s*.08,q*s*.3,s*.17)}
- if(f===3){for(let q=0;q<3;q++){let an=t*1.5+q*2.1;el(g,Math.cos(an)*s*.28,top+s*.12+Math.sin(an)*s*.08,s*.045,s*.07,glow)}}
- if(f===1){for(let q=-1;q<=1;q++){g.fillStyle=glow;g.fillRect(q*s*.17-s*.025,top+s*.2,s*.05,s*.05)}if(j===4||j===3){g.fillStyle='#55565a';g.fillRect(-s*.06,top-s*.16,s*.12,s*.18)}}
+ if(f===1){for(let q of[-1,1])pg(g,stone,q*s*.22,s*.08,q*s*.34,-s*.08,q*s*.3,s*.17)}
+ if(f===1){for(let q=0;q<3;q++){let an=t*1.5+q*2.1;el(g,Math.cos(an)*s*.28,top+s*.12+Math.sin(an)*s*.08,s*.045,s*.07,glow)}}
+ if(f===2){for(let q=-1;q<=1;q++){g.fillStyle=glow;g.fillRect(q*s*.17-s*.025,top+s*.2,s*.05,s*.05)}if(j===4||j===3){g.fillStyle='#55565a';g.fillRect(-s*.06,top-s*.16,s*.12,s*.18)}}
  if(f===4){g.globalAlpha=.35;g.strokeStyle=accent;g.lineWidth=s*.04;g.beginPath();g.ellipse(0,top+s*.08,s*.34,s*.12,t*.3,0,7);g.stroke();g.globalAlpha=1;for(let q=0;q<3;q++){let an=-t*1.2+q*2.1;el(g,Math.cos(an)*s*.34,top+s*.06+Math.sin(an)*s*.12,s*.035,s*.035,accent)}}
  /* Niveau et état */
  for(let q=0;q<lv;q++){el(g,(q-(lv-1)/2)*s*.105,s*.34,s*.025,s*.025,'#ffe17a')}
