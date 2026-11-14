@@ -21,7 +21,7 @@ async function capturer({racine=RACINE,sortie,police='reelle',echelle=2,graine=1
  fs.mkdirSync(sortie,{recursive:true});
  const srv=await demarrer(racine),proprio=!nav;if(!nav)nav=await N.lancer({webgl:rendu=='3d'});
  const res={police,policeChargee:true,images:[],erreurs:[]};
- try{for(const format of FORMATS){const o=await N.ouvrir(nav,srv.url+(rendu=='3d'?'?rendu=3d':''),{format,graine,police,echelle}),p=o.page;
+ try{for(const format of FORMATS){const o=await N.ouvrir(nav,srv.url+(rendu=='3d'?'?rendu=3d':'?rendu=2d'),{format,graine,police,echelle}),p=o.page;
   if(!o.policeChargee)res.policeChargee=false;
   const prendre=async e=>{const f=path.join(sortie,`${format}-${e.id}.png`);await p.screenshot({path:f,animations:'allow'});res.images.push({format,...e,fichier:f})};
   try{
