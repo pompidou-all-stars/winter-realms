@@ -1,4 +1,4 @@
-/* 2.6 : les modèles 3D couvrent tout le jeu et ont ce qu'il faut au rendu 3D (rendu3d.js).
+/* 2.7 : les modèles 3D couvrent tout le jeu et ont ce qu'il faut au rendu 3D (rendu3d.js).
    Complète assets3d.test.js (manifeste, empreintes, budgets) : ici, la correspondance avec sim.js et le contenu des GLB.
    Lit seulement l'en-tête JSON des GLB (aucun décodage, pas de Blender). */
 'use strict';

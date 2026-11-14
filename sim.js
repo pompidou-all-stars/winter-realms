@@ -72,6 +72,15 @@ const HPK=.55,GRACE=25,GROUP=4,
 const dmg=t=>TW[t.k].d*2**(t.lv-1),rng=t=>TW[t.k].r*(1+.05*(t.lv-1)),upCost=t=>Math.round(TW[t.k].c*1.5*2**(t.lv-1)/5)*5,topY=t=>.28+.045*(t.lv-1);
 
 /* ---------- simulation ---------- */
+/* grille de voisinage (2.5.2, performances) : chaque élément d'une liste est rangé dans sa case, pour ne tester que les voisins d'un point
+   au lieu de toute la liste. near() rend les indices dans l'ordre de la liste : les résultats sont identiques à un parcours complet. */
+const gcl=(v,m)=>Math.min(m-1,Math.max(0,v|0));
+class Grid{constructor(){this.b=Array.from({length:C*R},()=>[]);this.u=[];this.o=[]}
+ fill(l){for(const i of this.u)this.b[i].length=0;this.u.length=0;for(let n=0;n<l.length;n++){const i=gcl(l[n].y,R)*C+gcl(l[n].x,C);if(!this.b[i].length)this.u.push(i);this.b[i].push(n)}return this}
+ /* éléments dont la case touche le carré de demi-côté r autour de (x, y), dans l'ordre de la liste */
+ near(x,y,r){const o=this.o,x0=gcl(Math.floor(x-r),C),x1=gcl(Math.floor(x+r),C),y0=gcl(Math.floor(y-r),R),y1=gcl(Math.floor(y+r),R);o.length=0;
+  for(let b=y0;b<=y1;b++)for(let a=x0;a<=x1;a++){const L=this.b[b*C+a];for(let k=0;k<L.length;k++)o.push(L[k])}if(o.length>1)o.sort((p,q)=>p-q);return o}}
+const GRID_MIN=12;
 class Board{
  constructor(i,name,col,ai,classId=0){this.i=i;this.name=name;this.col=col;this.ai=ai;this.classId=classId;this.dead=0;this.aiT=1+i*.2;this.ev=[];this.G=null;
   this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=100;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=60;this.ap=40;this.lastG=100;this.flyIn=0;this.hpIn=0;this.specSeen=0;this.mz=null;this.d=this.dist()}
@@ -105,7 +114,7 @@ class Board{
  }
  impact(p){const T=TW[p.k],tg=p.tg,rad=T.sp||T.fsp;
   if(!tg.dead&&!tg.leak)this.hit(tg,p.d,T,p.sf);
-  if(rad){for(const c of this.cr){if(c===tg||c.hid||(T.gr&&CR[c.k].fly)||Math.hypot(c.x+.5-p.tx,c.y+.5-flyH(c.k)-p.ty)>=rad)continue;this.hit(c,p.d*.6,T,p.sf)}
+  if(rad){const cg=this.cgOk&&this.cr.length>GRID_MIN?this.cg.near(p.tx-.5,p.ty-.5,rad+.5).map(n=>this.cr[n]):this.cr;for(const c of cg){if(c===tg||c.hid||(T.gr&&CR[c.k].fly)||Math.hypot(c.x+.5-p.tx,c.y+.5-flyH(c.k)-p.ty)>=rad)continue;this.hit(c,p.d*.6,T,p.sf)}
    this.fx.push({type:'boom',x:p.tx,y:p.ty,r:rad,t:.3,d:.3,col:T.sl?'#8fdcff':'#ffb347'});if(T.sp)this.ev.push('boom')}
   else this.fx.push({type:'ring',x:p.tx,y:p.ty,r:T.skin==3?.45:.26,t:.2,d:.2,col:T.skin==0?'#ffffff':'#e39bff'})}
  update(dt){
@@ -113,9 +122,12 @@ class Board{
   for(const s of this.q){s.t-=dt;if(s.t<=0){const hp=CR[s.k].hp*s.m*HPK;this.hpIn+=hp;if(CR[s.k].fly)this.flyIn+=hp;if(CR[s.k].inv)this.specSeen=1;this.cr.push({id:++UID,k:s.k,x:SP[0],y:SP[1],tx:SP[0],ty:SP[1],hp,max:hp,sl:0,sf:.5,f:1,ph:Math.random()*6,ox:(Math.random()-.5)*.3,oy:(Math.random()-.5)*.22,arm:(CR[s.k].arm||0)*s.m,cs:2})}}
   this.q=this.q.filter(s=>s.t>0);
   const au=this.cr.filter(c=>CR[c.k].aura),mg=this.t.filter(t=>TW[t.k].mg&&!(t.b>0)),hl=this.cr.filter(c=>CR[c.k].heal);
-  for(const c of this.cr){const T=CR[c.k];c.sl=Math.max(0,c.sl-dt);c.mark=Math.max(0,(c.mark||0)-dt);c.h=!T.aura&&au.some(a=>Math.hypot(a.x-c.x,a.y-c.y)<AURA_R);
+  /* hâte et soin : avec beaucoup de Chamans ou de Prêtresses, on ne regarde que ceux des cases voisines. Ils bougent pendant la boucle (au plus 3,4 cases/s × dt),
+     d'où la marge ajoutée au rayon ; la distance exacte est ensuite vérifiée comme avant. */
+  const ar=AURA_R+3.4*dt+.01,auG=au.length>GRID_MIN&&(this.ag||(this.ag=new Grid())).fill(au),hlG=hl.length>GRID_MIN&&(this.hg||(this.hg=new Grid())).fill(hl);
+  for(const c of this.cr){const T=CR[c.k];c.sl=Math.max(0,c.sl-dt);c.mark=Math.max(0,(c.mark||0)-dt);c.h=!T.aura&&(auG?auG.near(c.x,c.y,ar).some(n=>Math.hypot(au[n].x-c.x,au[n].y-c.y)<AURA_R):au.some(a=>Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));
    c.hid=T.inv&&!mg.some(m=>Math.hypot(c.x-m.x,c.y-m.y)<=rng(m));
-   c.hl=c.hp<c.max&&hl.some(a=>a!==c&&Math.hypot(a.x-c.x,a.y-c.y)<AURA_R);if(c.hl)c.hp=Math.min(c.max,c.hp+c.max*.05*dt);
+   c.hl=c.hp<c.max&&(hlG?hlG.near(c.x,c.y,ar).some(n=>hl[n]!==c&&Math.hypot(hl[n].x-c.x,hl[n].y-c.y)<AURA_R):hl.some(a=>a!==c&&Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));if(c.hl)c.hp=Math.min(c.max,c.hp+c.max*.05*dt);
    if(T.stun){c.cs-=dt;if(c.cs<=0){let bt=null,bd=2.3;for(const t of this.t){const d=Math.hypot(t.x-c.x,t.y-c.y);if(d<bd&&!(t.stun>0)&&!(t.b>0)){bd=d;bt=t}}
     if(bt){bt.stun=2;c.cs=3.5;this.fx.push({type:'zap',x:c.x+.5,y:c.y+.3,x2:bt.x+.5,y2:bt.y+.5-topY(bt),t:.3,d:.3});this.ev.push('zap')}else c.cs=.3}}
    let sp=T.s*(c.sl>0?c.sf:1)*(c.h?1.4:1)*dt;
@@ -128,20 +140,22 @@ class Board{
     const m=Math.min(sp,dd);c.x+=dx/dd*m;c.y+=dy/dd*m;sp-=m}}
   this.pen*=Math.pow(.955,dt);const tot=this.d[SP[1]][SP[0]]||1;
   for(const c of this.cr){const pr=CR[c.k].fly?1-Math.hypot(EX[0]-c.x,EX[1]-c.y)/12:1-(this.d[c.ty][c.tx]+Math.hypot(c.tx-c.x,c.ty-c.y))/tot;if(pr>this.pen)this.pen=pr}
+  /* tours et explosions : seuls les monstres des cases à portée sont examinés (grille remplie une fois par pas, les monstres ne bougent plus ensuite) */
+  const cr=this.cr,useG=cr.length>GRID_MIN;if(useG)(this.cg||(this.cg=new Grid())).fill(cr);this.cgOk=useG;const voisins=(x,y,r)=>useG?this.cg.near(x,y,r).map(n=>cr[n]):cr;
   for(const t of this.t){if(t.b>0){t.b-=dt;if(t.b<=0){t.b=0;t.cd=0;this.fx.push({type:'range',x:t.x+.5,y:t.y+.5,r:rng(t),t:.6,d:.6,col:TW[t.k].col})}continue}
    if(t.stun>0){t.stun-=dt;continue}t.cd-=dt;if(t.sw>0)t.sw-=dt;if(t.cd>0)continue;const T=TW[t.k],r=rng(t),dm=dmg(t);let tg=null,bd=INF;
-   for(const c of this.cr){const F=CR[c.k].fly;if(c.hid||(T.gr&&F)||(T.mag&&CR[c.k].mi))continue;if(Math.hypot(c.x-t.x,c.y-t.y)>r)continue;
+   for(const c of voisins(t.x,t.y,r)){const F=CR[c.k].fly;if(c.hid||(T.gr&&F)||(T.mag&&CR[c.k].mi))continue;if(Math.hypot(c.x-t.x,c.y-t.y)>r)continue;
     const rem=F?Math.hypot(EX[0]-c.x,EX[1]-c.y):this.d[c.ty][c.tx]+Math.hypot(c.tx-c.x,c.ty-c.y);if(rem<bd){bd=rem;tg=c}}
    if(!tg)continue;t.cd=T.cd;t.a=Math.atan2(tg.y-t.y,tg.x-t.x);
    if(T.me){this.hit(tg,dm,T);t.sw=.2;this.fx.push({type:'slash',x:tg.x+.5,y:tg.y+.5,a:t.a,t:.18,d:.18})}
-   else if(T.fl){for(const c of this.cr){if(c.hid)continue;const dx=c.x-t.x,dy=c.y-t.y,dd=Math.hypot(dx,dy);if(dd>r)continue;const da=Math.atan2(dy,dx)-t.a;if(dd<.6||Math.abs(Math.atan2(Math.sin(da),Math.cos(da)))<.5)this.hit(c,dm,T)}
+   else if(T.fl){for(const c of voisins(t.x,t.y,r)){if(c.hid)continue;const dx=c.x-t.x,dy=c.y-t.y,dd=Math.hypot(dx,dy);if(dd>r)continue;const da=Math.atan2(dy,dx)-t.a;if(dd<.6||Math.abs(Math.atan2(Math.sin(da),Math.cos(da)))<.5)this.hit(c,dm,T)}
     const h=topY(t);for(let i=0;i<2;i++){const a=t.a+(Math.random()-.5)*.5,v=r/.35*(.75+Math.random()*.35);this.fx.push({type:'flame',x:t.x+.5,y:t.y+.5-h,vx:Math.cos(a)*v,vy:Math.sin(a)*v+h/.35,t:.35,d:.35})}}
    else this.pr.push({id:++UID,x:t.x+.5,y:t.y+.5-topY(t),tg,k:t.k,d:dm,sf:.5-.05*(t.lv-1),tx:tg.x+.5,ty:tg.y+.5,tot:Math.hypot(tg.x-t.x,tg.y-t.y)||.1,a:t.a});
    this.ev.push(T.s)}
   for(const p of this.pr){const T=TW[p.k];if(!p.tg.dead&&!p.tg.leak){p.tx=p.tg.x+.5;p.ty=p.tg.y+.5-flyH(p.tg.k)}
    const dx=p.tx-p.x,dy=p.ty-p.y,dd=Math.hypot(dx,dy),m=T.ps*dt;
    if(dd<=m){p.hit=1;this.impact(p)}else{p.x+=dx/dd*m;p.y+=dy/dd*m;p.a=Math.atan2(dy,dx)}}
-  this.pr=this.pr.filter(p=>!p.hit);
+  this.pr=this.pr.filter(p=>!p.hit);this.cgOk=false;
   const kids=[];
   for(const c of this.cr){
    if(c.leak){this.lives--;this.hurt=6;this.fx.push({type:'text',x:EX[0]+.5,y:EX[1]+.2,txt:'-1 vie',col:'#ff7b6e',t:.9,d:.9});this.ev.push('!leak')}
@@ -156,7 +170,7 @@ class Board{
 const invest=b=>b.t.reduce((s,t)=>s+t.inv,0),airInv=b=>b.t.reduce((s,t)=>s+(!TW[t.k].gr&&Math.abs(t.x-6)<=2?t.inv:0),0),mages=b=>b.t.filter(t=>TW[t.k].mg).length;
 function pathCells(b){const out=[];let x=SP[0],y=SP[1];out.push([x,y]);for(let n=0;n<200&&b.d[y][x]>0&&b.d[y][x]<INF;n++){for(const[dx,dy]of DIRS){const a=x+dx,c=y+dy;if(a>=0&&c>=0&&a<C&&c<R&&b.d[c][a]==b.d[y][x]-1){x=a;y=c;break}}out.push([x,y])}return out}
 
-/* --- labyrinthe de l'IA (2.5) : chaque terrain IA reçoit un plan cible au début de la partie ---
+/* --- labyrinthe de l'IA (2.5, affiné en 2.6) : chaque terrain IA reçoit un plan cible au début de la partie ---
    grille plate (case i = y*C+x, 1 = mur), parcours en largeur rapide, hasard propre (graine tirée une fois) pour que le découpage dans le temps ne change rien. */
 const N=C*R,SPI=SP[1]*C+SP[0],EXI=EX[1]*C+EX[0],NB=new Int16Array(N*5),QB=new Int16Array(N),DB=new Int16Array(N);
 for(let i=0;i<N;i++){const x=i%C,y=i/C|0;let k=0;for(const[dx,dy]of DIRS){const a=x+dx,b=y+dy;if(a>=0&&b>=0&&a<C&&b<R)NB[i*5+1+k++]=b*C+a}NB[i*5]=k}
@@ -177,28 +191,38 @@ function mzClimb(c,r,K,steps){for(let e=0;e<steps&&c.it<K;e++,c.it++){const w=c.
  const seg=[i];if(r()<.3){const[dx,dy]=DIRS[r()*4|0];let x=i%C,y=i/C|0;for(let k=1+(r()*3|0);k>0;k--){x+=dx;y+=dy;if(x<0||y<0||x>=C||y>=R)break;const j=y*C+x;if(j!=SPI&&j!=EXI)seg.push(j)}}
  const v=w[i]?0:1,ch=seg.filter(j=>w[j]!=v);for(const j of ch)w[j]=v;const L=plen(w),n=c.n+(v?ch.length:-ch.length),s=L-MZ_LAM*n;
  if(L>=0&&(s>=c.s||r()<Math.exp((s-c.s)/T))){c.L=L;c.n=n;c.s=s;if(s>c.bs){c.bs=s;c.best=w.slice()}}else for(const j of ch)w[j]=1-v}}
-/* fait avancer la génération du plan d'au plus « steps » essais (un essai ≈ un parcours en largeur) ; renvoie le plan quand il est prêt */
+/* fait avancer la génération du plan d'au plus « steps » essais (un essai ≈ un parcours en largeur) ; renvoie le plan quand il est prêt.
+   Étapes : 1) MZ_NC formes de départ affinées par recherche locale ; 2) pour chacune : murs inutiles retirés, ordre de construction, note de milieu de partie ; 3) choix et rôles. */
 function mzStep(A,steps){let M=A.mz;if(M&&M.ok)return M;
- if(!M)M=A.mz={r:rnd32(Math.random()*4294967296>>>0),c:[],ok:0};const r=M.r,LV=A.G?A.G.LV|0:0,K=MZ_K[LV];
- while(steps>0&&!M.left){let c=M.c[M.c.length-1];if(!c||c.it>=K){if(M.c.length>=MZ_NC){mzChoose(M,LV);break}c=mzTemplate(r);M.c.push(c)}const s=Math.min(steps,K-c.it);mzClimb(c,r,K,s);steps-=s}
- while(steps>0&&M.left&&M.left.length)steps-=mzRemove(M);
- if(!M.left||M.left.length)return null;
- mzRoles(A,M);M.ok=1;return M}
+ if(!M)M=A.mz={r:rnd32(Math.random()*4294967296>>>0),c:[],ok:0,o:0};const r=M.r,LV=A.G?A.G.LV|0:0,K=MZ_K[LV];
+ while(steps>0){let c=M.c[M.c.length-1];if(c&&c.it>=K&&M.c.length>=MZ_NC)break;if(!c||c.it>=K){c=mzTemplate(r);M.c.push(c)}const s=Math.min(steps,K-c.it);mzClimb(c,r,K,s);steps-=s}
+ while(steps>0&&M.o<MZ_NC){const c=M.c[M.o];if(!c.left)steps-=mzPrune(c);else if(c.left.length)steps-=mzRemove(c,r);else{steps-=mzEval(c);M.o++}}
+ if(M.o<MZ_NC)return null;
+ mzChoose(M,LV);mzRoles(A,M);M.ok=1;return M}
 const MZX=new Int8Array(N),MZY=new Int8Array(N);for(let i=0;i<N;i++){MZX[i]=i%C;MZY[i]=i/C|0}
 const near=(i,j,d)=>{const dx=MZX[i]-MZX[j],dy=MZY[i]-MZY[j];return dx*dx+dy*dy<=d*d};
-/* choix du plan parmi les candidats (le meilleur en Brutal, un des 2 ou 3 meilleurs sinon) */
-function mzChoose(M,LV){const r=M.r;M.c.sort((a,b)=>b.bs-a.bs);const P=MZ_PICK[LV];let q=r(),ch=0;for(;ch<P.length-1;ch++){q-=P[ch];if(q<=0)break}
- const w=M.c[ch].best;M.f=M.c[ch].f;M.c=null;M.w=w.slice();M.cur=w.slice();M.left=[];for(let i=0;i<N;i++)if(w[i])M.left.push(i);M.walls=M.left.slice();M.rev=[]}
+/* murs inutiles : une tour qui ne touche pas le chemin (8 cases autour) et dont le retrait ne le raccourcit pas est retirée du plan ; puis l'ordre de construction est préparé */
+function mzPrune(c){const w=c.best.slice(),L=plen(w);let n=1,ch=1;
+ while(ch){ch=0;const adj=new Uint8Array(N);for(const j of mzPath(w)){n++;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const x=MZX[j]+dx,y=MZY[j]+dy;if(x>=0&&y>=0&&x<C&&y<R)adj[y*C+x]=1}}
+  for(let i=0;i<N;i++)if(w[i]&&!adj[i]){w[i]=0;n++;if(plen(w)==L)ch=1;else w[i]=1}}
+ c.w=w;c.cur=w.slice();c.left=[];for(let i=0;i<N;i++)if(w[i])c.left.push(i);c.walls=c.left.slice();c.rev=[];return n}
 /* ordre de construction : on retire une à une, depuis le plan complet, la tour qui raccourcit le moins le chemin (puis la moins utile au chemin actuel et au couloir aérien) ;
    construire dans l'ordre inverse allonge le chemin presque à chaque tour et, au début, place les tours près du chemin droit et des volants */
-function mzRemove(M){const cur=M.cur,left=M.left,r=M.r,L0=plen(cur),Pc=mzPath(cur);let bi=0,bk=INF;
+function mzRemove(c,r){const cur=c.cur,left=c.left,L0=plen(cur),Pc=mzPath(cur);let bi=0,bk=INF;
  const smp=left.length<=24?left.map((_,k)=>k):Array.from({length:24},()=>r()*left.length|0);
  for(const k of smp){const i=left[k];cur[i]=0;const L=plen(cur);cur[i]=1;let cv=0;for(const j of Pc)if(near(i,j,2.5))cv++;
   const key=(L0-L)+.05*cv+(Math.abs(MZX[i]-6)<=2?.3:0)+r()*.2;if(key<bk){bk=key;bi=k}}
- const i=left[bi];left.splice(bi,1);cur[i]=0;M.rev.push(i);return smp.length+2}
+ const i=left[bi];left.splice(bi,1);cur[i]=0;c.rev.push(i);return smp.length+2}
+/* note d'un candidat : longueur moyenne du chemin après 15, 25, 40 et 60 tours (l'IA en a rarement plus en milieu de partie) et une fois complet */
+const MZ_AT=[15,25,40,60];
+function mzEval(c){c.ord=c.rev.reverse();const w=new Uint8Array(N),Ls=[];c.ord.forEach((i,n)=>{w[i]=1;if(MZ_AT.includes(n+1))Ls.push(plen(w))});
+ c.L=plen(c.w);while(Ls.length<MZ_AT.length)Ls.push(c.L);c.pre=Ls;c.note=(Ls.reduce((a,b)=>a+b,0)+c.L)/(MZ_AT.length+1);delete c.cur;delete c.rev;delete c.left;return MZ_AT.length+2}
+/* choix du plan parmi les candidats, sur la note de milieu de partie (le meilleur en Brutal, un des 2 ou 3 meilleurs sinon) */
+function mzChoose(M,LV){const r=M.r;M.c.sort((a,b)=>b.note-a.note);const P=MZ_PICK[LV];let q=r(),ch=0;for(;ch<P.length-1;ch++){q-=P[ch];if(q<=0)break}
+ const c=M.c[ch];M.f=c.f;M.w=c.w;M.ord=c.ord;M.walls=c.walls;M.pre=c.pre;M.note=c.note;M.c=null}
 /* rôles (emplacement j de la faction) : Givre répartis le long du chemin final, Mages pour que leur détection couvre tout le chemin, air près du couloir des volants */
 function mzRoles(A,M){const base=A.classId*10,rg=j=>TW[base+j].r,w=M.w,P=mzPath(w),walls=M.walls,role=new Int8Array(N).fill(-1);
- M.ord=M.rev.reverse();M.L=P.length-1;delete M.cur;delete M.rev;delete M.left;delete M.walls;
+ M.L=P.length-1;delete M.walls;
  const cov=(i,d)=>{let n=0;for(const j of P)if(near(i,j,d))n++;return n},gain=(i,d,cv)=>{let v=0;for(let n=0;n<P.length;n++)if(!cv[n]&&near(i,P[n],d))v++;return v},mark=(i,d,cv)=>{for(let n=0;n<P.length;n++)if(near(i,P[n],d))cv[n]=1};
  const ng=Math.min(6,Math.max(2,Math.round(M.L/15))),cG=new Uint8Array(P.length);
  for(let k=0;k<ng;k++){const tgt=P[Math.floor(P.length*(k+.5)/ng)];let bi=-1,bv=0;for(const i of walls){if(role[i]>=0||!near(i,tgt,rg(2)))continue;const v=gain(i,rg(2),cG);if(v>bv){bv=v;bi=i}}
@@ -226,7 +250,7 @@ function aiDefend(A){const M=mzStep(A,INF),time=A.G.time,bud=Math.min(A.dp,A.gol
  /* amélioration : la tour qui couvre le plus de chemin (et de couloir aérien, d'autant plus que des volants arrivent) pour son prix */
  if(ups.length&&(!todo.length||(n>=10&&Math.random()<(n>=24?.6:.35)))){const path=pathCells(A),aw=.6*(1+2*fs),val=t=>{const T=TW[t.k],r=rng(t);let c=0;for(const[x,y]of path)if(Math.hypot(x-t.x,y-t.y)<=r)c++;if(!T.gr)for(let y=0;y<R;y++)if(Math.hypot(6-t.x,y-t.y)<=r)c+=aw;
    return c*T.d/T.cd*(T.sp?2.5:T.fl?3:T.fsp?1.6:T.mg?1.4:1)/T.c};
-  ups.sort((a,b)=>val(b)-val(a));ok=A.upgrade(ups[Math.random()<.75?0:Math.floor(Math.random()*ups.length)])}
+  const vs=new Map(ups.map(t=>[t,val(t)]));ups.sort((a,b)=>vs.get(b)-vs.get(a));ok=A.upgrade(ups[Math.random()<.75?0:Math.floor(Math.random()*ups.length)])}
  /* construction : la prochaine case du plan ; si elle est occupée par un monstre, on essaie les suivantes, mais on n'en saute pas une faute d'or */
  else for(const i of todo.slice(0,4)){const k=mzKind(A,i,n,bud,thr,fs);if(k<0)break;if(A.place(i%C,i/C|0,k)){ok=true;break}}
  A.dp-=g0-A.gold;return ok}

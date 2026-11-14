@@ -44,11 +44,15 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.6 — 2026-11-14
+### 2.7 — 2026-11-14
 - Playable 3D view (prototype): add `?rendu=3d` to the address, or tap "Essayer la vue 3D (prototype)" on the home screen. Diorama board, animated towers and monsters, scaffolding while towers are built, projectiles and effects, same controls as 2D (two-tap building with a ghost tower, two-finger zoom and pan, tower panel).
 - 3D models for the whole game, one Blender script per asset in `art/`: all 50 towers (5 factions × 10, heroic-fantasy cartoon style, one look per faction), 17 animated monsters (sizes follow their in-game size), spawn portal and castle. `generer.py` now also exports pivots and animations and compresses with meshopt.
 - three.js r170 is vendored in `vendor/three/` (MIT), loaded through an import map only in 3D mode; no build step. Model viewer page: `apercu-3d.html`.
 - The 2D view stays the default and is unchanged. Game rules unchanged (`sim.js` untouched, no server redeploy).
+
+### 2.6 — 2026-11-14
+- AI mazes pay off earlier: each candidate maze is graded on its path length after 15, 25, 40 and 60 towers, not only when finished. With 40 towers, the median path goes from 57 to 66 cells.
+- Useless walls (not touching the path and not making it longer) are removed from AI plans, so the gold goes to towers that matter.
 
 ### 2.5.1 — 2026-11-14
 - Fixes multiplayer: after 2–3 minutes (as soon as a ground monster reached your board), tapping the board crashed the page, the board froze and towers could no longer be built. Monsters received from the server now carry an approximate target cell. Client-only fix (no server redeploy).

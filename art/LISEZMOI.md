@@ -46,7 +46,7 @@ Modèle complet : `art/exemples/caisse.py`.
 - **1 unité = 1 case** du terrain. L'origine (0, 0, 0) est **au sol, au centre de la case**. Axe Z vers le haut (Blender).
 - Une tour tient dans **0,9 × 0,9** au sol et mesure au plus **1,6** de haut ; sa face avant regarde vers **−Y**.
 - Les couleurs de faction viennent de `ctx.jeu['FACTIONS'][f]['color']` : un changement de couleur dans le jeu se reporte sur les modèles à la prochaine génération.
-- Les **niveaux d'amélioration** (taille, pastilles) sont gérés par le jeu à l'affichage : un seul modèle par tour et par monstre. Depuis la 2.6, les **animations de marche et de vol** des monstres sont dans le fichier (pistes NLA `marche` et `vol`, voir plus bas) ; les autres petits mouvements (rotation des cristaux, flammes, visée) sont faits par le jeu sur des **pivots nommés**.
+- Les **niveaux d'amélioration** (taille, pastilles) sont gérés par le jeu à l'affichage : un seul modèle par tour et par monstre. Depuis la 2.7, les **animations de marche et de vol** des monstres sont dans le fichier (pistes NLA `marche` et `vol`, voir plus bas) ; les autres petits mouvements (rotation des cristaux, flammes, visée) sont faits par le jeu sur des **pivots nommés**.
 - **Licences** : aucun modèle ni texture externe sauf licence **CC0** (par exemple Poly Haven), avec la source notée en commentaire dans le script. Pas de génération 3D par IA sans accord du concepteur.
 
 ## Générer les fichiers 3D
@@ -75,7 +75,7 @@ Puis commiter **le script, le `.glb` et `assets/3d/manifeste.json` ensemble**.
 - Budgets par fichier dans `art/budgets.json` : tour et monstre ≤ 3 000 triangles et 150 Ko, décor ≤ 6 000 triangles et 300 Ko, total ≤ 8 Mo. Le jeu doit rester fluide sur téléphone.
 - Modifier un fichier de `art/communs/` change l'empreinte de **tous** les assets : il faut alors tout régénérer (`python art/outils/generer.py`).
 
-## Modèles du jeu (depuis la 2.6)
+## Modèles du jeu (depuis la 2.7)
 
 Les 50 tours, les 17 monstres, le portail et le château sont construits avec les pièces communes de `art/communs/` (un paquet Python : `from communs.tours_communes import tour`) :
 

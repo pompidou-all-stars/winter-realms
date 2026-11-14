@@ -16,7 +16,7 @@ function disponible(){return !!playwright}
 
 /* options de Chromium pour un rendu reproductible : rendu logiciel, pas de lissage sous-pixel ni d'optimisations variables */
 const OPTIONS_STABLES=['--disable-gpu','--disable-lcd-text','--font-render-hinting=none','--force-color-profile=srgb','--disable-partial-raster','--disable-skia-runtime-opts','--disable-threaded-animation','--disable-threaded-scrolling','--disable-checker-imaging'];
-/* webgl : pour le rendu 3D (2.6), WebGL en rendu logiciel SwiftShader (identique sur toutes les machines, sans carte graphique) */
+/* webgl : pour le rendu 3D (2.7), WebGL en rendu logiciel SwiftShader (identique sur toutes les machines, sans carte graphique) */
 const OPTIONS_WEBGL=OPTIONS_STABLES.filter(o=>o!='--disable-gpu').concat(['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']);
 /* WR_CANAL permet d'utiliser un navigateur déjà installé (par exemple msedge) au lieu du Chromium de Playwright */
 async function lancer({webgl=false}={}){return playwright.chromium.launch({args:webgl?OPTIONS_WEBGL:OPTIONS_STABLES,...(process.env.WR_CANAL?{channel:process.env.WR_CANAL}:{})})}
@@ -70,7 +70,7 @@ async function avancer(page,ms){await page.clock.runFor(ms)}
 async function etat(page){return page.evaluate(()=>({or:P.gold,revenu:P.inc,vies:P.lives,tours:P.t.map(t=>({x:t.x,y:t.y,k:t.k,lv:t.lv})),temps:time,horloge:document.getElementById('clock').textContent,
  vue:view,fin:over,faction:chosenClass,panneauOuvert:!!document.querySelector('#bar .info')||document.getElementById('fiche')?.dataset.mode=='tour',fiche:document.getElementById('fiche')?.innerText||'',zoom:typeof VUE=='object'?VUE.z:1,projet:typeof projet!='undefined'&&projet?{...projet}:null,toast:document.getElementById('toast').hidden?'':document.getElementById('toast').textContent,boutons:[...document.querySelectorAll('#bar button')].map(b=>b.textContent)}))}
 
-/* 2.6 : attend que le rendu 3D soit prêt (module chargé et modèles préchargés). Le chargement passe par le réseau local,
+/* 2.7 : attend que le rendu 3D soit prêt (module chargé et modèles préchargés). Le chargement passe par le réseau local,
    qui ne dépend pas de l'horloge figée : on attend en temps réel, puis on avance l'horloge d'une image. */
 async function attendre3D(page,ms=30000){const fin=Date.now()+ms;
  while(Date.now()<fin){const e=await page.evaluate(()=>({ok:!!(window.R3D_ETAT&&R3D_ETAT().charge),echec:window.R3D_ETAT&&R3D_ETAT().echec}));

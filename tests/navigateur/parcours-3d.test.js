@@ -1,4 +1,4 @@
-/* 2.6 : parcours mobile avec le rendu 3D (?rendu=3d), au format téléphone (portrait et paysage).
+/* 2.7 : parcours mobile avec le rendu 3D (?rendu=3d), au format téléphone (portrait et paysage).
    WebGL tourne en rendu logiciel (SwiftShader) : le test ne dépend pas d'une carte graphique.
    Mêmes commandes qu'en 2D : construction en deux touchers, panneau de tour, zoom et déplacement à deux doigts. */
 'use strict';
@@ -39,8 +39,11 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile e
  });
  test('Envoyer des monstres : ils apparaissent en 3D chez l\'adversaire, animés',async()=>{
   await N.toucher(p,'#tabs button[data-t="n"]');await N.toucher(p,'#bar button:has-text("Sapeur gobelin")');await N.toucher(p,'#tabs button[data-t="t"]');
-  await p.evaluate(()=>setView(1));await N.avancer(p,2500);const s=(await r3d()).scene;assert.ok(s.monstres>=1,'monstres en 3D : '+s.monstres);
-  await p.evaluate(()=>setView(0));await N.avancer(p,50);
+  /* les monstres apparaissent en moins de 1,4 s ; l'IA peut les tuer vite : on garde le maximum observé */
+  await p.evaluate(()=>setView(1));let max=0;
+  try{for(let i=0;i<12;i++){await N.avancer(p,200);max=Math.max(max,(await r3d()).scene.monstres)}}
+  finally{await p.evaluate(()=>setView(0));await N.avancer(p,50)}
+  assert.ok(max>=1,'monstres en 3D : '+max);
  });
  test('Deux doigts : écarter les doigts zoome, sans poser de tour',async()=>{
   const avant=await N.etat(p),c=await N.centreCase(p,6,8);
