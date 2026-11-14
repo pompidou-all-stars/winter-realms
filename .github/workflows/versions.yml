@@ -1,0 +1,33 @@
+# Après chaque fusion dans main : pose une étiquette de version (tag + Release GitHub)
+# pour pouvoir revenir à n'importe quel état publié. Voir CLAUDE.md §14.
+# Le calcul de la version est dans .github/versionner.sh.
+name: Versions
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: versions
+  cancel-in-progress: false
+
+jobs:
+  etiqueter:
+    name: Étiqueter la version
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Créer l'étiquette de version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          bash .github/versionner.sh
