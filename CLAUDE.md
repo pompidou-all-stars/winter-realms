@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.1)
+# Winter Realms — Tower Wars (Édition 2.3)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -343,7 +343,11 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 
 ## 9. Interface et commandes
 
-- **HUD** : or, revenu toutes les 10 s, horloge, faction, bouton son, bouton plein écran. On y trouve aussi 4 vignettes avec une mini-carte, les vies et le revenu (bonus de difficulté compris) de chaque terrain. **Toucher une vignette** affiche le terrain correspondant (en lecture seule).
+- **HUD** : or, revenu toutes les 10 s, horloge, **vies du joueur** (❤, depuis la 2.3), faction, bouton son, bouton plein écran.
+- **Terrains des joueurs** (flottants depuis la 2.3, pour agrandir la carte sur téléphone) : un **bouton rond avec une icône de carte**, en haut à gauche du terrain (`#cartesBtn`), ouvre un panneau posé **par-dessus le terrain** (`#chips`) avec les 4 vignettes : mini-carte, vies et revenu (bonus de difficulté compris) de chaque terrain.
+  - **Toucher une vignette** affiche le terrain correspondant (en lecture seule) et referme le panneau ; le bouton prend alors la couleur et le nom de ce joueur.
+  - Toucher le terrain pendant que le panneau est ouvert le referme **sans poser de tour**.
+  - La bannière en bas du terrain (« Terrain de … · ↩ revenir au tien ») se touche pour revenir à son propre terrain.
 - **Onglets** : « Construire » ou « Envoyer » (Sol, Volants, Spéciaux). Les boutons trop chers ou pas encore débloqués sont grisés, et leur prix passe en rouge quand l'or manque.
 - **Fiche d'information** (depuis la 2.1), entre les onglets et les boutons :
   - **Construire** : la tour sélectionnée est décrite en clair : nom, type, rôle, ⚔ dégâts par seconde, ◎ portée en cases, cibles (« sol et air » ou « sol uniquement »), effets (explosion de zone, ralentissement, souffle en cône, corps à corps, révèle les Spectres, magique), bonus de faction chiffré (calculé à partir de `FACTION_BALANCE`) ;
@@ -583,3 +587,4 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 | 2026-11-14 | 2.0.1 | Outillage : **versions et retour arrière** (§14). Étiquette automatique à chaque fusion dans `main` (`vX.Y.Z`, ou `vX.Y.Z.N` sans changement du jeu), Releases GitHub, versions historiques 1.4 à 2.0.1 étiquetées, procédure « reviens à la version … ». **Aucun changement de jeu.** |
 | 2026-11-14 | 2.0.1 | Correctif outillage : le déploiement automatique du serveur passe de Node 20 à **Node 22** (Wrangler 4 refuse Node 20 ; le premier déploiement automatique avait échoué). **Aucun changement de jeu.** |
 | 2026-11-14 | 2.1 | **Interface plus claire** : fiche d'information de la tour (dégâts/s, portée, cibles, effets, bonus de faction chiffré, gain du niveau suivant), cartes de tours avec dégâts/s, portée et ✈, prix en rouge si l'or manque, monstres verrouillés avec heure de déblocage. **Zoom (1× à 3×) et déplacement à deux doigts**, molette, bouton « Vue d'ensemble », cadre de la partie visible sur la vignette. Pose au doigt au relâcher. Correction du paysage sur téléphone (haut et bas coupés). Tests navigateur complétés (19 vérifications par orientation), 5ᵉ capture (zoom). **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
+| 2026-11-14 | 2.3 | **Carte plus grande sur téléphone** : les 4 vignettes des joueurs quittent le HUD et s'ouvrent dans un panneau flottant par-dessus le terrain, depuis un bouton-icône en haut à gauche. Vies du joueur ajoutées dans le HUD (❤). Bannière « ↩ revenir au tien » cliquable. Mini-cartes un peu plus grandes. Interface uniquement : `sim.js` inchangé. Test du parcours mobile adapté (ouvrir le panneau avant de toucher une vignette). |

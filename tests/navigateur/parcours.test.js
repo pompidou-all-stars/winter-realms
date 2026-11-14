@@ -47,8 +47,8 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
   await N.toucher(p,'#tabs button[data-t="t"]');
  });
  test('Toucher une vignette affiche le terrain d\'une IA, puis on revient au sien',async()=>{
-  await N.toucher(p,'#chips .chip >> nth=1');assert.equal((await N.etat(p)).vue,1);assert.equal(await val(()=>document.getElementById('banner').hidden),false);
-  await N.toucher(p,'#chips .chip >> nth=0');assert.equal((await N.etat(p)).vue,0);assert.equal(await val(()=>document.getElementById('banner').hidden),true);
+  await N.toucher(p,'#cartesBtn');await N.toucher(p,'#chips .chip >> nth=1');assert.equal((await N.etat(p)).vue,1);assert.equal(await val(()=>document.getElementById('banner').hidden),false);
+  assert.equal(await val(()=>document.getElementById('chips').hidden),true,'le panneau se referme');await N.toucher(p,'#banner');assert.equal((await N.etat(p)).vue,0);assert.equal(await val(()=>document.getElementById('banner').hidden),true);
  });
  test('Fiche de construction (2.1) : la tour sélectionnée est décrite en clair',async()=>{
   let e=await N.etat(p);assert.match(e.fiche,/Arbre sentinelle/);assert.match(e.fiche,/Dégâts\/s/);assert.match(e.fiche,/Portée/);assert.match(e.fiche,/sol et air/);assert.match(e.fiche,/Racines/);
