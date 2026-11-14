@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 1.6.1)
+# Winter Realms — Tower Wars (Édition 1.7)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -35,7 +35,11 @@ Claude : après chaque amélioration terminée, propose (ou fais, si on te l'a d
 
 ## 1. Structure technique
 
-- **Un seul fichier** : `index.html` (HTML + CSS + JavaScript). Pas de build, pas de dépendances, pas de serveur. On l'ouvre directement dans un navigateur.
+- **Deux fichiers, sans build ni dépendances** :
+  - `sim.js` contient **toute la simulation** : tables de données, `class Board`, IA, et `class Game`, qui fait tourner une partie de 4 terrains. Il ne touche ni au DOM ni au son, ce qui permet au serveur multijoueur de le réutiliser tel quel. Les sons y sont seulement notés dans `board.ev` (un `!` devant signifie « toujours audible pour le propriétaire du terrain »). Les événements de partie (revenu, élimination, fin) vont dans `game.log`.
+  - `index.html` contient l'interface, le dessin et les sons. Il charge `sim.js` avec `<script src="sim.js">`.
+  - **Toutes les actions du joueur passent par `doAction()`**, qui appelle `Game.action()`. Cette fonction renvoie `''` si l'action réussit, sinon un code d'erreur : `poor`, `blocked`, `locked`, `max`, `over` ou `bad`.
+- **Pour tester en local**, il faut un petit serveur web : `npx http-server` à la racine, puis ouvrir http://localhost:8080. Un `file://` ne charge pas toujours `sim.js`, surtout dans les aperçus intégrés. Ouvert normalement dans un navigateur, le fichier fonctionne aussi.
 - **Seule ressource externe** : la police Google Fonts *Fredoka*.
 - **Rendu** : Canvas 2D. Tous les visuels (tours, monstres, effets) sont **dessinés en code**, sans images. La netteté s'adapte à l'écran (`devicePixelRatio`, plafonné à 3).
 - **Sons** : synthétisés avec Web Audio (oscillateurs et bruit), **aucun fichier audio**.
@@ -311,7 +315,7 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 
 ## 10. Choix de conception à respecter
 
-1. **Un seul fichier HTML autonome**, jouable hors ligne (sauf la police), sans étape de build.
+1. **Pas d'étape de build** : `index.html` + `sim.js`, jouable hors ligne en solo (sauf la police). **La simulation reste dans `sim.js`, sans DOM ni son**, pour être partagée avec le serveur multijoueur.
 2. **Tout est dessiné en code** (Canvas 2D) et **tous les sons sont synthétisés** : pas d'images ni de fichiers audio.
 3. **Univers fantasy original** : noms, personnages et visuels propres au jeu. On ne copie pas les personnages, les visuels ou les noms d'un jeu existant.
 4. **Style « maquette 2.5D » en relief** : ombres portées, dalles biseautées, éclairage doux, personnages caricaturaux (grosse tête, gros nez).
@@ -340,3 +344,4 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 | 2026-11-14 | 1.4 | Import initial du projet et création de ce document par rétro-ingénierie du code. |
 | 2026-11-14 | 1.6 | Visuel uniquement : plateau-diorama avec socle et dalles surélevées, palette de biome par faction, décor déterministe (rochers, herbes, cristaux), ombres sous le portail et le château. Texte d'accueil retouché. **Aucun changement de règles ni d'équilibrage.** Le bug des racines sylvestres (§11) est toujours présent. |
 | 2026-11-14 | 1.6.1 | Correction des racines sylvestres : ralentissement ×0,82 pendant 0,72 s sur toutes leurs tours (le Givre garde son propre ralentissement). Le ralentissement le plus fort l'emporte. Fin des monstres figés et des volants bloqués pour toujours. |
+| 2026-11-14 | 1.7 | Technique : la simulation passe dans `sim.js` (classe `Game`, sons notés sous forme d'événements, actions via `Game.action`), en préparation du multijoueur. La fin de partie survient quand il ne reste qu'un terrain, ou plus aucun humain. **Aucun changement de règles en solo.** |

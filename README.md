@@ -24,6 +24,9 @@ Game rules, balance tables and project conventions are documented (in French) in
 
 ## Changelog
 
+### 1.7 — 2026-11-14
+- Technical: the game simulation moved to `sim.js` (shared with the upcoming multiplayer server). Solo play is unchanged.
+
 ### 1.6.1 — 2026-11-14
 - Fix Sylvestres roots: all their towers now slow enemies to ×0.82 speed for 0.72 s (Frost towers keep their stronger slow). The strongest active slow wins.
 - Fixes ground monsters freezing and flying monsters getting stuck forever (unkillable) when hit by Sylvestres melee or flame towers.
