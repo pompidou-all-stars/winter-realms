@@ -13,7 +13,7 @@ const N=require('./outils/navigateur');
 const args=process.argv.slice(2),avant=args.find(a=>!a.startsWith('--'))||'origin/main',sansVisuel=args.includes('--sans-visuel');
 const DOSSIER=path.join(RACINE,'rapports');fs.rmSync(DOSSIER,{recursive:true,force:true});fs.mkdirSync(DOSSIER,{recursive:true});
 const FICHIERS_TECHNIQUES=['parcours.test.js','assets3d.test.js'];
-const FACTIONS=['Alliance','Horde','Sylvestres','Nains','Légion'],NIVEAUX=['Normal','Difficile','Brutal'];
+const FACTIONS=['Humains','Créatures','Végétaux','Robots','Magiques'],NIVEAUX=['Normal','Difficile','Brutal'];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const git=(...a)=>{try{return execFileSync('git',a,{cwd:RACINE,encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim()}catch(e){return null}};
 
