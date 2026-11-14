@@ -64,7 +64,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 #bar button{-webkit-touch-callout:none;position:relative;flex:0 0 auto;min-width:62px;padding:2px 5px 4px;border:2px solid transparent;border-radius:10px;background:var(--panel);display:flex;flex-direction:column;align-items:center;line-height:1.15;white-space:nowrap}
 #bar button b{font-size:12px;font-weight:700}
 #bar button small{font-size:11px;color:var(--gold)}
-#bar button em{display:block;min-height:11px;font-style:normal;font-size:9px;font-weight:700;color:#9be7ff}
+#bar button em{display:block;min-height:11px;white-space:pre-line;font-style:normal;font-size:10px;line-height:1.2;font-weight:700;color:#9be7ff}
 #bar button.sel{border-color:var(--gold);background:var(--panel2)}
 #bar button.dis{opacity:.45}
 #bar button.dis small{color:#ff8a7a}
@@ -566,7 +566,7 @@ function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=P.classId*10;
  $('factionBadge').textContent=FACTIONS[P.classId].icon+' '+FACTIONS[P.classId].name;hudK='';pick=null;setView(me);render()}
 function newSolo(lv){G=new Game(soloSeats(chosenClass),lv);LV=lv;useBoards(G.B,0);syncSolo()}
 function syncSolo(){time=G.time;tick=G.tick;over=G.over}
-function icon(fn){const c=document.createElement('canvas'),g=setup(c,40,40);fn(g);return c}
+function icon(fn,w=40,h=40){const c=document.createElement('canvas'),g=setup(c,w,h);fn(g);return c}
 function add(ic,name,sub,cost,fn,on,tag,at){const b=document.createElement('button'),n=document.createElement('b'),s=document.createElement('small');n.textContent=name;s.textContent=sub;b.append(ic,n,s);
  const e=document.createElement('em');e.textContent=tag||'';b.append(e);b.dataset.c=cost;b.dataset.at=at||0;b.className=on?'sel':'';b.onclick=fn;bar.appendChild(b)}
 const IC={coin(g){g.lineWidth=2;g.strokeStyle='#9a6b12';g.beginPath();g.arc(20,20,12,0,7);fs(g,'#f2c14e');g.beginPath();g.arc(20,20,6,0,7);g.stroke()},
@@ -606,7 +606,9 @@ function drawBadge(g,x,y,s,kind){const c=BADGE[kind];g.save();
  g.beginPath();g.rect(x+p,y+p,s-2*p,s-2*p);g.clip();
  const h=(s-2*p)/2;g.translate(x+s/2,y+s/2);g.scale(h*.92,h*.92);g.lineWidth=1.1/(h*.92);g.lineJoin='round';g.strokeStyle='#0b0b10';GLYPH[kind](g);g.restore()}
 /* pastilles d'une tour dans une icône 40×40 : rôle en haut à droite, cibles en bas à gauche, magie à côté */
-function drawTowerBadges(g,k){const T=TW[k];drawBadge(g,24,1,15,T.s);drawBadge(g,1,27,12,T.gr?'sol':'air');if(T.mag)drawBadge(g,14,29,10,'magie')}
+function drawTowerBadges(g,k,w=56,h=46){const T=TW[k];drawBadge(g,w-21,1,20,T.s);drawBadge(g,1,h-18,17,T.gr?'sol':'air');if(T.mag)drawBadge(g,20,h-14,13,'magie')}
+/* icône de carte de tour (2.2) : plus large que haute pour loger les pastilles autour de la tour */
+const towerIcon=(k,lv)=>icon(g=>{drawTower(g,k,28,27,30,.7,0,lv,0);drawTowerBadges(g,k)},56,46);
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 /* messages d'erreur renvoyés par Game.action */
 const ERR={poor:"Pas assez d'or",blocked:'Impossible ici : le chemin serait bloqué',max:'Niveau maximum atteint',over:'Partie terminée',bad:'Action impossible'};
@@ -635,7 +637,7 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
  const bf=bonusFaction(T.faction);if(bf)part(bf);
  txt.append(tt,st,ex);
- f.append(icon(g=>{drawTower(g,k,20,25,30,.7,0,lv,0);drawTowerBadges(g,k)}),txt)}
+ f.append(towerIcon(k,lv),txt)}
 function ficheEnvoi(){const f=$('fiche');f.textContent='';f.className='envoyer';f.dataset.mode='envoyer';
  const d=document.createElement('div');d.className='txt';const b=document.createElement('b');b.textContent='Envoyer des monstres';
  d.append(b,document.createElement('br'),'Chaque envoi attaque tous tes adversaires (4 monstres chacun) et augmente ton revenu pour toute la partie.');f.appendChild(d)}
@@ -644,7 +646,7 @@ function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P
   if(t.lv<5)add(icon(IC.up),'Améliorer',upCost(t)+' or',upCost(t),()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()},1,'niveau '+(t.lv+1));
   add(icon(IC.coin),'Vendre','+'+Math.floor(t.inv*.7)+' or',0,()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()});
   add(icon(IC.x),'Fermer',' ',0,()=>{pick=null;render()});return}
- if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(icon(g=>{drawTower(g,k,20,25,30,.7,0,1,0);drawTowerBadges(g,k)}),T.n,T.c+' or',T.c,()=>{sel=k;render()},sel==k,'⚔'+dps(k,1)+'/s ◎'+fr(T.r)+(T.gr?'':' ✈'));apercu(bar.lastChild,k)})}
+ if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(towerIcon(k,1),T.n,T.c+' or',T.c,()=>{sel=k;render()},sel==k,'⚔ '+dps(k,1)+' dégâts/s\n◎ portée '+fr(T.r));apercu(bar.lastChild,k)})}
  else{ficheEnvoi();byCat(tab).forEach(k=>{const T=CR[k],lock=time<(T.at||0);add(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.n,T.c+' or · +'+T.i+' revenu',T.c,()=>playerSend(k),0,lock?'🔒 dès '+mmss(T.at):T.tag||'',T.at);bar.lastChild.dataset.tag=T.tag||''})}}
 /* 2.2 : aperçu de la fiche sans changer la sélection. Appui long (400 ms) au doigt, survol à la souris. */
 let apT=0;

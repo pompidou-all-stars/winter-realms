@@ -45,7 +45,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.2 — 2026-11-14
-- Tower cards get role badges in bevelled gold frames (arrow, sword, snowflake, bomb, flame, star), a target badge (ground only / ground and air) and a magic marker, all drawn in code.
+- Tower cards get role badges in bevelled gold frames (arrow, sword, snowflake, bomb, flame, star), a target badge (ground only / ground and air) and a magic marker, all drawn in code. Card text now reads "⚔ 15 dégâts/s" and "◎ portée 3,1" instead of abbreviations.
 - Long-press a tower card (or hover with the mouse) to preview its info panel without selecting it.
 - Interface only (`sim.js` untouched, no server redeploy).
 
