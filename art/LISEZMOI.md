@@ -53,7 +53,7 @@ Modèle complet : `art/exemples/caisse.py`.
 
 Depuis la racine du dépôt :
 
-- **Cloud ou Python avec bpy** (`pip install -r art/outils/requirements.txt`) :
+- **Cloud ou Python avec bpy** (`pip install -r art/outils/requirements.txt`, et **Node.js** : ce Blender ne sait pas compresser, `generer.py` compresse alors automatiquement avec gltf-transform) :
   ```bash
   python art/outils/generer.py tours/alliance-0      # un asset
   python art/outils/generer.py                        # tous
