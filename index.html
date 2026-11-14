@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 1.7</title>
+<title>Winter Realms — Tower Wars · Édition 2.0</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#16221a;--panel:#27382b;--panel2:#33483a;--ink:#f6ecd0;--dim:#b9c4ab;--gold:#f2c14e;--red:#e4572e;color-scheme:dark}
@@ -90,6 +90,20 @@ button{font:inherit;color:inherit;cursor:pointer}
 #ov>h1,#ov>p{flex:0 0 auto}
 @media(max-width:420px){#factions{grid-template-columns:1fr}#factions button{min-height:58px;padding:7px 10px}#factions .ficon{height:38px;flex-basis:40px;font-size:24px}}
 @media(max-height:650px){#ov{gap:7px;padding:12px}#ov h1{font-size:30px}#factions button{padding:6px;font-size:11px}}
+/* multijoueur : bloc « Jouer entre amis » et salon */
+#online,#lobby{width:min(620px,94vw);display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;border-radius:14px;background:#0003;flex:0 0 auto}
+.orow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;width:100%}
+#ov input{font:inherit;font-size:16px;padding:9px 12px;border-radius:10px;border:2px solid #71836c;background:#101b14;color:var(--ink);min-width:0}
+#rcode{width:6.5em;text-transform:uppercase;text-align:center;letter-spacing:.15em}#llink{flex:1;font-size:13px!important}
+#lcode{color:var(--gold);letter-spacing:.15em}
+#lseats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:100%}
+#lseats div{padding:8px;border-radius:10px;background:var(--panel2);border-left:5px solid var(--c);text-align:left;font-size:13px;color:var(--dim)}
+#lseats div b{display:block;color:var(--ink);font-size:15px}
+#lseats div.me{box-shadow:0 0 0 2px var(--gold)}
+#ldiff button{font-size:14px!important;padding:6px 10px!important;background:var(--panel2)!important;color:var(--ink)!important}
+#ldiff button.on{background:var(--gold)!important;color:#3a2a05!important}
+#ov button.ghost{background:transparent;color:var(--dim);font-size:14px;text-decoration:underline}
+body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:none!important}
 </style></head><body>
 <div id="app">
  <div id="hud">
@@ -114,7 +128,14 @@ button{font:inherit;color:inherit;cursor:pointer}
  <button type="button" data-faction="2" aria-pressed="false" onclick="window.chooseFaction(2)"><span class="ficon">🌿</span><span><strong>Peuples sylvestres</strong><small>Contrôle · racines et ralentissements</small></span></button>
  <button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">⚒️</span><span><strong>Clans nains</strong><small>Artillerie · perforation des armures</small></span></button>
  <button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">☠️</span><span><strong>Légion des ombres</strong><small>Malédictions · amplification des dégâts</small></span></button>
- </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><p id="difficultyLabel" hidden>Choisis la difficulté</p><div id="lv"><button id="go0" disabled>Normal</button><button id="go1" disabled>Difficile</button><button id="go2" disabled>Brutal</button></div></div>
+ </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><p id="difficultyLabel" hidden>Choisis la difficulté</p><div id="lv"><button id="go0" disabled>Normal</button><button id="go1" disabled>Difficile</button><button id="go2" disabled>Brutal</button></div>
+ <div id="online"><h2>Jouer entre amis</h2><input id="pname" maxlength="16" placeholder="Ton pseudo" autocomplete="nickname">
+  <div class="orow"><button id="mkRoom" type="button">Créer un salon</button><input id="rcode" maxlength="4" placeholder="CODE" autocapitalize="characters"><button id="joinRoom" type="button">Rejoindre</button></div></div>
+ <div id="lobby" hidden><h2>Salon <b id="lcode"></b></h2><p id="lhelp">Partage ce lien à tes amis :</p><div class="orow"><input id="llink" readonly><button id="lcopy" type="button">Copier</button></div>
+  <div id="lseats"></div><p id="lnote"></p>
+  <div id="lctl"><div class="orow" id="ldiff"><span>IA :</span><button type="button" data-lv="0">Normal</button><button type="button" data-lv="1">Difficile</button><button type="button" data-lv="2">Brutal</button></div><button id="lstart" type="button">Lancer la partie</button></div>
+  <button id="lquit" type="button" class="ghost">Quitter le salon</button></div>
+</div>
 <script src="sim.js"></script>
 <script>
 /* ---------- sons (Web Audio, aucun fichier) ---------- */
@@ -423,8 +444,75 @@ if(typeof CanvasRenderingContext2D!='undefined'&&!CanvasRenderingContext2D.proto
 let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',sel=0,view=0,mx,hudK='',tt=0,painting=false,lastCell='',pick=null;
 const VB=()=>B[view],dpr=()=>Math.min(3,window.devicePixelRatio||1);
 const eff=b=>b.ai?Math.round(b.inc*DIFF[LV].b):b.inc;
-/* multijoueur : désactivé en 1.7 (le mode en ligne remplacera cet objet) */
-const NET={on:false,send(){},act(){},frame(){},ended(){}};
+/* ---------- multijoueur ---------- */
+/* Le serveur (dossier server/) fait tourner la partie ; la page envoie des actions et dessine les instantanés reçus. */
+const QS=new URLSearchParams(location.search);
+const SERVER=QS.get('serveur')||(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)?'ws://localhost:8787':'wss://winter-realms.winter-realms-server.workers.dev');
+const store={get(k){try{return localStorage.getItem(k)}catch(_){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(_){}}};
+const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
+ token(){let t=store.get('wr-token');if(!t){t=Math.random().toString(36).slice(2)+Date.now().toString(36);store.set('wr-token',t)}return t},
+ send(m){if(this.ws&&this.ws.readyState==1)this.ws.send(JSON.stringify(m))},
+ join(code){code=String(code||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,4);if(code.length!=4){toast('Le code fait 4 caractères');return}
+  const name=$('pname').value.trim()||'Joueur';store.set('wr-name',name);
+  this.on=true;this.code=code;this.playing=false;document.body.classList.add('net');
+  history.replaceState(null,'','?salon='+code+(QS.get('serveur')?'&serveur='+encodeURIComponent(QS.get('serveur')):''));
+  $('msg').textContent='Winter Realms';$('sub').textContent='Connexion au salon…';$('lobby').hidden=false;$('lcode').textContent=code;
+  $('llink').value=location.origin+location.pathname+'?salon='+code;this.connect()},
+ connect(){const ws=new WebSocket(SERVER+'/room/'+this.code);this.ws=ws;
+  ws.onopen=()=>{this.retry=0;this.send({t:'hello',token:this.token(),name:store.get('wr-name')||'Joueur'})};
+  ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(_){return}this.msg(m)};
+  ws.onclose=()=>{if(this.ws!==ws||!this.on)return;toast('Connexion perdue, reconnexion…');$('lnote').textContent='Connexion perdue, reconnexion…';
+   setTimeout(()=>{if(this.on&&this.ws===ws)this.connect()},Math.min(8000,1000*++this.retry))}},
+ leave(){this.on=false;this.playing=false;const ws=this.ws;this.ws=null;if(ws)ws.close();document.body.classList.remove('net');$('lobby').hidden=true;
+  history.replaceState(null,'',location.pathname+(QS.get('serveur')?'?serveur='+encodeURIComponent(QS.get('serveur')):''));
+  $('msg').textContent='Winter Realms';$('sub').textContent='Choisis ta faction, puis la difficulté pour jouer seul, ou crée un salon pour jouer entre amis.';$('ov').hidden=false;
+  G=new Game(soloSeats(chosenClass),0);G.over=true;LV=0;useBoards(G.B,0);over=true},
+ msg(m){
+  if(m.t=='lobby'){this.lob=m;$('lnote').textContent='';if(this.playing&&!m.playing){this.playing=false;over=true;$('msg').textContent='Winter Realms'}this.showLobby();return}
+  if(m.t=='start'){this.start(m);return}
+  if(m.t=='snap'){if(this.playing)this.apply(m);return}
+  if(m.t=='res'){const a=m.a||{};if(m.err){if(!m.q){showErr(m.err,a);if(a.type=='place')P.fx.push({type:'bad',x:a.x+.5,y:a.y+.5,t:.35,d:.35})}}else if(a.type=='send')sfx('send');return}},
+ showLobby(){const m=this.lob;if(this.playing)return;$('ov').hidden=false;$('lobby').hidden=false;
+  const box=$('lseats');box.textContent='';
+  m.seats.forEach((s,i)=>{const d=document.createElement('div'),n=document.createElement('b');d.style.setProperty('--c',['#f2c14e','#e4572e','#4aa3df','#b06ad0'][i]);
+   if(s){n.textContent=s.name+(i==m.you?' (toi)':'');d.append(n,FACTIONS[s.f].icon+' '+FACTIONS[s.f].name+(s.online?'':' · déconnecté'))}else{n.textContent='IA';d.append(n,'Place libre : une IA jouera ici')}
+   if(i==m.you)d.className='me';box.appendChild(d)});
+  if(m.you>=0&&m.seats[m.you]&&m.seats[m.you].f!==chosenClass){chosenClass=m.seats[m.you].f;[...factionBox.querySelectorAll('button[data-faction]')].forEach(el=>el.classList.toggle('selected',Number(el.dataset.faction)===chosenClass))}
+  $('classPick').hidden=m.you<0;
+  document.querySelectorAll('#ldiff button').forEach(b=>{b.classList.toggle('on',+b.dataset.lv==m.lv);b.disabled=!m.leader});
+  $('lstart').hidden=!m.leader;
+  $('sub').textContent=m.playing?'Une partie est en cours : tu la regardes en spectateur.':m.you<0?'Le salon est complet : tu pourras regarder la partie.':'Choisis ta faction. '+(m.leader?'Tu es le chef du salon : lance la partie quand tout le monde est là.':'Le chef du salon lancera la partie.');
+  $('lnote').textContent='Difficulté des IA : '+DIFF[m.lv].n+'.'},
+ start(m){this.playing=true;this.spect=m.you<0;LV=m.lv;
+  const boards=m.seats.map((s,i)=>new Board(i,s.name,s.col,s.ai,s.classId));
+  useBoards(boards,this.spect?0:m.you);time=0;tick=10;over=false;started=true;
+  $('lobby').hidden=true;$('ov').hidden=true;if(this.spect)toast('Tu regardes la partie en spectateur')},
+ /* applique un instantané : les positions sont lissées entre deux instantanés dans frame() */
+ apply(s){this.snapAt=performance.now();time=s.time;tick=s.tick;
+  s.B.forEach((d,i)=>{const b=B[i];if(!b)return;b.gold=d.gold;b.inc=d.inc;b.lives=d.lives;b.dead=d.dead;
+   const tk=JSON.stringify(d.t.map(t=>t.slice(0,5)));
+   if(tk!==b.tk){b.tk=tk;b.g=Array.from({length:R},()=>Array(C).fill(0));for(const t of d.t)b.g[t[1]][t[0]]=1;b.d=b.dist()}
+   b.t=d.t.map(t=>({x:t[0],y:t[1],k:t[2],lv:t[3],inv:t[4],a:t[5],sw:t[6]?.1:0,stun:t[7]}));
+   const oc=new Map(b.cr.map(c=>[c.id,c]));
+   b.cr=d.c.map(c=>{const o=oc.get(c[0]);return {id:c[0],k:c[1],px:o?o.x:c[2],py:o?o.y:c[3],nx:c[2],ny:c[3],x:o?o.x:c[2],y:o?o.y:c[3],hp:c[4],max:1,sl:c[5]&1,h:c[5]&2,hl:c[5]&4,hid:c[5]&8,f:c[6],ph:c[7],ox:c[8],oy:c[9]}});
+   const op=new Map(b.pr.map(p=>[p.id,p]));
+   b.pr=d.p.map(p=>{const o=op.get(p[0]);return {id:p[0],k:p[1],px:o?o.x:p[2],py:o?o.y:p[3],nx:p[2],ny:p[3],x:o?o.x:p[2],y:o?o.y:p[3],tx:p[4],ty:p[5],tot:p[6],a:p[7]}});
+   for(const f of d.fx)b.fx.push(f);for(const e of d.ev)b.ev.push(e)});
+  if(pick){const np=P.t.find(t=>t.x==pick.x&&t.y==pick.y);if(!np||np.lv!=pick.lv){pick=np||null;render()}else pick=np}
+  for(const l of s.log)onLog(l)},
+ frame(dt){if(!this.playing)return;const k=Math.min(1,(performance.now()-this.snapAt)/100);
+  for(const b of B){for(const c of b.cr){c.x=c.px+(c.nx-c.px)*k;c.y=c.py+(c.ny-c.py)*k}for(const p of b.pr){p.x=p.px+(p.nx-p.px)*k;p.y=p.py+(p.ny-p.py)*k}
+   for(const f of b.fx){f.t-=dt;if(f.vx!==undefined){f.x+=f.vx*dt;f.y+=f.vy*dt}}b.fx=b.fx.filter(f=>f.t>0)}},
+ act(a,first){if(this.spect){toast('Tu es spectateur');return}this.send({t:'act',a,q:first===false?1:0})},
+ ended(){}};
+$('pname').value=store.get('wr-name')||'';
+$('mkRoom').onclick=()=>{audio();const L='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let c='';for(let i=0;i<4;i++)c+=L[Math.floor(Math.random()*L.length)];NET.join(c)};
+$('joinRoom').onclick=()=>{audio();NET.join($('rcode').value)};
+$('rcode').addEventListener('keydown',e=>{if(e.key=='Enter')$('joinRoom').click()});
+$('lstart').onclick=()=>NET.send({t:'start'});
+$('lquit').onclick=()=>NET.leave();
+$('lcopy').onclick=()=>{const v=$('llink').value;(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(()=>toast('Lien copié')).catch(()=>{$('llink').select();toast('Copie le lien sélectionné')})};
+document.querySelectorAll('#ldiff button').forEach(b=>b.onclick=()=>NET.send({t:'diff',lv:+b.dataset.lv}));
 function setup(cv,w,h){const r=dpr();cv.width=Math.round(w*r);cv.height=Math.round(h*r);cv.style.width=w+'px';cv.style.height=h+'px';const g=cv.getContext('2d');g.setTransform(r,0,0,r,0,0);return g}
 function fit(){const r=stage.getBoundingClientRect();cell=Math.max(16,Math.floor(Math.min((r.width-6)/C,(r.height-6)/R)));mx=setup(main,C*cell,R*cell)}
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true},1900)}
@@ -508,7 +596,7 @@ document.addEventListener('click',audio,true);
 function playEvents(){for(const b of B){for(const e of b.ev){if(e[0]=='!'){if(b===P||b===VB())sfx(e.slice(1))}else if(b===VB())sfx(e)}b.ev.length=0}}
 function onLog(l){
  if(l.type=='income'){sfx('income');const e=$('gold');e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')}
- else if(l.type=='out'){if(l.i!==me){toast(B[l.i].name+' est éliminé·e');sfx('out')}}
+ else if(l.type=='out'){if(l.i!==me){toast(B[l.i].name+' est éliminé·e');sfx('out')}else if(NET.on){over=true;toast('Tu es éliminé·e : tu peux regarder la fin de la partie');sfx('lose')}}
  else if(l.type=='end')end(l.winner)}
 function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.dead).join('|')+'|'+Math.floor(time);
  if(k!=hudK){hudK=k;$('gold').textContent=Math.floor(P.gold);$('inc').textContent='+'+P.inc;$('clock').textContent=mmss(time);
@@ -530,4 +618,6 @@ function loop(now){const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;
 
 fit();if(typeof ResizeObserver!='undefined')new ResizeObserver(fit).observe(stage);else addEventListener('resize',fit);
 G=new Game(soloSeats(chosenClass),0);G.over=true;LV=0;useBoards(G.B,0);started=true;over=true;requestAnimationFrame(loop);
+/* lien d'invitation ?salon=CODE : on rejoint directement si le pseudo est déjà connu */
+if(QS.get('salon')){$('rcode').value=QS.get('salon').toUpperCase().slice(0,4);if(store.get('wr-name'))NET.join($('rcode').value);else{$('pname').focus();$('sub').textContent='Tu es invité·e dans le salon '+$('rcode').value+' : choisis un pseudo puis touche « Rejoindre ».'}}
 </script></body></html>

@@ -22,7 +22,17 @@ git clone https://github.com/pompidou-all-stars/winter-realms.git
 
 Game rules, balance tables and project conventions are documented (in French) in [CLAUDE.md](CLAUDE.md). Every change must update CLAUDE.md and the changelog below.
 
+## Play together
+
+On the site, enter a nickname, click **Créer un salon** and share the link (or the 4-letter code). Friends click the link (or type the code and **Rejoindre**), pick a faction, and the room leader clicks **Lancer la partie**. Empty seats are played by AIs.
+
+The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](server/). **After any change to `sim.js` or `server/`, redeploy it**: `cd server` then `npx wrangler deploy` (see CLAUDE.md, section 9 bis).
+
 ## Changelog
+
+### 2.0 — 2026-11-14
+- Online multiplayer: 2–4 players in a room (AIs fill free seats), invite link or code, room leader picks AI difficulty, spectators, reconnection.
+- Game server on Cloudflare Workers + Durable Objects (free plan).
 
 ### 1.7 — 2026-11-14
 - Technical: the game simulation moved to `sim.js` (shared with the upcoming multiplayer server). Solo play is unchanged.

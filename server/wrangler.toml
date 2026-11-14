@@ -1,0 +1,12 @@
+name = "winter-realms"
+main = "src/worker.js"
+compatibility_date = "2025-06-01"
+
+# Un Durable Object « GameRoom » par salon. Classe SQLite : seule disponible sur le plan gratuit.
+[[durable_objects.bindings]]
+name = "ROOMS"
+class_name = "GameRoom"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["GameRoom"]
