@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.0.1</title>
+<title>Winter Realms — Tower Wars · Édition 2.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#16221a;--panel:#27382b;--panel2:#33483a;--ink:#f6ecd0;--dim:#b9c4ab;--gold:#f2c14e;--red:#e4572e;color-scheme:dark}
@@ -30,7 +30,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 #tbar{position:absolute;left:0;right:0;bottom:0;height:4px;background:#0004}
 #tfill{display:block;height:100%;background:var(--gold);transform-origin:left;transform:scaleX(0)}
 #stage{grid-area:stage;position:relative;min-height:0;min-width:0;overflow:hidden}
-#main{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:10px;box-shadow:0 0 0 3px var(--panel),0 14px 32px #0009;touch-action:none;background:#18251c}
+#main{position:absolute;left:0;top:0;touch-action:none}
+#zoomReset{position:absolute;right:8px;top:8px;width:auto;padding:0 10px;gap:5px;display:flex;align-items:center;font-size:12px;font-weight:700;background:#000a;color:var(--ink);border:0;border-radius:99px;height:30px}
+#zoomReset svg{width:16px;height:16px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #banner,#toast{position:absolute;left:50%;transform:translateX(-50%);padding:5px 12px;border-radius:99px;font-size:13px;white-space:nowrap;pointer-events:none}
 #banner{top:8px;color:#fff;font-weight:700}
 #toast{bottom:10px;background:#000c}
@@ -45,6 +47,17 @@ button{font:inherit;color:inherit;cursor:pointer}
 #tabs .mon button{flex:1}
 #tabs .mon button.on{background:var(--red);color:#fff}
 #bar.mon button{background:#3a2622}
+#fiche{display:flex;align-items:center;gap:8px;min-width:0;height:76px;overflow:hidden;padding:5px 9px;background:var(--panel);border-radius:10px;font-size:12px;line-height:1.3;color:var(--dim)}
+#fiche canvas{flex:0 0 auto}
+#fiche .txt{flex:1;min-width:0}
+#fiche .tt{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+#fiche .tt b{font-size:14px;font-weight:700;color:var(--ink)}
+#fiche .tt span{font-size:11px;color:var(--dim)}
+#fiche .st{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:2px}
+#fiche .st i{font-style:normal;color:var(--ink);font-weight:700}
+#fiche .ex{margin-top:2px;font-size:11px;line-height:1.3;color:#9be7ff;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+#fiche .next{color:#a8e07a}
+#fiche.envoyer{background:#3a2622;color:#ffcfc4}
 #bar{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
 #bar::-webkit-scrollbar{display:none}
 #bar button{position:relative;flex:0 0 auto;min-width:62px;padding:2px 5px 4px;border:2px solid transparent;border-radius:10px;background:var(--panel);display:flex;flex-direction:column;align-items:center;line-height:1.15;white-space:nowrap}
@@ -52,10 +65,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 #bar button small{font-size:11px;color:var(--gold)}
 #bar button em{display:block;min-height:11px;font-style:normal;font-size:9px;font-weight:700;color:#9be7ff}
 #bar button.sel{border-color:var(--gold);background:var(--panel2)}
-#bar button.dis{opacity:.4}
+#bar button.dis{opacity:.45}
+#bar button.dis small{color:#ff8a7a}
 #bar button:active{transform:scale(.95)}
-#bar .info{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:6px;padding:2px 8px;background:var(--panel);border-radius:10px;font-size:12px;line-height:1.3;color:var(--dim);white-space:nowrap}
-#bar .info b{display:block;font-size:14px;color:var(--ink)}
 #ov{position:fixed;z-index:1000;inset:0;background:radial-gradient(ellipse at 50% 0%,#35533feF 0%,#14251feF 48%,#09130ff2 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(22px + env(safe-area-inset-bottom,0px));text-align:center;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
 #ov h1{margin:0;font-size:clamp(30px,7vw,48px);font-weight:700;letter-spacing:.02em;color:#ffe08a;text-shadow:0 3px 0 #70451c,0 6px 18px #0009}
 #ov h1:after{content:'✦  ✦  ✦';display:block;font-size:11px;letter-spacing:.55em;color:#9ed9bd;text-shadow:none;margin-top:2px}
@@ -69,6 +81,11 @@ button{font:inherit;color:inherit;cursor:pointer}
  #tabs .tw{flex:1 1 100%}
  #bar{flex-wrap:wrap;overflow:visible;align-content:flex-start}
  #bar button{flex:1 1 28%}
+ /* 2.1 : la colonne de droite défile au lieu de pousser l'écran (le haut et le bas étaient coupés sur téléphone) */
+ #app{grid-template-rows:auto minmax(0,1fr)}
+ #ctl{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:4px}
+ #fiche{height:auto;flex:0 0 auto}
+ #fiche .ex{-webkit-line-clamp:unset;display:block}
 }
 
 #ov h2{margin:2px 0 0;color:var(--ink);font-size:18px}
@@ -113,9 +130,10 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
   <div id="chips"></div>
   <div id="tbar"><i id="tfill"></i></div>
  </div>
- <div id="stage"><canvas id="main"></canvas><div id="banner" hidden></div><div id="toast" hidden></div></div>
+ <div id="stage"><canvas id="main"></canvas><div id="banner" hidden></div><div id="toast" hidden></div><button id="zoomReset" type="button" hidden aria-label="Revenir à la vue d'ensemble"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>Vue d'ensemble</button></div>
  <div id="ctl">
   <div id="tabs"><button data-t="t" class="tw on">Construire</button><div class="mon"><span>Envoyer</span><button data-t="n">Sol</button><button data-t="f">Volants</button><button data-t="s">Spéciaux</button></div></div>
+  <div id="fiche"></div>
   <div id="bar"></div>
  </div>
 </div>
@@ -433,6 +451,8 @@ function draw(b,g,s,t){
  for(const c of fl)cre(c);
  for(const f of b.fx)drawFx(g,f,s);
  if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,C*s,R*s);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',C*s/2,R*s/2)}}
+/* sur la vignette du terrain affiché, un cadre montre la partie visible quand on a zoomé */
+function cadreMini(g){const s=cell*VUE.z,m=MINI;g.strokeStyle='#fff';g.lineWidth=1;g.strokeRect(Math.max(0,-VUE.ox/s*m)+.5,Math.max(0,-VUE.oy/s*m)+.5,Math.min(C,VUE.w/s)*m-1,Math.min(R,VUE.h/s)*m-1)}
 function drawMini(b,g,m){g.fillStyle=b.dead?'#333':'#426c3e';g.fillRect(0,0,C*m,R*m);
  for(const t of b.t){g.fillStyle=TW[t.k].col;g.fillRect(t.x*m+.5,t.y*m+.5,m-1,m-1)}
  for(const c of b.cr){g.fillStyle=CR[c.k].fly?'#fff':'#ffd23f';g.fillRect((c.x+.5)*m-1,(c.y+.5)*m-1,2,2)}}
@@ -517,9 +537,25 @@ $('lquit').onclick=()=>NET.leave();
 $('lcopy').onclick=()=>{const v=$('llink').value;(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(()=>toast('Lien copié')).catch(()=>{$('llink').select();toast('Copie le lien sélectionné')})};
 document.querySelectorAll('#ldiff button').forEach(b=>b.onclick=()=>NET.send({t:'diff',lv:+b.dataset.lv}));
 function setup(cv,w,h){const r=dpr();cv.width=Math.round(w*r);cv.height=Math.round(h*r);cv.style.width=w+'px';cv.style.height=h+'px';const g=cv.getContext('2d');g.setTransform(r,0,0,r,0,0);return g}
-function fit(){const r=stage.getBoundingClientRect();cell=Math.max(16,Math.floor(Math.min((r.width-6)/C,(r.height-6)/R)));mx=setup(main,C*cell,R*cell)}
+/* ---------- vue du terrain : zoom (1× à 3×) et déplacement ----------
+   Le canevas couvre toute la zone de jeu ; le plateau y est dessiné avec un décalage (VUE.ox, VUE.oy) et une taille de case cell × VUE.z. */
+const VUE={z:1,ox:0,oy:0,w:0,h:0},ZMAX=3;let cadre='#27382b';
+function fit(){const r=stage.getBoundingClientRect();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);cell=Math.max(16,Math.floor(Math.min((r.width-6)/C,(r.height-6)/R)));mx=setup(main,VUE.w,VUE.h);borner()}
+/* garde le plateau dans la zone visible : centré s'il est plus petit, sinon jamais plus de 8 px de vide au bord */
+function borner(){const s=cell*VUE.z,W=C*s,H=R*s,m=8;
+ VUE.ox=W<=VUE.w?(VUE.w-W)/2:Math.min(m,Math.max(VUE.w-W-m,VUE.ox));VUE.oy=H<=VUE.h?(VUE.h-H)/2:Math.min(m,Math.max(VUE.h-H-m,VUE.oy));
+ const zr=$('zoomReset');if(zr)zr.hidden=VUE.z<1.02}
+/* zoome autour d'un point de l'écran (px, py en pixels de la page) en gardant sous ce point la même case */
+function zoomer(nz,px,py){const r=main.getBoundingClientRect(),x=px-r.left,y=py-r.top,bx=(x-VUE.ox)/(cell*VUE.z),by=(y-VUE.oy)/(cell*VUE.z);
+ VUE.z=Math.min(ZMAX,Math.max(1,nz));VUE.ox=x-bx*cell*VUE.z;VUE.oy=y-by*cell*VUE.z;borner()}
+function vueEnsemble(){VUE.z=1;borner()}
+/* centre d'une case du terrain, en coordonnées de la page (utilisé aussi par les tests) */
+function caseVersEcran(x,y){const r=main.getBoundingClientRect(),s=cell*VUE.z;return {x:r.left+VUE.ox+(x+.5)*s,y:r.top+VUE.oy+(y+.5)*s}}
+function dessinerVue(t){const g=mx,s=cell*VUE.z,W=C*s,H=R*s,rr=Math.min(10*VUE.z,30);g.clearRect(0,0,VUE.w,VUE.h);g.save();g.translate(VUE.ox,VUE.oy);
+ g.save();g.shadowColor='rgba(0,0,0,.56)';g.shadowBlur=32;g.shadowOffsetY=14;g.fillStyle=cadre;g.beginPath();g.roundRect(-3,-3,W+6,H+6,rr+3);g.fill();g.restore();
+ g.beginPath();g.roundRect(0,0,W,H,rr);g.fillStyle='#18251c';g.fill();g.clip();draw(VB(),g,s,t);g.restore()}
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true},1900)}
-function setView(v){view=v;const b=B[v],bn=$('banner');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · touche « '+P.name+' » pour revenir';bn.style.background=b.col;main.style.boxShadow='0 0 0 3px '+(v!=me?b.col:'#27382b');hudK=''}
+function setView(v){view=v;const b=B[v],bn=$('banner');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · touche « '+P.name+' » pour revenir';bn.style.background=b.col;cadre=v!=me?b.col:'#27382b';hudK=''}
 const SOLO_COL=['#e4572e','#4aa3df','#b06ad0'];
 function soloSeats(f){return [{name:'Toi',col:FACTIONS[f].color,ai:0,classId:f}].concat([1,2,3].map(i=>({name:'IA '+i,col:SOLO_COL[i-1],ai:1,classId:(f+i)%5})))}
 /* installe une partie (locale ou reçue du serveur) : vignettes, joueur, vue */
@@ -541,14 +577,39 @@ const ERR={poor:"Pas assez d'or",blocked:'Impossible ici : le chemin serait bloq
 function showErr(e,a){if(!e)return;sfx('nope');if(e=='locked'){const T=CR[a.k];toast(T.n+' disponible à '+mmss(T.at)+' de jeu')}else toast(ERR[e]||ERR.bad)}
 /* toutes les actions du joueur passent par ici : en solo vers G, en ligne vers le serveur */
 function doAction(a){if(over)return;if(NET.on){NET.act(a);return ''}const e=G.action(me,a);showErr(e,a);return e}
+/* ---------- fiche d'information (au-dessus des boutons) ---------- */
+const fr=n=>String(+(+n).toFixed(1)).replace('.',',');
+const dps=(k,lv)=>Math.round(dmg({k,lv})/TW[k].cd);
+/* bonus de faction, en clair, calculé à partir de FACTION_BALANCE */
+function bonusFaction(f){const B=FACTION_BALANCE[f],pc=x=>Math.round((x-1)*100)+' %';
+ return B.airBonus?'Anti-aérien : +'+pc(B.airBonus)+' de dégâts contre les volants':B.execute?'Frénésie : +'+pc(B.execute)+' sur les monstres à moins de 35 % de vie':
+  B.root?'Racines : chaque coup ralentit le monstre (vitesse ×'+fr(B.rootFactor)+')':B.pierce?'Perforant : ignore '+Math.round(B.pierce*100)+' % de l\'armure':B.mark?'Malédiction : chaque coup suivant sur la même cible fait +'+pc(B.mark):''}
+/* effets propres à la tour, en clair */
+function effets(T,lv){const l=[];if(T.sp)l.push('explosion de zone');if(T.fsp)l.push('ralentit ×'+fr(.5-.05*(lv-1))+' pendant '+fr(T.sl)+' s');if(T.fl)l.push('souffle en cône');if(T.me)l.push('corps à corps');
+ if(T.mg)l.push('révèle les Spectres invisibles');if(T.mag)l.push('magique : sans effet sur le Briseur de runes');return l}
+function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textContent='';f.className='';f.dataset.mode=mode;
+ const txt=document.createElement('div');txt.className='txt';
+ const tt=document.createElement('div');tt.className='tt';const n=document.createElement('b');n.textContent=T.n;const r=document.createElement('span');
+ r.textContent=BASE_TW[T.skin].n+' · '+T.role+(t?' · niveau '+lv+'/5':'');tt.append(n,r);
+ const st=document.createElement('div');st.className='st';
+ const stat=(lbl,val)=>{const e=document.createElement('span'),i=document.createElement('i');i.textContent=val;e.append(lbl+' ',i);st.appendChild(e)};
+ stat('⚔ Dégâts/s',dps(k,lv));stat('◎ Portée',fr(rng({k,lv})));stat('Cibles',T.gr?'sol uniquement':'sol et air');
+ const ex=document.createElement('div');ex.className='ex';const part=(t,c)=>{if(ex.childNodes.length)ex.append(' · ');const e=document.createElement('span');if(c)e.className=c;e.textContent=t;ex.appendChild(e)};
+ if(t&&lv<5)part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+' (pour '+upCost(t)+' or)','next');
+ const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
+ const bf=bonusFaction(T.faction);if(bf)part(bf);
+ txt.append(tt,st,ex);
+ f.append(icon(g=>drawTower(g,k,20,25,30,.7,0,lv,0)),txt)}
+function ficheEnvoi(){const f=$('fiche');f.textContent='';f.className='envoyer';f.dataset.mode='envoyer';
+ const d=document.createElement('div');d.className='txt';const b=document.createElement('b');b.textContent='Envoyer des monstres';
+ d.append(b,document.createElement('br'),'Chaque envoi attaque tous tes adversaires (4 monstres chacun) et augmente ton revenu pour toute la partie.');f.appendChild(d)}
 function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P.t.includes(pick))pick=null;
- if(tab=='t'&&pick){const T=TW[pick.k],d=document.createElement('div'),tx=document.createElement('span'),n=document.createElement('b'),t=pick;d.className='info';
-  n.textContent=T.n+' · niveau '+t.lv+(t.lv>=5?' (max)':'');tx.append(n,Math.round(dmg(t)/T.cd)+' dégâts/s · portée '+rng(t).toFixed(1)+' · '+T.role+' · '+T.tag);d.append(icon(g=>drawTower(g,t.k,20,25,30,.7,0,t.lv,0)),tx);bar.appendChild(d);
-  if(t.lv<5)add(icon(IC.up),'Améliorer',upCost(t)+' or',upCost(t),()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()},1);
+ if(tab=='t'&&pick){const t=pick;remplirFiche('tour',t.k,t);
+  if(t.lv<5)add(icon(IC.up),'Améliorer',upCost(t)+' or',upCost(t),()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()},1,'niveau '+(t.lv+1));
   add(icon(IC.coin),'Vendre','+'+Math.floor(t.inv*.7)+' or',0,()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()});
   add(icon(IC.x),'Fermer',' ',0,()=>{pick=null;render()});return}
- if(tab=='t')ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(icon(g=>drawTower(g,k,20,25,30,.7,0,1,0)),T.n,T.c+' or',T.c,()=>{sel=k;render()},sel==k,T.tag)});
- else byCat(tab).forEach(k=>{const T=CR[k];add(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.n,T.c+' or · +'+T.i,T.c,()=>playerSend(k),0,T.tag,T.at)})}
+ if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(icon(g=>drawTower(g,k,20,25,30,.7,0,1,0)),T.n,T.c+' or',T.c,()=>{sel=k;render()},sel==k,'⚔'+dps(k,1)+'/s ◎'+fr(T.r)+(T.gr?'':' ✈'))})}
+ else{ficheEnvoi();byCat(tab).forEach(k=>{const T=CR[k],lock=time<(T.at||0);add(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.n,T.c+' or · +'+T.i+' revenu',T.c,()=>playerSend(k),0,lock?'🔒 dès '+mmss(T.at):T.tag||'',T.at);bar.lastChild.dataset.tag=T.tag||''})}}
 function setTab(t){tab=t;pick=null;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==t));render()}
 function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(time<(T.at||0)){showErr('locked',a);return}if(!NET.on&&P.gold<T.c){showErr('poor',a);return}if(doAction(a)==='')sfx('send')}
 
@@ -573,7 +634,7 @@ factionBox.addEventListener('click',e=>{
 });
 selectFaction(chosenClass);
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
-function act(e,first){if(over)return;const r=main.getBoundingClientRect(),x=Math.floor((e.clientX-r.left)/r.width*C),y=Math.floor((e.clientY-r.top)/r.height*R);
+function act(e,first){if(over)return;const r=main.getBoundingClientRect(),s=cell*VUE.z,x=Math.floor((e.clientX-r.left-VUE.ox)/s),y=Math.floor((e.clientY-r.top-VUE.oy)/s);
  if(x<0||y<0||x>=C||y>=R)return;const key=x+','+y;if(key==lastCell)return;lastCell=key;
  const tw=P.t.find(t=>t.x==x&&t.y==y);
  if(tw){if(first){painting=false;if(tab!='t')setTab('t');pick=tw;render();sfx('tap')}return}
@@ -583,15 +644,38 @@ function act(e,first){if(over)return;const r=main.getBoundingClientRect(),x=Math
  if(NET.on){if(poor){if(first){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr('poor')}return}NET.act({type:'place',x,y,k:sel},first);return}
  const e2=G.action(me,{type:'place',x,y,k:sel});
  if(e2){if(first||e2!='poor')P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});if(first)showErr(e2)}}
-main.addEventListener('pointerdown',e=>{if(view!=me){toast('Tu regardes le terrain de '+B[view].name);return}painting=true;lastCell='';try{main.setPointerCapture(e.pointerId)}catch(_){}act(e,true)});
-main.addEventListener('pointermove',e=>{if(painting)act(e,false)});
-for(const n of['pointerup','pointercancel'])main.addEventListener(n,()=>{painting=false});
+/* Gestes sur le terrain :
+   - un doigt : toucher une case pose la tour (au relâcher) ; glisser vers d'autres cases en pose plusieurs ;
+   - deux doigts : pincer pour zoomer, déplacer pour se promener sur la carte (aucune tour n'est posée) ;
+   - souris : clic immédiat comme avant, molette pour zoomer. */
+const DOIGTS=new Map();let geste=null,attente=null,gesteFini=false;
+const dist2=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y)||1,milieu=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+const caseDe=e=>{const r=main.getBoundingClientRect(),s=cell*VUE.z;return Math.floor((e.clientX-r.left-VUE.ox)/s)+','+Math.floor((e.clientY-r.top-VUE.oy)/s)};
+main.addEventListener('pointerdown',e=>{try{main.setPointerCapture(e.pointerId)}catch(_){}
+ DOIGTS.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(DOIGTS.size==2){painting=false;attente=null;const [a,b]=[...DOIGTS.values()];geste={d:dist2(a,b),m:milieu(a,b),z:VUE.z,ox:VUE.ox,oy:VUE.oy};return}
+ if(DOIGTS.size>2||gesteFini)return;
+ lastCell='';
+ if(e.pointerType=='mouse'){if(view!=me){toast('Tu regardes le terrain de '+B[view].name);return}painting=true;act(e,true)}
+ else attente={clientX:e.clientX,clientY:e.clientY,id:e.pointerId}});
+main.addEventListener('pointermove',e=>{if(DOIGTS.has(e.pointerId))DOIGTS.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(geste){if(DOIGTS.size<2)return;const [a,b]=[...DOIGTS.values()],m=milieu(a,b),r=main.getBoundingClientRect(),s0=cell*geste.z;
+  const bx=(geste.m.x-r.left-geste.ox)/s0,by=(geste.m.y-r.top-geste.oy)/s0;
+  VUE.z=Math.min(ZMAX,Math.max(1,geste.z*dist2(a,b)/geste.d));VUE.ox=m.x-r.left-bx*cell*VUE.z;VUE.oy=m.y-r.top-by*cell*VUE.z;borner();return}
+ if(attente&&e.pointerId==attente.id){if(view==me&&caseDe(e)!=caseDe(attente)){painting=true;act(attente,true);attente=null;act(e,false)}return}
+ if(painting)act(e,false)});
+for(const n of['pointerup','pointercancel'])main.addEventListener(n,e=>{const tap=attente&&e.pointerId==attente.id&&n=='pointerup'&&!geste;
+ if(tap){if(view!=me)toast('Tu regardes le terrain de '+B[view].name);else act(attente,true)}
+ if(attente&&e.pointerId==attente.id)attente=null;
+ DOIGTS.delete(e.pointerId);if(geste){geste=null;gesteFini=DOIGTS.size>0}if(!DOIGTS.size){gesteFini=false;painting=false}});
+main.addEventListener('wheel',e=>{e.preventDefault();zoomer(VUE.z*Math.exp(-e.deltaY*.0015),e.clientX,e.clientY)},{passive:false});
+$('zoomReset').onclick=vueEnsemble;
 $('snd').onclick=()=>{muted=!muted;$('snd').classList.toggle('off',muted);audio();if(!muted)sfx('income')};
 $('fs').onclick=()=>{const d=document,e=d.documentElement,no=()=>toast("Plein écran refusé ici : ouvre le jeu dans ton navigateur");
  try{if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return}
   const rq=e.requestFullscreen||e.webkitRequestFullscreen;if(!rq){toast("Plein écran indisponible sur cet appareil");return}
   const p=rq.call(e);if(p&&p.catch)p.catch(no)}catch(_){no()}};
-[0,1,2].forEach(l=>{$('go'+l).onclick=()=>{audio();started=true;newSolo(l);$('ov').hidden=true}});
+[0,1,2].forEach(l=>{$('go'+l).onclick=()=>{audio();started=true;newSolo(l);$('ov').hidden=true;vueEnsemble();toast('Astuce : deux doigts pour zoomer et se déplacer')}});
 document.addEventListener('click',audio,true);
 
 /* ---------- sons et événements ---------- */
@@ -605,7 +689,9 @@ function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.d
  if(k!=hudK){hudK=k;$('gold').textContent=Math.floor(P.gold);$('inc').textContent='+'+P.inc;$('clock').textContent=mmss(time);
   for(const b of B){b.ui.s.textContent=b.dead?'éliminé':Math.max(0,b.lives)+' vies\n+'+eff(b);b.ui.e.className='chip'+(b.i==view?' on':'')+(b.dead?' dead':'')}}
  $('tfill').style.transform='scaleX('+(1-tick/10).toFixed(3)+')';
- for(const b of bar.children)b.classList.toggle('dis',+b.dataset.c>P.gold||time<+b.dataset.at)}
+ for(const b of bar.children){b.classList.toggle('dis',+b.dataset.c>P.gold||time<+b.dataset.at);
+  /* un monstre qui se débloque pendant que l'onglet est ouvert perd son cadenas */
+  if(b.dataset.tag!==undefined&&time>=+b.dataset.at){const e=b.querySelector('em');if(e&&e.textContent.startsWith('🔒'))e.textContent=b.dataset.tag}}}
 function end(winner){over=true;const win=winner===me;sfx(win?'win':'lose');
  $('msg').textContent=win?'Victoire !':winner>=0&&NET.on?B[winner].name+' gagne':'Défaite';
  $('sub').textContent='Partie de '+mmss(time)+'. Ton revenu final : +'+P.inc+' toutes les 10 s, en '+DIFF[LV].n+'. Adversaires éliminés : '+B.filter(b=>b!==P&&b.dead).length+' sur 3.';
@@ -616,7 +702,7 @@ function loop(now){const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;
   if(NET.on)NET.frame(dt);
   else if(G&&!G.over){G.step(dt);syncSolo();const lg=G.log.splice(0);for(const l of lg)onLog(l)}
   playEvents();
-  draw(VB(),mx,cell,now/1000);for(const b of B)drawMini(b,b.ui.g,MINI);hud()}
+  dessinerVue(now/1000);for(const b of B){drawMini(b,b.ui.g,MINI);if(b===VB()&&VUE.z>1.02)cadreMini(b.ui.g)}hud()}
  requestAnimationFrame(loop)}
 
 fit();if(typeof ResizeObserver!='undefined')new ResizeObserver(fit).observe(stage);else addEventListener('resize',fit);

@@ -44,6 +44,12 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.1 — 2026-11-14
+- Clearer interface: an info panel describes the selected tower in plain French (damage per second, range, ground/air targets, effects, faction bonus, next-level gain); tower cards show damage/s, range and anti-air; prices turn red when gold is short; locked monsters show when they unlock.
+- Two-finger pinch zoom (1× to 3×) and pan on the board, mouse-wheel zoom, "Vue d'ensemble" reset button. Touch placement now happens on release so a two-finger gesture never builds a tower.
+- Landscape layout fixed on phones (the top of the screen and the bottom of the board were cut off).
+- Game rules unchanged (`sim.js` untouched, no server redeploy).
+
 ### Tooling — 2026-11-14
 - The multiplayer server now redeploys automatically (GitHub Action) when `sim.js` or `server/` changes on `main`. No game changes.
 - Automated tests in `tests/`: game mechanics, 15 seeded AI-vs-AI games replayed exactly against a frozen copy of the 1.7 engine, mobile browser journey (portrait and landscape).
