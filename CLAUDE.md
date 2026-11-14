@@ -700,3 +700,10 @@ Les illustrations 2D ajoutent des détails propres aux archers humains, aux robo
 
 ### Journal des modifications
 - 2.8 : renomme et réorganise les cinq factions, remplace les noms des 50 unités, actualise la sélection et différencie les silhouettes 2D.
+
+
+## 2.8 — Cinq factions revisitées
+Humains (anti-aérien), Robots (perforation), Créatures (exécution), Végétaux (racines), Magiques (malédiction). Dix unités fixes par faction, incluant personnages, héros, arbres et machines. Les rôles de simulation sont conservés ; les modèles 3D restent à adapter.
+
+### Journal des modifications
+- 2.8 : cinq nouvelles identités, 50 noms d'unités et silhouettes 2D différenciées.
