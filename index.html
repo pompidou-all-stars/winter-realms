@@ -589,6 +589,8 @@ function dessinerVue3D(t){const g=mx,b=VB(),s=cell*VUE.z,A=R3D.api,E=(x,z,h)=>A.
  A.dessiner(b,t,VUE,cell,{pick:b===P&&b.t.includes(pick)?pick:null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
  for(const c of b.cr){const hp=c.hp/c.max;if(hp>=1)continue;const p=E(c.x+.5+(c.ox||0),c.y+.5+(c.oy||0),A.hauteurMonstre(c.k)),w=s*.6;
   g.fillStyle='rgba(0,0,0,.6)';g.fillRect(p.x-w/2,p.y-s*.12,w,s*.09);g.fillStyle=c.sl>0?'#5dc8ff':hp>.4?'#7cdc6a':'#ff6b4a';g.fillRect(p.x-w/2,p.y-s*.12,w*Math.max(0,hp),s*.09)}
+ for(const t of b.t)if(t.b>0){const p=1-t.b/(t.bt||1),q=E(t.x+.5,t.y+.88,0),w=s*.7,h=Math.max(3,s*.09);
+  g.fillStyle='rgba(20,16,10,.75)';g.fillRect(q.x-w/2-1,q.y-1,w+2,h+2);g.fillStyle='#ffc95e';g.fillRect(q.x-w/2,q.y,w*p,h)}
  for(const f of b.fx)if(f.type=='text'){const p=1-f.t/f.d,q=E(f.x,f.y+.4,.9+p*.6);g.save();g.globalAlpha=Math.max(0,1-p);
   g.font='700 '+Math.round(s*.36)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='rgba(0,0,0,.6)';g.strokeText(f.txt,q.x,q.y);g.fillStyle=f.col;g.fillText(f.txt,q.x,q.y);g.restore()}
  if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,VUE.w,VUE.h);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';const q=E(C/2,R/2,0);g.fillText('Éliminé',q.x,q.y)}}

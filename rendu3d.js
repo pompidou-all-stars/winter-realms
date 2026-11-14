@@ -16,8 +16,6 @@ export const E = 42 * Math.PI / 180, KY = Math.sin(E), KH = Math.cos(E), TOPM = 
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
-const MON = ['sapeur_gobelin', 'warg', 'brute_orc', 'troll_glaces', 'golem_runique', 'cyclope_cendres', 'chauve_souris', 'griffon_corrompu',
-  'dragon_ancien', 'chaman_guerre', 'pretresse', 'gelee_mutante', 'tortue', 'briseur_runes', 'spectre', 'saboteur_gobelin', 'azhkhar', 'petit_limon'];
 /* couleurs du terrain : mêmes valeurs que art/communs/factions.py (SOL, BIOME) */
 const SOL = [['#5a9a45', '#66a64f'], ['#52683b', '#647b43'], ['#356d4b', '#407d58'], ['#68604d', '#77705b'], ['#493858', '#594568']];
 const BIOME = [{bord: '#6b6253', terre: '#5a4632', detail: '#c8e08a', fleur: '#f4e27a'}, {bord: '#303b25', terre: '#4b3a2a', detail: '#c9a36a', fleur: '#e07a3a'},
@@ -67,8 +65,12 @@ export function creer(J) {
     }).catch(e => { console.warn('Modèle 3D introuvable : ' + url, e); prets.set(url, null); return null }));
     return cache.get(url);
   }
-  const urlTour = k => `assets/3d/tours/${FAC[TW[k].faction]}_${k % 10}.glb`;
-  const urlMonstre = k => `assets/3d/monstres/${MON[k]}.glb`;
+  /* noms des fichiers : voir art/LISEZMOI.md (tours/<faction>-<j>, monstres/<clé g de CR>) */
+  const urlTour = k => `assets/3d/tours/${FAC[TW[k].faction]}-${k % 10}.glb`;
+  const urlMonstre = k => `assets/3d/monstres/${CR[k].g}.glb`;
+  /* plusieurs monstres peuvent partager un modèle (le Petit limon et la Gelée mutante) : le jeu le met à l'échelle de z */
+  const echelleModele = k => { const ref = CR.find(c => c.g === CR[k].g); return Math.pow(CR[k].z / ref.z, 1.8) };
+  /* undefined : en cours de chargement ; null : introuvable (le jeu affiche alors une forme de repli) */
   const modele = url => { if (!prets.has(url)) { charger(url); return undefined } return prets.get(url) };
   function precharger(factions) {
     const l = [charger('assets/3d/decor/portail.glb'), charger('assets/3d/decor/chateau.glb')];
@@ -171,9 +173,35 @@ export function creer(J) {
   /* ---------- tours ---------- */
   const tours = new Map();
   const pipGeo = new THREE.SphereGeometry(.035, 8, 6);
+  /* formes de repli quand un modèle manque (règle d'art/LISEZMOI.md : le jeu fonctionne sans le fichier 3D) */
+  function repliTour(k) {
+    const g = new THREE.Group(), m = mat(TW[k].col);
+    const socle = new THREE.Mesh(new THREE.CylinderGeometry(.38, .4, .1, 12), mat('#8a8f99')); socle.position.y = .05;
+    const fut = new THREE.Mesh(new THREE.CylinderGeometry(.18, .24, .6, 10), m); fut.position.y = .4;
+    for (const o of [socle, fut]) { o.castShadow = o.receiveShadow = true; g.add(o) }
+    return g;
+  }
+  function repliMonstre(k) {
+    const T = CR[k], h = .4 * Math.pow(T.z, 1.8), o = new THREE.Mesh(G.sphere, mat(T.col));
+    o.scale.set(h * .45, h * .5, h * .45); o.position.y = h * .5; o.castShadow = true;
+    const g = new THREE.Group(); g.add(o); return g;
+  }
+  /* échafaudage d'un chantier (construction ou amélioration, depuis la 2.4) */
+  function echafaudage() {
+    const g = new THREE.Group();
+    for (const [x, z] of [[-.34, -.34], [.34, -.34], [-.34, .34], [.34, .34]]) { const p = new THREE.Mesh(G.boite, M.bois); p.scale.set(.04, 1.0, .04); p.position.set(x, .5, z); g.add(p) }
+    for (const y of [.35, .75]) for (const [x, z, sx, sz] of [[0, -.34, .72, .03], [0, .34, .72, .03], [-.34, 0, .03, .72], [.34, 0, .03, .72]]) {
+      const p = new THREE.Mesh(G.boite, M.bois); p.scale.set(sx, .03, sz); p.position.set(x, y, z); g.add(p);
+    }
+    const marteau = new THREE.Group(), manche = new THREE.Mesh(G.boite, M.bois), tete = new THREE.Mesh(G.boite, M.fer);
+    manche.scale.set(.03, .22, .03); manche.position.y = .11; tete.scale.set(.12, .06, .06); tete.position.y = .22;
+    marteau.add(manche, tete); marteau.position.set(.3, .78, .3); g.add(marteau); g.userData.marteau = marteau;
+    g.traverse(o => { if (o.isMesh) o.castShadow = true });
+    return g;
+  }
   function creerTour(t, fantome) {
-    const g = modele(urlTour(t.k)); if (!g) return null;
-    const o = g.scene.clone(true);
+    const g = modele(urlTour(t.k)); if (g === undefined) return null;
+    const o = g ? g.scene.clone(true) : repliTour(t.k);
     if (fantome) o.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = .55; m.material.depthWrite = false; m.castShadow = false } });
     const r = new THREE.Group(); r.add(o);
     const anim = {};
@@ -181,13 +209,21 @@ export function creer(J) {
     if (anim.Orbe) anim.orbeY = anim.Orbe.position.y;
     const pips = new THREE.Group(); r.add(pips);
     const etoiles = new THREE.Group(); for (let i = 0; i < 3; i++) etoiles.add(new THREE.Mesh(pipGeo, M.etoile)); etoiles.visible = false; r.add(etoiles);
-    return {r, o, anim, pips, etoiles, k: t.k, lv: 0, ph: (t.x * 7 + t.y * 13) % 6};
+    const chantier = fantome ? null : echafaudage(); if (chantier) { chantier.visible = false; r.add(chantier) }
+    return {r, o, anim, pips, etoiles, chantier, k: t.k, lv: 0, ech: 1, ph: (t.x * 7 + t.y * 13) % 6};
   }
   function majTour(T, t, temps) {
     if (T.lv !== t.lv) {
-      T.lv = t.lv; const s = 1 + .07 * (t.lv - 1); T.o.scale.setScalar(s);
+      T.lv = t.lv; T.ech = 1 + .07 * (t.lv - 1);
       T.pips.clear(); for (let q = 0; q < t.lv; q++) { const p = new THREE.Mesh(pipGeo, M.or); p.position.set((q - (t.lv - 1) / 2) * .1, .03, .44); T.pips.add(p) }
     }
+    /* chantier : échafaudage et marteau qui frappe ; à la construction, la tour sort de terre */
+    const enChantier = t.b > 0, p = enChantier ? Math.max(0, Math.min(1, 1 - t.b / (t.bt || 1))) : 1;
+    if (T.chantier) {
+      T.chantier.visible = enChantier;
+      if (enChantier) T.chantier.userData.marteau.rotation.z = -.4 + Math.abs(Math.sin(temps * 7)) * 1.1;
+    }
+    T.o.scale.set(T.ech, T.ech * (enChantier && t.lv === 1 ? .15 + .85 * p : 1), T.ech);
     const A = T.anim;
     if (A.Tourelle && t.a !== undefined) {
       A.Tourelle.rotation.y = Math.atan2(Math.cos(t.a), Math.sin(t.a));
@@ -217,13 +253,13 @@ export function creer(J) {
   /* ---------- monstres ---------- */
   const monstres = new Map();
   function creerMonstre(c) {
-    const g = modele(urlMonstre(c.k)); if (!g) return null;
+    const g = modele(urlMonstre(c.k)); if (g === undefined) return null;
     const T = CR[c.k];
-    const o = g.scene.clone(true); o.scale.setScalar(ECH_MONSTRES);
+    const o = g ? g.scene.clone(true) : repliMonstre(c.k); o.scale.setScalar(ECH_MONSTRES * (g ? echelleModele(c.k) : 1));
     if (T.inv) o.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true } });
     const r = new THREE.Group(); r.add(o);
     let mixer = null;
-    if (g.animations.length) { mixer = new THREE.AnimationMixer(o); const a = mixer.clipAction(g.animations[0]); a.play(); a.time = (c.ph || 0) % g.animations[0].duration }
+    if (g && g.animations.length) { mixer = new THREE.AnimationMixer(o); const a = mixer.clipAction(g.animations[0]); a.play(); a.time = (c.ph || 0) % g.animations[0].duration }
     /* halo au sol : ralenti (bleu), hâté (jaune), soigné (vert) */
     const halo = new THREE.Mesh(G.disque, transp('#8fdcff', .45)); halo.scale.setScalar(.22 * (T.z || 1)); halo.position.y = .01; halo.visible = false; r.add(halo);
     let aura = null;

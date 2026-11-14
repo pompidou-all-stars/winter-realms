@@ -1,6 +1,6 @@
 /* Captures d'écran du jeu, format téléphone, portrait et paysage (5 écrans).
    Usage : node tests/captures.js            → images dans captures/actuel/
-           node tests/captures.js --3d       → la même chose avec le rendu 3D (2.4), dans captures/3d/
+           node tests/captures.js --3d       → la même chose avec le rendu 3D (2.6), dans captures/3d/
    Le scénario est toujours le même (graine fixe, horloge figée) : deux lancements donnent les mêmes images
    sur une même machine. Voir CLAUDE.md, « Conditions de la comparaison visuelle ». */
 'use strict';
@@ -16,7 +16,7 @@ const ECRANS=[
 const FORMATS=['portrait','paysage'];
 
 /* joue le scénario et enregistre les images ; renvoie la liste des captures et l'état de la police */
-/* rendu : '2d' (par défaut) ou '3d' (2.4, ?rendu=3d, WebGL logiciel) */
+/* rendu : '2d' (par défaut) ou '3d' (2.6, ?rendu=3d, WebGL logiciel) */
 async function capturer({racine=RACINE,sortie,police='reelle',echelle=2,graine=12345,nav=null,rendu='2d'}={}){
  fs.mkdirSync(sortie,{recursive:true});
  const srv=await demarrer(racine),proprio=!nav;if(!nav)nav=await N.lancer({webgl:rendu=='3d'});

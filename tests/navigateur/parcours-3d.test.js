@@ -1,4 +1,4 @@
-/* 2.4 : parcours mobile avec le rendu 3D (?rendu=3d), au format téléphone (portrait et paysage).
+/* 2.6 : parcours mobile avec le rendu 3D (?rendu=3d), au format téléphone (portrait et paysage).
    WebGL tourne en rendu logiciel (SwiftShader) : le test ne dépend pas d'une carte graphique.
    Mêmes commandes qu'en 2D : construction en deux touchers, panneau de tour, zoom et déplacement à deux doigts. */
 'use strict';
@@ -33,8 +33,8 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile e
  test('Une pose impossible est refusée avec un message',async()=>{
   await N.toucherCase(p,6,0);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(await p.textContent('#toast'),'Impossible ici : le chemin serait bloqué');
  });
- test('Toucher la tour ouvre son panneau ; Améliorer fonctionne',async()=>{
-  await N.toucherCase(p,3,5);let e=await N.etat(p);assert.equal(e.panneauOuvert,true);
+ test('Toucher la tour ouvre son panneau ; Améliorer fonctionne (après le chantier)',async()=>{
+  await N.avancer(p,1500);await N.toucherCase(p,3,5);let e=await N.etat(p);assert.equal(e.panneauOuvert,true);
   await N.toucher(p,'#bar button:has-text("Améliorer")');e=await N.etat(p);assert.equal(e.tours[0].lv,2);await N.toucher(p,'#bar button:has-text("Fermer")');
  });
  test('Envoyer des monstres : ils apparaissent en 3D chez l\'adversaire, animés',async()=>{
