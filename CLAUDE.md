@@ -73,7 +73,8 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 - **Autour du jeu** (ces dossiers ne sont pas chargés par la page) :
   - `server/` : le serveur multijoueur (Cloudflare Workers), qui importe `sim.js` tel quel (voir §9 bis) ;
   - `tests/` : les tests automatiques, les captures et les bilans (voir §12) ;
-  - `.github/` : la vérification automatique des Pull Requests (`tests.yml`), le déploiement automatique du serveur (`deploy-server.yml`, voir §9 bis), l'étiquetage automatique des versions (`versions.yml` et `versionner.sh`, voir §14) et le modèle de description de PR.
+  - `art/` : les **recettes des modèles 3D** (un script Blender par asset) et l'outil de génération ; `assets/3d/` : les fichiers 3D produits (GLB) et leur manifeste (voir §15 et `art/LISEZMOI.md`) ;
+  - `.github/` : la vérification automatique des Pull Requests (`tests.yml`), le déploiement automatique du serveur (`deploy-server.yml`, voir §9 bis), l'étiquetage automatique des versions (`versions.yml` et `versionner.sh`, voir §14), la régénération des assets 3D (`assets-3d.yml`, voir §15) et le modèle de description de PR.
 - **Pour jouer en local**, il faut un petit serveur web : `npx http-server` à la racine, puis ouvrir http://localhost:8080. Un `file://` ne charge pas toujours `sim.js`, surtout dans les aperçus intégrés. **Pour tester**, voir §12 : `node tests/tout.js`.
 - **Seule ressource externe** : la police Google Fonts *Fredoka*.
 - **Rendu** : Canvas 2D. Tous les visuels (tours, monstres, effets) sont **dessinés en code**, sans images. La netteté s'adapte à l'écran (`devicePixelRatio`, plafonné à 3).
@@ -429,7 +430,7 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 ## 10. Choix de conception à respecter
 
 1. **Pas d'étape de build** : `index.html` + `sim.js`, jouable hors ligne en solo (sauf la police). **La simulation reste dans `sim.js`, sans DOM ni son**, pour être partagée avec le serveur multijoueur.
-2. **Tout est dessiné en code** (Canvas 2D) et **tous les sons sont synthétisés** : pas d'images ni de fichiers audio.
+2. **Tout est produit par du code** et **tous les sons sont synthétisés** : pas de fichiers audio. Le rendu 2D est dessiné en code (Canvas 2D). Les **modèles 3D** (depuis la préparation de la 3D) sont des fichiers GLB **générés par des scripts Blender versionnés** dans `art/` (§15), jamais retouchés à la main ; **aucun asset externe sans licence CC0**.
 3. **Univers fantasy original** : noms, personnages et visuels propres au jeu. On ne copie pas les personnages, les visuels ou les noms d'un jeu existant.
 4. **Style « maquette 2.5D » en relief** : ombres portées, dalles biseautées, éclairage doux, personnages caricaturaux (grosse tête, gros nez).
    - Depuis la v1.6, chaque terrain est un **plateau-diorama** : un socle épais aux bords arrondis et des dalles surélevées avec une tranche visible. Une **palette de biome** propre à chaque faction (bord, reflets, ombres, détails) colore le terrain.
@@ -468,6 +469,7 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 | `node tests/captures.js` | 10 captures (5 écrans × portrait et paysage) dans `captures/actuel/` | ≈ 1 min |
 | `node tests/comparer-visuel.js [version]` | Avant/après visuel seul, dans `captures/comparaison/` | ≈ 2 min 30 |
 | `node tests/outils/audit-doc.js` | Compare les tableaux chiffrés de ce document au code et liste les écarts, sans rien corriger | 1 s |
+| `python art/outils/generer.py [asset…] [--verifier] [--apercus dossier]` | Génère (ou vérifie) les fichiers 3D à partir des scripts de `art/` ; demande Blender 5.3 (`pip install bpy==5.3.0`) | quelques s par asset |
 
 Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en plus **Playwright** et Chromium, présents dans l'environnement de Claude mais **pas ajoutés au projet**. Sans eux, ces tests sont ignorés avec un message clair.
 
@@ -582,6 +584,20 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 
 ---
 
+## 15. Assets 3D (préparation)
+
+Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
+- **Un script Python Blender par asset** dans `art/` : c'est la **source** du modèle. `art/outils/generer.py` l'exécute dans une scène vide, exporte `assets/3d/<asset>.glb` et met à jour `assets/3d/manifeste.json` (taille, triangles, empreinte du script). Le même programme fonctionne sur le PC du concepteur (Blender 5.3) et dans le cloud (module `bpy==5.3.0`, sans écran ni carte graphique).
+- **Noms** : `tours/<faction>-<j>` pour `TW[faction × 10 + j]`, `monstres/<g>` pour le monstre de clé `CR[…].g`, `decor/<nom>`, `exemples/<nom>` (non utilisés par le jeu) ; pièces partagées dans `art/communs/`.
+- **Conventions** : 1 unité = 1 case, origine au sol au centre de la case, couleurs de faction lues dans `FACTIONS` ; un seul modèle par tour et par monstre (niveaux et petites animations gérés par le jeu).
+- **Budgets** (`art/budgets.json`) : tour et monstre ≤ 3 000 triangles et 150 Ko, décor ≤ 6 000 triangles et 300 Ko, total ≤ 8 Mo.
+- **Contrôles** : `tests/simulation/assets3d.test.js` (chaque PR, sans Blender : manifeste complet, aucun fichier en retard sur son script, GLB valides, budgets) ; action GitHub **« Assets 3D »** (`.github/workflows/assets-3d.yml`, PR qui touchent `art/` ou `assets/3d/`) : régénère tout avec Blender 5.3, vérifie et joint les images d'aperçu.
+- **Qui fait quoi** : la conception d'un nouveau modèle ou d'un nouveau style se fait de préférence sur le PC du concepteur (Blender + MCP, en direct ou via Remote Control) ; les retouches mineures peuvent être faites par n'importe quel contributeur ou une session cloud, en modifiant le script puis en régénérant.
+- **Repli obligatoire** : le jeu doit fonctionner même si un modèle manque (un contributeur peut ajouter un monstre avant son modèle 3D).
+- **Fins de ligne** : `.gitattributes` impose LF dans le dépôt (les empreintes vérifiées par les tests en dépendent) et traite les fichiers 3D et images comme binaires. Les fichiers `.blend` ne sont pas versionnés.
+
+---
+
 ## Journal des modifications
 
 | Date | Version | Modification |
@@ -600,3 +616,4 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 | 2026-11-14 | 2.1 | **Interface plus claire** : fiche d'information de la tour (dégâts/s, portée, cibles, effets, bonus de faction chiffré, gain du niveau suivant), cartes de tours avec dégâts/s, portée et ✈, prix en rouge si l'or manque, monstres verrouillés avec heure de déblocage. **Zoom (1× à 3×) et déplacement à deux doigts**, molette, bouton « Vue d'ensemble », cadre de la partie visible sur la vignette. Pose au doigt au relâcher. Correction du paysage sur téléphone (haut et bas coupés). Tests navigateur complétés (19 vérifications par orientation), 5ᵉ capture (zoom). **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
 | 2026-11-14 | 2.2 | **Construction en deux touchers** : le 1er toucher montre un aperçu (tour fantôme, portée, prix), le 2e sur la même case construit ; une case impossible est signalée dès le 1er toucher ; glisser le doigt ne construit plus rien. Tests navigateur complétés (22 vérifications par orientation). **Règles du jeu inchangées** (`sim.js` non modifié). |
 | 2026-11-14 | 2.3 | **Carte plus grande sur téléphone et pastilles de rôle des tours**. Carte : les 4 vignettes des joueurs quittent le HUD et s'ouvrent dans un panneau flottant par-dessus le terrain, depuis un bouton-icône en haut à gauche. Vies du joueur ajoutées dans le HUD (❤). Bannière « ↩ revenir au tien » cliquable. Mini-cartes un peu plus grandes. Tours : pastilles de rôle (flèche, épée, flocon, bombe, flamme, étoile), de cibles (sol ou sol et air) et de magie dans des cadres dorés biseautés dessinés en code ; texte des cartes « ⚔ N dégâts/s » et « ◎ portée N » ; appui long (ou survol) sur une carte pour voir sa fiche sans la sélectionner. Interface uniquement : `sim.js` inchangé. Test du parcours mobile adapté (ouvrir le panneau avant de toucher une vignette). |
+| 2026-11-14 | 2.3 | Outillage : **préparation des assets 3D** (§15, `art/LISEZMOI.md`) : un script Blender par asset dans `art/`, génération identique sur PC et dans le cloud (`art/outils/generer.py`, Blender 5.3), manifeste et budgets, test de cohérence sur chaque PR, action GitHub « Assets 3D » avec aperçus, exemple `exemples/caisse`. Règle de conception n°2 adaptée aux modèles 3D générés par script. `.gitattributes` (fins de ligne LF, fichiers binaires). **Aucun changement de jeu.** |
