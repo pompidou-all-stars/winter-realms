@@ -6,12 +6,12 @@ const vm=require('vm'),fs=require('fs'),path=require('path'),crypto=require('cry
 const {mulberry32}=require('./hasard');
 const RACINE=path.join(__dirname,'..','..');
 /* WR_MOTEUR permet de faire passer toute la suite de tests à un autre moteur (vérification, comparaison de versions) */
-const MOTEURS={actuel:process.env.WR_MOTEUR?path.resolve(process.env.WR_MOTEUR):path.join(RACINE,'sim.js'),'v1.7':path.join(RACINE,'tests','moteurs','v1.7','sim.js'),'v2.4':path.join(RACINE,'tests','moteurs','v2.4','sim.js')};
-const INTERNES=['aiAct','aiDefend','aiAttack','PLAN','pathCells','invest','airInv','mages','BASE_TW','FACTION_BALANCE','ARCH','ROLE','ORDER','HPK','GRACE','GROUP','AURA_R','DIRS','dmg','rng','upCost','topY','flyH','NORM','FLY','AURA','SPEC','HEAL','SPLIT','TURT','BRK','SAP','KID'];
+const MOTEURS={actuel:process.env.WR_MOTEUR?path.resolve(process.env.WR_MOTEUR):path.join(RACINE,'sim.js')};
+const INTERNES=['aiAct','aiDefend','aiAttack','PLAN','pathCells','mzStep','mzPath','plen','mzKind','invest','airInv','mages','BASE_TW','FACTION_BALANCE','ARCH','ROLE','ORDER','HPK','GRACE','GROUP','AURA_R','DIRS','dmg','rng','upCost','topY','flyH','NORM','FLY','AURA','SPEC','HEAL','SPLIT','TURT','BRK','SAP','KID'];
 
 function sha256(fichier){return crypto.createHash('sha256').update(fs.readFileSync(fichier)).digest('hex')}
 
-/* source : 'actuel', 'v1.7', un chemin de fichier, ou {code} (texte d'un sim.js, par exemple extrait de git).
+/* source : 'actuel', un chemin de fichier, ou {code} (texte d'un sim.js, par exemple extrait de git).
    graine : 1 par défaut, pour que chaque test soit reproductible ; graine:null redonne le vrai hasard (Math.random). */
 function charger(source='actuel',{graine=1}={}){
  const code=typeof source=='object'?source.code:fs.readFileSync(MOTEURS[source]||source,'utf8');

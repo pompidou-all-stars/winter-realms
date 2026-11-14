@@ -5,7 +5,7 @@
 <!-- Tests (node tests/tout.js), erreurs, fichiers modifiés. Une réussite technique ne valide ni le gameplay ni le rendu. -->
 
 ## 🎮 Bilan gameplay
-<!-- Identique à la référence, ou changé : quelles mécaniques, quelles statistiques (avant → après). À valider par le concepteur. -->
+<!-- Identique à main, ou changé : quelles mécaniques, quelles statistiques (avant → après). À valider par le concepteur. -->
 
 ## 🎨 Bilan visuel
 <!-- Captures portrait et paysage ; comparaison avant/après si le rendu change. À valider par le concepteur. -->
