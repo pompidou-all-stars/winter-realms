@@ -25,6 +25,10 @@ SORTIE = os.path.join(RACINE, 'assets', '3d')
 MANIFESTE = os.path.join(SORTIE, 'manifeste.json')
 BUDGETS = os.path.join(ART, 'budgets.json')
 VERSION_BLENDER = '5.3'
+# Outil de compression de secours (gltf-transform, licence MIT) : utilisé seulement quand le Blender utilisé n'a pas sa
+# bibliothèque de compression meshopt. C'est le cas du module bpy du cloud et de GitHub : sans cela, les fichiers sortiraient
+# 2 à 3 fois plus lourds et seraient refusés par tests/simulation/modeles-3d.test.js. Sur le PC, Blender compresse lui-même.
+GLTF_TRANSFORM = '@gltf-transform/cli@4.2.1'
 
 def lire(chemin):
     with open(chemin, 'rb') as f:
@@ -130,6 +134,7 @@ def generer(bpy, id_, dossier, jeu, apercus=None):
                               export_cameras=False, export_lights=False,
                               export_animations=animee, export_animation_mode='NLA_TRACKS', export_force_sampling=True,
                               export_meshopt_compression_enable=True)
+    compresser_si_besoin(fichier)
     if apercus:
         rendre_apercu(bpy, maillages, os.path.join(apercus, id_.replace('/', '-') + '.png'))
     return {'id': id_, 'categorie': infos.get('categorie', 'exemple'), 'titre': infos.get('titre', id_),
@@ -154,6 +159,27 @@ def rendre_apercu(bpy, maillages, chemin):
     sc.render.resolution_x = sc.render.resolution_y = 400; sc.render.filepath = chemin
     os.makedirs(os.path.dirname(chemin), exist_ok=True)
     bpy.ops.render.render(write_still=True)
+
+def compresse(fichier):
+    """Vrai si le GLB déclare la compression meshopt."""
+    with open(fichier, 'rb') as f:
+        b = f.read()
+    n = int.from_bytes(b[12:16], 'little')
+    return 'EXT_meshopt_compression' in json.loads(b[20:20 + n]).get('extensionsUsed', [])
+
+def compresser_si_besoin(fichier):
+    """Compresse en meshopt avec gltf-transform si Blender ne l'a pas fait (cloud, GitHub). Garde pièces nommées et animations."""
+    if compresse(fichier):
+        return 'blender'
+    tmp = fichier + '.tmp.glb'
+    npx = 'npx.cmd' if os.name == 'nt' else 'npx'
+    r = subprocess.run([npx, '--yes', GLTF_TRANSFORM, 'meshopt', fichier, tmp], capture_output=True, text=True)
+    if r.returncode != 0 or not os.path.exists(tmp):
+        raise RuntimeError('compression meshopt impossible (Node.js et npx sont nécessaires) : ' + (r.stderr or r.stdout).strip()[-300:])
+    os.replace(tmp, fichier)
+    if not compresse(fichier):
+        raise RuntimeError('la compression meshopt a échoué')
+    return 'gltf-transform'
 
 def budgets():
     with open(BUDGETS, encoding='utf-8') as f:

@@ -53,7 +53,7 @@ Modèle complet : `art/exemples/caisse.py`.
 
 Depuis la racine du dépôt :
 
-- **Cloud ou Python avec bpy** (`pip install -r art/outils/requirements.txt`) :
+- **Cloud ou Python avec bpy** (`pip install -r art/outils/requirements.txt`, et **Node.js** : ce Blender ne sait pas compresser, `generer.py` compresse alors automatiquement avec gltf-transform) :
   ```bash
   python art/outils/generer.py tours/alliance-0      # un asset
   python art/outils/generer.py                        # tous
@@ -88,6 +88,7 @@ Les 50 tours, les 17 monstres, le portail et le château sont construits avec le
 | `animations.py` | animations par pièces, sans squelette : `marche`, `trot`, `saut`, `flotte`, `vol` |
 | `echelles.py` | tailles des monstres : `0,40 × z^1,8` cases (z de `CR`) |
 | `tours_communes.py` | les 6 archétypes de tours déclinés par `STYLE` de faction ; `tour(faction, j)` |
+| `neige.py` | `enneiger(racine)` (2.9) : neige sur les faces tournées vers le ciel (haut seulement sur les pentes), hors personnages, pièces animées et lumineuses, dans la limite du budget de triangles |
 | `decor.py` | portail, château, plateau de référence |
 | `export_jeu.py` | `preparer(racine)`, à appeler **à la fin de `construire`** : couleurs cuites dans les sommets (matériau unique `Peint`, `Lueur_…` pour les pièces lumineuses, `Drapeau` gardé), pièces fusionnées sous chaque pivot |
 | `rendu.py` | rendus de validation (EEVEE) |

@@ -15,7 +15,7 @@ for _p in (ART, os.path.join(ART, 'outils')):
     if _p not in sys.path: sys.path.insert(0, _p)
 import bpy
 # ordre de rechargement : les modules de base d'abord (les autres importent leurs fonctions)
-for _n in ['outils', 'echelles', 'animations', 'factions', 'personnages', 'betes', 'tours_communes', 'decor', 'export_jeu', 'rendu']:
+for _n in ['outils', 'echelles', 'animations', 'factions', 'personnages', 'betes', 'neige', 'tours_communes', 'decor', 'export_jeu', 'rendu']:
     _m = sys.modules.get('communs.' + _n)
     _m = importlib.reload(_m) if _m else importlib.import_module('communs.' + _n)
     globals()[_n] = _m

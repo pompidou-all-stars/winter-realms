@@ -17,10 +17,13 @@ export const E = 42 * Math.PI / 180, KY = Math.sin(E), KH = Math.cos(E), TOPM = 
 const ECH_MONSTRES = 1.4;
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
 /* couleurs du terrain : mêmes valeurs que art/communs/factions.py (SOL, BIOME) */
-const SOL = [['#5a9a45', '#66a64f'], ['#52683b', '#647b43'], ['#356d4b', '#407d58'], ['#68604d', '#77705b'], ['#493858', '#594568']];
-const BIOME = [{bord: '#6b6253', terre: '#5a4632', detail: '#c8e08a', fleur: '#f4e27a'}, {bord: '#303b25', terre: '#4b3a2a', detail: '#c9a36a', fleur: '#e07a3a'},
-  {bord: '#244a39', terre: '#3a3326', detail: '#d6e8a2', fleur: '#c79bff'}, {bord: '#4b4538', terre: '#4a4036', detail: '#d9c9a5', fleur: '#e0a34d'},
-  {bord: '#382d4a', terre: '#2a2236', detail: '#a78cdb', fleur: '#7ff3ff'}];
+/* thème hiver (2.9) : terrain enneigé. Damier de neige légèrement teinté par la couleur de la faction (TEINTE),
+   bord en roche givrée, décor d'hiver (sapins enneigés, rochers, cristaux de glace). */
+const NEIGE = ['#eef3f9', '#e2eaf3'];
+const TEINTE = ['#5a9a45', '#a8652f', '#356d4b', '#8a7a5a', '#7a5a9a'];
+const BIOME = [{bord: '#5b6b80', terre: '#8a9bb0', glace: '#bfe6ff'}, {bord: '#5f5a58', terre: '#958a86', glace: '#cfe9ff'},
+  {bord: '#4f6670', terre: '#8aa3a8', glace: '#c8f2e6'}, {bord: '#625d58', terre: '#9a948c', glace: '#ffe2b8'},
+  {bord: '#4e4660', terre: '#8e86a3', glace: '#d9c4ff'}];
 const VOL = .5; // hauteur de vol des volants (cases)
 
 export function creer(J) {
@@ -34,19 +37,19 @@ export function creer(J) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#18251c');
+  scene.background = new THREE.Color('#1a2433');
   const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, .1, 200);
   cam.position.set(0, 60 * Math.sin(E), 60 * Math.cos(E)); cam.lookAt(0, 0, 0);
 
   /* lumières : ciel et sol (ambiance), soleil chaud avec ombres, contre-jour */
-  scene.add(new THREE.HemisphereLight('#dfeaff', '#5a4632', 1.25));
-  const soleil = new THREE.DirectionalLight('#fff1db', 2.3);
+  scene.add(new THREE.HemisphereLight('#e4efff', '#6a7890', 1.15));
+  const soleil = new THREE.DirectionalLight('#fff6ea', 2.2);
   soleil.position.set(C / 2 - 7, 14, R / 2 + 5); soleil.target.position.set(C / 2, 0, R / 2);
   soleil.castShadow = true;
   const sc = soleil.shadow.camera; sc.left = -12; sc.right = 12; sc.top = 13; sc.bottom = -13; sc.near = 1; sc.far = 40;
   soleil.shadow.mapSize.set(2048, 2048); soleil.shadow.bias = -.0006; soleil.shadow.normalBias = .02;
   scene.add(soleil, soleil.target);
-  const contre = new THREE.DirectionalLight('#ffe2b8', .9); contre.position.set(C / 2 + 3, 8, -6); contre.target.position.set(C / 2, 0, R / 2);
+  const contre = new THREE.DirectionalLight('#cfe0ff', .8); contre.position.set(C / 2 + 3, 8, -6); contre.target.position.set(C / 2, 0, R / 2);
   scene.add(contre, contre.target);
 
   /* ---------- modèles ---------- */
@@ -100,7 +103,7 @@ export function creer(J) {
   function construirePlateau(f) {
     if (plateau) scene.remove(plateau);
     plateau = new THREE.Group(); plateauFaction = f;
-    const bio = BIOME[f] || BIOME[0], sol = SOL[f] || SOL[0];
+    const bio = BIOME[f] || BIOME[0], teinte = new THREE.Color(TEINTE[f] || TEINTE[0]), sol = NEIGE.map(c => new THREE.Color(c).lerp(teinte, .07));
     const terre = new THREE.Mesh(G.boite, mat(bio.terre)); terre.scale.set(C + .1, .3, R + .1); terre.position.set(C / 2, -.2, R / 2); terre.receiveShadow = true;
     const falaise = new THREE.Mesh(G.boite, mat(bio.bord)); falaise.scale.set(C + .34, .4, R + .34); falaise.position.set(C / 2, -.5, R / 2);
     plateau.add(terre, falaise);
@@ -110,10 +113,10 @@ export function creer(J) {
     let i = 0;
     for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) {
       m4.makeTranslation(x + .5, 0, y + .5); dalles.setMatrixAt(i, m4);
-      const s = decorSeed(x, y, f); col.set(sol[(x + y) % 2]).multiplyScalar(.93 + (s % 13) / 100); dalles.setColorAt(i++, col);
+      const s = decorSeed(x, y, f); col.copy(sol[(x + y) % 2]).multiplyScalar(.95 + (s % 9) / 100); dalles.setColorAt(i++, col);
     }
     plateau.add(dalles);
-    /* décor déterministe (aucun scintillement), comme en 2D : cailloux, herbes, fleurs */
+    /* décor déterministe (aucun scintillement) : rochers enneigés, sapins, cristaux de glace */
     const pos = {caillou: [], herbe: [], fleur: []};
     for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) {
       const s = decorSeed(x, y, f), fx = x + .2 + (s % 61) / 100, fy = y + .2 + ((s * 7) % 45) / 100;
@@ -124,11 +127,17 @@ export function creer(J) {
       liste.forEach((p, n) => { fn(m4, p); im.setMatrixAt(n, m4) }); plateau.add(im);
     };
     const q = new THREE.Quaternion(), v = new THREE.Vector3(), e = new THREE.Euler();
-    inst(G.ico, mat('#b8b2a2'), pos.caillou, (m, [x, y, s]) => m.compose(v.set(x, .02, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.08, .05, .07)));
-    const herbes = []; for (const p of pos.herbe) for (let k = -1; k <= 1; k++) herbes.push([p[0] + k * .045, p[1], k]);
-    inst(G.cone, mat(bio.detail), herbes, (m, [x, y, k]) => m.compose(v.set(x, 0, y), q.setFromEuler(e.set(0, 0, k * .4)), new THREE.Vector3(.022, .12, .022)));
-    const fleurs = []; for (const p of pos.fleur) for (let k = 0; k < 3; k++) fleurs.push([p[0] + k * .06, p[1] + (k % 2) * .05, k]);
-    inst(G.sphere, mat(bio.fleur, {emissive: bio.fleur, emissiveIntensity: .15}), fleurs, (m, [x, y]) => m.compose(v.set(x, .03, y), q.identity(), new THREE.Vector3(.025, .018, .025)));
+    // rochers gris givrés, coiffés de neige
+    inst(G.ico, mat('#8c939e'), pos.caillou, (m, [x, y, s]) => m.compose(v.set(x, .02, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.09, .06, .08)));
+    inst(G.ico, mat('#f4f8fc'), pos.caillou, (m, [x, y, s]) => m.compose(v.set(x, .055, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.07, .025, .06)));
+    // petits sapins : tronc, feuillage vert sombre, pointe de neige
+    inst(G.boite, mat('#5a3d26'), pos.herbe, (m, [x, y]) => m.compose(v.set(x, .03, y), q.identity(), new THREE.Vector3(.025, .06, .025)));
+    inst(G.cone, mat('#2f5a45'), pos.herbe, (m, [x, y, s]) => m.compose(v.set(x, .05, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.09, .2, .09)));
+    inst(G.cone, mat('#f4f8fc'), pos.herbe, (m, [x, y, s]) => m.compose(v.set(x, .16, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.05, .1, .05)));
+    // congères (bosses de neige) et cristaux de glace
+    inst(G.sphere, mat('#f6f9fd', {roughness: .95}), pos.fleur, (m, [x, y, s]) => m.compose(v.set(x, 0, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.14, .045, .09)));
+    const cristaux = pos.fleur.filter(p => p[2] % 3 === 0);
+    inst(G.octa, mat(bio.glace, {emissive: bio.glace, emissiveIntensity: .25, roughness: .2}), cristaux, (m, [x, y, s]) => m.compose(v.set(x + .12, .06, y), q.setFromEuler(e.set(.3, s, .2)), new THREE.Vector3(.03, .07, .03)));
     scene.add(plateau);
   }
 
@@ -146,9 +155,24 @@ export function creer(J) {
     if (decor.drapeau && decor.col !== b.col) { decor.col = b.col; decor.drapeau.color.set(b.col) }
   }
 
+  /* ---------- flocons (thème hiver, 2.9) : 260 points qui tombent en boucle au-dessus du plateau ---------- */
+  const NF = 260, flocons = new Float32Array(NF * 3), vitesses = new Float32Array(NF);
+  for (let i = 0; i < NF; i++) { const h = (i * 2654435761 >>> 0) / 4294967296, h2 = (i * 40503 % 997) / 997, h3 = (i * 7919 % 389) / 389;
+    flocons[i * 3] = -1 + h * (C + 2); flocons[i * 3 + 1] = h2 * 6; flocons[i * 3 + 2] = -1 + h3 * (R + 2); vitesses[i] = .35 + h2 * .35 }
+  const geoF = new THREE.BufferGeometry(); geoF.setAttribute('position', new THREE.BufferAttribute(flocons, 3));
+  const neige = new THREE.Points(geoF, new THREE.PointsMaterial({color: '#ffffff', size: .07, transparent: true, opacity: .85, depthWrite: false}));
+  neige.frustumCulled = false; neige.renderOrder = 4; scene.add(neige);
+  function fairePleuvoir(dt, temps) {
+    for (let i = 0; i < NF; i++) {
+      let y = flocons[i * 3 + 1] - vitesses[i] * dt; if (y < 0) y += 6;
+      flocons[i * 3 + 1] = y; flocons[i * 3] += Math.sin(temps * .8 + i) * dt * .08;
+    }
+    geoF.attributes.position.needsUpdate = true;
+  }
+
   /* ---------- chemin en pointillés animés ---------- */
   const NTIR = 240;
-  const tirets = new THREE.InstancedMesh(G.tiret, transp('#ffffff', .42), NTIR); tirets.frustumCulled = false; scene.add(tirets);
+  const tirets = new THREE.InstancedMesh(G.tiret, transp('#3d5f8a', .5), NTIR); tirets.frustumCulled = false; scene.add(tirets);
   let cheminD = null, chemin = [], longueur = 0;
   function calculerChemin(b) {
     if (b.d === cheminD) return; cheminD = b.d; chemin = []; longueur = 0;
@@ -241,7 +265,7 @@ export function creer(J) {
 
   /* repères de sélection : cercle de portée, case dorée, tour fantôme */
   const portee = new THREE.Group();
-  const porteeFond = new THREE.Mesh(G.disque, transp('#ffffff', .1)), porteeBord = new THREE.Mesh(G.anneau, transp('#ffffff', .75));
+  const porteeFond = new THREE.Mesh(G.disque, transp('#3d6fb0', .12)), porteeBord = new THREE.Mesh(G.anneau, transp('#25486f', .8));
   porteeFond.renderOrder = porteeBord.renderOrder = 2; portee.add(porteeFond, porteeBord); portee.visible = false; scene.add(portee);
   const cadreCase = new THREE.Group(), cadreMat = transp('#ffd95e', .95);
   for (const [x, z, sx, sz] of [[0, -.48, 1, .05], [0, .48, 1, .05], [-.48, 0, .05, 1], [.48, 0, .05, 1]]) {
@@ -309,7 +333,7 @@ export function creer(J) {
     switch (f.type) {
       case 'boom': o = new THREE.Mesh(G.sphere, transp(f.col, .55)); break;
       case 'ring': o = new THREE.Mesh(G.anneau, transp(f.col, 1)); break;
-      case 'range': { o = new THREE.Group(); o.add(new THREE.Mesh(G.disque, transp(f.col, .12)), new THREE.Mesh(G.anneau, transp('#ffffff', .7))); break }
+      case 'range': { o = new THREE.Group(); o.add(new THREE.Mesh(G.disque, transp(f.col, .12)), new THREE.Mesh(G.anneau, transp('#25486f', .7))); break }
       case 'puff': { o = new THREE.Group(); for (let i = 0; i < 6; i++) { const m = new THREE.Mesh(G.sphere, transp(f.col, .8)); m.userData.a = i * 1.05; o.add(m) } break }
       case 'flame': o = new THREE.Mesh(G.sphere, transp('#ffb347', .85)); break;
       case 'slash': o = new THREE.Mesh(G.tranche, transp('#ffffff', .9)); break;
@@ -362,7 +386,7 @@ export function creer(J) {
     if (b.classId !== plateauFaction) construirePlateau(b.classId);
     placerDecor(b);
     if (decor.portail) decor.portail.traverse(o => { const m = /^Anneau(\d)$/.exec(o.name); if (m) o.rotation.y = temps * (2 + +m[1] * .6) * (m[1] % 2 ? 1 : -1) });
-    calculerChemin(b); dessinerChemin(temps);
+    calculerChemin(b); dessinerChemin(temps); fairePleuvoir(dt, temps);
 
     synchro(tours, b.t, t => t.x + ',' + t.y + ',' + t.k, t => { const T = creerTour(t); if (T) { T.r.position.set(t.x + .5, 0, t.y + .5); scene.add(T.r) } return T },
       (T, t) => majTour(T, t, temps), retirerGroupe);
@@ -376,7 +400,7 @@ export function creer(J) {
     if (sel) {
       const r = etat.projet ? TW[sel.k].r : etat.rng(sel);
       portee.position.set(sel.x + .5, .03, sel.y + .5); portee.scale.setScalar(r);
-      porteeFond.material.color.set(etat.projet && !etat.ok ? '#ff4d3d' : '#ffffff');
+      porteeFond.material.color.set(etat.projet && !etat.ok ? '#ff4d3d' : '#3d6fb0');
       cadreCase.position.set(sel.x + .5, 0, sel.y + .5); cadreMat.color.set(etat.projet && !etat.ok ? '#ff6b5a' : '#ffd95e');
       cadreMat.opacity = etat.projet ? .7 + .25 * Math.sin(temps * 6) : .95;
     }

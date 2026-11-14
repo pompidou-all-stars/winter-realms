@@ -14,6 +14,7 @@ import math
 from . import outils
 from .outils import pivot, cylindre, boite, sphere, cone, prisme, anneau, peindre, collection, dans
 from .factions import PAL, SOCLES
+from .neige import enneiger
 from .personnages import (humanoide, arc_court, epee, marteau, gourdin, baton, bouclier, hache, lame_courbe, baguette)
 
 # ---------------------------------------------------------------- styles des factions
@@ -441,4 +442,6 @@ FACTIONS = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres']
 
 def tour(faction, j):
     fn, kw = EMPLACEMENTS[j]
-    return fn(f'{faction}_{j}', faction, **kw)
+    r = fn(f'{faction}_{j}', faction, **kw)
+    enneiger(r)  # thème hiver (2.8) : neige sur les toits, créneaux et socles
+    return r
