@@ -16,6 +16,10 @@ Game rules, balance tables and project conventions are documented (in French) in
 
 ## Changelog
 
+### 1.6.1 — 2026-11-14
+- Fix Sylvestres roots: all their towers now slow enemies to ×0.82 speed for 0.72 s (Frost towers keep their stronger slow). The strongest active slow wins.
+- Fixes ground monsters freezing and flying monsters getting stuck forever (unkillable) when hit by Sylvestres melee or flame towers.
+
 ### 1.6 — 2026-11-14
 - Visual only: each board is now a diorama (thick base, raised tiles) with a per-faction biome palette.
 - Deterministic scenery (rocks, grass, crystals), no flickering; shadows under the spawn portal and the castle.

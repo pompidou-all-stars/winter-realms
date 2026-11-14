@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 1.6</title>
+<title>Winter Realms — Tower Wars · Édition 1.6.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#16221a;--panel:#27382b;--panel2:#33483a;--ink:#f6ecd0;--dim:#b9c4ab;--gold:#f2c14e;--red:#e4572e;color-scheme:dark}
@@ -246,7 +246,8 @@ class Board{
   if(T.mark){if((c.mark||0)>0)d*=T.mark;c.mark=1.35}
   if(c.arm){const armor=c.arm*(1-(T.pierce||0));d=Math.max(d*.2,d-armor)}
   c.hp-=d;
-  if(T.sl){c.sl=Math.max(c.sl||0,T.sl);c.sf=T.rootFactor||sf}
+  /* ralentissement : le Givre garde son facteur selon le niveau ; les racines sylvestres (autres tours) appliquent T.sf (.82). Un ralentissement plus faible n'écrase jamais un plus fort en cours. */
+  if(T.sl){const f=T.fsp?(sf||.5):T.sf;c.sf=c.sl>0?Math.min(c.sf||1,f):f;c.sl=Math.max(c.sl||0,T.sl)}
  }
  impact(p){const T=TW[p.k],tg=p.tg,rad=T.sp||T.fsp;
   if(!tg.dead&&!tg.leak)this.hit(tg,p.d,T,p.sf);

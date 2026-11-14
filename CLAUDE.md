@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 1.6)
+# Winter Realms — Tower Wars (Édition 1.6.1)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -108,7 +108,7 @@ Claude : après chaque amélioration terminée, propose (ou fais, si on te l'a d
 
 - Les tours « magiques » (Givre, Mage) **n'ont aucun effet sur le Briseur de runes**.
 - **Ciblage** : chaque tour vise, dans sa portée, le monstre visible **le plus proche de la sortie**.
-- **Ralentissement** : la vitesse est multipliée par `0,5 − 0,05 × (niveau − 1)`, soit ×0,5 au niveau 1 et ×0,3 au niveau 5.
+- **Ralentissement** : le Givre multiplie la vitesse par `0,5 − 0,05 × (niveau − 1)`, soit ×0,5 au niveau 1 et ×0,3 au niveau 5, pendant 1,5 s. Les racines des Sylvestres multiplient la vitesse par ×0,82 (`T.sf`). Si un monstre est déjà ralenti, c'est le ralentissement **le plus fort** qui reste appliqué, et la durée retenue est la plus longue.
 
 ### 4.2 Les 10 emplacements par faction (`ARCH`, `ROLE`)
 Chaque faction a 10 tours. L'emplacement `j` détermine l'archétype, un multiplicateur de puissance (qui s'applique au coût et aux dégâts) et quelques retouches :
@@ -145,7 +145,7 @@ Principe d'équilibrage (commentaire dans le code) : *des coefficients volontair
 |---|---|---|---|---|---|---|
 | Alliance | 🛡️ | ×1,04 | ×0,97 | **×1,10** | ×1,03 | **Anti-aérien** : +18 % de dégâts contre les volants |
 | Horde | 🪓 | ×1,02 | ×0,96 | ×0,93 | ×1,04 | **Frénésie** : +30 % de dégâts sur les cibles à moins de 35 % de PV |
-| Sylvestres | 🌿 | ×1,00 | ×0,96 | ×1,00 | ×1,02 | **Racines** : *toutes* leurs tours ralentissent ou immobilisent (≥ 0,72 s) |
+| Sylvestres | 🌿 | ×1,00 | ×0,96 | ×1,00 | ×1,02 | **Racines** : *toutes* leurs tours ralentissent les monstres (vitesse ×0,82 pendant 0,72 s). Leurs tours Givre gardent le ralentissement normal du Givre |
 | Nains | ⚒️ | ×1,07 | **×1,08** | ×1,02 | ×1,08 | **Perforant** : ignorent 55 % de l'armure |
 | Légion des ombres | ☠️ | ×1,01 | ×1,01 | ×0,99 | ×1,01 | **Malédiction** : une cible touchée est marquée 1,35 s, et chaque coup suivant sur elle fait +14 % |
 
@@ -328,11 +328,7 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 
 ## 11. Points connus à vérifier
 
-- **Racines des Sylvestres** : `FACTION_BALANCE[2].rootFactor` (0,82) n'est **jamais appliqué**, car `hit()` lit `T.rootFactor`, qui n'existe pas sur les tours. Résultat :
-  - les tirs des Sylvestres ralentissent à ×0,5 (comme le Givre), et non à ×0,82 ;
-  - leurs tours Garde et Flammes donnent une vitesse `NaN`. Un monstre au sol est alors **totalement immobilisé** pendant 0,72 s. Un **volant** touché par les Flammes sylvestres (*Cœur ardent*) prend une position `NaN` : il n'atteint plus jamais la sortie et les projectiles ne l'atteignent plus.
-
-  À corriger (par exemple `c.sf = T.sf` ou `sf ?? .5`), puis mettre à jour ce document.
+- ~~Racines des Sylvestres~~ : **corrigé en v1.6.1**. Avant, `hit()` lisait `T.rootFactor`, qui n'existait pas sur les tours. Les tours Garde et Flammes sylvestres donnaient alors une vitesse `NaN` : les monstres au sol étaient figés, et les volants restaient bloqués pour toujours sans pouvoir être tués.
 - Le texte d'accueil annonce « +25 % / +50 % de revenu » pour les IA : c'est cohérent avec `DIFF`.
 
 ---
@@ -343,3 +339,4 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 |---|---|---|
 | 2026-11-14 | 1.4 | Import initial du projet et création de ce document par rétro-ingénierie du code. |
 | 2026-11-14 | 1.6 | Visuel uniquement : plateau-diorama avec socle et dalles surélevées, palette de biome par faction, décor déterministe (rochers, herbes, cristaux), ombres sous le portail et le château. Texte d'accueil retouché. **Aucun changement de règles ni d'équilibrage.** Le bug des racines sylvestres (§11) est toujours présent. |
+| 2026-11-14 | 1.6.1 | Correction des racines sylvestres : ralentissement ×0,82 pendant 0,72 s sur toutes leurs tours (le Givre garde son propre ralentissement). Le ralentissement le plus fort l'emporte. Fin des monstres figés et des volants bloqués pour toujours. |
