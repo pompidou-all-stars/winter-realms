@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.0</title>
+<title>Winter Realms — Tower Wars · Édition 2.0.1</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#16221a;--panel:#27382b;--panel2:#33483a;--ink:#f6ecd0;--dim:#b9c4ab;--gold:#f2c14e;--red:#e4572e;color-scheme:dark}
@@ -458,10 +458,13 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   history.replaceState(null,'','?salon='+code+(QS.get('serveur')?'&serveur='+encodeURIComponent(QS.get('serveur')):''));
   $('msg').textContent='Winter Realms';$('sub').textContent='Connexion au salon…';$('lobby').hidden=false;$('lcode').textContent=code;
   $('llink').value=location.origin+location.pathname+'?salon='+code;this.connect()},
- connect(){const ws=new WebSocket(SERVER+'/room/'+this.code);this.ws=ws;
-  ws.onopen=()=>{this.retry=0;this.send({t:'hello',token:this.token(),name:store.get('wr-name')||'Joueur'})};
+ connect(){const ws=new WebSocket(SERVER+'/room/'+this.code);this.ws=ws;let opened=false;
+  ws.onopen=()=>{opened=true;this.retry=0;this.send({t:'hello',token:this.token(),name:store.get('wr-name')||'Joueur'})};
   ws.onmessage=e=>{let m;try{m=JSON.parse(e.data)}catch(_){return}this.msg(m)};
-  ws.onclose=()=>{if(this.ws!==ws||!this.on)return;toast('Connexion perdue, reconnexion…');$('lnote').textContent='Connexion perdue, reconnexion…';
+  ws.onclose=()=>{if(this.ws!==ws||!this.on)return;
+   /* connexion refusée d'emblée : le serveur est peut-être réservé à certains pays */
+   if(!opened)fetch(SERVER.replace(/^ws/,'http')+'/check').then(r=>{if(r.status==403)return r.text().then(t=>{this.leave();$('sub').textContent='Jeu en ligne indisponible ici. '+t+'. Le jeu en solo reste disponible.';toast('Jeu en ligne indisponible depuis ton pays')})}).catch(()=>{});
+   toast('Connexion perdue, reconnexion…');$('lnote').textContent='Connexion perdue, reconnexion…';
    setTimeout(()=>{if(this.on&&this.ws===ws)this.connect()},Math.min(8000,1000*++this.retry))}},
  leave(){this.on=false;this.playing=false;const ws=this.ws;this.ws=null;if(ws)ws.close();document.body.classList.remove('net');$('lobby').hidden=true;
   history.replaceState(null,'',location.pathname+(QS.get('serveur')?'?serveur='+encodeURIComponent(QS.get('serveur')):''));

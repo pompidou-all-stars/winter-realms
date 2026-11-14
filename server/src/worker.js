@@ -12,12 +12,15 @@ const STEP_MS=50,SNAP_EVERY=2,BACK_TO_LOBBY_MS=8000;
 
 export default {
  async fetch(req,env){
-  const url=new URL(req.url);
-  if(url.pathname==='/')return new Response('Winter Realms : serveur OK');
+  const url=new URL(req.url),o=req.headers.get('Origin');
+  const cors=o&&ORIGINS.includes(o)?{'Access-Control-Allow-Origin':o}:{};
+  /* accès réservé à certains pays (ALLOWED_COUNTRIES dans wrangler.toml, vide = tout le monde) */
+  const allowed=String(env.ALLOWED_COUNTRIES||'').split(',').map(s=>s.trim()).filter(Boolean),country=req.cf&&req.cf.country;
+  if(allowed.length&&!allowed.includes(country))return new Response('Le jeu en ligne est réservé à : '+allowed.join(', '),{status:403,headers:cors});
+  if(url.pathname==='/'||url.pathname==='/check')return new Response('Winter Realms : serveur OK',{headers:cors});
   const m=url.pathname.match(/^\/room\/([A-Z0-9]{4})$/);
   if(!m)return new Response('Introuvable',{status:404});
   if(req.headers.get('Upgrade')!=='websocket')return new Response('WebSocket attendu',{status:426});
-  const o=req.headers.get('Origin');
   if(o&&!ORIGINS.includes(o))return new Response('Origine refusée',{status:403});
   return env.ROOMS.get(env.ROOMS.idFromName(m[1])).fetch(req);
  }
