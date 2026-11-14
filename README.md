@@ -44,7 +44,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.8 — 2026-11-14
+### 2.9 — 2026-11-14
 - Stronger "Winter Realms" theme in the 3D view: snowy board (snow checkerboard lightly tinted by the faction, frosted rock edges), winter scenery (snowy pines, snow-capped rocks, snowdrifts, ice crystals), falling snowflakes and cold winter lighting. The path and range rings turn night blue to stay readable on snow.
 - Snow on every tower, the spawn portal and the castle: snow caps on battlements, bases and platforms, snowy roof tops while the faction colours stay visible below. All 3D assets were regenerated.
 - The 2D view is unchanged. Game rules unchanged (`sim.js` untouched, no server redeploy).

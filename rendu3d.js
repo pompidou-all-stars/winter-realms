@@ -17,7 +17,7 @@ export const E = 42 * Math.PI / 180, KY = Math.sin(E), KH = Math.cos(E), TOPM = 
 const ECH_MONSTRES = 1.4;
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
 /* couleurs du terrain : mêmes valeurs que art/communs/factions.py (SOL, BIOME) */
-/* thème hiver (2.8) : terrain enneigé. Damier de neige légèrement teinté par la couleur de la faction (TEINTE),
+/* thème hiver (2.9) : terrain enneigé. Damier de neige légèrement teinté par la couleur de la faction (TEINTE),
    bord en roche givrée, décor d'hiver (sapins enneigés, rochers, cristaux de glace). */
 const NEIGE = ['#eef3f9', '#e2eaf3'];
 const TEINTE = ['#5a9a45', '#a8652f', '#356d4b', '#8a7a5a', '#7a5a9a'];
@@ -155,7 +155,7 @@ export function creer(J) {
     if (decor.drapeau && decor.col !== b.col) { decor.col = b.col; decor.drapeau.color.set(b.col) }
   }
 
-  /* ---------- flocons (thème hiver, 2.8) : 260 points qui tombent en boucle au-dessus du plateau ---------- */
+  /* ---------- flocons (thème hiver, 2.9) : 260 points qui tombent en boucle au-dessus du plateau ---------- */
   const NF = 260, flocons = new Float32Array(NF * 3), vitesses = new Float32Array(NF);
   for (let i = 0; i < NF; i++) { const h = (i * 2654435761 >>> 0) / 4294967296, h2 = (i * 40503 % 997) / 997, h3 = (i * 7919 % 389) / 389;
     flocons[i * 3] = -1 + h * (C + 2); flocons[i * 3 + 1] = h2 * 6; flocons[i * 3 + 2] = -1 + h3 * (R + 2); vitesses[i] = .35 + h2 * .35 }
