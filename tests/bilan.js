@@ -1,5 +1,5 @@
 /* Les trois bilans d'une évolution : 🔧 technique, 🎮 gameplay, 🎨 visuel.
-   Usage : node tests/bilan.js [version-avant] [--sans-visuel]     (version-avant par défaut : origin/main)
+   Usage : node tests/bilan.js [version-avant] [--sans-visuel] [--complet]     (version-avant par défaut : origin/main ; --complet : 15 parties entre IA au lieu de 3)
    Produit rapports/bilan.html (lisible sur téléphone) et affiche un résumé.
    Règle : une réussite technique ne valide JAMAIS le gameplay ni le rendu. Ces deux bilans comparent à « version-avant »
    et disent seulement « identique » ou « changé : à examiner », la validation revient au concepteur. */
@@ -21,7 +21,7 @@ async function main(){
  const debut=Date.now();console.log(`Bilan en cours (référence visuelle : ${avant})…\n`);
  /* ---------- exécution des tests ---------- */
  const fRes=path.join(DOSSIER,'resultats.json'),fParties=path.join(DOSSIER,'parties.jsonl');
- const run=spawnSync(process.execPath,[path.join(__dirname,'tout.js'),...(N.disponible()?[]:['--simulation'])],{cwd:RACINE,encoding:'utf8',env:{...process.env,WR_RESULTATS:fRes,WR_PARTIES:fParties}});
+ const run=spawnSync(process.execPath,[path.join(__dirname,'tout.js'),...(N.disponible()?[]:['--simulation']),...(args.includes('--complet')?['--complet']:[])],{cwd:RACINE,encoding:'utf8',env:{...process.env,WR_RESULTATS:fRes,WR_PARTIES:fParties}});
  fs.writeFileSync(path.join(DOSSIER,'tests.log'),(run.stdout||'')+(run.stderr||''));
  const res=fs.existsSync(fRes)?JSON.parse(fs.readFileSync(fRes,'utf8')):[];
  const tech=res.filter(r=>FICHIERS_TECHNIQUES.includes(r.fichier)),jeu=res.filter(r=>!FICHIERS_TECHNIQUES.includes(r.fichier));
@@ -51,7 +51,7 @@ async function main(){
   cmp('Constantes',clone({C:S.C,R:S.R,SP:S.SP,EX:S.EX}),clone({C:SA.C,R:SA.R,SP:SA.SP,EX:SA.EX}));cmp('Difficultés',clone(S.DIFF),clone(SA.DIFF))}
  const parties=fs.existsSync(fParties)?fs.readFileSync(fParties,'utf8').trim().split('\n').filter(Boolean).map(l=>JSON.parse(l)):[];
  /* mêmes parties (mêmes graines) jouées avec le moteur d'avant ; inutile si sim.js n'a pas changé */
- const PREF=!codeAvant?[]:memeMoteur?parties:SCENARIOS.map(sc=>jouer({code:codeAvant},sc));
+ const PREF=!codeAvant?[]:memeMoteur?parties:SCENARIOS.filter(sc=>parties.some(p=>p.graine==sc.graine)).map(sc=>jouer({code:codeAvant},sc));
  const audit=auditer(S);
  const jeuIdentique=J.ko.length==0&&memeMoteur;
  const gameplay={verdict:jeuIdentique?'identique':'change',
