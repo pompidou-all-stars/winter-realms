@@ -15,6 +15,7 @@ Concrètement :
 2. Ajouter une ligne dans le **Journal des modifications** en bas du fichier **et** dans la section **Changelog** du `README.md`.
 3. Si la version change, mettre à jour le numéro dans le `<title>` de `index.html` **et** dans le titre de ce fichier.
 4. Un changement qui contredit ce document sans le mettre à jour est considéré comme incomplet.
+5. **Les tests doivent passer** (`node tests/tout.js`) avant chaque commit, et chaque évolution est présentée avec ses **trois bilans** (technique, gameplay, visuel). Voir §12.
 
 Claude : quand tu modifies le jeu, applique cette règle sans qu'on te le demande.
 
@@ -55,20 +56,30 @@ Plusieurs personnes travaillent en même temps, souvent depuis un téléphone, s
 
 Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu es sur `main`, crée d'abord une branche selon ces règles. Ne pousse jamais directement sur `main` : ouvre une PR. Fusionne-la seulement si on te le demande, après avoir testé le jeu.
 
+**Règles supplémentaires pour Claude** :
+- Les sessions Claude Code dans le cloud imposent leur propre nom de branche (`claude/…`). Il remplace alors le format `<type>/<sujet>`.
+- **Ne jamais fusionner une PR sans l'accord explicite du concepteur**, donné dans la conversation (par exemple « je valide la fusion de la PR 4 »). Avant de fusionner, répéter le numéro et le titre de la PR et attendre un « oui » : les instructions sont souvent dictées à la voix, une erreur de transcription est possible.
+- Ne jamais activer de fusion automatique.
+- Une PR par évolution importante. Sa description suit le modèle `.github/pull_request_template.md` (trois bilans).
+
 ---
 
 ## 1. Structure technique
 
-- **Deux fichiers, sans build ni dépendances** :
+- **Le jeu tient en deux fichiers, sans build ni dépendances** :
   - `sim.js` contient **toute la simulation** : tables de données, `class Board`, IA, et `class Game`, qui fait tourner une partie de 4 terrains. Il ne touche ni au DOM ni au son, ce qui permet au serveur multijoueur de le réutiliser tel quel. Les sons y sont seulement notés dans `board.ev` (un `!` devant signifie « toujours audible pour le propriétaire du terrain »). Les événements de partie (revenu, élimination, fin) vont dans `game.log`.
   - `index.html` contient l'interface, le dessin et les sons. Il charge `sim.js` avec `<script src="sim.js">`.
   - **Toutes les actions du joueur passent par `doAction()`**, qui appelle `Game.action()`. Cette fonction renvoie `''` si l'action réussit, sinon un code d'erreur : `poor`, `blocked`, `locked`, `max`, `over` ou `bad`.
-- **Pour tester en local**, il faut un petit serveur web : `npx http-server` à la racine, puis ouvrir http://localhost:8080. Un `file://` ne charge pas toujours `sim.js`, surtout dans les aperçus intégrés. Ouvert normalement dans un navigateur, le fichier fonctionne aussi.
+- **Autour du jeu** (ces dossiers ne sont pas chargés par la page) :
+  - `server/` : le serveur multijoueur (Cloudflare Workers), qui importe `sim.js` tel quel (voir §9 bis) ;
+  - `tests/` : les tests automatiques, les captures et les bilans (voir §12) ;
+  - `.github/` : la vérification automatique des Pull Requests et le modèle de description de PR.
+- **Pour jouer en local**, il faut un petit serveur web : `npx http-server` à la racine, puis ouvrir http://localhost:8080. Un `file://` ne charge pas toujours `sim.js`, surtout dans les aperçus intégrés. **Pour tester**, voir §12 : `node tests/tout.js`.
 - **Seule ressource externe** : la police Google Fonts *Fredoka*.
 - **Rendu** : Canvas 2D. Tous les visuels (tours, monstres, effets) sont **dessinés en code**, sans images. La netteté s'adapte à l'écran (`devicePixelRatio`, plafonné à 3).
 - **Sons** : synthétisés avec Web Audio (oscillateurs et bruit), **aucun fichier audio**.
 - **Pas de sauvegarde** : aucun `localStorage`. Chaque partie repart de zéro.
-- **Style de code** : JavaScript compact, presque minifié (noms courts, une logique par ligne). Les **tables de données sont en tête du script** et c'est là qu'on règle l'équilibrage :
+- **Style de code** : JavaScript compact, presque minifié (noms courts, une logique par ligne). Les **tables de données sont en tête de `sim.js`** et c'est là qu'on règle l'équilibrage :
   | Constante | Rôle |
   |---|---|
   | `C`, `R`, `SP`, `EX` | Taille de la grille, case d'apparition, case de sortie |
@@ -81,7 +92,9 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
   | `CR` | Les monstres |
   | `DIFF` | Les niveaux de difficulté |
   | `HPK`, `GRACE`, `GROUP`, `AURA_R` | Constantes de gameplay |
-- **Sections du script** : sons → simulation (`class Board`) → dessin → interface → IA → boucle principale (`loop`).
+- **Sections de `sim.js`** : tables de données → simulation (`class Board`) → IA (`aiDefend`, `aiAttack`, `aiAct`) → partie (`class Game`).
+- **Sections du script de `index.html`** : sons → dessin → interface (dont le multijoueur, objet `NET`) → sons et événements → boucle principale (`loop`).
+- **Retouches des emplacements 6 à 9** (§4.2) : elles sont écrites directement dans le calcul de `TW` (`late&&j==6?…`), pas dans une table.
 - **Langue** : toute l'interface est en **français**.
 - **Mobile d'abord** : commandes tactiles, zones sûres (`safe-area-inset`), plein écran, mise en page portrait. En paysage (largeur ≥ 560 px), le HUD passe sur le côté.
 
@@ -407,6 +420,100 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 
 - ~~Racines des Sylvestres~~ : **corrigé en v1.6.1**. Avant, `hit()` lisait `T.rootFactor`, qui n'existait pas sur les tours. Les tours Garde et Flammes sylvestres donnaient alors une vitesse `NaN` : les monstres au sol étaient figés, et les volants restaient bloqués pour toujours sans pouvoir être tués.
 - Le texte d'accueil annonce « +25 % / +50 % de revenu » pour les IA : c'est cohérent avec `DIFF`.
+- **Constaté par les tests** (2.0.1). Ce sont des comportements réels du code, **non corrigés**, qui attendent une décision du concepteur :
+  - plusieurs monstres qui sortent au même instant peuvent faire passer les vies **sous zéro** en interne (l'affichage montre 0) ;
+  - l'IA décide de transformer une tour en Mage avec un prix de Mage **fixé à 90** dans le code, alors que le vrai prix varie de 85 à 90 selon la faction ;
+  - dès sa première action, chaque IA pose **jusqu'à 3 tours** (règle « jusqu'à 3 actions par tour ») ;
+  - le §1 dit « aucun `localStorage` », mais depuis la v2.0 la page y garde le pseudo et le jeton multijoueur (§9 bis) ;
+  - les tableaux chiffrés de ce document (§4.1, §5.1, §6.2, §7) correspondent exactement au code (vérifié par `node tests/outils/audit-doc.js`).
+
+---
+
+## 12. Tests et validation
+
+### 12.1 Lancer les tests
+| Commande | Ce qu'elle fait | Durée |
+|---|---|---|
+| `node tests/tout.js` | Tout : simulation (mécaniques et 15 parties entre IA) et parcours mobile dans un navigateur | ≈ 1 min |
+| `node tests/tout.js --simulation` | Simulation seule. C'est ce que GitHub lance à chaque Pull Request. | ≈ 35 s |
+| `node tests/tout.js --rapide` | Simulation avec 5 parties au lieu de 15, pour les petites retouches | ≈ 20 s |
+| `node tests/bilan.js [version]` | Les **trois bilans** dans `rapports/bilan.html`, avec la comparaison visuelle par rapport à `version` (par défaut `origin/main`) | ≈ 3 min |
+| `node tests/captures.js` | 8 captures (4 écrans × portrait et paysage) dans `captures/actuel/` | ≈ 1 min |
+| `node tests/comparer-visuel.js [version]` | Avant/après visuel seul, dans `captures/comparaison/` | ≈ 2 min 30 |
+| `node tests/outils/audit-doc.js` | Compare les tableaux chiffrés de ce document au code et liste les écarts, sans rien corriger | 1 s |
+
+Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en plus **Playwright** et Chromium, présents dans l'environnement de Claude mais **pas ajoutés au projet**. Sans eux, ces tests sont ignorés avec un message clair.
+
+### 12.2 Ce que contient `tests/`
+- `simulation/` : les tests du moteur (`sim.js`). Ils **caractérisent le comportement réel de la version actuelle** : ils décrivent ce que le jeu fait, sans ajouter de règle.
+  - `integrite` : le moteur figé et les références n'ont pas été modifiés.
+  - `tables` : les 50 tours, les 18 monstres, les archétypes, les factions et la difficulté, comparés à la référence et recalculés à partir des formules.
+  - `construction`, `deplacements`, `combats`, `economie`, `vagues` (avec l'IA), `fin-de-partie` : les mécaniques.
+  - `parties-ia` : 15 parties complètes (5 factions × 3 difficultés) rejouées à l'identique et comparées, état par état, à la référence.
+- `navigateur/parcours.test.js` : le **parcours automatisé** d'un joueur dans Chromium au format téléphone (390 × 844 en portrait, 844 × 390 en paysage) : accueil, faction, difficulté, pose et refus, panneau de tour, envoi, vignettes, revenu, mise en page. **Ce n'est pas une garantie de compatibilité avec tous les téléphones** : Safari sur iPhone, les anciens Android et les vrais écrans tactiles ne sont pas testés.
+- `moteurs/v1.7/` : une **copie figée** du moteur, extraite du commit `c868ff9` (empreinte SHA-256 `e0cd2f78…615f6f`, voir `PROVENANCE.md`). Le `sim.js` des versions 2.0 et 2.0.1 lui est identique octet pour octet.
+- `references/` : les valeurs de référence (statistiques, parties), **produites à partir du moteur figé**, jamais à partir de `main`.
+- `outils/` : chargement du moteur dans un environnement isolé, hasard à graine, serveur web local, pilotage du navigateur, affichage en français, audit de la documentation.
+
+### 12.3 Reproductibilité sans toucher au jeu
+Les tests chargent `sim.js` dans un environnement isolé et y remplacent `Math.random` par un **hasard à graine** (`tests/outils/hasard.js`). Une même graine donne donc toujours la même partie. Dans le navigateur, le même hasard est injecté avant le chargement de la page, et l'horloge est figée. **Le jeu publié n'est pas modifié.**
+
+### 12.4 Règles
+1. **On ne régénère jamais une référence pour faire passer un test.** `tests/outils/creer-references.js` refuse d'ailleurs d'écraser un fichier existant.
+2. Quand une évolution **change volontairement le gameplay**, les tests concernés échouent : c'est normal. On présente alors le bilan gameplay (avant → après). Une fois l'évolution validée par le concepteur, on ajoute un **nouveau moteur figé** (`tests/moteurs/vX.Y/`) et de **nouvelles références**, sans supprimer les anciennes. Les tests sont mis à jour dans le même commit, et le commit le dit explicitement.
+3. Un désaccord entre le code et ce document est **signalé, pas corrigé d'office** : le concepteur décide.
+4. Ne jamais désactiver ou ignorer un test pour obtenir un résultat vert.
+
+### 12.5 Les trois bilans
+Chaque évolution est présentée avec trois bilans **séparés** (`node tests/bilan.js`) :
+| Bilan | Contenu | Verdicts |
+|---|---|---|
+| 🔧 **Technique** | Les tests s'exécutent, le moteur figé est intact, le parcours mobile fonctionne, aucune erreur JavaScript. Liste des fichiers modifiés. | ✅ réussi / ❌ en échec |
+| 🎮 **Gameplay** | Mécaniques caractérisées, statistiques changées (avant → après), 15 parties entre IA, écarts entre la documentation et le code | ✅ identique à la référence / ⚠️ changé : **à valider par le concepteur** |
+| 🎨 **Visuel** | Captures portrait et paysage, avant \| après \| différences, pourcentage de pixels changés | ✅ identique / ⚠️ changé : **à valider par le concepteur** / ⏸ non vérifiable |
+
+**Une réussite technique ne vaut jamais validation du gameplay ni du rendu.** Le gameplay et le visuel ne sont « validés » que par le concepteur.
+
+### 12.6 Conditions de la comparaison visuelle (contre les fausses différences)
+- **Même machine, même navigateur, même séance** : l'« avant » (extrait de git) et l'« après » sont capturés l'un après l'autre par le même Chromium. On ne compare **jamais** des images faites sur deux machines différentes, ni des images enregistrées dans le dépôt.
+- **Même scénario** : graine 12345, Alliance, Normal, 4 tours posées en (5,6), (7,6), (5,10) et (7,10), capture à 35 s de jeu, puis panneau de la tour (5,6).
+- **Horloge figée** : le temps du navigateur est en pause et n'avance que sur commande. Sans cela, les animations (pointillés du chemin, barre de revenu) diffèrent d'une capture à l'autre.
+- **Écran fixé** : 390 × 844 et 844 × 390, densité ×2, mode mobile tactile, langue `fr-FR`, fuseau `Europe/Paris`.
+- **Police** : **tous** les fichiers de Fredoka (graisses 500 et 700, tous les jeux de caractères) sont chargés avant la première capture. Si la police manque d'un côté, les deux versions sont recapturées avec la police de remplacement.
+- **Réseau** : seule la police est autorisée. Le serveur multijoueur n'est jamais contacté.
+- **Tolérance** : un pixel compte comme changé si une couleur varie de plus de 16 sur 255. Ce seuil absorbe les infimes variations de lissage, qu'on observe jusqu'à 1 sur 255. Un écran est « identique » sous 0,05 % de pixels changés.
+- **Témoin** : la version actuelle est capturée deux fois. Si le témoin dépasse 0,05 %, la comparaison est déclarée **non fiable** au lieu d'afficher de fausses différences.
+- **Limite** : seule la partie visible de l'écran est comparée. Un élément sous la ligne de flottaison (par exemple « Jouer entre amis » en paysage) n'est pas vu.
+
+### 12.7 Procédure de validation (pour le concepteur, sans connaissance technique)
+1. **Lire le compte rendu de Claude** : ce qui a changé, puis les trois bilans d'une ligne chacun.
+2. **Regarder les images** envoyées : les captures, et pour un changement visuel, l'image « avant | après | différences ». Les zones rouges montrent ce qui a bougé.
+3. **Ouvrir la Pull Request** sur GitHub : vérifier la coche verte « Tests de simulation » et la liste des fichiers modifiés.
+4. *(Facultatif)* Jouer sur la branche, ou demander d'autres captures à Claude.
+5. **Répondre** : « je valide la fusion de la PR N », ou demander des corrections. Claude répète le titre et attend votre « oui » avant de fusionner.
+
+### 12.8 Vérification automatique sur GitHub
+`.github/workflows/tests.yml` lance `node tests/tout.js --simulation` à **chaque Pull Request vers `main`**, avec Node 22, sans rien installer d'autre. Le résultat s'affiche dans la PR sous le nom « Tests de simulation ». Les tests navigateur n'y sont pas lancés. La vérification ne publie rien et ne fusionne rien.
+
+---
+
+## 13. Protection de la branche `main` (réglage GitHub)
+
+À faire par un administrateur du dépôt, **dans un navigateur** (l'application mobile GitHub n'a pas ces réglages ; sur téléphone, utiliser le mode « version ordinateur »). Objectif : rendre **impossible** toute modification directe de `main` et imposer le passage par une Pull Request, **sans fusion automatique**.
+
+1. github.com/pompidou-all-stars/winter-realms → **Settings** → **Rules** → **Rulesets** → **New ruleset** → **New branch ruleset**.
+2. **Ruleset name** : `Protection de main`. **Enforcement status** : `Active`.
+3. **Bypass list** : la laisser **vide** (personne ne contourne la règle, administrateurs compris).
+4. **Target branches** → **Add target** → **Include default branch**.
+5. Cocher :
+   - **Restrict deletions** ;
+   - **Require a pull request before merging**, avec **Required approvals : 0** (personne n'est obligé d'approuver, mais tout passe par une PR) ;
+   - **Block force pushes**.
+6. **Create**.
+7. **Plus tard**, une fois que la vérification « Tests de simulation » a tourné au moins une fois sur une PR : modifier la règle, cocher **Require status checks to pass**, puis **Add checks** → `Tests de simulation`. Le nom n'est proposé qu'après un premier passage.
+8. **Settings** → **General** → section **Pull Requests** : vérifier que **Allow auto-merge** est **décoché**.
+
+Pour vérifier : une tentative de `git push` directe sur `main` doit être refusée par GitHub.
 
 ---
 
@@ -421,3 +528,4 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 | 2026-11-14 | 2.0 | **Multijoueur en ligne** : salons de 2 à 4 humains (IA sur les places libres), code ou lien d'invitation, chef de salon, spectateurs, reconnexion. Serveur Cloudflare Workers et Durable Objects (`server/`, plan gratuit). Site publié sur GitHub Pages. |
 | 2026-11-14 | 2.0.1 | Jeu en ligne **réservé à la France** (`ALLOWED_COUNTRIES`, contrôlé par le serveur), avec un message clair côté page. Le solo reste disponible partout. |
 | 2026-11-14 | 2.0.1 | Organisation : nouvelle **règle des branches**. Plus de commit direct sur `main` : une branche par sujet (`<type>/<sujet>`), pull request, puis fusion par l'auteur après un test rapide (pas de relecture obligatoire). **Aucun changement de jeu.** |
+| 2026-11-14 | 2.0.1 | Outillage : tests automatiques (`tests/`, 116 vérifications : mécaniques, 15 parties entre IA rejouées à l'identique, parcours mobile portrait et paysage), moteur 1.7 figé comme référence, captures et comparaison visuelle avant/après, trois bilans (technique, gameplay, visuel), vérification GitHub à chaque PR, procédure de validation et protection de `main` (§12, §13). **Aucune modification de `sim.js` ni d'`index.html`.** |
