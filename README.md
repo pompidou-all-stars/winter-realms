@@ -49,6 +49,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 - Automated tests in `tests/`: game mechanics, 15 seeded AI-vs-AI games replayed exactly against a frozen copy of the 1.7 engine, mobile browser journey (portrait and landscape).
 - Phone screenshots, before/after visual comparison, three separate reports (technical, gameplay, visual), simulation tests on every pull request (GitHub Actions).
 - No change to `sim.js` or `index.html`: the game is unchanged.
+- Versioning: every merge into `main` is tagged automatically (`vX.Y.Z`, or `vX.Y.Z.N` when the game version does not change) with a GitHub Release; past versions 1.4 to 2.0.1 are tagged too. Any version can be restored (CLAUDE.md §14).
 
 ### Workflow — 2026-11-14
 - New branch rule (see CLAUDE.md): no direct commits to `main`. One branch per change (`<type>/<topic>`), then a pull request that the author merges after a quick test (no review required). No game changes.

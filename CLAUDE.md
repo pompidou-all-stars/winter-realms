@@ -73,7 +73,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 - **Autour du jeu** (ces dossiers ne sont pas chargés par la page) :
   - `server/` : le serveur multijoueur (Cloudflare Workers), qui importe `sim.js` tel quel (voir §9 bis) ;
   - `tests/` : les tests automatiques, les captures et les bilans (voir §12) ;
-  - `.github/` : la vérification automatique des Pull Requests (`tests.yml`), le déploiement automatique du serveur (`deploy-server.yml`, voir §9 bis) et le modèle de description de PR.
+  - `.github/` : la vérification automatique des Pull Requests (`tests.yml`), le déploiement automatique du serveur (`deploy-server.yml`, voir §9 bis), l'étiquetage automatique des versions (`versions.yml` et `versionner.sh`, voir §14) et le modèle de description de PR.
 - **Pour jouer en local**, il faut un petit serveur web : `npx http-server` à la racine, puis ouvrir http://localhost:8080. Un `file://` ne charge pas toujours `sim.js`, surtout dans les aperçus intégrés. **Pour tester**, voir §12 : `node tests/tout.js`.
 - **Seule ressource externe** : la police Google Fonts *Fredoka*.
 - **Rendu** : Canvas 2D. Tous les visuels (tours, monstres, effets) sont **dessinés en code**, sans images. La netteté s'adapte à l'écran (`devicePixelRatio`, plafonné à 3).
@@ -516,7 +516,44 @@ Chaque évolution est présentée avec trois bilans **séparés** (`node tests/b
 7. **Plus tard**, une fois que la vérification « Tests de simulation » a tourné au moins une fois sur une PR : modifier la règle, cocher **Require status checks to pass**, puis **Add checks** → `Tests de simulation`. Le nom n'est proposé qu'après un premier passage.
 8. **Settings** → **General** → section **Pull Requests** : vérifier que **Allow auto-merge** est **décoché**.
 
+9. *(Facultatif, recommandé)* Protéger aussi les **étiquettes de version** : **New ruleset** → **New tag ruleset**, nom `Protection des versions`, cible `Include by pattern` → `v*`, cocher **Restrict updates** et **Restrict deletions** (ne **pas** cocher « Restrict creations », sinon l'étiquetage automatique du §14 serait bloqué).
+
 Pour vérifier : une tentative de `git push` directe sur `main` doit être refusée par GitHub.
+
+---
+
+## 14. Versions et retour arrière
+
+### 14.1 Chaque fusion dans `main` reçoit une version
+L'action GitHub `.github/workflows/versions.yml` (script `.github/versionner.sh`) tourne **après chaque fusion dans `main`** et pose une **étiquette de version** (tag git et « Release » GitHub, visibles dans l'onglet *Releases* du dépôt) :
+- la version vient du `<title>` d'`index.html` (« Édition X.Y.Z ») ;
+- **nouvelle version du jeu** (le numéro a changé) : étiquette `vX.Y.Z` ;
+- **fusion sans changement de version** (tests, documentation, outillage) : `vX.Y.Z.1`, puis `vX.Y.Z.2`… (« révision, jeu inchangé ») ;
+- chaque Release liste les changements depuis la version précédente, et permet de télécharger le code de cette version.
+
+Versions historiques étiquetées automatiquement (une seule fois) :
+
+| Étiquette | Commit | Contenu |
+|---|---|---|
+| `v1.4` | `bfc655a` | Import initial |
+| `v1.6` | `5dee062` | Plateau diorama |
+| `v1.6.1` | `313ce10` | Correction des racines sylvestres |
+| `v1.7` | `c868ff9` | Simulation dans `sim.js` |
+| `v2.0` | `e4636a4` | Multijoueur en ligne |
+| `v2.0.1` | `4a1fb64` | État de `main` juste avant le socle de tests (France, règle des branches, déploiement auto) |
+
+Claude ne peut pas créer d'étiquette lui-même (l'environnement cloud n'autorise que l'envoi de sa propre branche) : c'est pour cela que GitHub s'en charge. Pré-requis : dans **Settings → Actions → General → Workflow permissions**, l'organisation doit permettre « Read and write permissions » ; sinon l'action échoue et il faut cocher ce réglage.
+
+### 14.2 Revenir à une version (« rollback »)
+Le concepteur dit à Claude : « **reviens à la version vX.Y.Z** ». Claude :
+1. crée une branche à partir de `main` à jour et y **restaure tous les fichiers** de l'étiquette demandée (`git restore --source vX.Y.Z -- .`, l'historique est conservé, rien n'est effacé) ;
+2. présente les trois bilans (comparaison visuelle avec `main`, gameplay comparé à la référence) ;
+3. ouvre une PR « Revient à la version vX.Y.Z » et attend l'accord explicite du concepteur avant de fusionner ;
+4. à la fusion : le site GitHub Pages revient à cette version, le **serveur est redéployé automatiquement** si `sim.js` ou `server/` changent (§9 bis), et une nouvelle étiquette est posée (un retour arrière est lui-même une version, donc on peut l'annuler de la même façon).
+
+On ne réécrit **jamais** l'historique de `main` (pas de « force push ») : le retour arrière est une nouvelle modification.
+
+Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les tests (`tests/`) et ces règles ; il vaut mieux alors ne restaurer que les fichiers du jeu (`index.html`, `sim.js`, `server/`) — Claude le proposera.
 
 ---
 
@@ -533,3 +570,4 @@ Pour vérifier : une tentative de `git push` directe sur `main` doit être refus
 | 2026-11-14 | 2.0.1 | Organisation : nouvelle **règle des branches**. Plus de commit direct sur `main` : une branche par sujet (`<type>/<sujet>`), pull request, puis fusion par l'auteur après un test rapide (pas de relecture obligatoire). **Aucun changement de jeu.** |
 | 2026-11-14 | 2.0.1 | Outillage : **déploiement automatique du serveur** par une GitHub Action (`.github/workflows/deploy-server.yml`) à chaque fusion dans `main` qui touche `sim.js` ou `server/`. Secrets `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID`. **Aucun changement de jeu.** |
 | 2026-11-14 | 2.0.1 | Outillage : tests automatiques (`tests/`, 116 vérifications : mécaniques, 15 parties entre IA rejouées à l'identique, parcours mobile portrait et paysage), moteur 1.7 figé comme référence, captures et comparaison visuelle avant/après, trois bilans (technique, gameplay, visuel), vérification GitHub à chaque PR, procédure de validation et protection de `main` (§12, §13). **Aucune modification de `sim.js` ni d'`index.html`.** |
+| 2026-11-14 | 2.0.1 | Outillage : **versions et retour arrière** (§14). Étiquette automatique à chaque fusion dans `main` (`vX.Y.Z`, ou `vX.Y.Z.N` sans changement du jeu), Releases GitHub, versions historiques 1.4 à 2.0.1 étiquetées, procédure « reviens à la version … ». **Aucun changement de jeu.** |
