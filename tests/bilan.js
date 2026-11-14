@@ -12,7 +12,7 @@ const N=require('./outils/navigateur');
 const args=process.argv.slice(2),avant=args.find(a=>!a.startsWith('--'))||'origin/main',sansVisuel=args.includes('--sans-visuel');
 const DOSSIER=path.join(RACINE,'rapports');fs.rmSync(DOSSIER,{recursive:true,force:true});fs.mkdirSync(DOSSIER,{recursive:true});
 const EMPREINTE_V17='e0cd2f786b5a3aa616d7446a787436b77d1e30b1bd930e7849a1f1a2a0615f6f';
-const FICHIERS_TECHNIQUES=['integrite.test.js','parcours.test.js'];
+const FICHIERS_TECHNIQUES=['integrite.test.js','parcours.test.js','assets3d.test.js'];
 const FACTIONS=['Alliance','Horde','Sylvestres','Nains','Légion'],NIVEAUX=['Normal','Difficile','Brutal'];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const git=(...a)=>{try{return execFileSync('git',a,{cwd:RACINE,encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim()}catch(e){return null}};
