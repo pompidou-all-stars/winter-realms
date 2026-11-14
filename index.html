@@ -1,91 +1,101 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.9</title>
+<title>Winter Realms — Tower Wars · Édition 2.11</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
 <style>
-:root{--bg:#16221a;--panel:#27382b;--panel2:#33483a;--ink:#f6ecd0;--dim:#b9c4ab;--gold:#f2c14e;--red:#e4572e;color-scheme:dark}
+/* 2.11 : direction artistique « jeu vidéo » heroic fantasy hivernale (nuit bleue, liserés d'or, givre) */
+:root{--bg:#0a1220;--panel:#16233a;--panel2:#22365a;--ink:#f4ecd6;--dim:#a9b8cc;--gold:#f2c14e;--gold2:#c9a24a;--ice:#9be7ff;--red:#e4572e;color-scheme:dark;
+ --cadre:linear-gradient(180deg,#1e3050,#111c30);--liseré:#c9a24a99;
+ --relief:inset 0 1px 0 #ffffff24,inset 0 0 0 1px #0009,0 2px 0 #0008,0 4px 10px #0006;
+ --or-fond:linear-gradient(180deg,#ffe597,#f2c14e 48%,#c98b22);--or-relief:inset 0 1px 0 #fff9,inset 0 -3px 0 #0003,0 3px 0 #6b420b,0 5px 12px #0007}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);font-family:'Fredoka',system-ui,sans-serif;font-weight:500;touch-action:manipulation;user-select:none;-webkit-user-select:none;overflow:hidden}
+html,body{height:100%;margin:0;background:radial-gradient(ellipse at 50% 30%,#14223a,var(--bg) 70%);color:var(--ink);font-family:'Fredoka',system-ui,sans-serif;font-weight:500;touch-action:manipulation;user-select:none;-webkit-user-select:none;overflow:hidden}
 button{font:inherit;color:inherit;cursor:pointer}
-#app{height:100vh;height:100dvh;display:grid;grid-template:"hud" auto "stage" 1fr "ctl" auto / 1fr;gap:5px;
- padding:calc(5px + env(safe-area-inset-top,0px)) calc(5px + env(safe-area-inset-right,0px)) calc(5px + env(safe-area-inset-bottom,0px)) calc(5px + env(safe-area-inset-left,0px))}
-#hud{grid-area:hud;position:relative;display:flex;flex-direction:column;gap:4px;background:var(--panel);border-radius:12px;padding:4px 5px 8px;overflow:hidden}
-#row1{display:flex;align-items:center;gap:8px;padding-left:5px;font-size:14px;color:var(--dim);white-space:nowrap}
+#app{height:100vh;height:100dvh;display:grid;grid-template:"hud" auto "stage" 1fr "ctl" auto / 1fr;gap:4px;
+ padding:calc(4px + env(safe-area-inset-top,0px)) calc(4px + env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) calc(4px + env(safe-area-inset-left,0px))}
+/* bandeau du haut : une seule ligne, comme la barre de ressources d'un jeu */
+#hud{grid-area:hud;position:relative;background:var(--cadre);border:1px solid var(--liseré);border-radius:9px;box-shadow:var(--relief);padding:3px 4px 6px;overflow:hidden}
+#row1{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--dim);white-space:nowrap;min-width:0}
 #row1 b{color:var(--ink);font-weight:700}
-#row1 .big{font-size:20px;color:var(--gold);display:inline-block}
-#row1 .coin{display:inline-block;width:14px;height:14px;border-radius:50%;background:var(--gold);border:2px solid #9a6b12;margin-right:-3px}
-#row1 .sp{flex:1}
-#lives{color:#ff9a8a}#lives b{color:var(--ink)}
+.res{display:inline-flex;align-items:center;gap:3px;height:28px;padding:0 7px;border-radius:7px;background:#0007;box-shadow:inset 0 1px 3px #000a,0 1px 0 #ffffff14}
+.res small{font-size:10px;color:var(--dim)}
+#row1 .big{font-size:18px;color:var(--gold);display:inline-block;text-shadow:0 1px 0 #6b420b}
+#row1 .coin{display:inline-block;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#f2c14e 45%,#a86e12);border:1px solid #6b420b;box-shadow:0 1px 0 #0008}
+#clock{color:var(--ice);font-weight:700}
+#lives{color:#ff8f7e}#lives b{color:var(--ink)}
+#factionBadge{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:700;color:var(--gold)}
+#row1 .sp{flex:0 0 0}
 #gold.pop{animation:pop .35s}
 @keyframes pop{40%{transform:scale(1.35)}}
-.ib{width:34px;height:30px;border:0;border-radius:9px;background:var(--panel2);display:grid;place-items:center;padding:0}
-.ib svg{width:18px;height:18px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ib{flex:0 0 auto;width:30px;height:28px;border:1px solid #8fb6d966;border-radius:7px;background:linear-gradient(180deg,#34507a,#1d3152);box-shadow:inset 0 1px 0 #ffffff30,0 2px 0 #0009;display:grid;place-items:center;padding:0}
+.ib:active{transform:translateY(1px)}
+.ib svg{width:17px;height:17px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .ib.off{opacity:.45}
-/* 2.3 : les vignettes des joueurs flottent au-dessus du terrain (bouton en haut à gauche) pour agrandir la carte */
-#cartesBtn{position:absolute;left:8px;top:8px;z-index:3;display:flex;align-items:center;gap:6px;height:36px;min-width:36px;justify-content:center;padding:0 7px;border:2px solid var(--c,#71836c);border-radius:99px;background:#000b;color:var(--ink);font-size:12px;font-weight:700}
-#cartesBtn svg{width:18px;height:18px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* 2.3 puis 2.11 : le bouton des terrains des joueurs est revenu dans le bandeau ; le panneau des vignettes flotte sur le terrain */
+#cartesBtn{width:auto;min-width:34px;display:flex;align-items:center;gap:4px;padding:0 6px;border:2px solid var(--c,#c9a24a);font-size:11px;font-weight:700;color:var(--ink)}
+#cartesTxt{max-width:62px;overflow:hidden;text-overflow:ellipsis}
 #cartesTxt:empty{display:none}
-#cartesBtn.on{background:var(--panel2)}
-#chips{position:absolute;left:8px;top:50px;z-index:3;display:grid;grid-template-columns:repeat(2,auto);gap:6px;padding:6px;border-radius:12px;background:#0b140fee;box-shadow:0 10px 28px #000b}
+#cartesBtn.on{background:linear-gradient(180deg,#f2c14e,#b8862b)}#cartesBtn.on svg{stroke:#3a2205}
+#chips{position:absolute;left:6px;top:6px;z-index:3;display:grid;grid-template-columns:repeat(2,auto);gap:6px;padding:6px;border-radius:10px;background:#0a1322f0;border:1px solid var(--liseré);box-shadow:0 10px 28px #000b}
 #chips[hidden]{display:none}
-.chip{display:flex;align-items:center;gap:6px;min-width:0;padding:4px 8px 4px 4px;border:2px solid transparent;border-radius:9px;background:var(--panel2);font-size:11px;line-height:1.2;text-align:left;white-space:pre-line;color:var(--dim)}
+.chip{display:flex;align-items:center;gap:6px;min-width:0;padding:4px 8px 4px 4px;border:2px solid transparent;border-radius:8px;background:var(--panel2);font-size:11px;line-height:1.2;text-align:left;white-space:pre-line;color:var(--dim)}
 .chip canvas{flex:0 0 auto;border-radius:3px}
 .chip b{display:block;font-size:13px;font-weight:700;color:var(--c)}
-.chip.on{border-color:var(--c);background:#0004}
+.chip.on{border-color:var(--c);background:#0006}
 .chip.dead{opacity:.35}
-#tbar{position:absolute;left:0;right:0;bottom:0;height:4px;background:#0004}
-#tfill{display:block;height:100%;background:var(--gold);transform-origin:left;transform:scaleX(0)}
+#tbar{position:absolute;left:4px;right:4px;bottom:2px;height:3px;border-radius:2px;background:#0008;overflow:hidden}
+#tfill{display:block;height:100%;background:linear-gradient(90deg,#c98b22,#ffe597);transform-origin:left;transform:scaleX(0)}
 #stage{grid-area:stage;position:relative;min-height:0;min-width:0;overflow:hidden}
 #main{position:absolute;left:0;top:0;touch-action:none}
-#zoomReset{position:absolute;right:8px;top:8px;width:auto;padding:0 10px;gap:5px;display:flex;align-items:center;font-size:12px;font-weight:700;background:#000a;color:var(--ink);border:0;border-radius:99px;height:30px}
+#zoomReset{position:absolute;right:6px;top:6px;width:auto;padding:0 10px;gap:5px;display:flex;align-items:center;font-size:12px;font-weight:700;background:#0a1322d8;color:var(--ink);border:1px solid var(--liseré);border-radius:8px;height:30px}
 #zoomReset svg{width:16px;height:16px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#banner,#toast{position:absolute;left:50%;transform:translateX(-50%);padding:5px 12px;border-radius:99px;font-size:13px;white-space:nowrap;pointer-events:none}
-#banner{bottom:48px;color:#fff;font-weight:700;pointer-events:auto;box-shadow:0 4px 14px #0008}
-#toast{bottom:10px;background:#000c}
+#banner,#toast{position:absolute;left:50%;transform:translateX(-50%);padding:5px 12px;border-radius:8px;font-size:13px;white-space:nowrap;pointer-events:none}
+#banner{bottom:48px;color:#fff;font-weight:700;pointer-events:auto;box-shadow:0 4px 14px #0008;border:1px solid #fff6;text-shadow:0 1px 2px #0008}
+#toast{bottom:10px;background:#0a1322e8;border:1px solid var(--liseré)}
 [hidden]{display:none!important}
-#ctl{grid-area:ctl;display:flex;flex-direction:column;gap:5px;min-width:0}
-#tabs{display:flex;gap:8px;align-items:stretch}
-#tabs button{font-weight:700;font-size:14px;padding:6px 2px;border:0;border-radius:9px;background:transparent}
-#tabs .tw{flex:0 0 27%;background:var(--panel);border-radius:10px}
-#tabs .tw.on{background:var(--gold);color:#3a2a05}
-#tabs .mon{flex:1;display:flex;align-items:center;gap:3px;min-width:0;padding:3px;border-radius:10px;background:#40221c}
-#tabs .mon span{font-size:11px;color:#ffb4a2;padding:0 3px 0 4px}
+#ctl{grid-area:ctl;display:flex;flex-direction:column;gap:4px;min-width:0}
+/* onglets façon jeu : boutons en relief, or pour construire, rouge pour attaquer */
+#tabs{display:flex;gap:6px;align-items:stretch}
+#tabs button{font-weight:700;font-size:13px;padding:5px 2px;border:0;border-radius:7px;background:transparent;text-shadow:0 1px 0 #0008}
+#tabs .tw{flex:0 0 29%;background:var(--cadre);border:1px solid var(--liseré);box-shadow:var(--relief)}
+#tabs .tw:before{content:'⚒ '}
+#tabs .tw.on{background:var(--or-fond);color:#3a2205;border-color:#7a4e10;box-shadow:var(--or-relief);text-shadow:0 1px 0 #fff6}
+#tabs .mon{flex:1;display:flex;align-items:center;gap:3px;min-width:0;padding:3px;border-radius:8px;background:linear-gradient(180deg,#3a1d1a,#24110f);border:1px solid #c8574088;box-shadow:var(--relief)}
+#tabs .mon span{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffb4a2;padding:0 3px 0 4px}
 #tabs .mon button{flex:1}
-#tabs .mon button.on{background:var(--red);color:#fff}
-#bar.mon button{background:#3a2622}
-#fiche{display:flex;align-items:center;gap:8px;min-width:0;height:76px;overflow:hidden;padding:5px 9px;background:var(--panel);border-radius:10px;font-size:12px;line-height:1.3;color:var(--dim)}
+#tabs .mon button.on{background:linear-gradient(180deg,#f07a52,#c2401f 55%,#8a2410);color:#fff;box-shadow:inset 0 1px 0 #fff6,0 2px 0 #4a1307}
+#bar.mon button{background:linear-gradient(180deg,#3e2522,#261513)}
+/* fiche d'information : parchemin de nuit à liseré d'or */
+#fiche{display:flex;align-items:center;gap:8px;min-width:0;height:72px;overflow:hidden;padding:4px 9px;background:var(--cadre);border:1px solid var(--liseré);border-radius:8px;box-shadow:var(--relief);font-size:12px;line-height:1.3;color:var(--dim)}
 #fiche canvas{flex:0 0 auto}
 #fiche .txt{flex:1;min-width:0}
 #fiche .tt{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
-#fiche .tt b{font-size:14px;font-weight:700;color:var(--ink)}
+#fiche .tt b{font-size:14px;font-weight:700;color:var(--gold);text-shadow:0 1px 0 #000}
 #fiche .tt span{font-size:11px;color:var(--dim)}
-#fiche .st{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:2px}
+#fiche .st{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:1px}
 #fiche .st i{font-style:normal;color:var(--ink);font-weight:700}
-#fiche .ex{margin-top:2px;font-size:11px;line-height:1.3;color:#9be7ff;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+#fiche .ex{margin-top:1px;font-size:11px;line-height:1.3;color:var(--ice);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
 #fiche .next{color:#a8e07a}#fiche .chantier{color:#ffc95e;font-weight:700}
-#fiche.apercu{box-shadow:inset 0 0 0 2px #f2c14e88}
-#fiche.envoyer{background:#3a2622;color:#ffcfc4}
-#bar{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none}
+#fiche.apercu{box-shadow:inset 0 0 0 2px #f2c14e99,var(--relief)}
+#fiche.envoyer{background:linear-gradient(180deg,#3a1d1a,#24110f);border-color:#c8574088;color:#ffcfc4}
+/* cartes de tours et de monstres : emplacements sertis, comme une barre de sorts */
+#bar{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
 #bar::-webkit-scrollbar{display:none}
-#bar button{-webkit-touch-callout:none;position:relative;flex:0 0 auto;min-width:62px;padding:2px 5px 4px;border:2px solid transparent;border-radius:10px;background:var(--panel);display:flex;flex-direction:column;align-items:center;line-height:1.15;white-space:nowrap}
-#bar button b{font-size:12px;font-weight:700}
-#bar button small{font-size:11px;color:var(--gold)}
-#bar button em{display:block;min-height:11px;white-space:pre-line;font-style:normal;font-size:10px;line-height:1.2;font-weight:700;color:#9be7ff}
-#bar button.sel{border-color:var(--gold);background:var(--panel2)}
+#bar button{-webkit-touch-callout:none;position:relative;flex:0 0 auto;min-width:62px;padding:2px 5px 3px;border:1px solid #8fb6d944;border-radius:8px;background:linear-gradient(180deg,#203251,#131f35);box-shadow:inset 0 1px 0 #ffffff1c,0 2px 0 #0009;display:flex;flex-direction:column;align-items:center;line-height:1.15;white-space:nowrap}
+#bar button b{font-size:12px;font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+#bar button small{font-size:11px;font-weight:700;color:var(--gold)}
+#bar button small:before{content:'';display:inline-block;width:8px;height:8px;margin-right:3px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#f2c14e 50%,#a86e12);vertical-align:0}
+#bar button em{display:block;min-height:11px;white-space:pre-line;font-style:normal;font-size:10px;line-height:1.2;font-weight:700;color:var(--ice)}
+#bar button.sel{border:1px solid var(--gold);background:linear-gradient(180deg,#3a5078,#1f3152);box-shadow:inset 0 0 0 1px #f2c14e88,0 0 10px #f2c14e55,0 2px 0 #0009}
 #bar button.dis{opacity:.45}
 #bar button.dis small{color:#ff8a7a}
 #bar button:active{transform:scale(.95)}
-#ov{position:fixed;z-index:1000;inset:0;background:radial-gradient(ellipse at 50% 0%,#35533feF 0%,#14251feF 48%,#09130ff2 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(22px + env(safe-area-inset-bottom,0px));text-align:center;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
-#ov h1{margin:0;font-size:clamp(30px,7vw,48px);font-weight:700;letter-spacing:.02em;color:#ffe08a;text-shadow:0 3px 0 #70451c,0 6px 18px #0009}
-#ov h1:after{content:'✦  ✦  ✦';display:block;font-size:11px;letter-spacing:.55em;color:#9ed9bd;text-shadow:none;margin-top:2px}
-#ov p{margin:0;max-width:36ch;font-size:15px;line-height:1.45;color:var(--dim)}
-#lv{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:6px}
-#ov button{font-size:18px;font-weight:700;padding:10px 18px;border:0;border-radius:12px;background:var(--gold);color:#3a2a05}
 @media (orientation:landscape) and (min-width:560px){
  #app{grid-template:"stage hud" auto "stage ctl" 1fr / 1fr minmax(230px,310px)}
+ #row1{flex-wrap:wrap;row-gap:4px}
  #tabs{flex-wrap:wrap}
  #tabs .tw{flex:1 1 100%}
  #bar{flex-wrap:wrap;overflow:visible;align-content:flex-start}
@@ -97,65 +107,125 @@ button{font:inherit;color:inherit;cursor:pointer}
  #fiche .ex{-webkit-line-clamp:unset;display:block}
 }
 
-#ov h2{margin:2px 0 0;color:var(--ink);font-size:18px}
-#factions{display:grid;grid-template-columns:repeat(2,minmax(130px,1fr));gap:9px;width:min(620px,94vw);position:relative;z-index:5;pointer-events:auto}
-#factions button{font-size:13px;line-height:1.25;padding:11px 10px;min-height:82px;background:linear-gradient(145deg,#314b3b,#1b2d25);color:var(--ink);border:2px solid #71836c;border-bottom-width:4px;text-align:left;touch-action:manipulation;pointer-events:auto;display:flex;align-items:center;gap:10px;cursor:pointer;position:relative;z-index:6;-webkit-appearance:none;appearance:none;box-shadow:0 5px 12px #0005;transition:transform .12s,border-color .12s,filter .12s}
+/* ===== Écran d'accueil (2.11) : menu de jeu vidéo, nuit d'hiver, montagnes et neige ===== */
+#ov{position:fixed;z-index:1000;inset:0;background:linear-gradient(180deg,#060b18 0%,#0e1c36 40%,#1b3358 75%,#2b4a72 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(22px + env(safe-area-inset-bottom,0px));text-align:center;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
+#ovSnow,#ov .monts{position:fixed;left:0;width:100%;pointer-events:none;z-index:0}
+#ovSnow{top:0;height:100%}
+#ov .monts{bottom:0;height:30vh;opacity:.7}
+#ov>*:not(#ovSnow):not(.monts){position:relative;z-index:1}
+.titre{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;margin-top:2px}
+.embleme{width:74px;height:84px;filter:drop-shadow(0 6px 14px #000a)}
+#ov h1{margin:-6px 0 0;font-size:clamp(34px,9vw,56px);font-weight:700;letter-spacing:.04em;line-height:1;background:linear-gradient(180deg,#fff6cf 10%,#f2c14e 52%,#b8782a 90%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1px #5a3410;filter:drop-shadow(0 3px 0 #2a1806) drop-shadow(0 8px 16px #000c)}
+.soustitre{display:flex;align-items:center;gap:10px;margin-top:6px;font-size:12px;font-weight:700;letter-spacing:.5em;text-transform:uppercase;color:#cfe8ff;text-shadow:0 0 10px #9be7ff88}
+.soustitre:before,.soustitre:after{content:'';width:42px;height:1px;background:linear-gradient(90deg,transparent,#c9a24a)}.soustitre:after{transform:scaleX(-1)}
+#ov p{margin:0;max-width:40ch;font-size:15px;line-height:1.45;color:#c8d5e6}
+#sub{text-shadow:0 1px 2px #000}
+.regles{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:0;padding:0;list-style:none;width:min(620px,94vw)}
+.regles li{flex:1 1 150px;display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:9px;background:#0a142ab8;border:1px solid #8fb6d944;font-size:12px;line-height:1.25;text-align:left;color:var(--dim)}
+.regles li b{display:block;color:var(--gold);font-size:13px}
+.regles i{flex:0 0 auto;font-style:normal;font-size:20px}
+#ov.fin .regles{display:none}
+#hint{font-size:13px!important;color:#9fb3cc!important}
+#ov h2,.orne{white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:10px;margin:2px 0 0;color:#ffe597;font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;text-shadow:0 2px 0 #000}
+#ov h2:before,#ov h2:after,.orne:before,.orne:after{content:'';flex:0 1 60px;height:2px;background:linear-gradient(90deg,transparent,#c9a24a);clip-path:polygon(0 40%,100% 0,100% 100%,0 60%)}
+#ov h2:after,.orne:after{transform:scaleX(-1)}
+#lv{display:flex;gap:8px;justify-content:center;margin-top:4px;width:min(480px,94vw)}
+/* boutons de jeu : or en relief, lèvre d'ombre, enfoncement au toucher */
+#ov button{font-size:17px;font-weight:700;padding:10px 18px;border:1px solid #7a4e10;border-radius:10px;background:var(--or-fond);color:#3a2205;box-shadow:var(--or-relief);text-shadow:0 1px 0 #fff7;transition:transform .08s,filter .12s}
+#ov button:active{transform:translateY(2px);box-shadow:inset 0 1px 0 #fff9,0 1px 0 #6b420b}
+#lv button{flex:1 1 0;min-width:0;padding-left:6px!important;padding-right:6px!important;display:flex;flex-direction:column;align-items:center;gap:1px;padding:9px 14px 8px;font-size:18px;letter-spacing:.03em}
+#lv button small{font-size:9.5px;white-space:nowrap;font-weight:700;letter-spacing:0;opacity:.78}
+#lv #go1{background:linear-gradient(180deg,#ffc9a0,#ef8a4a 48%,#b8501c);border-color:#6b2a08;box-shadow:inset 0 1px 0 #fff9,inset 0 -3px 0 #0003,0 3px 0 #5a2106,0 5px 12px #0007}
+#lv #go2{background:linear-gradient(180deg,#ff9f9f,#d9433a 48%,#8f1c18);border-color:#4f0b08;color:#fff3ea;text-shadow:0 1px 0 #0008;box-shadow:inset 0 1px 0 #fff7,inset 0 -3px 0 #0004,0 3px 0 #4a0a07,0 5px 12px #0007}
+#ov button:disabled{filter:grayscale(.8);opacity:.45;cursor:not-allowed}
+#factions{display:grid;grid-template-columns:repeat(2,minmax(130px,1fr));gap:8px;width:min(620px,94vw);position:relative;z-index:5;pointer-events:auto;margin-top:6px}
+#factions button{font-size:13px;line-height:1.25;padding:9px 10px;min-height:74px;background:linear-gradient(180deg,#1e3050ee,#0f1a2eee);color:var(--ink);border:1px solid #8fb6d955;text-align:left;touch-action:manipulation;pointer-events:auto;display:flex;align-items:center;gap:10px;cursor:pointer;position:relative;z-index:6;-webkit-appearance:none;appearance:none;box-shadow:inset 0 1px 0 #ffffff1c,0 3px 0 #0009,0 6px 14px #0006;text-shadow:none;transition:transform .12s,border-color .12s,filter .12s}
 #factions button:active{transform:translateY(2px);filter:brightness(1.2)}
-#factions button:after{content:'CHOISIR';position:absolute;right:8px;bottom:5px;font-size:8px;letter-spacing:.12em;color:#d5e6d5;opacity:.55}
-#factions button strong{display:block;font-size:16px;color:var(--gold);margin-bottom:3px}#factions button small{display:block;color:var(--dim);font-size:11px;line-height:1.2}#factions .ficon{display:grid;place-items:center;flex:0 0 42px;height:42px;border-radius:11px;background:#101b14;font-size:27px}#factionStatus{font-size:13px!important;color:var(--gold)!important;margin-top:7px!important;min-height:18px}
-#factions button.selected{border-color:#ffe08a;background:linear-gradient(145deg,#526c45,#293e31);box-shadow:0 0 0 3px #f2c14e55,0 8px 20px #0008;filter:brightness(1.16)}
-#factions button.selected:after{content:'✓ SÉLECTIONNÉ';color:#ffe08a;opacity:1}
+#factions button:after{content:'CHOISIR';position:absolute;right:8px;bottom:5px;font-size:8px;letter-spacing:.14em;color:#cfe0f5;opacity:.5}
+#factions button strong{display:block;font-size:16px;color:var(--gold);margin-bottom:2px;text-shadow:0 1px 0 #000}#factions button small{display:block;color:var(--dim);font-size:11px;line-height:1.2}
+/* blason de faction en forme d'écu */
+#factions .ficon{display:grid;place-items:center;flex:0 0 44px;height:50px;font-size:24px;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--sigil) 45%,#0d1628),#0b1322 75%);clip-path:polygon(0 0,100% 0,100% 58%,50% 100%,0 58%);box-shadow:inset 0 0 0 2px var(--sigil);padding-bottom:8px}
+#factionStatus{font-size:13px!important;color:var(--gold)!important;margin-top:7px!important;min-height:18px}
+#factions button.selected{border-color:#ffe08a;background:linear-gradient(180deg,#38517cee,#1b2c4aee);box-shadow:0 0 0 2px #f2c14e88,0 0 18px #f2c14e44,0 6px 16px #0008}
+#factions button.selected:after{content:'✓ SÉLECTIONNÉE';color:#ffe08a;opacity:1}
 #factions button[data-faction='0']{--sigil:#7fc4ee}
 #factions button[data-faction='1']{--sigil:#f07850}
 #factions button[data-faction='2']{--sigil:#8fd47d}
 #factions button[data-faction='3']{--sigil:#e2ad68}
 #factions button[data-faction='4']{--sigil:#c19aff}
-#factions .ficon{border:2px solid var(--sigil);box-shadow:inset 0 0 12px color-mix(in srgb,var(--sigil) 40%,transparent),0 0 12px color-mix(in srgb,var(--sigil) 20%,transparent)}
-#lv button:disabled{opacity:.35;cursor:not-allowed}
-#classPick{width:min(620px,94vw);flex:0 0 auto}#lv{padding-bottom:8px;flex:0 0 auto}
+#classPick{width:min(620px,94vw);flex:0 0 auto}#lv{padding-bottom:6px;flex:0 0 auto}
 #ov>h1,#ov>p{flex:0 0 auto}
-@media(max-width:420px){#factions{grid-template-columns:1fr}#factions button{min-height:58px;padding:7px 10px}#factions .ficon{height:38px;flex-basis:40px;font-size:24px}}
-@media(max-height:650px){#ov{gap:7px;padding:12px}#ov h1{font-size:30px}#factions button{padding:6px;font-size:11px}}
+@media(max-width:420px){#factions{grid-template-columns:1fr 1fr;gap:6px}#factions button{min-height:62px;padding:6px 7px;gap:7px}#factions button:last-child{grid-column:1/-1}#factions button strong{font-size:14px}#factions button small{font-size:10px}#factions button:after{display:none}#factions button.selected:after{display:block;content:'✓';top:4px;bottom:auto;right:6px;font-size:13px}#factions .ficon{height:40px;flex-basis:34px;font-size:19px;padding-bottom:6px}#ov{gap:9px}.embleme{width:58px;height:66px}#ov h1{font-size:40px}#ov p{font-size:14px}.regles{gap:6px}.regles li{flex:1 1 0;flex-direction:column;gap:2px;padding:6px 5px;text-align:center;font-size:11px}.regles li b{font-size:12px}}
+@media(max-height:650px){#ov{gap:7px;padding:12px}#ov h1{font-size:32px}.embleme{width:52px;height:58px}#factions button{padding:6px;font-size:11px}}
+/* paysage : présentation à gauche, choix à droite, pour voir les boutons de jeu sans faire défiler */
+.intro{display:flex;flex-direction:column;align-items:center;gap:12px;flex:0 0 auto}
+@media (orientation:landscape) and (min-width:560px){
+ #ov{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);grid-auto-flow:row dense;align-content:start;column-gap:22px;row-gap:9px;justify-items:center}
+ #ov>.intro{grid-column:1;grid-row:1/span 12;position:sticky;top:0;align-self:start}
+ #ov>*:not(.intro){grid-column:2}
+ #ov .regles{width:100%}.regles li{flex:1 1 100%;padding:5px 9px}
+ #classPick,#lv,#online,#lobby,#factions{width:100%}
+ #factions button:after{display:none}#factions button.selected:after{display:block;content:'✓';top:4px;bottom:auto;right:7px;font-size:13px}#factions button small{font-size:10px}
+ #factions button{min-height:58px;padding:6px 9px}#factions .ficon{height:42px;flex-basis:36px;font-size:20px}
+ .embleme{width:56px;height:64px}#ov h1{font-size:40px}
+}
 /* multijoueur : bloc « Jouer entre amis » et salon */
-#online,#lobby{width:min(620px,94vw);display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;border-radius:14px;background:#0003;flex:0 0 auto}
+#online,#lobby{width:min(620px,94vw);display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;border-radius:12px;background:#0a142acc;border:1px solid var(--liseré);box-shadow:inset 0 1px 0 #ffffff1c,0 6px 16px #0007;flex:0 0 auto}
 .orow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;width:100%}
-#ov input{font:inherit;font-size:16px;padding:9px 12px;border-radius:10px;border:2px solid #71836c;background:#101b14;color:var(--ink);min-width:0}
+#ov input{font:inherit;font-size:16px;padding:9px 12px;border-radius:9px;border:1px solid #8fb6d977;background:#060d1a;color:var(--ink);min-width:0;box-shadow:inset 0 2px 4px #000a}
+#online button,#lobby button{font-size:15px;padding:8px 14px}
 #rcode{width:6.5em;text-transform:uppercase;text-align:center;letter-spacing:.15em}#llink{flex:1;font-size:13px!important}
 #lcode{color:var(--gold);letter-spacing:.15em}
 #lseats{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;width:100%}
-#lseats div{padding:8px;border-radius:10px;background:var(--panel2);border-left:5px solid var(--c);text-align:left;font-size:13px;color:var(--dim)}
+#lseats div{padding:8px;border-radius:9px;background:var(--panel2);border-left:5px solid var(--c);text-align:left;font-size:13px;color:var(--dim)}
 #lseats div b{display:block;color:var(--ink);font-size:15px}
 #lseats div.me{box-shadow:0 0 0 2px var(--gold)}
-#ldiff button{font-size:14px!important;padding:6px 10px!important;background:var(--panel2)!important;color:var(--ink)!important}
-#ldiff button.on{background:var(--gold)!important;color:#3a2a05!important}
-#ov button.ghost{background:transparent;color:var(--dim);font-size:14px;text-decoration:underline}
-#vue3d{margin:6px 0 0;font-size:14px}#vue3d a{color:var(--gold)}
+#ldiff button{font-size:14px!important;padding:6px 10px!important;background:linear-gradient(180deg,#34507a,#1d3152)!important;color:var(--ink)!important;border-color:#8fb6d966!important;text-shadow:none!important;box-shadow:inset 0 1px 0 #ffffff30,0 2px 0 #0009!important}
+#ldiff button.on{background:var(--or-fond)!important;color:#3a2205!important}
+#ov button.ghost{background:transparent;border:0;box-shadow:none;color:var(--dim);font-size:14px;text-decoration:underline;text-shadow:none}
+#vue3d{margin:4px 0 0;font-size:14px}#vue3d a{color:var(--gold)}
 body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:none!important}
 </style></head><body>
 <div id="app">
  <div id="hud">
-  <div id="row1"><span class="coin"></span><b class="big" id="gold">0</b><span><b id="inc">+0</b> / 10 s</span><span id="clock">0:00</span><span id="lives">❤ <b>40</b></span><span id="factionBadge" style="font-size:11px;color:#f2c14e"></span><span class="sp"></span>
+  <div id="row1"><button class="ib" id="cartesBtn" type="button" aria-expanded="false" aria-label="Voir les terrains des autres joueurs"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span id="cartesTxt"></span></button><span class="res"><span class="coin"></span><b class="big" id="gold">0</b></span><span class="res"><b id="inc">+0</b><small>/10 s</small></span><span class="res" id="clock">0:00</span><span class="res" id="lives">❤ <b>40</b></span><span id="factionBadge"></span><span class="sp"></span>
    <button class="ib" id="snd" aria-label="Couper ou remettre le son"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9a4 4 0 0 1 0 6"/></svg></button>
    <button class="ib" id="fs" aria-label="Plein écran"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></div>
   <div id="tbar"><i id="tfill"></i></div>
  </div>
- <div id="stage"><canvas id="main"></canvas><button id="cartesBtn" type="button" aria-expanded="false" aria-label="Voir les terrains des autres joueurs"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span id="cartesTxt"></span></button><div id="chips" hidden></div><div id="banner" hidden></div><div id="toast" hidden></div><button id="zoomReset" type="button" hidden aria-label="Revenir à la vue d'ensemble"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>Vue d'ensemble</button></div>
+ <div id="stage"><canvas id="main"></canvas><div id="chips" hidden></div><div id="banner" hidden></div><div id="toast" hidden></div><button id="zoomReset" type="button" hidden aria-label="Revenir à la vue d'ensemble"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>Vue d'ensemble</button></div>
  <div id="ctl">
   <div id="tabs"><button data-t="t" class="tw on">Construire</button><div class="mon"><span>Envoyer</span><button data-t="n">Sol</button><button data-t="f">Volants</button><button data-t="s">Spéciaux</button></div></div>
   <div id="fiche"></div>
   <div id="bar"></div>
  </div>
 </div>
-<div id="ov"><h1 id="msg">Winter Realms</h1>
- <p id="sub">Choisis ta faction, bâtis ton réseau de défense et envoie des vagues contre trois adversaires. Un univers fantasy original en relief 2.5D : arènes en diorama, reliefs sculptés, décors vivants, éclairages doux, créatures expressives et machines de guerre propres à chaque faction. Chaque faction possède 10 tours à silhouette propre.</p>
- <p id="hint">Carte agrandie : 13 × 17 cases. En Difficile et en Brutal, les IA touchent 25 % et 50 % de revenu en plus.</p>
+<div id="ov"><canvas id="ovSnow" aria-hidden="true"></canvas>
+ <svg class="monts" viewBox="0 0 400 140" preserveAspectRatio="none" aria-hidden="true">
+  <path d="M0 140V78l38-30 26 18 44-46 30 26 22-14 48 40 40-52 46 44 28-18 40 30 38-26v90z" fill="#3a5a85" opacity=".55"/>
+  <path d="M120 46l-8 12 10-4 6 7 4-9zM228 22l-10 14 11-5 7 8 5-10zM64 66l-6 8 7-3 5 5 2-6z" fill="#e8f2ff" opacity=".7"/>
+  <path d="M0 140V104l30-22 30 16 40-34 34 26 30-18 44 32 36-28 42 30 34-20 34 24 46-30v100z" fill="#1c3355"/>
+  <path d="M100 64l-9 11 10-3 5 6 4-8zM234 76l-8 10 9-4 5 5 3-7zM354 80l-8 9 8-3 5 5 3-7z" fill="#dce9fb" opacity=".8"/>
+  <path d="M0 140v-18c60-12 120 6 200-4s140-10 200 0v22z" fill="#b9cde6" opacity=".35"/>
+ </svg>
+<div class="intro"> <div class="titre"><svg class="embleme" viewBox="0 0 64 72" aria-hidden="true">
+  <defs><linearGradient id="eOr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2b8"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#9c6418"/></linearGradient>
+   <linearGradient id="eBleu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3f6aa3"/><stop offset="1" stop-color="#14264a"/></linearGradient></defs>
+  <path d="M8 22L56 66M56 22L8 66" stroke="#cfd8e6" stroke-width="4" stroke-linecap="round"/><path d="M4 18l8 8M60 18l-8 8" stroke="url(#eOr)" stroke-width="5" stroke-linecap="round"/>
+  <path d="M32 4L54 12V36C54 52 44 62 32 68C20 62 10 52 10 36V12z" fill="url(#eBleu)" stroke="url(#eOr)" stroke-width="3.5"/>
+  <g stroke="#e9f6ff" stroke-width="2.6" stroke-linecap="round"><path d="M32 20V52M18 28L46 44M46 28L18 44"/><path d="M28 23l4 4 4-4M28 49l4-4 4 4M20 33l4-1-1-4M44 39l-4 1 1 4M44 33l-4-1 1-4M20 39l4 1-1 4" fill="none"/></g>
+  <circle cx="32" cy="36" r="3.4" fill="url(#eOr)"/></svg>
+  <h1 id="msg">Winter Realms</h1><div class="soustitre">Tower Wars</div></div>
+ <p id="sub">L'hiver éternel s'abat sur les royaumes du Nord. Fortifie ton domaine et lance tes armées contre trois seigneurs rivaux : le dernier debout régnera sur les terres gelées.</p>
+ <ul class="regles"><li><i>🏰</i><span><b>Bâtis</b>des tours pour tracer ton labyrinthe</span></li><li><i>⚔️</i><span><b>Envoie</b>des monstres : chaque vague augmente ton revenu</span></li><li><i>❤️</i><span><b>Résiste</b>40 vies, pas une de plus</span></li></ul></div>
  <div id="classPick"><h2>Choisis ta faction</h2><div id="factions">
  <button type="button" data-faction="0" aria-pressed="false" onclick="window.chooseFaction(0)"><span class="ficon">🛡️</span><span><strong>Alliance</strong><small>Défense équilibrée · portée et anti-aérien</small></span></button>
  <button type="button" data-faction="1" aria-pressed="false" onclick="window.chooseFaction(1)"><span class="ficon">🪓</span><span><strong>Horde</strong><small>Agressivité · exécution des ennemis affaiblis</small></span></button>
  <button type="button" data-faction="2" aria-pressed="false" onclick="window.chooseFaction(2)"><span class="ficon">🌿</span><span><strong>Peuples sylvestres</strong><small>Contrôle · racines et ralentissements</small></span></button>
  <button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">⚒️</span><span><strong>Clans nains</strong><small>Artillerie · perforation des armures</small></span></button>
  <button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">☠️</span><span><strong>Légion des ombres</strong><small>Malédictions · amplification des dégâts</small></span></button>
- </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><p id="difficultyLabel" hidden>Choisis la difficulté</p><div id="lv"><button id="go0" disabled>Normal</button><button id="go1" disabled>Difficile</button><button id="go2" disabled>Brutal</button></div><p id="vue3d"><a id="mode3d" href="?rendu=2d">Jouer en vue 2D (classique)</a></p>
+ </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><h2 id="difficultyLabel" hidden>Lance la bataille</h2><div id="lv"><button id="go0" disabled>Normal<small>IA à revenu égal</small></button><button id="go1" disabled>Difficile<small>IA : +25 % de revenu</small></button><button id="go2" disabled>Brutal<small>IA : +50 % de revenu</small></button></div>
+ <p id="hint">Carte de 13 × 17 cases. En Difficile et en Brutal, tes chantiers prennent aussi plus de temps.</p><p id="vue3d"><a id="mode3d" href="?rendu=2d">Jouer en vue 2D (classique)</a></p>
  <div id="online"><h2>Jouer entre amis</h2><input id="pname" maxlength="16" placeholder="Ton pseudo" autocomplete="nickname">
   <div class="orow"><button id="mkRoom" type="button">Créer un salon</button><input id="rcode" maxlength="4" placeholder="CODE" autocapitalize="characters"><button id="joinRoom" type="button">Rejoindre</button></div></div>
  <div id="lobby" hidden><h2>Salon <b id="lcode"></b></h2><p id="lhelp">Partage ce lien à tes amis :</p><div class="orow"><input id="llink" readonly><button id="lcopy" type="button">Copier</button></div>
@@ -559,7 +629,7 @@ document.querySelectorAll('#ldiff button').forEach(b=>b.onclick=()=>NET.send({t:
 function setup(cv,w,h){const r=dpr();cv.width=Math.round(w*r);cv.height=Math.round(h*r);cv.style.width=w+'px';cv.style.height=h+'px';const g=cv.getContext('2d');g.setTransform(r,0,0,r,0,0);return g}
 /* ---------- vue du terrain : zoom (1× à 3×) et déplacement ----------
    Le canevas couvre toute la zone de jeu ; le plateau y est dessiné avec un décalage (VUE.ox, VUE.oy) et une taille de case cell × VUE.z. */
-const VUE={z:1,ox:0,oy:0,w:0,h:0},ZMAX=3;let cadre='#27382b';
+const VUE={z:1,ox:0,oy:0,w:0,h:0},ZMAX=3;let cadre='#c9a24a';
 /* 2.7 : rendu 3D, chargé à la demande (module rendu3d.js). Depuis la 2.8, c'est le rendu par défaut ; ?rendu=2d garde la 2D.
    En 3D, la caméra est orthographique et inclinée : à l'écran, les rangées du terrain sont tassées d'un facteur KY,
    et TOPM cases sont gardées libres au-dessus du plateau pour les tours hautes. En 2D, KY = 1 et TOPM = 0 (rien ne change). */
@@ -596,9 +666,9 @@ function dessinerVue3D(t){const g=mx,b=VB(),s=cell*VUE.z,A=R3D.api,E=(x,z,h)=>A.
  if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,VUE.w,VUE.h);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';const q=E(C/2,R/2,0);g.fillText('Éliminé',q.x,q.y)}}
 function dessinerVue(t){if(R3D.api){dessinerVue3D(t);return}const g=mx,s=cell*VUE.z,W=C*s,H=R*s,rr=Math.min(10*VUE.z,30);g.clearRect(0,0,VUE.w,VUE.h);g.save();g.translate(VUE.ox,VUE.oy);
  g.save();g.shadowColor='rgba(0,0,0,.56)';g.shadowBlur=32;g.shadowOffsetY=14;g.fillStyle=cadre;g.beginPath();g.roundRect(-3,-3,W+6,H+6,rr+3);g.fill();g.restore();
- g.beginPath();g.roundRect(0,0,W,H,rr);g.fillStyle='#18251c';g.fill();g.clip();draw(VB(),g,s,t);g.restore()}
+ g.beginPath();g.roundRect(0,0,W,H,rr);g.fillStyle='#141f33';g.fill();g.clip();draw(VB(),g,s,t);g.restore()}
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true},1900)}
-function setView(v){view=v;projet=null;const b=B[v],bn=$('banner'),cb=$('cartesBtn');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · ↩ revenir au tien';cb.style.setProperty('--c',v==me?'#71836c':b.col);$('cartesTxt').textContent=v==me?'':b.name;cartes(false);bn.style.background=b.col;cadre=v!=me?b.col:'#27382b';hudK=''}
+function setView(v){view=v;projet=null;const b=B[v],bn=$('banner'),cb=$('cartesBtn');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · ↩ revenir au tien';cb.style.setProperty('--c',v==me?'#c9a24a':b.col);$('cartesTxt').textContent=v==me?'':b.name;cartes(false);bn.style.background=b.col;cadre=v!=me?b.col:'#c9a24a';hudK=''}
 const SOLO_COL=['#e4572e','#4aa3df','#b06ad0'];
 function soloSeats(f){return [{name:'Toi',col:FACTIONS[f].color,ai:0,classId:f}].concat([1,2,3].map(i=>({name:'IA '+i,col:SOLO_COL[i-1],ai:1,classId:(f+i)%5})))}
 /* installe une partie (locale ou reçue du serveur) : vignettes, joueur, vue */
@@ -783,7 +853,7 @@ $('fs').onclick=()=>{const d=document,e=d.documentElement,no=()=>toast("Plein é
  try{if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return}
   const rq=e.requestFullscreen||e.webkitRequestFullscreen;if(!rq){toast("Plein écran indisponible sur cet appareil");return}
   const p=rq.call(e);if(p&&p.catch)p.catch(no)}catch(_){no()}};
-[0,1,2].forEach(l=>{$('go'+l).onclick=()=>{audio();started=true;newSolo(l);$('ov').hidden=true;vueEnsemble();toast('Astuce : deux doigts pour zoomer et se déplacer')}});
+[0,1,2].forEach(l=>{$('go'+l).onclick=()=>{audio();started=true;newSolo(l);$('ov').hidden=true;$('ov').classList.remove('fin');vueEnsemble();toast('Astuce : deux doigts pour zoomer et se déplacer')}});
 document.addEventListener('click',audio,true);
 
 /* ---------- sons et événements ---------- */
@@ -803,10 +873,19 @@ function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.d
 function end(winner){over=true;const win=winner===me;sfx(win?'win':'lose');
  $('msg').textContent=win?'Victoire !':winner>=0&&NET.on?B[winner].name+' gagne':'Défaite';
  $('sub').textContent='Partie de '+mmss(time)+'. Ton revenu final : +'+P.inc+' toutes les 10 s, en '+DIFF[LV].n+'. Adversaires éliminés : '+B.filter(b=>b!==P&&b.dead).length+' sur 3.';
- $('hint').textContent=NET.on?'Retour au salon dans quelques secondes…':'Rejouer en :';$('ov').hidden=false;if(NET.on)NET.ended()}
+ $('hint').textContent=NET.on?'Retour au salon dans quelques secondes…':'Rejouer en :';$('ov').classList.add('fin');$('ov').hidden=false;if(NET.on)NET.ended()}
 let last=performance.now();
 let pickB=0;
-function loop(now){const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;
+/* 2.11 : neige qui tombe sur l'écran d'accueil (positions calculées, sans hasard) */
+const ovSnow=$('ovSnow'),ovG=ovSnow.getContext('2d');let ovW=0,ovH=0;
+function neigeAccueil(now){if($('ov').hidden)return;const r=Math.min(2,devicePixelRatio||1),w=innerWidth,h=innerHeight;
+ if(w!=ovW||h!=ovH){ovW=w;ovH=h;ovSnow.width=w*r;ovSnow.height=h*r;ovG.setTransform(r,0,0,r,0,0)}
+ ovG.clearRect(0,0,w,h);const t=now/1000;
+ for(let i=0;i<90;i++){const a=(i*0.6180339)%1,b=(i*0.4142136)%1,z=.35+((i*7)%10)/14,v=14+z*26;
+  const y=(b*h+t*v)%(h+10)-5,x=(a*w+Math.sin(t*.6+i)*14*z+w)%w;
+  ovG.globalAlpha=.25+z*.45;ovG.fillStyle='#eef6ff';ovG.beginPath();ovG.arc(x,y,.7+z*1.9,0,7);ovG.fill()}
+ ovG.globalAlpha=1}
+function loop(now){neigeAccueil(now);const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;
  if(started){
   if(NET.on)NET.frame(dt);
   else if(G&&!G.over){G.step(dt);syncSolo();const lg=G.log.splice(0);for(const l of lg)onLog(l)}
