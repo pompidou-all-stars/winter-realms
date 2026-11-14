@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Winter Realms — Aperçu des modèles 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
+<style>
+html,body{margin:0;height:100%;background:#16221a;color:#f6ecd0;font-family:'Fredoka',system-ui,sans-serif;overflow:hidden}
+#app{display:grid;grid-template-rows:auto 1fr auto;height:100dvh}
+header{padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+h1{font-size:18px;margin:0 8px 0 0;color:#f2c14e}
+select,button{font:inherit;background:#27382b;color:#f6ecd0;border:1px solid #3d5444;border-radius:10px;padding:6px 10px}
+button.on{background:#f2c14e;color:#3a2a05}
+#vue{position:relative;min-height:0}canvas{display:block;width:100%;height:100%}
+footer{padding:8px 14px;font-size:13px;color:#b9c4ab}
+a{color:#f2c14e}
+</style></head><body>
+<div id="app">
+ <header><h1>Modèles 3D</h1>
+  <select id="choix" aria-label="Modèle"></select>
+  <button id="prec" aria-label="Modèle précédent">◀</button><button id="suiv" aria-label="Modèle suivant">▶</button>
+  <button id="tourne" class="on">Rotation</button>
+ </header>
+ <div id="vue"></div>
+ <footer id="info">Chargement…</footer>
+</div>
+<script src="sim.js"></script>
+<script type="module">
+/* Aperçu des modèles de assets/3d/ (fabriqués par les scripts Blender de art/) : choisir un modèle, il tourne et s'anime. */
+import * as THREE from 'three';
+import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
+const FAC=['alliance','horde','sylvestres','nains','ombres'];
+const liste=[];
+FACTIONS.forEach((F,f)=>F.towers.forEach((n,j)=>liste.push({nom:`${F.icon} ${n}`,groupe:F.name,url:`assets/3d/tours/${FAC[f]}-${j}.glb`,detail:BASE_TW[TW[f*10+j].skin].n+' · '+TW[f*10+j].role})));
+CR.filter((T,k)=>CR.findIndex(c=>c.g==T.g)==k).forEach(T=>liste.push({nom:T.n,groupe:'Monstres',url:`assets/3d/monstres/${T.g}.glb`,detail:(T.fly?'volant':T.cat=='n'?'au sol':'spécial')+(T.tag?' · '+T.tag:'')}));
+liste.push({nom:'Portail',groupe:'Décor',url:'assets/3d/decor/portail.glb',detail:'case d\'apparition'},{nom:'Château',groupe:'Décor',url:'assets/3d/decor/chateau.glb',detail:'sortie'});
+const sel=document.getElementById('choix');let g0='',og=null;
+liste.forEach((m,i)=>{if(m.groupe!=g0){og=document.createElement('optgroup');og.label=g0=m.groupe;sel.appendChild(og)}const o=document.createElement('option');o.value=i;o.textContent=m.nom;og.appendChild(o)});
+const vue=document.getElementById('vue'),renderer=new THREE.WebGLRenderer({antialias:true});renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.shadowMap.enabled=true;
+renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));vue.appendChild(renderer.domElement);
+const scene=new THREE.Scene();scene.background=new THREE.Color('#1f2e25');
+scene.add(new THREE.HemisphereLight('#dfeaff','#5a4632',1.25));
+const sol=new THREE.DirectionalLight('#fff1db',2.3);sol.position.set(-3,6,4);sol.castShadow=true;sol.shadow.mapSize.set(1024,1024);scene.add(sol);
+const contre=new THREE.DirectionalLight('#ffe2b8',.9);contre.position.set(2,3,-4);scene.add(contre);
+const socle=new THREE.Mesh(new THREE.CylinderGeometry(.7,.75,.06,40),new THREE.MeshStandardMaterial({color:'#5a9a45',roughness:.9}));socle.position.y=-.03;socle.receiveShadow=true;scene.add(socle);
+const cam=new THREE.PerspectiveCamera(35,1,.01,50);
+const loader=new GLTFLoader();loader.setMeshoptDecoder(MeshoptDecoder);
+let courant=null,mixer=null,rot=true,angle=.6;
+async function montrer(i){const m=liste[i];sel.value=i;document.getElementById('info').textContent='Chargement…';
+ const g=await loader.loadAsync(m.url);if(courant)scene.remove(courant);courant=g.scene;
+ courant.traverse(o=>{if(o.isMesh){o.castShadow=o.receiveShadow=true}});scene.add(courant);
+ mixer=null;if(g.animations.length){mixer=new THREE.AnimationMixer(courant);mixer.clipAction(g.animations[0]).play()}
+ const b=new THREE.Box3().setFromObject(courant),t=b.getSize(new THREE.Vector3()),c=b.getCenter(new THREE.Vector3());
+ if(m.detail.startsWith('volant'))courant.position.y=.25;
+ const d=Math.max(t.x,t.y,t.z)*2.6+.3;cam.userData={c:new THREE.Vector3(0,c.y+(courant.position.y),0),d};
+ let tri=0;courant.traverse(o=>{if(o.isMesh)tri+=(o.geometry.index?o.geometry.index.count:o.geometry.attributes.position.count)/3});
+ document.getElementById('info').textContent=`${m.nom} — ${m.detail} — ${Math.round(tri)} triangles — ${t.y.toFixed(2)} case(s) de haut${g.animations.length?' — animation « '+g.animations[0].name+' »':''}`}
+sel.onchange=()=>montrer(+sel.value);
+document.getElementById('prec').onclick=()=>montrer((+sel.value-1+liste.length)%liste.length);
+document.getElementById('suiv').onclick=()=>montrer((+sel.value+1)%liste.length);
+document.getElementById('tourne').onclick=e=>{rot=!rot;e.target.classList.toggle('on',rot)};
+function taille(){const r=vue.getBoundingClientRect();renderer.setSize(r.width,r.height,false);cam.aspect=r.width/Math.max(1,r.height);cam.updateProjectionMatrix()}
+new ResizeObserver(taille).observe(vue);taille();
+let last=performance.now();
+renderer.setAnimationLoop(now=>{const dt=Math.min(.05,(now-last)/1000);last=now;if(rot)angle+=dt*.5;if(mixer)mixer.update(dt);
+ const u=cam.userData;if(u.c){cam.position.set(u.c.x+Math.sin(angle)*u.d,u.c.y+u.d*.45,u.c.z+Math.cos(angle)*u.d);cam.lookAt(u.c)}renderer.render(scene,cam)});
+const q=new URLSearchParams(location.search).get('modele');montrer(q?Math.max(0,liste.findIndex(m=>m.url.includes(q))):0);
+</script></body></html>

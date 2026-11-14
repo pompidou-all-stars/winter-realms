@@ -16,7 +16,10 @@ function disponible(){return !!playwright}
 
 /* options de Chromium pour un rendu reproductible : rendu logiciel, pas de lissage sous-pixel ni d'optimisations variables */
 const OPTIONS_STABLES=['--disable-gpu','--disable-lcd-text','--font-render-hinting=none','--force-color-profile=srgb','--disable-partial-raster','--disable-skia-runtime-opts','--disable-threaded-animation','--disable-threaded-scrolling','--disable-checker-imaging'];
-async function lancer(){return playwright.chromium.launch({args:OPTIONS_STABLES})}
+/* webgl : pour le rendu 3D (2.7), WebGL en rendu logiciel SwiftShader (identique sur toutes les machines, sans carte graphique) */
+const OPTIONS_WEBGL=OPTIONS_STABLES.filter(o=>o!='--disable-gpu').concat(['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']);
+/* WR_CANAL permet d'utiliser un navigateur déjà installé (par exemple msedge) au lieu du Chromium de Playwright */
+async function lancer({webgl=false}={}){return playwright.chromium.launch({args:webgl?OPTIONS_WEBGL:OPTIONS_STABLES,...(process.env.WR_CANAL?{channel:process.env.WR_CANAL}:{})})}
 
 /* ouvre le jeu ; options : format, graine, police ('reelle' ou 'bloquee'), echelle (densité de pixels) */
 async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='reelle',echelle=2}={}){
@@ -24,7 +27,8 @@ async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='ree
  const page=await ctx.newPage();
  const erreurs=[];page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()=='error')erreurs.push(m.text())});
  /* aucune connexion vers l'extérieur, sauf la police si demandée (le multijoueur n'est jamais contacté) */
- await page.route(u=>!u.href.startsWith(url),r=>{const h=new URL(r.request().url()).hostname;
+ const origine=new URL(url).origin+'/';
+ await page.route(u=>!u.href.startsWith(origine),r=>{const h=new URL(r.request().url()).hostname;
   if(police=='reelle'&&(h=='fonts.googleapis.com'||h=='fonts.gstatic.com'))return r.continue();return r.abort()});
  await page.addInitScript(`window.__GRAINE__=${graine>>>0};`+SOURCE_NAVIGATEUR);
  await page.clock.install({time:DEBUT});
@@ -38,7 +42,7 @@ async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='ree
  await page.clock.runFor(100);
  /* l'horloge simulée démarre avec 1 ou 2 ms de décalage selon les passages (temps réel écoulé pendant son installation) :
     on l'aligne sur exactement 200 ms pour que les animations (chemin, portail, barre de revenu) soient identiques à chaque passage */
- const pn=await page.evaluate(()=>performance.now());await page.clock.runFor(200-pn);
+ const pn=await page.evaluate(()=>performance.now());if(pn<200)await page.clock.runFor(200-pn);
  return {ctx,page,erreurs,policeChargee,fermer:()=>ctx.close()};
 }
 
@@ -66,4 +70,9 @@ async function avancer(page,ms){await page.clock.runFor(ms)}
 async function etat(page){return page.evaluate(()=>({or:P.gold,revenu:P.inc,vies:P.lives,tours:P.t.map(t=>({x:t.x,y:t.y,k:t.k,lv:t.lv})),temps:time,horloge:document.getElementById('clock').textContent,
  vue:view,fin:over,faction:chosenClass,panneauOuvert:!!document.querySelector('#bar .info')||document.getElementById('fiche')?.dataset.mode=='tour',fiche:document.getElementById('fiche')?.innerText||'',zoom:typeof VUE=='object'?VUE.z:1,projet:typeof projet!='undefined'&&projet?{...projet}:null,toast:document.getElementById('toast').hidden?'':document.getElementById('toast').textContent,boutons:[...document.querySelectorAll('#bar button')].map(b=>b.textContent)}))}
 
-module.exports={disponible,lancer,ouvrir,toucherCase,construire,glisser,centreCase,deuxDoigts,toucher,avancer,etat,FORMATS};
+/* 2.7 : attend que le rendu 3D soit prêt (module chargé et modèles préchargés). Le chargement passe par le réseau local,
+   qui ne dépend pas de l'horloge figée : on attend en temps réel, puis on avance l'horloge d'une image. */
+async function attendre3D(page,ms=30000){const fin=Date.now()+ms;
+ while(Date.now()<fin){const e=await page.evaluate(()=>({ok:!!(window.R3D_ETAT&&R3D_ETAT().charge),echec:window.R3D_ETAT&&R3D_ETAT().echec}));
+  if(e.ok){await page.clock.runFor(50);return true}if(e.echec)return false;await page.waitForTimeout(100)}return false}
+module.exports={disponible,lancer,ouvrir,attendre3D,toucherCase,construire,glisser,centreCase,deuxDoigts,toucher,avancer,etat,FORMATS};

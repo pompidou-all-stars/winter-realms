@@ -1,7 +1,7 @@
 /* Mini serveur web local (sans dépendance), pour ouvrir le jeu dans le navigateur de test. */
 'use strict';
 const http=require('http'),fs=require('fs'),path=require('path');
-const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css','.png':'image/png','.json':'application/json','.svg':'image/svg+xml'};
+const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css','.png':'image/png','.json':'application/json','.svg':'image/svg+xml','.glb':'model/gltf-binary','.mjs':'text/javascript; charset=utf-8'};
 /* sert le dossier « racine » sur un port libre ; renvoie {url, fermer()} */
 function demarrer(racine){return new Promise(ok=>{
  const srv=http.createServer((req,res)=>{let p=decodeURIComponent(new URL(req.url,'http://x').pathname);if(p.endsWith('/'))p+='index.html';

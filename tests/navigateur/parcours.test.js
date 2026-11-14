@@ -30,7 +30,7 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
  });
  test('Construction (2.2) : un premier toucher montre un aperçu, sans rien construire',async()=>{
   await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[]);assert.equal(e.or,100);
-  assert.deepEqual(e.projet,{x:3,y:5,k:20});assert.match(e.toast,/Touchez encore la case pour construire \(20 or\)/);
+  assert.deepEqual(e.projet,{x:3,y:5,k:20});assert.match(e.toast,/Touchez encore la case pour construire \(20 or/);
  });
  test('Construction (2.2) : un second toucher sur la même case construit la tour et débite son prix',async()=>{
   await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[{x:3,y:5,k:20,lv:1}]);assert.equal(e.or,80);assert.equal(e.projet,null);
@@ -45,8 +45,8 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
   await N.toucherCase(p,6,0);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(e.or,80);
   assert.equal(await p.textContent('#toast'),'Impossible ici : le chemin serait bloqué');assert.equal(await val(()=>document.getElementById('toast').hidden),false);
  });
- test('Toucher une tour ouvre son panneau ; Améliorer puis Vendre fonctionnent',async()=>{
-  await N.toucherCase(p,3,5);let e=await N.etat(p);assert.equal(e.panneauOuvert,true);
+ test('Toucher une tour ouvre son panneau ; Améliorer (après le chantier, 2.4) puis Vendre fonctionnent',async()=>{
+  await N.avancer(p,1500);await N.toucherCase(p,3,5);let e=await N.etat(p);assert.equal(e.panneauOuvert,true);
   assert.ok(e.boutons.some(b=>b.startsWith('Améliorer'))&&e.boutons.some(b=>b.startsWith('Vendre'))&&e.boutons.some(b=>b.startsWith('Fermer')));
   await N.toucher(p,'#bar button:has-text("Améliorer")');e=await N.etat(p);assert.equal(e.tours[0].lv,2);assert.equal(e.or,50);
   await N.toucher(p,'#bar button:has-text("Vendre")');e=await N.etat(p);assert.equal(e.tours.length,0);assert.equal(e.or,85);assert.equal(e.panneauOuvert,false);
@@ -67,7 +67,7 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
   assert.ok((await p.textContent('#bar button:has-text("Arbre sentinelle") em')).includes('/s'),'la carte affiche les dégâts par seconde');
  });
  test('Fiche d\'une tour posée (2.1) : niveau et gain du niveau suivant',async()=>{
-  await N.construire(p,3,5);await N.toucherCase(p,3,5);const e=await N.etat(p);assert.equal(e.panneauOuvert,true);assert.match(e.fiche,/niveau 1\/5/);assert.match(e.fiche,/Niveau 2 :/);
+  await N.construire(p,3,5);await N.avancer(p,1500);await N.toucherCase(p,3,5);const e=await N.etat(p);assert.equal(e.panneauOuvert,true);assert.match(e.fiche,/niveau 1\/5/);assert.match(e.fiche,/Niveau 2 :/);
   await N.toucher(p,'#bar button:has-text("Vendre")');
  });
  test('Onglet « Spéciaux » (2.1) : les monstres verrouillés affichent leur heure de déblocage',async()=>{

@@ -46,7 +46,7 @@ Modèle complet : `art/exemples/caisse.py`.
 - **1 unité = 1 case** du terrain. L'origine (0, 0, 0) est **au sol, au centre de la case**. Axe Z vers le haut (Blender).
 - Une tour tient dans **0,9 × 0,9** au sol et mesure au plus **1,6** de haut ; sa face avant regarde vers **−Y**.
 - Les couleurs de faction viennent de `ctx.jeu['FACTIONS'][f]['color']` : un changement de couleur dans le jeu se reporte sur les modèles à la prochaine génération.
-- Les **niveaux d'amélioration** (taille, pastilles) et les **petites animations** (balancement, battement d'ailes) sont gérés par le jeu à l'affichage : un seul modèle par tour et par monstre.
+- Les **niveaux d'amélioration** (taille, pastilles) sont gérés par le jeu à l'affichage : un seul modèle par tour et par monstre. Depuis la 2.7, les **animations de marche et de vol** des monstres sont dans le fichier (pistes NLA `marche` et `vol`, voir plus bas) ; les autres petits mouvements (rotation des cristaux, flammes, visée) sont faits par le jeu sur des **pivots nommés**.
 - **Licences** : aucun modèle ni texture externe sauf licence **CC0** (par exemple Poly Haven), avec la source notée en commentaire dans le script. Pas de génération 3D par IA sans accord du concepteur.
 
 ## Générer les fichiers 3D
@@ -74,6 +74,28 @@ Puis commiter **le script, le `.glb` et `assets/3d/manifeste.json` ensemble**.
 - Action GitHub « Assets 3D » (sur les PR qui touchent `art/` ou `assets/3d/`) : régénère tout avec Blender 5.3, vérifie, et joint les images d'aperçu (onglet *Actions → Artifacts → apercus-3d*).
 - Budgets par fichier dans `art/budgets.json` : tour et monstre ≤ 3 000 triangles et 150 Ko, décor ≤ 6 000 triangles et 300 Ko, total ≤ 8 Mo. Le jeu doit rester fluide sur téléphone.
 - Modifier un fichier de `art/communs/` change l'empreinte de **tous** les assets : il faut alors tout régénérer (`python art/outils/generer.py`).
+
+## Modèles du jeu (depuis la 2.7)
+
+Les 50 tours, les 17 monstres, le portail et le château sont construits avec les pièces communes de `art/communs/` (un paquet Python : `from communs.tours_communes import tour`) :
+
+| Module | Rôle |
+|---|---|
+| `outils.py` | formes de base (cylindre, boîte, sphère, cône, tore, prisme), matériaux par couleur, **peinture des sommets** (dégradé sombre en bas, clair en haut, léger grain), `SIMPLE` pour alléger les petits personnages |
+| `factions.py` | palettes des 5 factions (reprises de la 2D, avivées) et **socles** |
+| `personnages.py` | personnage caricatural paramétrable (nez, oreilles, défenses, casque, capuche, barbe, robe, cape, couronne, plumes, un œil…) et armes |
+| `betes.py` | quadrupèdes, volants (ailes membrane ou plumes), gelées |
+| `animations.py` | animations par pièces, sans squelette : `marche`, `trot`, `saut`, `flotte`, `vol` |
+| `echelles.py` | tailles des monstres : `0,40 × z^1,8` cases (z de `CR`) |
+| `tours_communes.py` | les 6 archétypes de tours déclinés par `STYLE` de faction ; `tour(faction, j)` |
+| `decor.py` | portail, château, plateau de référence |
+| `export_jeu.py` | `preparer(racine)`, à appeler **à la fin de `construire`** : couleurs cuites dans les sommets (matériau unique `Peint`, `Lueur_…` pour les pièces lumineuses, `Drapeau` gardé), pièces fusionnées sous chaque pivot |
+| `rendu.py` | rendus de validation (EEVEE) |
+
+- **Pivots nommés** (objets vides) : `Tourelle` (vise la cible), `Cristal`, `Eclats`, `Flamme`, `Anneaux`, `Orbe`, `AnneauFlottant`, `Anneau1..3` (portail), `Corps`, `Tete`, `BrasG`, `BrasD`, `JambeG`… `generer.py` exporte les maillages **et** les objets vides, les animations **par piste NLA** et compresse en **meshopt** (`EXT_meshopt_compression`, lu par three.js).
+- **Monstres** : `monstres/<g>.py` pour chaque clé `g` de `CR`. Plusieurs monstres peuvent partager une clé (le Petit limon utilise `slime`) : le jeu met alors le modèle à l'échelle de leur `z`.
+- **Concevoir dans Blender ouvert** (MCP) : `exec(open(r'<dépôt>\art\outils\atelier.py', encoding='utf-8').read())` recharge les pièces communes ; `atelier_asset('tours/horde-3')` construit un asset dans la scène, sans l'exporter ; `art/outils/planches.py` fait les planches de validation. L'export définitif passe toujours par `generer.py`.
+- Vérifications propres aux modèles du jeu : `tests/simulation/modeles-3d.test.js` (un modèle par tour et par clé de monstre, animations, `Tourelle`, meshopt, `Drapeau`).
 
 ## Travailler à plusieurs
 - **Un asset = un fichier** : deux personnes qui travaillent sur deux tours différentes n'ont jamais de conflit.
