@@ -51,6 +51,46 @@ def marche(racine, duree=1.0, ampl_jambe=.5, ampl_bras=.4, rebond=.03, roulis=.0
         _cles(c, 'rotation_euler', 1, lambda ph: roulis * s(ph), n)
     _nommer(racine, 'marche')
 
+def trot(racine, duree=.6, ampl=.6, rebond=.02, queue=.4, n=8):
+    """Quadrupède : pattes en diagonale (avant gauche avec arrière droite), queue qui balance."""
+    _debut(racine, 'marche', duree)
+    s = lambda ph: math.sin(ph * 2 * math.pi)
+    for nom, sg in (('JambeAG', 1), ('JambePD', 1), ('JambeAD', -1), ('JambePG', -1)):
+        o = _trouver(racine, nom)
+        if o: _cles(o, 'rotation_euler', 0, lambda ph, sg=sg: sg * ampl * s(ph), n)
+    c = _trouver(racine, 'Corps')
+    if c: _cles(c, 'location', 2, lambda ph: rebond * abs(s(ph)), n)
+    q = _trouver(racine, 'Queue')
+    if q: _cles(q, 'rotation_euler', 2, lambda ph: queue * s(ph), n)
+    t = _trouver(racine, 'Tete')
+    if t: _cles(t, 'rotation_euler', 0, lambda ph: .08 * s(ph * 2), n)
+    _nommer(racine, 'marche')
+
+def saut(racine, duree=.8, ecrase=.18, hauteur=.04, n=8):
+    """Gelée : s'écrase puis rebondit (échelle et hauteur du Corps)."""
+    _debut(racine, 'marche', duree)
+    c = _trouver(racine, 'Corps')
+    if c:
+        f = lambda ph: math.sin(ph * 2 * math.pi)
+        _cles(c, 'scale', 2, lambda ph: -ecrase * f(ph), n)
+        _cles(c, 'scale', 0, lambda ph: ecrase * .6 * f(ph), n)
+        _cles(c, 'scale', 1, lambda ph: ecrase * .6 * f(ph), n)
+        _cles(c, 'location', 2, lambda ph: hauteur * max(0, -f(ph)), n)
+    _nommer(racine, 'marche')
+
+def flotte(racine, duree=1.6, ampl=.03, roulis=.12, n=8):
+    """Spectre : ondule en flottant, sans pas."""
+    _debut(racine, 'marche', duree)
+    c = _trouver(racine, 'Corps')
+    s = lambda ph: math.sin(ph * 2 * math.pi)
+    if c:
+        _cles(c, 'location', 2, lambda ph: ampl * s(ph), n)
+        _cles(c, 'rotation_euler', 1, lambda ph: roulis * s(ph + .25), n)
+    for nom, sg in (('BrasG', 1), ('BrasD', -1)):
+        o = _trouver(racine, nom)
+        if o: _cles(o, 'rotation_euler', 0, lambda ph, sg=sg: -.6 + .25 * sg * s(ph), n)
+    _nommer(racine, 'marche')
+
 def battement(racine, duree=.35, ampl=.9, flottement=.05, n=8):
     _debut(racine, 'vol', duree)
     s = lambda ph: math.sin(ph * 2 * math.pi)

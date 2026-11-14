@@ -48,7 +48,8 @@ def mat(h, rough=0.7, metal=0.0, emis=0.0):
     p.inputs['Metallic'].default_value = metal
     if emis:
         p.inputs['Emission Color'].default_value = lin(h)
-        p.inputs['Emission Strength'].default_value = emis
+        # lueur modérée : la couleur reste lisible au lieu de virer au blanc
+        p.inputs['Emission Strength'].default_value = emis * .3
     m.diffuse_color = lin(h)
     return m
 

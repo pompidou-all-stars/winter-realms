@@ -33,4 +33,53 @@ def socle_alliance(racine):
         sphere(f'Clou{q}', p['or_'], .022, (math.cos(a) * .37, math.sin(a) * .37, .105), (1, 1, .6), 6, 4, racine, metal=.7, rough=.3)
     return HAUT_SOCLE
 
-SOCLES = {'alliance': socle_alliance}
+def socle_horde(racine):
+    """Plateforme de rondins cerclée de fer, défenses d'os plantées autour."""
+    p = PAL['horde']
+    cylindre('Plateforme', '#6b4423', .42, .4, .08, 12, (0, 0, 0), racine, biseau=.015)
+    anneau('Cercle', '#3a3330', .41, .016, 16, 3, (0, 0, .055), racine, metal=.5)
+    cylindre('Dessus', '#8a5a33', .36, .35, .04, 12, (0, 0, .08), racine, biseau=.01)
+    for q in range(5):
+        a = q * 2 * math.pi / 5 + .3
+        from outils import cone
+        cone(f'Defense{q}', '#f0e6cc', .03, .16, 6, (math.cos(a) * .4, math.sin(a) * .4, .06), racine,
+             (math.cos(a + math.pi / 2) * .5, math.sin(a + math.pi / 2) * .5, 0))
+    return HAUT_SOCLE
+
+def socle_sylvestres(racine):
+    """Souche moussue et racines noueuses, champignons luisants."""
+    from outils import cone
+    cylindre('Souche', '#6b4a2f', .38, .32, .08, 10, (0, 0, 0), racine, biseau=.02)
+    cylindre('Mousse', '#4f9a4a', .33, .31, .04, 10, (0, 0, .08), racine, biseau=.01)
+    for q in range(5):
+        a = q * 2 * math.pi / 5
+        cone(f'Racine{q}', '#5a3d26', .06, .26, 6, (math.cos(a) * .28, math.sin(a) * .28, .03), racine,
+             (0, 1.75, a))
+    for q in range(3):
+        a = q * 2.1 + .5
+        sphere(f'Champignon{q}', '#c79bff', .035, (math.cos(a) * .34, math.sin(a) * .34, .1), (1, 1, .55), 8, 4, racine, emis=1.5)
+    return HAUT_SOCLE
+
+def socle_nains(racine):
+    """Base hexagonale de pierre et d'acier riveté, bandeau de cuivre."""
+    p = PAL['nains']
+    cylindre('Hexa', '#4a4d55', .43, .41, .07, 6, (0, 0, 0), racine, biseau=.015)
+    cylindre('Dalle', p['pierre'], .36, .35, .05, 6, (0, 0, .07), racine, biseau=.012)
+    anneau('Cuivre', '#c8803e', .36, .013, 12, 3, (0, 0, .07), racine, metal=.7, rough=.3)
+    for q in range(6):
+        a = q * math.pi / 3
+        sphere(f'Rivet{q}', '#d9b37a', .025, (math.cos(a) * .4, math.sin(a) * .4, .07), (1, 1, .6), 6, 4, racine, metal=.7)
+    return HAUT_SOCLE
+
+def socle_ombres(racine):
+    """Dalle d'obsidienne et anneaux runiques flottants (lueur cyan)."""
+    cylindre('Obsidienne', '#2c2340', .4, .36, .08, 7, (0, 0, 0), racine, biseau=.015)
+    cylindre('Dalle', '#4a3a66', .32, .31, .04, 7, (0, 0, .08), racine, biseau=.01)
+    a = pivot('AnneauFlottant', (0, 0, .16), racine)
+    anneau('Rune', '#7ff3ff', .41, .012, 20, 3, (0, 0, 0), a, emis=2)
+    for q in range(3):
+        b = q * 2.094
+        sphere(f'Eclat{q}', '#b8a0d9', .03, (math.cos(b) * .41, math.sin(b) * .41, 0), (1, 1, 1.5), 6, 4, a, emis=1)
+    return HAUT_SOCLE
+
+SOCLES = {'alliance': socle_alliance, 'horde': socle_horde, 'sylvestres': socle_sylvestres, 'nains': socle_nains, 'ombres': socle_ombres}
