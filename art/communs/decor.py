@@ -5,6 +5,7 @@ Le portail et le château sont exportés en GLB. Le plateau est reconstruit en c
 import math
 from .outils import collection, dans, pivot, cylindre, boite, sphere, cone, prisme, peindre, anneau
 from .factions import SOL, BIOME
+from .neige import enneiger
 
 def portail():
     c = collection('portail'); dans(c)
@@ -24,6 +25,7 @@ def portail():
         cylindre(f'Pilier{"GD"[s > 0]}', '#4a3b5e', .07, .06, .5, 8, (s * .4, .05, 0), r)
         sphere(f'Cristal{"GD"[s > 0]}', '#c79bff', .06, (s * .4, .05, .54), (1, 1, 1.6), 6, 4, r, emis=2)
     peindre(r, sol=.8)
+    enneiger(r, 5900)
     return r
 
 def chateau():
@@ -58,6 +60,7 @@ def chateau():
     d = prisme('Drapeau', '#ffd166', [(0, 0), (.2, -.035), (0, -.1)], .012, (0, .1, 1.5), r)
     d.data.materials[0].name = 'Drapeau'
     peindre(r, sol=.7)
+    enneiger(r, 5900)
     return r
 
 def plateau(cols, rows, faction='alliance', x0=0, y0=0):
