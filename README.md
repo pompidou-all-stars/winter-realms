@@ -44,6 +44,9 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.5.1 — 2026-11-14
+- Fixes multiplayer: after 2–3 minutes (as soon as a ground monster reached your board), tapping the board crashed the page, the board froze and towers could no longer be built. Monsters received from the server now carry an approximate target cell. Client-only fix (no server redeploy).
+
 ### 2.5 — 2026-11-14
 - Smarter AI mazes: at the start of each game, every AI draws its own target maze (serpentines, vertical combs or organic labyrinths, refined by a local search), so each AI board looks different and the monster path grows with almost every tower (about 100 cells when complete, against 16 for a straight line).
 - The AI builds its maze in an order that keeps the path long at every stage, starting near the centre to hit both the straight path and the flyers early on.
