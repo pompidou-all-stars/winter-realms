@@ -28,8 +28,18 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
   await N.toucher(p,'#go0');assert.equal(await val(()=>document.getElementById('ov').hidden),true);
   await N.avancer(p,2100);const e=await N.etat(p);assert.equal(e.horloge,'0:02');assert.deepEqual([e.or,e.revenu,e.vies,e.faction],[100,10,40,2]);
  });
- test('Toucher une case pose la tour sélectionnée et débite son prix',async()=>{
-  await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[{x:3,y:5,k:20,lv:1}]);assert.equal(e.or,80);
+ test('Construction (2.2) : un premier toucher montre un aperçu, sans rien construire',async()=>{
+  await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[]);assert.equal(e.or,100);
+  assert.deepEqual(e.projet,{x:3,y:5,k:20});assert.match(e.toast,/Touchez encore la case pour construire \(20 or\)/);
+ });
+ test('Construction (2.2) : un second toucher sur la même case construit la tour et débite son prix',async()=>{
+  await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[{x:3,y:5,k:20,lv:1}]);assert.equal(e.or,80);assert.equal(e.projet,null);
+ });
+ test('Construction (2.2) : toucher une autre case déplace l\'aperçu, sans construire',async()=>{
+  await N.toucherCase(p,8,5);await N.toucherCase(p,9,5);const e=await N.etat(p);assert.deepEqual(e.projet,{x:9,y:5,k:20});assert.equal(e.tours.length,1);assert.equal(e.or,80);
+ });
+ test('Construction (2.2) : glisser le doigt sur plusieurs cases ne construit rien',async()=>{
+  await N.glisser(p,[1,12],[5,12]);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(e.or,80);
  });
  test('Une pose impossible est refusée avec un message',async()=>{
   await N.toucherCase(p,6,0);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(e.or,80);
@@ -57,7 +67,7 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
   assert.ok((await p.textContent('#bar button:has-text("Arbre sentinelle") em')).includes('/s'),'la carte affiche les dégâts par seconde');
  });
  test('Fiche d\'une tour posée (2.1) : niveau et gain du niveau suivant',async()=>{
-  await N.toucherCase(p,3,5);await N.toucherCase(p,3,5);const e=await N.etat(p);assert.equal(e.panneauOuvert,true);assert.match(e.fiche,/niveau 1\/5/);assert.match(e.fiche,/Niveau 2 :/);
+  await N.construire(p,3,5);await N.toucherCase(p,3,5);const e=await N.etat(p);assert.equal(e.panneauOuvert,true);assert.match(e.fiche,/niveau 1\/5/);assert.match(e.fiche,/Niveau 2 :/);
   await N.toucher(p,'#bar button:has-text("Vendre")');
  });
  test('Onglet « Spéciaux » (2.1) : les monstres verrouillés affichent leur heure de déblocage',async()=>{
@@ -77,7 +87,7 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
  test('Zoomé (2.1) : toucher une case pose la tour exactement sur cette case',async()=>{
   const b=await p.locator('#stage').boundingBox();let cible=null;
   for(let y=0;y<17&&!cible;y++)for(let x=0;x<13;x++){const c=await N.centreCase(p,x,y);if(x!=6&&c.x>b.x+20&&c.x<b.x+b.width-20&&c.y>b.y+50&&c.y<b.y+b.height-20){cible={x,y};break}}
-  assert.ok(cible,'une case visible');const avant=(await N.etat(p)).or;await N.toucherCase(p,cible.x,cible.y);
+  assert.ok(cible,'une case visible');const avant=(await N.etat(p)).or;await N.construire(p,cible.x,cible.y);
   const e=await N.etat(p);assert.ok(e.tours.some(t=>t.x==cible.x&&t.y==cible.y),'tour posée en ('+cible.x+','+cible.y+')');assert.equal(e.or,avant-20);
   await N.toucherCase(p,cible.x,cible.y);await N.toucher(p,'#bar button:has-text("Vendre")');
  });
