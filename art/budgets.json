@@ -1,0 +1,8 @@
+{
+ "_explication": "Limites par fichier 3D livré au jeu (doit rester fluide sur téléphone). Modifiables par décision du concepteur.",
+ "tour": {"triangles": 3000, "octets": 153600},
+ "monstre": {"triangles": 3000, "octets": 153600},
+ "decor": {"triangles": 6000, "octets": 307200},
+ "exemple": {"triangles": 1000, "octets": 51200},
+ "total_octets": 8388608
+}
