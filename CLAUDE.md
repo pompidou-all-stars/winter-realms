@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 1.4)
+# Winter Realms — Tower Wars (Édition 1.6)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -17,6 +17,19 @@ Concrètement :
 4. Un changement qui contredit ce document sans le mettre à jour est considéré comme incomplet.
 
 Claude : quand tu modifies le jeu, applique cette règle sans qu'on te le demande.
+
+## ⚠️ Règle de commits réguliers (obligatoire)
+
+On commite **souvent, par petites étapes**, pour que tout le monde suive l'avancement :
+
+1. **Un commit par amélioration** (une nouvelle tour, un monstre, une retouche d'équilibrage, un correctif, une évolution visuelle…). On ne mélange pas plusieurs sujets dans un même commit.
+2. Chaque commit contient **à la fois** le changement dans `index.html` **et** la mise à jour de `CLAUDE.md`.
+3. **Nouvelle version reçue** (fichier HTML partagé par un membre du groupe) : la copier dans `index.html`, lire le diff (`git diff`), mettre à jour `CLAUDE.md`, puis faire un commit nommé `Version X.Y : <résumé>`.
+4. **Messages de commit** en français, au présent, courts et précis : `Ajoute la tour …`, `Corrige …`, `Rééquilibre …`, `Version 1.6 : plateau diorama`.
+5. Faire `git pull` avant de commencer et `git push` juste après chaque commit, pour que les autres récupèrent les changements.
+6. Ne jamais laisser une modification qui marche sans la commiter à la fin d'une séance de travail.
+
+Claude : après chaque amélioration terminée, propose (ou fais, si on te l'a demandé) le commit et le push correspondants.
 
 ---
 
@@ -302,6 +315,10 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 2. **Tout est dessiné en code** (Canvas 2D) et **tous les sons sont synthétisés** : pas d'images ni de fichiers audio.
 3. **Univers fantasy original** : noms, personnages et visuels propres au jeu. On ne copie pas les personnages, les visuels ou les noms d'un jeu existant.
 4. **Style « maquette 2.5D » en relief** : ombres portées, dalles biseautées, éclairage doux, personnages caricaturaux (grosse tête, gros nez).
+   - Depuis la v1.6, chaque terrain est un **plateau-diorama** : un socle épais aux bords arrondis et des dalles surélevées avec une tranche visible. Une **palette de biome** propre à chaque faction (bord, reflets, ombres, détails) colore le terrain.
+   - Le **décor est placé de façon déterministe**, calculé à partir des coordonnées de la case et de la faction, sans hasard à chaque image, donc **sans scintillement**. On y trouve des motifs minéraux, des touffes d'herbe et des reflets sur les dalles, plus 22 petits éléments sur les marges (rochers, végétation).
+   - Le portail d'apparition et le château de sortie ont une ombre portée.
+   - Ces décors sont **purement visuels** : ils ne bloquent ni la pose de tours ni les déplacements.
 5. **Équilibrage par coefficients** : on règle les tables (`BASE_TW`, `FACTION_BALANCE`, `CR`…) plutôt que les tours une par une. Chaque bonus de faction doit avoir une contrepartie.
 6. **Attaquer = investir** : chaque envoi augmente définitivement le revenu. C'est le moteur de la partie.
 7. **Montée en puissance avec le temps** : les PV des monstres augmentent avec le temps de jeu, et les monstres spéciaux se débloquent progressivement.
@@ -325,3 +342,4 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 | Date | Version | Modification |
 |---|---|---|
 | 2026-11-14 | 1.4 | Import initial du projet et création de ce document par rétro-ingénierie du code. |
+| 2026-11-14 | 1.6 | Visuel uniquement : plateau-diorama avec socle et dalles surélevées, palette de biome par faction, décor déterministe (rochers, herbes, cristaux), ombres sous le portail et le château. Texte d'accueil retouché. **Aucun changement de règles ni d'équilibrage.** Le bug des racines sylvestres (§11) est toujours présent. |
