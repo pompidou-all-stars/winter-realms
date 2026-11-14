@@ -12,7 +12,7 @@ Ce document a été **reconstitué à partir du code** (`index.html`). Il décri
 
 Concrètement :
 1. Mettre à jour la ou les sections concernées (tableaux, règles, constantes).
-2. Ajouter une ligne dans le **Journal des modifications** en bas du fichier.
+2. Ajouter une ligne dans le **Journal des modifications** en bas du fichier **et** dans la section **Changelog** du `README.md`.
 3. Si la version change, mettre à jour le numéro dans le `<title>` de `index.html` **et** dans le titre de ce fichier.
 4. Un changement qui contredit ce document sans le mettre à jour est considéré comme incomplet.
 
