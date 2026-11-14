@@ -25,7 +25,7 @@ async function capturer({racine=RACINE,sortie,police='reelle',echelle=2,graine=1
   try{
    await prendre(ECRANS[0]);
    await N.toucher(p,'#go0');await N.avancer(p,500);
-   for(const [x,y] of [[5,6],[7,6],[5,10],[7,10]])await N.toucherCase(p,x,y);
+   for(const [x,y] of [[5,6],[7,6],[5,10],[7,10]])await N.construire(p,x,y);
    await N.avancer(p,500);await prendre(ECRANS[1]);
    await N.avancer(p,34000);await prendre(ECRANS[2]);
    await N.toucherCase(p,5,6);await N.avancer(p,200);await prendre(ECRANS[3]);

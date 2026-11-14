@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.1)
+# Winter Realms — Tower Wars (Édition 2.2)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -351,7 +351,13 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
   - **Envoyer** : rappel de la règle (chaque envoi attaque tous les adversaires et augmente le revenu).
   - En portrait, la fiche a une hauteur fixe pour que le terrain ne change pas de taille.
 - **Cartes de tours** : prix, puis `⚔ dégâts/s ◎ portée`, et `✈` si la tour touche les volants. **Cartes de monstres** : prix et revenu gagné ; un monstre verrouillé affiche « 🔒 dès m:ss ».
-- **Poser une tour** : toucher une case. Au doigt, la tour est posée **au relâcher** (pour qu'un geste à deux doigts ne pose rien). **Glisser** le doigt vers d'autres cases en pose plusieurs d'affilée. À la souris, la pose est immédiate.
+- **Construire une tour : deux touchers** (depuis la 2.2, pour éviter les constructions par erreur) :
+  - **1er toucher** sur une case libre : **aperçu** (tour fantôme, cercle de portée en pointillés, case surlignée en or) et message « Touchez encore la case pour construire (prix) ». Rien n'est construit ni payé ;
+  - **2e toucher sur la même case** : construction. Il n'y a pas de délai imposé entre les deux touchers ;
+  - toucher une **autre case** déplace l'aperçu ; choisir une autre tour dans la barre change la tour de l'aperçu ; changer d'onglet ou de terrain l'annule ;
+  - une case **impossible** (or insuffisant, chemin bloqué, case occupée) est signalée **dès le 1er toucher**, sans aperçu. Le contrôle (`peutConstruire`) reprend celui de `Board.place` sans rien modifier ;
+  - au doigt, un toucher compte au relâcher ; un doigt qui **glisse** vers une autre case ne fait rien (la construction « à la volée » en glissant est supprimée) ;
+  - à la souris : deux clics sur la même case.
 - **Zoom et déplacement** (depuis la 2.1) : **deux doigts** pour zoomer (de 1× à 3×) et pour faire glisser la carte ; **molette** à la souris. Le bouton « Vue d'ensemble » apparaît quand on a zoomé et ramène au zoom normal. Sur la vignette du terrain affiché, un cadre blanc montre la partie visible. Une astuce l'annonce au lancement d'une partie solo.
 - **Toucher une tour** : ouvre sa fiche (voir plus haut), avec les boutons Améliorer, Vendre et Fermer.
 - **Paysage** (depuis la 2.1) : la colonne de droite défile si elle est trop haute ; avant, le haut de l'écran et le bas du terrain étaient coupés sur téléphone.
@@ -462,7 +468,7 @@ Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en
   - `tables` : les 50 tours, les 18 monstres, les archétypes, les factions et la difficulté, comparés à la référence et recalculés à partir des formules.
   - `construction`, `deplacements`, `combats`, `economie`, `vagues` (avec l'IA), `fin-de-partie` : les mécaniques.
   - `parties-ia` : 15 parties complètes (5 factions × 3 difficultés) rejouées à l'identique et comparées, état par état, à la référence.
-- `navigateur/parcours.test.js` : le **parcours automatisé** d'un joueur dans Chromium au format téléphone (390 × 844 en portrait, 844 × 390 en paysage) : accueil, faction, difficulté, pose et refus, panneau de tour, envoi, vignettes, fiche d'information, monstres verrouillés, zoom et déplacement à deux doigts (sans pose accidentelle), pose exacte en mode zoomé, « Vue d'ensemble », revenu, mise en page. **Ce n'est pas une garantie de compatibilité avec tous les téléphones** : Safari sur iPhone, les anciens Android et les vrais écrans tactiles ne sont pas testés.
+- `navigateur/parcours.test.js` : le **parcours automatisé** d'un joueur dans Chromium au format téléphone (390 × 844 en portrait, 844 × 390 en paysage) : accueil, faction, difficulté, construction en deux touchers (aperçu, confirmation, déplacement de l'aperçu, glisser sans effet) et refus, panneau de tour, envoi, vignettes, fiche d'information, monstres verrouillés, zoom et déplacement à deux doigts (sans pose accidentelle), pose exacte en mode zoomé, « Vue d'ensemble », revenu, mise en page. **Ce n'est pas une garantie de compatibilité avec tous les téléphones** : Safari sur iPhone, les anciens Android et les vrais écrans tactiles ne sont pas testés.
 - `moteurs/v1.7/` : une **copie figée** du moteur, extraite du commit `c868ff9` (empreinte SHA-256 `e0cd2f78…615f6f`, voir `PROVENANCE.md`). Le `sim.js` des versions 2.0 et 2.0.1 lui est identique octet pour octet.
 - `references/` : les valeurs de référence (statistiques, parties), **produites à partir du moteur figé**, jamais à partir de `main`.
 - `outils/` : chargement du moteur dans un environnement isolé, hasard à graine, serveur web local, pilotage du navigateur, affichage en français, audit de la documentation.
@@ -489,7 +495,7 @@ Chaque évolution est présentée avec trois bilans **séparés** (`node tests/b
 ### 12.6 Conditions de la comparaison visuelle (contre les fausses différences)
 - **Même machine, même navigateur, même séance** : l'« avant » (extrait de git) et l'« après » sont capturés l'un après l'autre par le même Chromium. On ne compare **jamais** des images faites sur deux machines différentes, ni des images enregistrées dans le dépôt.
 - **Même scénario** : graine 12345, Alliance, Normal, 4 tours posées en (5,6), (7,6), (5,10) et (7,10), capture à 35 s de jeu, puis panneau de la tour (5,6), puis zoom à deux doigts autour de la case (6,7).
-- **Horloge figée** : le temps du navigateur est en pause et n'avance que sur commande. Sans cela, les animations (pointillés du chemin, barre de revenu) diffèrent d'une capture à l'autre.
+- **Horloge figée** : le temps du navigateur est en pause et n'avance que sur commande. Sans cela, les animations (pointillés du chemin, barre de revenu) diffèrent d'une capture à l'autre. Au chargement, l'horloge est en plus **alignée sur exactement 200 ms** : l'horloge simulée de Playwright démarre avec 1 ou 2 ms de décalage selon les passages, ce qui suffisait à décaler les animations.
 - **Écran fixé** : 390 × 844 et 844 × 390, densité ×2, mode mobile tactile, langue `fr-FR`, fuseau `Europe/Paris`.
 - **Rendu reproductible** : Chromium est lancé en rendu logiciel (`--disable-gpu`), sans lissage sous-pixel du texte (`--disable-lcd-text`, `--font-render-hinting=none`), avec un profil de couleur fixe (`--force-color-profile=srgb`) et sans optimisations variables. Sans ces options, le texte en gras pouvait être dessiné légèrement différemment d'une capture à l'autre (jusqu'à 0,4 % de faux écarts).
 - **Police** : **tous** les fichiers de Fredoka (graisses 500 et 700, tous les jeux de caractères) sont chargés avant la première capture. Si la police manque d'un côté, les deux versions sont recapturées avec la police de remplacement.
@@ -583,3 +589,4 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 | 2026-11-14 | 2.0.1 | Outillage : **versions et retour arrière** (§14). Étiquette automatique à chaque fusion dans `main` (`vX.Y.Z`, ou `vX.Y.Z.N` sans changement du jeu), Releases GitHub, versions historiques 1.4 à 2.0.1 étiquetées, procédure « reviens à la version … ». **Aucun changement de jeu.** |
 | 2026-11-14 | 2.0.1 | Correctif outillage : le déploiement automatique du serveur passe de Node 20 à **Node 22** (Wrangler 4 refuse Node 20 ; le premier déploiement automatique avait échoué). **Aucun changement de jeu.** |
 | 2026-11-14 | 2.1 | **Interface plus claire** : fiche d'information de la tour (dégâts/s, portée, cibles, effets, bonus de faction chiffré, gain du niveau suivant), cartes de tours avec dégâts/s, portée et ✈, prix en rouge si l'or manque, monstres verrouillés avec heure de déblocage. **Zoom (1× à 3×) et déplacement à deux doigts**, molette, bouton « Vue d'ensemble », cadre de la partie visible sur la vignette. Pose au doigt au relâcher. Correction du paysage sur téléphone (haut et bas coupés). Tests navigateur complétés (19 vérifications par orientation), 5ᵉ capture (zoom). **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
+| 2026-11-14 | 2.2 | **Construction en deux touchers** : le 1er toucher montre un aperçu (tour fantôme, portée, prix), le 2e sur la même case construit ; une case impossible est signalée dès le 1er toucher ; glisser le doigt ne construit plus rien. Tests navigateur complétés (22 vérifications par orientation). **Règles du jeu inchangées** (`sim.js` non modifié). |

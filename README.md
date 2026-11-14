@@ -44,6 +44,10 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.2 — 2026-11-14
+- Building a tower now takes two taps: the first tap shows a preview (ghost tower, range, price), the second tap on the same tile builds it. Invalid tiles are reported on the first tap. Dragging a finger no longer builds towers.
+- Game rules unchanged (`sim.js` untouched).
+
 ### 2.1 — 2026-11-14
 - Clearer interface: an info panel describes the selected tower in plain French (damage per second, range, ground/air targets, effects, faction bonus, next-level gain); tower cards show damage/s, range and anti-air; prices turn red when gold is short; locked monsters show when they unlock.
 - Two-finger pinch zoom (1× to 3×) and pan on the board, mouse-wheel zoom, "Vue d'ensemble" reset button. Touch placement now happens on release so a two-finger gesture never builds a tower.

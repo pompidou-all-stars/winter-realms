@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.1</title>
+<title>Winter Realms — Tower Wars · Édition 2.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#16221a;--panel:#27382b;--panel2:#33483a;--ink:#f6ecd0;--dim:#b9c4ab;--gold:#f2c14e;--red:#e4572e;color-scheme:dark}
@@ -444,9 +444,13 @@ function draw(b,g,s,t){
  for(const c of b.cr){const rc=CR[c.k].aura?'255,228,94':CR[c.k].heal?'111,207,151':0;if(rc){g.beginPath();g.arc((c.x+.5)*s,(c.y+.5)*s,AURA_R*s,0,7);g.fillStyle='rgba('+rc+',.1)';g.fill();g.strokeStyle='rgba('+rc+','+(.35+Math.sin(t*5)*.15)+')';g.lineWidth=2;g.stroke()}}
  if(pick&&b===P&&b.t.includes(pick)){const cx=(pick.x+.5)*s,cy=(pick.y+.5)*s;g.beginPath();g.arc(cx,cy,rng(pick)*s,0,7);g.fillStyle='rgba(255,255,255,.1)';g.fill();g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=1.5;g.stroke();
   g.strokeStyle='#ffd95e';g.lineWidth=3;g.strokeRect(pick.x*s+1.5,pick.y*s+1.5,s-3,s-3)}
+ if(projet&&b===P){const T=TW[projet.k],cx=(projet.x+.5)*s,cy=(projet.y+.5)*s,ok=!peutConstruire(projet.x,projet.y,projet.k);
+  g.beginPath();g.arc(cx,cy,T.r*s,0,7);g.fillStyle=ok?'rgba(255,255,255,.1)':'rgba(255,77,61,.12)';g.fill();g.strokeStyle='rgba(255,255,255,.7)';g.lineWidth=1.5;g.setLineDash([6,5]);g.stroke();g.setLineDash([]);
+  g.strokeStyle=ok?'#ffd95e':'#ff6b5a';g.lineWidth=2+Math.sin(t*6);g.strokeRect(projet.x*s+2,projet.y*s+2,s-4,s-4)}
  const ents=[],fl=[],cre=c=>drawCreep(g,c.k,(c.x+.5+c.ox)*s,(c.y+.5+c.oy)*s,s,t+c.ph,CR[c.k].fly?1:c.f,c.sl>0,c.hp/c.max,c.h?'rgba(255,228,94,.5)':c.hl?'rgba(111,207,151,.55)':0,CR[c.k].inv?(c.hid?.35:.85):1);
  for(const w of b.t)ents.push([w.y+.32,w]);for(const c of b.cr)CR[c.k].fly?fl.push(c):ents.push([c.y+c.oy+.1,c]);ents.sort((a,c)=>a[0]-c[0]);
  for(const[,o]of ents){if(o.lv){g.save();g.shadowColor='rgba(0,0,0,.55)';g.shadowBlur=s*.2;g.shadowOffsetX=s*.07;g.shadowOffsetY=s*.15;drawTower(g,o.k,(o.x+.5)*s,(o.y+.5)*s,s,o.a,t,o.lv,o.sw,o.stun>0);g.restore()}else cre(o)}
+ if(projet&&b===P){g.save();g.globalAlpha=.55+.15*Math.sin(t*6);drawTower(g,projet.k,(projet.x+.5)*s,(projet.y+.5)*s,s,.7,t,1,0,0);g.restore()}
  for(const p of b.pr)drawProj(g,p,s);
  for(const c of fl)cre(c);
  for(const f of b.fx)drawFx(g,f,s);
@@ -461,7 +465,7 @@ function drawMini(b,g,m){g.fillStyle=b.dead?'#333':'#426c3e';g.fillRect(0,0,C*m,
 const $=id=>document.getElementById(id),main=$('main'),stage=$('stage'),bar=$('bar'),MINI=3;
 if(typeof CanvasRenderingContext2D!='undefined'&&!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 /* G : partie locale (solo). B, P, time, tick, over, LV : vue courante, recopiée de G à chaque image. */
-let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',sel=0,view=0,mx,hudK='',tt=0,painting=false,lastCell='',pick=null;
+let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',sel=0,view=0,mx,hudK='',tt=0,pick=null;
 const VB=()=>B[view],dpr=()=>Math.min(3,window.devicePixelRatio||1);
 const eff=b=>b.ai?Math.round(b.inc*DIFF[LV].b):b.inc;
 /* ---------- multijoueur ---------- */
@@ -555,11 +559,11 @@ function dessinerVue(t){const g=mx,s=cell*VUE.z,W=C*s,H=R*s,rr=Math.min(10*VUE.z
  g.save();g.shadowColor='rgba(0,0,0,.56)';g.shadowBlur=32;g.shadowOffsetY=14;g.fillStyle=cadre;g.beginPath();g.roundRect(-3,-3,W+6,H+6,rr+3);g.fill();g.restore();
  g.beginPath();g.roundRect(0,0,W,H,rr);g.fillStyle='#18251c';g.fill();g.clip();draw(VB(),g,s,t);g.restore()}
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true},1900)}
-function setView(v){view=v;const b=B[v],bn=$('banner');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · touche « '+P.name+' » pour revenir';bn.style.background=b.col;cadre=v!=me?b.col:'#27382b';hudK=''}
+function setView(v){view=v;projet=null;const b=B[v],bn=$('banner');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · touche « '+P.name+' » pour revenir';bn.style.background=b.col;cadre=v!=me?b.col:'#27382b';hudK=''}
 const SOLO_COL=['#e4572e','#4aa3df','#b06ad0'];
 function soloSeats(f){return [{name:'Toi',col:FACTIONS[f].color,ai:0,classId:f}].concat([1,2,3].map(i=>({name:'IA '+i,col:SOLO_COL[i-1],ai:1,classId:(f+i)%5})))}
 /* installe une partie (locale ou reçue du serveur) : vignettes, joueur, vue */
-function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=P.classId*10;
+function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=P.classId*10;projet=null;
  const ch=$('chips');ch.textContent='';for(const b of B){const e=document.createElement('button'),cv=document.createElement('canvas'),tx=document.createElement('span'),n=document.createElement('b'),s=document.createElement('span');
   e.className='chip';e.style.setProperty('--c',b.col);n.textContent=b.name;tx.append(n,s);e.append(cv,tx);e.onclick=()=>setView(b.i);ch.appendChild(e);b.ui={e,g:setup(cv,C*MINI,R*MINI),s}}
  $('factionBadge').textContent=FACTIONS[P.classId].icon+' '+FACTIONS[P.classId].name;hudK='';pick=null;setView(me);render()}
@@ -608,9 +612,9 @@ function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P
   if(t.lv<5)add(icon(IC.up),'Améliorer',upCost(t)+' or',upCost(t),()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()},1,'niveau '+(t.lv+1));
   add(icon(IC.coin),'Vendre','+'+Math.floor(t.inv*.7)+' or',0,()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()});
   add(icon(IC.x),'Fermer',' ',0,()=>{pick=null;render()});return}
- if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(icon(g=>drawTower(g,k,20,25,30,.7,0,1,0)),T.n,T.c+' or',T.c,()=>{sel=k;render()},sel==k,'⚔'+dps(k,1)+'/s ◎'+fr(T.r)+(T.gr?'':' ✈'))})}
+ if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(icon(g=>drawTower(g,k,20,25,30,.7,0,1,0)),T.n,T.c+' or',T.c,()=>{sel=k;if(projet)projet.k=k;render()},sel==k,'⚔'+dps(k,1)+'/s ◎'+fr(T.r)+(T.gr?'':' ✈'))})}
  else{ficheEnvoi();byCat(tab).forEach(k=>{const T=CR[k],lock=time<(T.at||0);add(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.n,T.c+' or · +'+T.i+' revenu',T.c,()=>playerSend(k),0,lock?'🔒 dès '+mmss(T.at):T.tag||'',T.at);bar.lastChild.dataset.tag=T.tag||''})}}
-function setTab(t){tab=t;pick=null;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==t));render()}
+function setTab(t){tab=t;pick=null;projet=null;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==t));render()}
 function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(time<(T.at||0)){showErr('locked',a);return}if(!NET.on&&P.gold<T.c){showErr('poor',a);return}if(doAction(a)==='')sfx('send')}
 
 const factionBox=$('factions');
@@ -634,40 +638,52 @@ factionBox.addEventListener('click',e=>{
 });
 selectFaction(chosenClass);
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
-function act(e,first){if(over)return;const r=main.getBoundingClientRect(),s=cell*VUE.z,x=Math.floor((e.clientX-r.left-VUE.ox)/s),y=Math.floor((e.clientY-r.top-VUE.oy)/s);
- if(x<0||y<0||x>=C||y>=R)return;const key=x+','+y;if(key==lastCell)return;lastCell=key;
+/* ---------- construction en deux touchers (depuis la 2.2) ----------
+   1er toucher sur une case : aperçu (tour fantôme, portée, prix) ; 2e toucher sur la même case : construction.
+   Toucher une autre case déplace l'aperçu. Une case impossible est signalée dès le 1er toucher. */
+let projet=null;
+/* même contrôle que Board.place, sans rien modifier : '' si la pose est possible, sinon le code d'erreur */
+function peutConstruire(x,y,k){const T=TW[k];if(x<0||y<0||x>=C||y>=R||P.g[y][x]||(x==SP[0]&&y==SP[1])||(x==EX[0]&&y==EX[1]))return 'blocked';
+ if(P.gold<T.c)return 'poor';
+ if(P.cr.some(c=>!CR[c.k].fly&&((Math.abs(c.x-x)<.9&&Math.abs(c.y-y)<.9)||(c.tx==x&&c.ty==y))))return 'blocked';
+ P.g[y][x]=1;const nd=P.dist();P.g[y][x]=0;return nd[SP[1]][SP[0]]>=INF||P.cr.some(c=>!CR[c.k].fly&&nd[c.ty][c.tx]>=INF)?'blocked':''}
+function annulerProjet(){projet=null}
+function confirmerConstruction(x,y){const k=projet.k;projet=null;
+ if(NET.on){if(P.gold<TW[k].c){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr('poor');return}NET.act({type:'place',x,y,k},true);return}
+ const e2=G.action(me,{type:'place',x,y,k});if(e2){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(e2)}}
+function act(e){if(over)return;const r=main.getBoundingClientRect(),s=cell*VUE.z,x=Math.floor((e.clientX-r.left-VUE.ox)/s),y=Math.floor((e.clientY-r.top-VUE.oy)/s);
+ if(x<0||y<0||x>=C||y>=R)return;
  const tw=P.t.find(t=>t.x==x&&t.y==y);
- if(tw){if(first){painting=false;if(tab!='t')setTab('t');pick=tw;render();sfx('tap')}return}
- if(pick){if(first){painting=false;pick=null;render()}return}
- if(tab!='t'){if(first)toast('Passe sur « Construire » pour poser une tour');painting=false;return}
- const poor=P.gold<TW[sel].c;
- if(NET.on){if(poor){if(first){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr('poor')}return}NET.act({type:'place',x,y,k:sel},first);return}
- const e2=G.action(me,{type:'place',x,y,k:sel});
- if(e2){if(first||e2!='poor')P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});if(first)showErr(e2)}}
+ if(tw){projet=null;if(tab!='t')setTab('t');pick=tw;render();sfx('tap');return}
+ if(pick){pick=null;render();return}
+ if(tab!='t'){toast('Passe sur « Construire » pour poser une tour');return}
+ if(projet&&projet.x==x&&projet.y==y){confirmerConstruction(x,y);return}
+ const err=peutConstruire(x,y,sel);
+ if(err){projet=null;P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(err);return}
+ projet={x,y,k:sel};sfx('tap');toast('Touchez encore la case pour construire ('+TW[sel].c+' or)')}
 /* Gestes sur le terrain :
-   - un doigt : toucher une case pose la tour (au relâcher) ; glisser vers d'autres cases en pose plusieurs ;
-   - deux doigts : pincer pour zoomer, déplacer pour se promener sur la carte (aucune tour n'est posée) ;
-   - souris : clic immédiat comme avant, molette pour zoomer. */
+   - un doigt : un toucher (au relâcher) sur une case = aperçu, un 2e toucher sur la même case = construction ;
+     un doigt qui glisse vers une autre case n'est pas un toucher : il ne fait rien (plus de construction à la volée) ;
+   - deux doigts : pincer pour zoomer, déplacer pour se promener sur la carte (rien n'est construit) ;
+   - souris : même chose avec des clics, molette pour zoomer. */
 const DOIGTS=new Map();let geste=null,attente=null,gesteFini=false;
 const dist2=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y)||1,milieu=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
 const caseDe=e=>{const r=main.getBoundingClientRect(),s=cell*VUE.z;return Math.floor((e.clientX-r.left-VUE.ox)/s)+','+Math.floor((e.clientY-r.top-VUE.oy)/s)};
 main.addEventListener('pointerdown',e=>{try{main.setPointerCapture(e.pointerId)}catch(_){}
  DOIGTS.set(e.pointerId,{x:e.clientX,y:e.clientY});
- if(DOIGTS.size==2){painting=false;attente=null;const [a,b]=[...DOIGTS.values()];geste={d:dist2(a,b),m:milieu(a,b),z:VUE.z,ox:VUE.ox,oy:VUE.oy};return}
+ if(DOIGTS.size==2){attente=null;const [a,b]=[...DOIGTS.values()];geste={d:dist2(a,b),m:milieu(a,b),z:VUE.z,ox:VUE.ox,oy:VUE.oy};return}
  if(DOIGTS.size>2||gesteFini)return;
- lastCell='';
- if(e.pointerType=='mouse'){if(view!=me){toast('Tu regardes le terrain de '+B[view].name);return}painting=true;act(e,true)}
+ if(e.pointerType=='mouse'){if(view!=me){toast('Tu regardes le terrain de '+B[view].name);return}act(e)}
  else attente={clientX:e.clientX,clientY:e.clientY,id:e.pointerId}});
 main.addEventListener('pointermove',e=>{if(DOIGTS.has(e.pointerId))DOIGTS.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(geste){if(DOIGTS.size<2)return;const [a,b]=[...DOIGTS.values()],m=milieu(a,b),r=main.getBoundingClientRect(),s0=cell*geste.z;
   const bx=(geste.m.x-r.left-geste.ox)/s0,by=(geste.m.y-r.top-geste.oy)/s0;
   VUE.z=Math.min(ZMAX,Math.max(1,geste.z*dist2(a,b)/geste.d));VUE.ox=m.x-r.left-bx*cell*VUE.z;VUE.oy=m.y-r.top-by*cell*VUE.z;borner();return}
- if(attente&&e.pointerId==attente.id){if(view==me&&caseDe(e)!=caseDe(attente)){painting=true;act(attente,true);attente=null;act(e,false)}return}
- if(painting)act(e,false)});
+ if(attente&&e.pointerId==attente.id&&caseDe(e)!=caseDe(attente))attente=null});
 for(const n of['pointerup','pointercancel'])main.addEventListener(n,e=>{const tap=attente&&e.pointerId==attente.id&&n=='pointerup'&&!geste;
- if(tap){if(view!=me)toast('Tu regardes le terrain de '+B[view].name);else act(attente,true)}
+ if(tap){if(view!=me)toast('Tu regardes le terrain de '+B[view].name);else act(attente)}
  if(attente&&e.pointerId==attente.id)attente=null;
- DOIGTS.delete(e.pointerId);if(geste){geste=null;gesteFini=DOIGTS.size>0}if(!DOIGTS.size){gesteFini=false;painting=false}});
+ DOIGTS.delete(e.pointerId);if(geste){geste=null;gesteFini=DOIGTS.size>0}if(!DOIGTS.size)gesteFini=false});
 main.addEventListener('wheel',e=>{e.preventDefault();zoomer(VUE.z*Math.exp(-e.deltaY*.0015),e.clientX,e.clientY)},{passive:false});
 $('zoomReset').onclick=vueEnsemble;
 $('snd').onclick=()=>{muted=!muted;$('snd').classList.toggle('off',muted);audio();if(!muted)sfx('income')};

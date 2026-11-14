@@ -36,6 +36,9 @@ async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='ree
  const policeChargee=await page.evaluate(async()=>{const fr=()=>[...document.fonts].filter(f=>/Fredoka/.test(f.family));
   await Promise.all(fr().map(f=>f.load().catch(()=>{})));await document.fonts.ready;return fr().length>0&&fr().every(f=>f.status=='loaded')});
  await page.clock.runFor(100);
+ /* l'horloge simulée démarre avec 1 ou 2 ms de décalage selon les passages (temps réel écoulé pendant son installation) :
+    on l'aligne sur exactement 200 ms pour que les animations (chemin, portail, barre de revenu) soient identiques à chaque passage */
+ const pn=await page.evaluate(()=>performance.now());await page.clock.runFor(200-pn);
  return {ctx,page,erreurs,policeChargee,fermer:()=>ctx.close()};
 }
 
@@ -44,6 +47,14 @@ async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='ree
 async function centreCase(page,x,y){return page.evaluate(([x,y])=>{if(typeof caseVersEcran=='function')return caseVersEcran(x,y);
  const r=document.getElementById('main').getBoundingClientRect();return {x:r.left+(x+.5)*r.width/13,y:r.top+(y+.5)*r.height/17}},[x,y])}
 async function toucherCase(page,x,y){const c=await centreCase(page,x,y);await page.touchscreen.tap(c.x,c.y);await page.clock.runFor(50)}
+/* construire une tour : deux touchers sur la même case depuis la 2.2 (aperçu puis confirmation), un seul avant */
+async function construire(page,x,y){const deux=await page.evaluate(()=>typeof confirmerConstruction=='function');
+ await toucherCase(page,x,y);if(deux)await toucherCase(page,x,y)}
+/* glisser un doigt d'une case à une autre (sans relâcher entre les deux) */
+async function glisser(page,de,vers,etapes=8){const a=await centreCase(page,de[0],de[1]),b=await centreCase(page,vers[0],vers[1]),cdp=await page.context().newCDPSession(page);
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:a.x,y:a.y,id:1}]});
+ for(let i=1;i<=etapes;i++){const k=i/etapes;await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:a.x+(b.x-a.x)*k,y:a.y+(b.y-a.y)*k,id:1}]})}
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();await page.clock.runFor(50)}
 /* geste à deux doigts (pincer / écarter / déplacer), envoyé comme de vrais événements tactiles */
 async function deuxDoigts(page,{de,vers,etapes=8}){const cdp=await page.context().newCDPSession(page);const pts=(p,q)=>[{x:p.x,y:p.y,id:1},{x:q.x,y:q.y,id:2}];
  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:pts(de[0],de[1])});
@@ -53,6 +64,6 @@ async function deuxDoigts(page,{de,vers,etapes=8}){const cdp=await page.context(
 async function toucher(page,selecteur){await page.locator(selecteur).first().tap();await page.clock.runFor(50)}
 async function avancer(page,ms){await page.clock.runFor(ms)}
 async function etat(page){return page.evaluate(()=>({or:P.gold,revenu:P.inc,vies:P.lives,tours:P.t.map(t=>({x:t.x,y:t.y,k:t.k,lv:t.lv})),temps:time,horloge:document.getElementById('clock').textContent,
- vue:view,fin:over,faction:chosenClass,panneauOuvert:!!document.querySelector('#bar .info')||document.getElementById('fiche')?.dataset.mode=='tour',fiche:document.getElementById('fiche')?.innerText||'',zoom:typeof VUE=='object'?VUE.z:1,boutons:[...document.querySelectorAll('#bar button')].map(b=>b.textContent)}))}
+ vue:view,fin:over,faction:chosenClass,panneauOuvert:!!document.querySelector('#bar .info')||document.getElementById('fiche')?.dataset.mode=='tour',fiche:document.getElementById('fiche')?.innerText||'',zoom:typeof VUE=='object'?VUE.z:1,projet:typeof projet!='undefined'&&projet?{...projet}:null,toast:document.getElementById('toast').hidden?'':document.getElementById('toast').textContent,boutons:[...document.querySelectorAll('#bar button')].map(b=>b.textContent)}))}
 
-module.exports={disponible,lancer,ouvrir,toucherCase,centreCase,deuxDoigts,toucher,avancer,etat,FORMATS};
+module.exports={disponible,lancer,ouvrir,toucherCase,construire,glisser,centreCase,deuxDoigts,toucher,avancer,etat,FORMATS};
