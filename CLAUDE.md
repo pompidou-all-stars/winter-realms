@@ -51,7 +51,7 @@ Plusieurs personnes travaillent en même temps, souvent depuis un téléphone, s
 4. **Petites branches, courte durée** : une branche = une amélioration, fusionnée dans les jours qui suivent. Si `main` a bougé entretemps, y récupérer les changements (`git pull origin main`) et régler les conflits **avant** la fusion.
 5. **Pull request** : titre en français au même format que les commits. La description dit ce qui change et comment le tester. Elle signale si `sim.js` ou `server/` est modifié (le serveur devra être redéployé).
 6. **Fusion dans `main`** : seulement après **relecture par une autre personne** du groupe et un test rapide du jeu (solo, et multijoueur si `sim.js` ou `server/` a changé). Après la fusion, on supprime la branche.
-7. **Après une fusion qui touche `sim.js` ou `server/`** : redéployer le serveur (voir §9 bis, « Déployer »).
+7. **Après une fusion qui touche `sim.js` ou `server/`** : le serveur se redéploie tout seul. Vérifier dans l'onglet **Actions** que le déploiement a réussi (voir §9 bis, « Déployer »).
 
 Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu es sur `main`, crée d'abord une branche selon ces règles. Ne fusionne jamais dans `main` et ne pousse jamais sur `main` toi-même : ouvre une PR.
 
@@ -374,13 +374,15 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 
 ### ⚠️ Déployer
 - **Le site** (`index.html`, `sim.js`) est mis à jour **automatiquement** par GitHub Pages à chaque fusion dans `main`.
-- **Le serveur, lui, ne se met pas à jour tout seul.** Après **toute modification de `sim.js`** (règles, équilibrage, IA) ou de `server/`, il faut le redéployer :
+- **Le serveur est redéployé automatiquement** par la GitHub Action `.github/workflows/deploy-server.yml` à chaque fusion dans `main` qui touche `sim.js`, `server/` ou ce fichier. On suit le déploiement dans l'onglet **Actions** du dépôt. On peut aussi le relancer à la main : **Actions → Déployer le serveur → Run workflow**.
+  - L'action utilise deux secrets du dépôt (**Settings → Secrets and variables → Actions**) : `CLOUDFLARE_API_TOKEN`, un jeton API créé sur le compte Cloudflare d'Emilien avec le modèle « Edit Cloudflare Workers », et `CLOUDFLARE_ACCOUNT_ID`. Sans eux, le déploiement échoue.
+  - Si le déploiement échoue (croix rouge dans Actions), les parties en ligne tournent avec les anciennes règles tant qu'il n'est pas réparé.
+- **Déploiement manuel** (secours, depuis un ordinateur) :
   ```bash
   cd server
   npx wrangler deploy
   ```
-  Sinon, les parties en ligne tournent avec les anciennes règles.
-- La première fois sur une machine : installer Node.js LTS, lancer `npm install` dans `server/`, puis `npx wrangler login`. Le compte Cloudflare utilisé est celui d'Emilien. Pour déployer, un autre membre doit être invité sur ce compte Cloudflare.
+  La première fois sur une machine : installer Node.js LTS, lancer `npm install` dans `server/`, puis `npx wrangler login`. Le compte Cloudflare utilisé est celui d'Emilien. Pour déployer à la main, un autre membre doit être invité sur ce compte Cloudflare.
 - **Tester en local** :
   - `npx wrangler dev` dans `server/` (port 8787) ;
   - en parallèle, un serveur web à la racine (`npx http-server -p 8080`), puis ouvrir http://localhost:8080 ;
@@ -421,3 +423,4 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 | 2026-11-14 | 2.0 | **Multijoueur en ligne** : salons de 2 à 4 humains (IA sur les places libres), code ou lien d'invitation, chef de salon, spectateurs, reconnexion. Serveur Cloudflare Workers et Durable Objects (`server/`, plan gratuit). Site publié sur GitHub Pages. |
 | 2026-11-14 | 2.0.1 | Jeu en ligne **réservé à la France** (`ALLOWED_COUNTRIES`, contrôlé par le serveur), avec un message clair côté page. Le solo reste disponible partout. |
 | 2026-11-14 | 2.0.1 | Organisation : nouvelle **règle des branches**. Plus de commit direct sur `main` : une branche par sujet (`<type>/<sujet>`), pull request, relecture par un autre membre, puis fusion. **Aucun changement de jeu.** |
+| 2026-11-14 | 2.0.1 | Outillage : **déploiement automatique du serveur** par une GitHub Action (`.github/workflows/deploy-server.yml`) à chaque fusion dans `main` qui touche `sim.js` ou `server/`. Secrets `CLOUDFLARE_API_TOKEN` et `CLOUDFLARE_ACCOUNT_ID`. **Aucun changement de jeu.** |
