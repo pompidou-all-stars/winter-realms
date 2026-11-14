@@ -44,6 +44,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.4 — 2026-11-14
+- Towers now take time to build: 1 second per 30 gold spent, between 1 and 12 seconds (an Archer takes 1 s, a Mage about 3 s, an Archmage about 4.5 s). Upgrades work the same way, based on the upgrade price.
+- While building or upgrading, a tower does not shoot, does not reveal Spectres and cannot be upgraded again. It still blocks the path and can be sold (70 %).
+- A building tower is drawn faded, with scaffolding, a hammer and a gold progress bar. The info panel shows the build time and the countdown.
+
 ### 2.3 — 2026-11-14
 - Bigger board on phones: the four player thumbnails leave the top bar and open in a floating panel over the board, from a map icon in the top-left corner. Tap a thumbnail to watch that board; tap the banner to come back.
 - Your lives now show in the top bar (❤).

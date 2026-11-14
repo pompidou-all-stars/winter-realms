@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.3)
+# Winter Realms — Tower Wars (Édition 2.4)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -69,7 +69,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 - **Le jeu tient en deux fichiers, sans build ni dépendances** :
   - `sim.js` contient **toute la simulation** : tables de données, `class Board`, IA, et `class Game`, qui fait tourner une partie de 4 terrains. Il ne touche ni au DOM ni au son, ce qui permet au serveur multijoueur de le réutiliser tel quel. Les sons y sont seulement notés dans `board.ev` (un `!` devant signifie « toujours audible pour le propriétaire du terrain »). Les événements de partie (revenu, élimination, fin) vont dans `game.log`.
   - `index.html` contient l'interface, le dessin et les sons. Il charge `sim.js` avec `<script src="sim.js">`.
-  - **Toutes les actions du joueur passent par `doAction()`**, qui appelle `Game.action()`. Cette fonction renvoie `''` si l'action réussit, sinon un code d'erreur : `poor`, `blocked`, `locked`, `max`, `over` ou `bad`.
+  - **Toutes les actions du joueur passent par `doAction()`**, qui appelle `Game.action()`. Cette fonction renvoie `''` si l'action réussit, sinon un code d'erreur : `poor`, `blocked`, `locked`, `max`, `busy` (tour en chantier, depuis la 2.4), `over` ou `bad`.
 - **Autour du jeu** (ces dossiers ne sont pas chargés par la page) :
   - `server/` : le serveur multijoueur (Cloudflare Workers), qui importe `sim.js` tel quel (voir §9 bis) ;
   - `tests/` : les tests automatiques, les captures et les bilans (voir §12) ;
@@ -93,6 +93,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
   | `CR` | Les monstres |
   | `DIFF` | Les niveaux de difficulté |
   | `HPK`, `GRACE`, `GROUP`, `AURA_R` | Constantes de gameplay |
+  | `BUILD_OR`, `BUILD_MIN`, `BUILD_MAX` | Temps de construction : 1 s par `BUILD_OR` pièces d'or, borné (§4.4) |
 - **Sections de `sim.js`** : tables de données → simulation (`class Board`) → IA (`aiDefend`, `aiAttack`, `aiAct`) → partie (`class Game`).
 - **Sections du script de `index.html`** : sons → dessin → interface (dont le multijoueur, objet `NET`) → sons et événements → boucle principale (`loop`).
 - **Retouches des emplacements 6 à 9** (§4.2) : elles sont écrites directement dans le calcul de `TW` (`late&&j==6?…`), pas dans une table.
@@ -176,6 +177,20 @@ Formules : `coût = max(10, arrondi(coût_base × puissance × coût_faction / 5
 - **Les dégâts doublent à chaque niveau** (`dégâts × 2^(niveau−1)`).
 - La portée augmente de **5 % par niveau**.
 - La tour grandit visuellement à chaque niveau.
+- Chaque amélioration prend du temps (voir §4.4).
+
+### 4.4 Temps de construction (depuis la 2.4)
+- **Ratio** : **1 seconde pour 30 pièces d'or** dépensées (`BUILD_OR`), au minimum **1 s** (`BUILD_MIN`) et au maximum **12 s** (`BUILD_MAX`) : `temps = min(12, max(1, prix / 30))`.
+- Il s'applique à la **pose** (prix de la tour) et à **chaque amélioration** (prix de l'amélioration). Exemples : Archer 20 or → 1 s ; Mage 85 or → 2,8 s ; Archimage 130 or → 4,3 s ; Archer du niveau 4 au 5 (240 or) → 8 s ; toute amélioration à 360 or ou plus → 12 s.
+- **Pendant le chantier**, la tour (champ `t.b` : secondes restantes, `t.bt` : durée totale) :
+  - ne tire pas, et une tour Mage ne révèle pas les Spectres ;
+  - ne peut pas être améliorée (code d'erreur `busy`) ;
+  - n'est pas visée par l'étourdissement des Saboteurs et du héros ;
+  - **bloque déjà le chemin** (la case est occupée dès la pose) ;
+  - peut être vendue, au tarif normal de 70 %.
+- Pendant une amélioration, le niveau affiché est déjà le nouveau ; la tour ne tire pas jusqu'à la fin des travaux.
+- La transformation d'une tour en Mage par l'IA (§8) déclenche aussi un chantier (prix du Mage).
+- **Visuel** : tour en transparence, échafaudage en bois, marteau qui frappe et barre de progression dorée sous la case. La fiche affiche « 🔨 Construction : N s » avant la pose, puis le compte à rebours ; le bouton Améliorer indique la durée de l'amélioration.
 
 ---
 
@@ -329,7 +344,7 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 **Défense** (`aiDefend`), jusqu'à 3 actions par tour :
 - elle place ses tours selon un plan fixe (`PLAN`), dans l'ordre des rangées 8, 6, 10, 4, 12, 2, 14, en partant du centre ;
 - elle choisit la tour selon ce qu'elle a déjà : Archer ou Garde au début, puis Givre, Flammes et Mage au centre, Canon ailleurs ;
-- à partir de 10 tours, ou quand il n'y a plus de place, elle **améliore** la tour la plus rentable, celle qui couvre le plus de chemin et de couloir aérien par pièce d'or ;
+- à partir de 10 tours, ou quand il n'y a plus de place, elle **améliore** la tour la plus rentable (jamais une tour en chantier), celle qui couvre le plus de chemin et de couloir aérien par pièce d'or ;
 - après **2:20**, elle **transforme** des tours faibles du centre en Mages, jusqu'à `min(5, 2 + minutes/5)` Mages.
 
 **Attaque** (`aiAttack`) :
@@ -398,6 +413,7 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 - `GameRoom` fait tourner `Game` (de `sim.js`, importé tel quel) **toutes les 50 ms** et envoie un **instantané toutes les 100 ms** : or, revenu, vies, tours, monstres, projectiles, nouveaux effets et sons. Le serveur fait autorité : les actions des joueurs sont validées par `Game.action()`.
 - La page (`NET` dans `index.html`) envoie des actions (`{t:'act', a:{type, x, y, k}}`) et dessine les instantanés avec les fonctions de dessin existantes. Elle lisse les positions des monstres et des projectiles entre deux instantanés, et recalcule le chemin (`Board.dist`) à partir de la grille des tours.
 - Messages du client : `hello`, `faction`, `diff`, `start`, `act`. Messages du serveur : `lobby`, `start`, `snap`, `res`.
+- Dans l'instantané, chaque tour est un tableau `[x, y, k, lv, inv, a, sw, stun, b, bt]` ; `b` et `bt` (temps de chantier restant et total, depuis la 2.4) valent 0 hors chantier.
 - Origines autorisées : la constante `ORIGINS` dans `worker.js` (GitHub Pages, localhost, fichiers locaux).
 - Adresse du serveur : la constante `SERVER` dans `index.html`, à `wss://winter-realms.winter-realms-server.workers.dev` en production et `ws://localhost:8787` en local. On peut forcer une autre adresse avec `?serveur=wss://…`.
 
@@ -452,6 +468,7 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
   - l'IA décide de transformer une tour en Mage avec un prix de Mage **fixé à 90** dans le code, alors que le vrai prix varie de 85 à 90 selon la faction ;
   - dès sa première action, chaque IA pose **jusqu'à 3 tours** (règle « jusqu'à 3 actions par tour ») ;
   - le §1 dit « aucun `localStorage` », mais depuis la v2.0 la page y garde le pseudo et le jeton multijoueur (§9 bis) ;
+  - **2.4, temps de construction** : les tests de simulation qui supposent qu'une tour tire dès sa pose (ciblage, Spectre, Garde, Givre, améliorations successives) et les 15 parties de référence échouent, car la référence est le moteur 1.7. C'est voulu : il faudra figer un moteur `tests/moteurs/v2.4/` et de nouvelles références une fois le changement validé par le concepteur (§12.4) ;
   - les tableaux chiffrés de ce document (§4.1, §5.1, §6.2, §7) correspondent exactement au code (vérifié par `node tests/outils/audit-doc.js`).
 
 ---
@@ -600,3 +617,4 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 | 2026-11-14 | 2.1 | **Interface plus claire** : fiche d'information de la tour (dégâts/s, portée, cibles, effets, bonus de faction chiffré, gain du niveau suivant), cartes de tours avec dégâts/s, portée et ✈, prix en rouge si l'or manque, monstres verrouillés avec heure de déblocage. **Zoom (1× à 3×) et déplacement à deux doigts**, molette, bouton « Vue d'ensemble », cadre de la partie visible sur la vignette. Pose au doigt au relâcher. Correction du paysage sur téléphone (haut et bas coupés). Tests navigateur complétés (19 vérifications par orientation), 5ᵉ capture (zoom). **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
 | 2026-11-14 | 2.2 | **Construction en deux touchers** : le 1er toucher montre un aperçu (tour fantôme, portée, prix), le 2e sur la même case construit ; une case impossible est signalée dès le 1er toucher ; glisser le doigt ne construit plus rien. Tests navigateur complétés (22 vérifications par orientation). **Règles du jeu inchangées** (`sim.js` non modifié). |
 | 2026-11-14 | 2.3 | **Carte plus grande sur téléphone et pastilles de rôle des tours**. Carte : les 4 vignettes des joueurs quittent le HUD et s'ouvrent dans un panneau flottant par-dessus le terrain, depuis un bouton-icône en haut à gauche. Vies du joueur ajoutées dans le HUD (❤). Bannière « ↩ revenir au tien » cliquable. Mini-cartes un peu plus grandes. Tours : pastilles de rôle (flèche, épée, flocon, bombe, flamme, étoile), de cibles (sol ou sol et air) et de magie dans des cadres dorés biseautés dessinés en code ; texte des cartes « ⚔ N dégâts/s » et « ◎ portée N » ; appui long (ou survol) sur une carte pour voir sa fiche sans la sélectionner. Interface uniquement : `sim.js` inchangé. Test du parcours mobile adapté (ouvrir le panneau avant de toucher une vignette). |
+| 2026-11-14 | 2.4 | **Temps de construction des tours** : 1 s pour 30 or dépensés, entre 1 et 12 s, à la pose comme à chaque amélioration (§4.4). Pendant le chantier, la tour ne tire pas, ne révèle pas les Spectres, ne peut pas être améliorée (`busy`) et n'est pas étourdie ; elle bloque déjà le chemin. L'IA n'améliore pas une tour en chantier. Visuel : tour en transparence, échafaudage, marteau et barre de progression ; durée affichée dans la fiche, le bouton Améliorer et le message de pose. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur). Tests de simulation en échec attendu jusqu'à la validation et au gel d'un moteur 2.4. |
