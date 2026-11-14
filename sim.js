@@ -66,8 +66,9 @@ for(const T of CR)T.i=T.cat=='n'?Math.round(T.c/10*(1+.1*Math.log10(T.c/10))):Ma
 const byCat=c=>CR.map((T,k)=>k).filter(k=>CR[k].cat==c).sort((a,b)=>CR[a].c-CR[b].c),NORM=byCat('n'),FLY=byCat('f'),idx=f=>CR.findIndex(T=>T[f]),AURA=idx('aura'),SPEC=idx('inv'),HEAL=idx('heal'),SPLIT=idx('split'),TURT=idx('arm'),BRK=idx('mi'),SAP=idx('stun'),KID=CR.findIndex(T=>T.cat=='x'),AURA_R=1.7;
 const DIFF=[{n:'Normal',b:1,g:0},{n:'Difficile',b:1.25,g:30},{n:'Brutal',b:1.5,g:60}];
 const HPK=.55,GRACE=25,GROUP=4,
-/* temps de construction : 1 s pour BUILD_OR pièces d'or dépensées (achat ou amélioration), entre BUILD_MIN et BUILD_MAX secondes */
- BUILD_OR=30,BUILD_MIN=1,BUILD_MAX=12,buildT=c=>Math.min(BUILD_MAX,Math.max(BUILD_MIN,c/BUILD_OR)),flyH=k=>CR[k].fly?CR[k].z*.35:0;
+/* temps de construction : 1 s pour BUILD_OR pièces d'or dépensées (achat ou amélioration), entre BUILD_MIN et BUILD_MAX secondes,
+   multiplié pour les humains par BUILD_DIFF selon la difficulté (les IA gardent ×1, comme pour le revenu) */
+ BUILD_OR=50,BUILD_MIN=.5,BUILD_MAX=8,BUILD_DIFF=[1,1.25,1.5],buildT=(c,m=1)=>Math.min(BUILD_MAX,Math.max(BUILD_MIN,c/BUILD_OR))*m,flyH=k=>CR[k].fly?CR[k].z*.35:0;
 const dmg=t=>TW[t.k].d*2**(t.lv-1),rng=t=>TW[t.k].r*(1+.05*(t.lv-1)),upCost=t=>Math.round(TW[t.k].c*1.5*2**(t.lv-1)/5)*5,topY=t=>.28+.045*(t.lv-1);
 
 /* ---------- simulation ---------- */
@@ -82,11 +83,13 @@ class Board{
   if(this.cr.some(c=>!CR[c.k].fly&&((Math.abs(c.x-x)<.9&&Math.abs(c.y-y)<.9)||(c.tx==x&&c.ty==y))))return false;
   this.g[y][x]=1;const nd=this.dist();
   if(nd[SP[1]][SP[0]]>=INF||this.cr.some(c=>!CR[c.k].fly&&nd[c.ty][c.tx]>=INF)){this.g[y][x]=0;return false}
-  this.d=nd;this.gold-=T.c;const bt=buildT(T.c);this.t.push({x,y,k,cd:0,a:.7,lv:1,inv:T.c,sw:0,b:bt,bt});
+  this.d=nd;this.gold-=T.c;const bt=buildT(T.c,this.bm());this.t.push({x,y,k,cd:0,a:.7,lv:1,inv:T.c,sw:0,b:bt,bt});
   this.fx.push({type:'range',x:x+.5,y:y+.5,r:T.r,t:.6,d:.6,col:T.col});this.ev.push('build');return true}
+ /* multiplicateur de temps de construction : selon la difficulté pour un humain, ×1 pour une IA */
+ bm(){return this.G&&!this.ai?BUILD_DIFF[this.G.LV]||1:1}
  sell(x,y){const i=this.t.findIndex(t=>t.x==x&&t.y==y);if(i<0)return false;const b=Math.floor(this.t[i].inv*.7);this.gold+=b;this.t.splice(i,1);this.g[y][x]=0;this.d=this.dist();
   this.fx.push({type:'text',x:x+.5,y:y+.4,txt:'+'+b,col:'#ffd95e',t:.7,d:.7});this.ev.push('sell');return true}
- upgrade(t){const c=upCost(t);if(t.lv>=5||t.b>0||this.gold<c)return false;this.gold-=c;t.inv+=c;t.lv++;t.b=t.bt=buildT(c);
+ upgrade(t){const c=upCost(t);if(t.lv>=5||t.b>0||this.gold<c)return false;this.gold-=c;t.inv+=c;t.lv++;t.b=t.bt=buildT(c,this.bm());
   this.fx.push({type:'text',x:t.x+.5,y:t.y,txt:'Niveau '+t.lv,col:'#ffd95e',t:.9,d:.9},{type:'range',x:t.x+.5,y:t.y+.5,r:rng(t),t:.6,d:.6,col:TW[t.k].col});this.ev.push('up');return true}
  send(k,m){for(let i=0;i<GROUP;i++)this.q.push({k,m,t:i*.38+Math.random()*.25})}
  /* dégâts : l'anti-magie ignore Mage et Givre, la carapace retire un montant fixe à chaque coup */

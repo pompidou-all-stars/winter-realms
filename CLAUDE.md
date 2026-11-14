@@ -94,7 +94,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
   | `CR` | Les monstres |
   | `DIFF` | Les niveaux de difficulté |
   | `HPK`, `GRACE`, `GROUP`, `AURA_R` | Constantes de gameplay |
-  | `BUILD_OR`, `BUILD_MIN`, `BUILD_MAX` | Temps de construction : 1 s par `BUILD_OR` pièces d'or, borné (§4.4) |
+  | `BUILD_OR`, `BUILD_MIN`, `BUILD_MAX`, `BUILD_DIFF` | Temps de construction : 1 s par `BUILD_OR` pièces d'or, borné, multiplié selon la difficulté pour les humains (§4.4) |
 - **Sections de `sim.js`** : tables de données → simulation (`class Board`) → IA (`aiDefend`, `aiAttack`, `aiAct`) → partie (`class Game`).
 - **Sections du script de `index.html`** : sons → dessin → interface (dont le multijoueur, objet `NET`) → sons et événements → boucle principale (`loop`).
 - **Retouches des emplacements 6 à 9** (§4.2) : elles sont écrites directement dans le calcul de `TW` (`late&&j==6?…`), pas dans une table.
@@ -181,8 +181,14 @@ Formules : `coût = max(10, arrondi(coût_base × puissance × coût_faction / 5
 - Chaque amélioration prend du temps (voir §4.4).
 
 ### 4.4 Temps de construction (depuis la 2.4)
-- **Ratio** : **1 seconde pour 30 pièces d'or** dépensées (`BUILD_OR`), au minimum **1 s** (`BUILD_MIN`) et au maximum **12 s** (`BUILD_MAX`) : `temps = min(12, max(1, prix / 30))`.
-- Il s'applique à la **pose** (prix de la tour) et à **chaque amélioration** (prix de l'amélioration). Exemples : Archer 20 or → 1 s ; Mage 85 or → 2,8 s ; Archimage 130 or → 4,3 s ; Archer du niveau 4 au 5 (240 or) → 8 s ; toute amélioration à 360 or ou plus → 12 s.
+- **Ratio** : **1 seconde pour 50 pièces d'or** dépensées (`BUILD_OR`), au minimum **0,5 s** (`BUILD_MIN`) et au maximum **8 s** (`BUILD_MAX`), puis multiplié selon la difficulté : `temps = min(8, max(0,5, prix / 50)) × multiplicateur`.
+- **Multiplicateur de difficulté** (`BUILD_DIFF`, méthode `Board.bm()`) : il ne touche que les **humains**, comme les bonus de difficulté du §7 ne touchent que les IA. Les IA gardent toujours ×1.
+  | Difficulté | Humains | IA |
+  |---|---|---|
+  | Normal | ×1 | ×1 |
+  | Difficile | ×1,25 | ×1 |
+  | Brutal | ×1,5 | ×1 |
+- Il s'applique à la **pose** (prix de la tour) et à **chaque amélioration** (prix de l'amélioration). Exemples en Normal : Archer 20 or → 0,5 s ; Mage 85 or → 1,7 s ; Archimage 130 or → 2,6 s ; Archer du niveau 4 au 5 (240 or) → 4,8 s ; toute amélioration à 400 or ou plus → 8 s. En Brutal, un humain met 1,5 fois plus longtemps (Archimage 3,9 s, au plus 12 s).
 - **Pendant le chantier**, la tour (champ `t.b` : secondes restantes, `t.bt` : durée totale) :
   - ne tire pas, et une tour Mage ne révèle pas les Spectres ;
   - ne peut pas être améliorée (code d'erreur `busy`) ;
@@ -332,7 +338,7 @@ Vitesse en cases par seconde.
 | Difficile | ×1,25 | +30 |
 | Brutal | ×1,50 | +60 |
 
-Le joueur, lui, garde toujours un revenu ×1.
+Le joueur, lui, garde toujours un revenu ×1. Depuis la 2.4, la difficulté rallonge aussi le temps de construction des humains : ×1, ×1,25 ou ×1,5 (§4.4).
 
 ---
 
@@ -634,4 +640,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-14 | 2.2 | **Construction en deux touchers** : le 1er toucher montre un aperçu (tour fantôme, portée, prix), le 2e sur la même case construit ; une case impossible est signalée dès le 1er toucher ; glisser le doigt ne construit plus rien. Tests navigateur complétés (22 vérifications par orientation). **Règles du jeu inchangées** (`sim.js` non modifié). |
 | 2026-11-14 | 2.3 | **Carte plus grande sur téléphone et pastilles de rôle des tours**. Carte : les 4 vignettes des joueurs quittent le HUD et s'ouvrent dans un panneau flottant par-dessus le terrain, depuis un bouton-icône en haut à gauche. Vies du joueur ajoutées dans le HUD (❤). Bannière « ↩ revenir au tien » cliquable. Mini-cartes un peu plus grandes. Tours : pastilles de rôle (flèche, épée, flocon, bombe, flamme, étoile), de cibles (sol ou sol et air) et de magie dans des cadres dorés biseautés dessinés en code ; texte des cartes « ⚔ N dégâts/s » et « ◎ portée N » ; appui long (ou survol) sur une carte pour voir sa fiche sans la sélectionner. Interface uniquement : `sim.js` inchangé. Test du parcours mobile adapté (ouvrir le panneau avant de toucher une vignette). |
 | 2026-11-14 | 2.3 | Outillage : **préparation des assets 3D** (§15, `art/LISEZMOI.md`) : un script Blender par asset dans `art/`, génération identique sur PC et dans le cloud (`art/outils/generer.py`, Blender 5.3), manifeste et budgets, test de cohérence sur chaque PR, action GitHub « Assets 3D » avec aperçus, exemple `exemples/caisse`. Règle de conception n°2 adaptée aux modèles 3D générés par script. `.gitattributes` (fins de ligne LF, fichiers binaires). **Aucun changement de jeu.** |
-| 2026-11-14 | 2.4 | **Temps de construction des tours** : 1 s pour 30 or dépensés, entre 1 et 12 s, à la pose comme à chaque amélioration (§4.4). Pendant le chantier, la tour ne tire pas, ne révèle pas les Spectres, ne peut pas être améliorée (`busy`) et n'est pas étourdie ; elle bloque déjà le chemin. L'IA n'améliore pas une tour en chantier. Visuel : tour en transparence, échafaudage, marteau et barre de progression ; durée affichée dans la fiche, le bouton Améliorer et le message de pose. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur). Tests de simulation en échec attendu jusqu'à la validation et au gel d'un moteur 2.4. |
+| 2026-11-14 | 2.4 | **Temps de construction des tours** : 1 s pour 50 or dépensés, entre 0,5 et 8 s, multiplié pour les humains par ×1 / ×1,25 / ×1,5 selon la difficulté (les IA restent à ×1), à la pose comme à chaque amélioration (§4.4). Pendant le chantier, la tour ne tire pas, ne révèle pas les Spectres, ne peut pas être améliorée (`busy`) et n'est pas étourdie ; elle bloque déjà le chemin. L'IA n'améliore pas une tour en chantier. Visuel : tour en transparence, échafaudage, marteau et barre de progression ; durée affichée dans la fiche, le bouton Améliorer et le message de pose. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur). Tests de simulation en échec attendu jusqu'à la validation et au gel d'un moteur 2.4. |

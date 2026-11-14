@@ -45,7 +45,8 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.4 — 2026-11-14
-- Towers now take time to build: 1 second per 30 gold spent, between 1 and 12 seconds (an Archer takes 1 s, a Mage about 3 s, an Archmage about 4.5 s). Upgrades work the same way, based on the upgrade price.
+- Towers now take time to build: 1 second per 50 gold spent, between 0.5 and 8 seconds (on Normal, an Archer takes 0.5 s, a Mage 1.7 s, an Archmage 2.6 s). Upgrades work the same way, based on the upgrade price.
+- Difficulty slows human builders: ×1 on Normal, ×1.25 on Difficile, ×1.5 on Brutal. AIs always build at ×1.
 - While building or upgrading, a tower does not shoot, does not reveal Spectres and cannot be upgraded again. It still blocks the path and can be sold (70 %).
 - A building tower is drawn faded, with scaffolding, a hammer and a gold progress bar. The info panel shows the build time and the countdown.
 

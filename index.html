@@ -380,6 +380,7 @@ function drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun){
  g.restore();
 }
 /* 2.4 : tour en chantier (construction ou amélioration) : échafaudage, marteau qui frappe et barre de progression */
+const btJ=c=>buildT(c,BUILD_DIFF[LV]||1);
 function chantier(g,o,s,t){const x=(o.x+.5)*s,y=(o.y+.5)*s,p=1-o.b/(o.bt||1);g.save();g.lineCap='round';
  g.strokeStyle='#8a5a2b';g.lineWidth=Math.max(1.5,s*.045);g.beginPath();for(const q of[-1,1]){g.moveTo(x+q*s*.3,y+s*.3);g.lineTo(x+q*s*.3,y-s*.32)}g.moveTo(x-s*.3,y-s*.05);g.lineTo(x+s*.3,y-s*.05);g.moveTo(x-s*.3,y+s*.3);g.lineTo(x+s*.3,y-s*.05);g.stroke();
  const an=-.9+Math.abs(Math.sin(t*7))*1.1;g.translate(x+s*.2,y-s*.3);g.rotate(an);g.strokeStyle='#6b4423';g.lineWidth=Math.max(1.5,s*.05);g.beginPath();g.moveTo(0,0);g.lineTo(0,-s*.2);g.stroke();g.fillStyle='#c9ced6';g.strokeStyle=OUT;g.lineWidth=1;g.fillRect(-s*.08,-s*.26,s*.16,s*.08);g.strokeRect(-s*.08,-s*.26,s*.16,s*.08);g.restore();
@@ -647,8 +648,8 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  const stat=(lbl,val)=>{const e=document.createElement('span'),i=document.createElement('i');i.textContent=val;e.append(lbl+' ',i);st.appendChild(e)};
  stat('⚔ Dégâts/s',dps(k,lv));stat('◎ Portée',fr(rng({k,lv})));stat('Cibles',T.gr?'sol uniquement':'sol et air');
  const ex=document.createElement('div');ex.className='ex';const part=(t,c)=>{if(ex.childNodes.length)ex.append(' · ');const e=document.createElement('span');if(c)e.className=c;e.textContent=t;ex.appendChild(e)};
- if(t&&t.b>0)part('🔨 '+(lv>1?'Amélioration':'Construction')+' en cours : '+Math.ceil(t.b)+' s','chantier');else if(!t)part('🔨 Construction : '+fr(buildT(T.c))+' s');
- if(t&&lv<5&&!(t.b>0))part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+' (pour '+upCost(t)+' or, '+fr(buildT(upCost(t)))+' s)','next');
+ if(t&&t.b>0)part('🔨 '+(lv>1?'Amélioration':'Construction')+' en cours : '+Math.ceil(t.b)+' s','chantier');else if(!t)part('🔨 Construction : '+fr(btJ(T.c))+' s');
+ if(t&&lv<5&&!(t.b>0))part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+' (pour '+upCost(t)+' or, '+fr(btJ(upCost(t)))+' s)','next');
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
  const bf=bonusFaction(T.faction);if(bf)part(bf);
  txt.append(tt,st,ex);
@@ -659,7 +660,7 @@ function ficheEnvoi(){const f=$('fiche');f.textContent='';f.className='envoyer';
 function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P.t.includes(pick))pick=null;
  if(tab=='t'&&pick){const t=pick;remplirFiche('tour',t.k,t);
   if(t.b>0)add(icon(IC.up),'Améliorer','en chantier…',0,()=>showErr('busy'),1,'patiente');
-  else if(t.lv<5)add(icon(IC.up),'Améliorer',upCost(t)+' or',upCost(t),()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()},1,'niveau '+(t.lv+1)+' · '+fr(buildT(upCost(t)))+' s');
+  else if(t.lv<5)add(icon(IC.up),'Améliorer',upCost(t)+' or',upCost(t),()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()},1,'niveau '+(t.lv+1)+' · '+fr(btJ(upCost(t)))+' s');
   add(icon(IC.coin),'Vendre','+'+Math.floor(t.inv*.7)+' or',0,()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()});
   add(icon(IC.x),'Fermer',' ',0,()=>{pick=null;render()});return}
  if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(towerIcon(k,1),T.n,T.c+' or',T.c,()=>{sel=k;if(projet)projet.k=k;render()},sel==k,'⚔ '+dps(k,1)+' dégâts/s\n◎ portée '+fr(T.r));apercu(bar.lastChild,k)})}
@@ -719,7 +720,7 @@ function act(e){if(over)return;const r=main.getBoundingClientRect(),s=cell*VUE.z
  if(projet&&projet.x==x&&projet.y==y){confirmerConstruction(x,y);return}
  const err=peutConstruire(x,y,sel);
  if(err){projet=null;P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(err);return}
- projet={x,y,k:sel};sfx('tap');toast('Touchez encore la case pour construire ('+TW[sel].c+' or, '+fr(buildT(TW[sel].c))+' s)')}
+ projet={x,y,k:sel};sfx('tap');toast('Touchez encore la case pour construire ('+TW[sel].c+' or, '+fr(btJ(TW[sel].c))+' s)')}
 /* Gestes sur le terrain :
    - un doigt : un toucher (au relâcher) sur une case = aperçu, un 2e toucher sur la même case = construction ;
      un doigt qui glisse vers une autre case n'est pas un toucher : il ne fait rien (plus de construction à la volée) ;
