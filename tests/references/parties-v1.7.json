@@ -1,0 +1,711 @@
+{
+ "moteur": {
+  "version": "v1.7",
+  "sha256": "e0cd2f786b5a3aa616d7446a787436b77d1e30b1bd930e7849a1f1a2a0615f6f"
+ },
+ "pas": 0.05,
+ "parties": [
+  {
+   "graine": 1000,
+   "faction": 0,
+   "difficulte": 0,
+   "duree": 650.75,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    0,
+    5,
+    6
+   ],
+   "revenus": [
+    1179,
+    45,
+    2001,
+    1822
+   ],
+   "tours": [
+    36,
+    21,
+    36,
+    36
+   ],
+   "envois": [
+    93,
+    14,
+    96,
+    111
+   ],
+   "invalide": false,
+   "controles": [
+    "5ecd876707bf6e5a",
+    "3f16bd71829667ab",
+    "6b795dfde5e7360e",
+    "e9cbeaab0ef63313",
+    "b564af823e4cb2c5",
+    "a982014c9fae9679",
+    "ea39b307207267b8",
+    "5c2b79f0d83a3263",
+    "402edd19a0c1a0b7",
+    "7e62a3922d8ad604",
+    "a24a0b3afb7b61a4",
+    "6b02d693d90f0b49",
+    "6180c20008a602e5",
+    "bd1b242f931248a0",
+    "ab849158464f63d0",
+    "c1ccf8a420ea0943",
+    "812fb52b974f0e2f",
+    "1aa22b900b9284d9",
+    "bc874cd8d99e565f",
+    "641eb75493687449",
+    "de5d408878e8a260"
+   ],
+   "final": "deb7f5c5483ee578"
+  },
+  {
+   "graine": 1001,
+   "faction": 1,
+   "difficulte": 0,
+   "duree": 310.2,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    13,
+    2,
+    12
+   ],
+   "revenus": [
+    66,
+    104,
+    87,
+    97
+   ],
+   "tours": [
+    36,
+    32,
+    36,
+    30
+   ],
+   "envois": [
+    18,
+    20,
+    12,
+    22
+   ],
+   "invalide": false,
+   "controles": [
+    "91e6d6977dfd781a",
+    "b35834c5c0669ed5",
+    "e8ca06404fb6815c",
+    "56353856d5e41ecd",
+    "0786e60e3c0c23d2",
+    "a51938a95b8ddf78",
+    "33f4edb2c7a946d9",
+    "6cd0e6c99140a655",
+    "9422f15e5a6fd1a4",
+    "053fe2f4d4704047"
+   ],
+   "final": "6ad51be88baf102d"
+  },
+  {
+   "graine": 1002,
+   "faction": 2,
+   "difficulte": 0,
+   "duree": 686.85,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    -3,
+    19,
+    7,
+    15
+   ],
+   "revenus": [
+    3541,
+    3118,
+    4513,
+    3187
+   ],
+   "tours": [
+    36,
+    36,
+    36,
+    36
+   ],
+   "envois": [
+    131,
+    130,
+    151,
+    133
+   ],
+   "invalide": false,
+   "controles": [
+    "125110c41c2753f4",
+    "61039b7365a95662",
+    "2fdd425e3eea4d95",
+    "3c578d01bf295b41",
+    "8c6d2c5cfbf07b12",
+    "95775849f22237f2",
+    "559a1fa66fdb0886",
+    "1405c37f3d78e3c2",
+    "1cdccf301ea325c2",
+    "aad8007693efaae0",
+    "8e5046be63870f4e",
+    "6b65b6e15a59f8e1",
+    "f98fa5a9be23559f",
+    "ee3981cfe6f7a9f2",
+    "4e40914d4201db2b",
+    "17aa5f78bc10666e",
+    "ede6a5b3a495cd39",
+    "a831785c37e68578",
+    "c98ea3897de19e3a",
+    "dda1b8c1c36cb39f",
+    "fa742a1f0135582d",
+    "97492dee7d8928a3"
+   ],
+   "final": "aac6e48abe84fb8b"
+  },
+  {
+   "graine": 1003,
+   "faction": 3,
+   "difficulte": 0,
+   "duree": 570.2,
+   "terminee": true,
+   "gagnant": 0,
+   "vies": [
+    15,
+    0,
+    0,
+    0
+   ],
+   "revenus": [
+    1593,
+    195,
+    1097,
+    1245
+   ],
+   "tours": [
+    36,
+    36,
+    36,
+    36
+   ],
+   "envois": [
+    94,
+    31,
+    64,
+    87
+   ],
+   "invalide": false,
+   "controles": [
+    "e0deb93cb5bf475d",
+    "040242a710dcedd5",
+    "5fa47afbb7855b73",
+    "358f3a9752167a4d",
+    "a7cf3131d42ae41e",
+    "a6d7de24b005f990",
+    "932d62ea121582d4",
+    "ae4dbc83a6c00dca",
+    "6277686bf2de40ee",
+    "7555d8f7725d8713",
+    "7fdf7ac8ea328660",
+    "41aaacb64a4a5944",
+    "2982b5e9c055af60",
+    "52efb45ba7f52098",
+    "2782b2701abd51b5",
+    "b976020a783128f8",
+    "fe83f9785a3e187e",
+    "09895f471e25c3b2",
+    "2646ac631bd2fee9"
+   ],
+   "final": "9ec470b4ae49830e"
+  },
+  {
+   "graine": 1004,
+   "faction": 4,
+   "difficulte": 0,
+   "duree": 519.05,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    9,
+    0,
+    4
+   ],
+   "revenus": [
+    193,
+    227,
+    31,
+    290
+   ],
+   "tours": [
+    36,
+    36,
+    13,
+    36
+   ],
+   "envois": [
+    36,
+    49,
+    6,
+    42
+   ],
+   "invalide": false,
+   "controles": [
+    "abb178ecaba1d35e",
+    "7156548dc086f6b6",
+    "0ffa140a060b4346",
+    "ebf774886320c1fd",
+    "b38174627423c7c0",
+    "f41726e72d1030ba",
+    "e276b62a7b31005f",
+    "4db6d3e51c79869a",
+    "5801503f5d095e3a",
+    "f7182f1604a11525",
+    "8adb9d68ecb3365d",
+    "2a68e5833e7cb0a6",
+    "6b6b9def11b03fce",
+    "4c963ab14286d3ba",
+    "d963608eb583316a",
+    "c5d9cddb9611d305",
+    "e86554b0befde4c8"
+   ],
+   "final": "dff4d98f32569eb4"
+  },
+  {
+   "graine": 1010,
+   "faction": 0,
+   "difficulte": 1,
+   "duree": 181.4,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    22,
+    15,
+    25
+   ],
+   "revenus": [
+    27,
+    67,
+    57,
+    60
+   ],
+   "tours": [
+    26,
+    22,
+    20,
+    20
+   ],
+   "envois": [
+    6,
+    12,
+    14,
+    15
+   ],
+   "invalide": false,
+   "controles": [
+    "5008e77cb76a56bb",
+    "dba8407ad3b0dd68",
+    "9e0805a45b2afedd",
+    "465495b40d1bd718",
+    "4319e96f716517ed",
+    "8a9fdc3843feaa61"
+   ],
+   "final": "5c0c62607e314ab7"
+  },
+  {
+   "graine": 1011,
+   "faction": 1,
+   "difficulte": 1,
+   "duree": 101.8,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    24,
+    23,
+    19
+   ],
+   "revenus": [
+    15,
+    24,
+    29,
+    27
+   ],
+   "tours": [
+    13,
+    12,
+    11,
+    10
+   ],
+   "envois": [
+    3,
+    7,
+    7,
+    9
+   ],
+   "invalide": false,
+   "controles": [
+    "3dab9260c1268020",
+    "4f74b1cd5b530489",
+    "114036ac04fb56f7"
+   ],
+   "final": "bce0c6f69698cd88"
+  },
+  {
+   "graine": 1012,
+   "faction": 2,
+   "difficulte": 1,
+   "duree": 200.15,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    -2,
+    20,
+    28,
+    25
+   ],
+   "revenus": [
+    44,
+    76,
+    78,
+    93
+   ],
+   "tours": [
+    35,
+    25,
+    26,
+    27
+   ],
+   "envois": [
+    13,
+    24,
+    23,
+    15
+   ],
+   "invalide": false,
+   "controles": [
+    "1b3eaa3179681f36",
+    "501e8234e9c92f5f",
+    "482040c0e4eeddcb",
+    "aeb7d695cc404849",
+    "51b518315c7d16f2",
+    "f2777c16cd8aa699"
+   ],
+   "final": "ec8a1b937968c082"
+  },
+  {
+   "graine": 1013,
+   "faction": 3,
+   "difficulte": 1,
+   "duree": 526.8,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    -2,
+    25,
+    12
+   ],
+   "revenus": [
+    1161,
+    154,
+    3534,
+    1857
+   ],
+   "tours": [
+    36,
+    36,
+    36,
+    36
+   ],
+   "envois": [
+    84,
+    23,
+    133,
+    114
+   ],
+   "invalide": false,
+   "controles": [
+    "4f421c18583012b4",
+    "1b1baa545d30d32c",
+    "4ca5c531e5194252",
+    "46a02fefe5bf4ddb",
+    "bdd8645fa62c2ad9",
+    "74c5a41b971a0a3c",
+    "27d21ab5dc6c9278",
+    "dd50e474db045e04",
+    "2f4d5955fafea833",
+    "184cf316f803f259",
+    "0041351302a5db14",
+    "84c20fe240833c01",
+    "94b387b7bb09898d",
+    "ed0902358a373895",
+    "6f9a324286be9ecd",
+    "1be07a1138179dec",
+    "9938ca8c1e0056e3"
+   ],
+   "final": "9e80f6d8baca2ccb"
+  },
+  {
+   "graine": 1014,
+   "faction": 4,
+   "difficulte": 1,
+   "duree": 210.15,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    20,
+    1,
+    7
+   ],
+   "revenus": [
+    57,
+    91,
+    64,
+    71
+   ],
+   "tours": [
+    25,
+    23,
+    28,
+    28
+   ],
+   "envois": [
+    15,
+    17,
+    19,
+    19
+   ],
+   "invalide": false,
+   "controles": [
+    "e4e31c471e8a689b",
+    "dda3d298852bdf4f",
+    "b02dc36f2e26634e",
+    "35d66951c7174f89",
+    "62f2bd461661e692",
+    "e7ba9150ec99d3f4",
+    "84c7974f2694b20b"
+   ],
+   "final": "1a021346b59f1f4d"
+  },
+  {
+   "graine": 1020,
+   "faction": 0,
+   "difficulte": 2,
+   "duree": 279.85,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    -1,
+    14,
+    35
+   ],
+   "revenus": [
+    112,
+    145,
+    193,
+    457
+   ],
+   "tours": [
+    36,
+    36,
+    36,
+    36
+   ],
+   "envois": [
+    28,
+    31,
+    27,
+    40
+   ],
+   "invalide": false,
+   "controles": [
+    "c0ea6eb86676b6e9",
+    "02fa0b565188a76f",
+    "b72d7e1a22e691d7",
+    "c530e0080faffa3e",
+    "7a0b01f48f69e1df",
+    "d0412029c2c13455",
+    "54c2202e02feab39",
+    "e9791ef1854158d9",
+    "78afa7a690bed3a1"
+   ],
+   "final": "5a64a7f5eb9dd3a8"
+  },
+  {
+   "graine": 1021,
+   "faction": 1,
+   "difficulte": 2,
+   "duree": 221.1,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    29,
+    10,
+    28
+   ],
+   "revenus": [
+    62,
+    135,
+    157,
+    108
+   ],
+   "tours": [
+    36,
+    30,
+    35,
+    36
+   ],
+   "envois": [
+    14,
+    23,
+    19,
+    25
+   ],
+   "invalide": false,
+   "controles": [
+    "bc4e55f833c37e14",
+    "6c695edc151c29be",
+    "5b4e696b25a730ab",
+    "d1f615f48e965c42",
+    "91f5791f158da9d8",
+    "7f3f0285738b3111",
+    "ce6af4ae98ba53fe"
+   ],
+   "final": "686405ef4c2dd48b"
+  },
+  {
+   "graine": 1022,
+   "faction": 2,
+   "difficulte": 2,
+   "duree": 161.05,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    18,
+    20,
+    30
+   ],
+   "revenus": [
+    33,
+    72,
+    66,
+    73
+   ],
+   "tours": [
+    23,
+    23,
+    18,
+    21
+   ],
+   "envois": [
+    10,
+    16,
+    13,
+    20
+   ],
+   "invalide": false,
+   "controles": [
+    "8872e3670bdfaefa",
+    "9b95cd3b069f52cf",
+    "df366e1b3937714f",
+    "614cd3e6c723076d",
+    "a0c20d0972a53dc1"
+   ],
+   "final": "eda302ad55e5a294"
+  },
+  {
+   "graine": 1023,
+   "faction": 3,
+   "difficulte": 2,
+   "duree": 270.2,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    24,
+    32,
+    18
+   ],
+   "revenus": [
+    125,
+    219,
+    320,
+    296
+   ],
+   "tours": [
+    36,
+    36,
+    36,
+    36
+   ],
+   "envois": [
+    25,
+    34,
+    41,
+    38
+   ],
+   "invalide": false,
+   "controles": [
+    "f3ea3c217a0a9760",
+    "1aade6467ec94d25",
+    "86808c51b100abd9",
+    "372c81dba0f7b66f",
+    "41d3999b7bfb7dca",
+    "a5f97ec61661d425",
+    "4eebb615e443f7df",
+    "a1c0f283adfaf01a",
+    "be7de6facbffe4e0"
+   ],
+   "final": "c925fbcfce5cb1f6"
+  },
+  {
+   "graine": 1024,
+   "faction": 4,
+   "difficulte": 2,
+   "duree": 149.8,
+   "terminee": true,
+   "gagnant": -1,
+   "vies": [
+    0,
+    26,
+    14,
+    27
+   ],
+   "revenus": [
+    30,
+    64,
+    47,
+    67
+   ],
+   "tours": [
+    21,
+    19,
+    21,
+    22
+   ],
+   "envois": [
+    11,
+    14,
+    14,
+    13
+   ],
+   "invalide": false,
+   "controles": [
+    "1cb9e6defd6ab929",
+    "a7e272c0364d1795",
+    "4b68e23b9aec5c8f",
+    "fe4fbb0277dcc64d"
+   ],
+   "final": "43f94d6b06d9f1eb"
+  }
+ ]
+}

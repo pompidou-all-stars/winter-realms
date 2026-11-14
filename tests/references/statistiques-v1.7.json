@@ -1,0 +1,3166 @@
+{
+ "moteur": {
+  "version": "v1.7",
+  "sha256": "e0cd2f786b5a3aa616d7446a787436b77d1e30b1bd930e7849a1f1a2a0615f6f"
+ },
+ "constantes": {
+  "C": 13,
+  "R": 17,
+  "SP": [
+   6,
+   0
+  ],
+  "EX": [
+   6,
+   16
+  ],
+  "HPK": 0.55,
+  "GRACE": 25,
+  "GROUP": 4,
+  "AURA_R": 1.7
+ },
+ "BASE_TW": [
+  {
+   "n": "Archer",
+   "c": 20,
+   "r": 2.8,
+   "d": 8,
+   "cd": 0.5,
+   "ps": 10,
+   "col": "#6aa84f",
+   "s": "arrow"
+  },
+  {
+   "n": "Canon",
+   "c": 50,
+   "r": 2.5,
+   "d": 20,
+   "cd": 1.2,
+   "ps": 6.5,
+   "sp": 1.1,
+   "gr": 1,
+   "col": "#b0703a",
+   "s": "canon",
+   "tag": "sol"
+  },
+  {
+   "n": "Givre",
+   "c": 40,
+   "r": 2.5,
+   "d": 4,
+   "cd": 0.9,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#3d85c6",
+   "s": "frost",
+   "tag": "magie · zone"
+  },
+  {
+   "n": "Mage",
+   "c": 90,
+   "r": 3.2,
+   "d": 45,
+   "cd": 1.4,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#8e44ad",
+   "s": "mage",
+   "tag": "magie · détecte"
+  },
+  {
+   "n": "Garde",
+   "c": 30,
+   "r": 1.5,
+   "d": 20,
+   "cd": 0.55,
+   "me": 1,
+   "gr": 1,
+   "col": "#c0392b",
+   "s": "slash",
+   "tag": "sol"
+  },
+  {
+   "n": "Flammes",
+   "c": 70,
+   "r": 2,
+   "d": 3,
+   "cd": 0.12,
+   "fl": 1,
+   "col": "#e67e22",
+   "s": "flame"
+  }
+ ],
+ "FACTION_BALANCE": [
+  {
+   "cost": 1.04,
+   "dmg": 0.97,
+   "range": 1.1,
+   "cd": 1.03,
+   "airBonus": 1.18,
+   "tag": "anti-aérien"
+  },
+  {
+   "cost": 1.02,
+   "dmg": 0.96,
+   "range": 0.93,
+   "cd": 1.04,
+   "execute": 1.3,
+   "tag": "frénésie"
+  },
+  {
+   "cost": 1,
+   "dmg": 0.96,
+   "range": 1,
+   "cd": 1.02,
+   "root": 0.72,
+   "rootFactor": 0.82,
+   "tag": "racines"
+  },
+  {
+   "cost": 1.07,
+   "dmg": 1.08,
+   "range": 1.02,
+   "cd": 1.08,
+   "pierce": 0.55,
+   "tag": "perforant"
+  },
+  {
+   "cost": 1.01,
+   "dmg": 1.01,
+   "range": 0.99,
+   "cd": 1.01,
+   "mark": 1.14,
+   "tag": "malédiction"
+  }
+ ],
+ "ARCH": [
+  0,
+  4,
+  2,
+  1,
+  5,
+  3,
+  0,
+  4,
+  2,
+  3
+ ],
+ "ROLE": [
+  {
+   "name": "Tir rapide",
+   "tag": "cadence"
+  },
+  {
+   "name": "Garde rapprochée",
+   "tag": "corps-à-corps"
+  },
+  {
+   "name": "Contrôle",
+   "tag": "ralentit"
+  },
+  {
+   "name": "Artillerie",
+   "tag": "zone"
+  },
+  {
+   "name": "Dégâts continus",
+   "tag": "zone courte"
+  },
+  {
+   "name": "Arcanes",
+   "tag": "détection"
+  },
+  {
+   "name": "Tireur d’élite",
+   "tag": "longue portée"
+  },
+  {
+   "name": "Champion",
+   "tag": "frappe lourde"
+  },
+  {
+   "name": "Entrave",
+   "tag": "contrôle renforcé"
+  },
+  {
+   "name": "Archimage",
+   "tag": "dégâts élevés"
+  }
+ ],
+ "DIFF": [
+  {
+   "n": "Normal",
+   "b": 1,
+   "g": 0
+  },
+  {
+   "n": "Difficile",
+   "b": 1.25,
+   "g": 30
+  },
+  {
+   "n": "Brutal",
+   "b": 1.5,
+   "g": 60
+  }
+ ],
+ "tours": [
+  {
+   "k": 0,
+   "n": "Tour des archers",
+   "c": 20,
+   "r": 3.08,
+   "d": 7.8,
+   "cd": 0.515,
+   "ps": 10,
+   "col": "#d8b45c",
+   "s": "arrow",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 1.18,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 0,
+   "faction": 0,
+   "role": "Tir rapide",
+   "tag": "anti-aérien · cadence",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 7.8,
+     "portee": 3.08,
+     "coutPourPasserAuSuivant": 30
+    },
+    {
+     "lv": 2,
+     "degats": 15.6,
+     "portee": 3.2340000000000004,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 3,
+     "degats": 31.2,
+     "portee": 3.3880000000000003,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 4,
+     "degats": 62.4,
+     "portee": 3.542,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 5,
+     "degats": 124.8,
+     "portee": 3.6959999999999997,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 1,
+   "n": "Bastion du chevalier",
+   "c": 35,
+   "r": 1.65,
+   "d": 21,
+   "cd": 0.567,
+   "me": 1,
+   "gr": 1,
+   "col": "#d8b45c",
+   "s": "slash",
+   "tag": "anti-aérien · corps-à-corps",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 1.18,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 4,
+   "faction": 0,
+   "role": "Garde rapprochée",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 21,
+     "portee": 1.65,
+     "coutPourPasserAuSuivant": 55
+    },
+    {
+     "lv": 2,
+     "degats": 42,
+     "portee": 1.7325,
+     "coutPourPasserAuSuivant": 105
+    },
+    {
+     "lv": 3,
+     "degats": 84,
+     "portee": 1.815,
+     "coutPourPasserAuSuivant": 210
+    },
+    {
+     "lv": 4,
+     "degats": 168,
+     "portee": 1.8974999999999997,
+     "coutPourPasserAuSuivant": 420
+    },
+    {
+     "lv": 5,
+     "degats": 336,
+     "portee": 1.9799999999999998,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 2,
+   "n": "Obélisque de givre",
+   "c": 40,
+   "r": 2.75,
+   "d": 3.7,
+   "cd": 0.927,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#d8b45c",
+   "s": "frost",
+   "tag": "anti-aérien · ralentit",
+   "sf": 0.5,
+   "airBonus": 1.18,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 2,
+   "faction": 0,
+   "role": "Contrôle",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 3.7,
+     "portee": 2.75,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 2,
+     "degats": 7.4,
+     "portee": 2.8875,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 3,
+     "degats": 14.8,
+     "portee": 3.0250000000000004,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 4,
+     "degats": 29.6,
+     "portee": 3.1624999999999996,
+     "coutPourPasserAuSuivant": 480
+    },
+    {
+     "lv": 5,
+     "degats": 59.2,
+     "portee": 3.3,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 3,
+   "n": "Bombarde royale",
+   "c": 60,
+   "r": 2.75,
+   "d": 21.7,
+   "cd": 1.236,
+   "ps": 6.5,
+   "sp": 1.1,
+   "gr": 1,
+   "col": "#d8b45c",
+   "s": "canon",
+   "tag": "anti-aérien · zone",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 1.18,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 1,
+   "faction": 0,
+   "role": "Artillerie",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 21.7,
+     "portee": 2.75,
+     "coutPourPasserAuSuivant": 90
+    },
+    {
+     "lv": 2,
+     "degats": 43.4,
+     "portee": 2.8875,
+     "coutPourPasserAuSuivant": 180
+    },
+    {
+     "lv": 3,
+     "degats": 86.8,
+     "portee": 3.0250000000000004,
+     "coutPourPasserAuSuivant": 360
+    },
+    {
+     "lv": 4,
+     "degats": 173.6,
+     "portee": 3.1624999999999996,
+     "coutPourPasserAuSuivant": 720
+    },
+    {
+     "lv": 5,
+     "degats": 347.2,
+     "portee": 3.3,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 4,
+   "n": "Brasier du griffon",
+   "c": 85,
+   "r": 2.2,
+   "d": 3.4,
+   "cd": 0.124,
+   "fl": 1,
+   "col": "#d8b45c",
+   "s": "flame",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 1.18,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 5,
+   "faction": 0,
+   "role": "Dégâts continus",
+   "tag": "anti-aérien · zone courte",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 3.4,
+     "portee": 2.2,
+     "coutPourPasserAuSuivant": 130
+    },
+    {
+     "lv": 2,
+     "degats": 6.8,
+     "portee": 2.3100000000000005,
+     "coutPourPasserAuSuivant": 255
+    },
+    {
+     "lv": 3,
+     "degats": 13.6,
+     "portee": 2.4200000000000004,
+     "coutPourPasserAuSuivant": 510
+    },
+    {
+     "lv": 4,
+     "degats": 27.2,
+     "portee": 2.53,
+     "coutPourPasserAuSuivant": 1020
+    },
+    {
+     "lv": 5,
+     "degats": 54.4,
+     "portee": 2.64,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 5,
+   "n": "Sanctuaire solaire",
+   "c": 85,
+   "r": 3.52,
+   "d": 40.2,
+   "cd": 1.442,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#d8b45c",
+   "s": "mage",
+   "tag": "anti-aérien · détection",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 1.18,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 3,
+   "faction": 0,
+   "role": "Arcanes",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 40.2,
+     "portee": 3.52,
+     "coutPourPasserAuSuivant": 130
+    },
+    {
+     "lv": 2,
+     "degats": 80.4,
+     "portee": 3.696,
+     "coutPourPasserAuSuivant": 255
+    },
+    {
+     "lv": 3,
+     "degats": 160.8,
+     "portee": 3.8720000000000003,
+     "coutPourPasserAuSuivant": 510
+    },
+    {
+     "lv": 4,
+     "degats": 321.6,
+     "portee": 4.048,
+     "coutPourPasserAuSuivant": 1020
+    },
+    {
+     "lv": 5,
+     "degats": 643.2,
+     "portee": 4.224,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 6,
+   "n": "Tour des sentinelles",
+   "c": 25,
+   "r": 3.45,
+   "d": 8.3,
+   "cd": 0.443,
+   "ps": 10,
+   "col": "#d8b45c",
+   "s": "arrow",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 1.18,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 0,
+   "faction": 0,
+   "role": "Tireur d’élite",
+   "tag": "anti-aérien · longue portée",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 8.3,
+     "portee": 3.45,
+     "coutPourPasserAuSuivant": 40
+    },
+    {
+     "lv": 2,
+     "degats": 16.6,
+     "portee": 3.6225000000000005,
+     "coutPourPasserAuSuivant": 75
+    },
+    {
+     "lv": 3,
+     "degats": 33.2,
+     "portee": 3.7950000000000004,
+     "coutPourPasserAuSuivant": 150
+    },
+    {
+     "lv": 4,
+     "degats": 66.4,
+     "portee": 3.9675,
+     "coutPourPasserAuSuivant": 300
+    },
+    {
+     "lv": 5,
+     "degats": 132.8,
+     "portee": 4.14,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 7,
+   "n": "Garde du lion",
+   "c": 40,
+   "r": 1.65,
+   "d": 27.2,
+   "cd": 0.634,
+   "me": 1,
+   "gr": 1,
+   "col": "#d8b45c",
+   "s": "slash",
+   "tag": "anti-aérien · frappe lourde",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 1.18,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 4,
+   "faction": 0,
+   "role": "Champion",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 27.2,
+     "portee": 1.65,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 2,
+     "degats": 54.4,
+     "portee": 1.7325,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 3,
+     "degats": 108.8,
+     "portee": 1.815,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 4,
+     "degats": 217.6,
+     "portee": 1.8974999999999997,
+     "coutPourPasserAuSuivant": 480
+    },
+    {
+     "lv": 5,
+     "degats": 435.2,
+     "portee": 1.9799999999999998,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 8,
+   "n": "Cristal hivernal",
+   "c": 50,
+   "r": 2.75,
+   "d": 4.1,
+   "cd": 0.927,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#d8b45c",
+   "s": "frost",
+   "tag": "anti-aérien · contrôle renforcé",
+   "sf": 0.5,
+   "airBonus": 1.18,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 2,
+   "faction": 0,
+   "role": "Entrave",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 4.1,
+     "portee": 2.75,
+     "coutPourPasserAuSuivant": 75
+    },
+    {
+     "lv": 2,
+     "degats": 8.2,
+     "portee": 2.8875,
+     "coutPourPasserAuSuivant": 150
+    },
+    {
+     "lv": 3,
+     "degats": 16.4,
+     "portee": 3.0250000000000004,
+     "coutPourPasserAuSuivant": 300
+    },
+    {
+     "lv": 4,
+     "degats": 32.8,
+     "portee": 3.1624999999999996,
+     "coutPourPasserAuSuivant": 600
+    },
+    {
+     "lv": 5,
+     "degats": 65.6,
+     "portee": 3.3,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 9,
+   "n": "Arcaniste royal",
+   "c": 130,
+   "r": 3.8,
+   "d": 65.1,
+   "cd": 1.442,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#d8b45c",
+   "s": "mage",
+   "tag": "anti-aérien · dégâts élevés",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 1.18,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 3,
+   "faction": 0,
+   "role": "Archimage",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 65.1,
+     "portee": 3.8,
+     "coutPourPasserAuSuivant": 195
+    },
+    {
+     "lv": 2,
+     "degats": 130.2,
+     "portee": 3.9899999999999998,
+     "coutPourPasserAuSuivant": 390
+    },
+    {
+     "lv": 3,
+     "degats": 260.4,
+     "portee": 4.18,
+     "coutPourPasserAuSuivant": 780
+    },
+    {
+     "lv": 4,
+     "degats": 520.8,
+     "portee": 4.369999999999999,
+     "coutPourPasserAuSuivant": 1560
+    },
+    {
+     "lv": 5,
+     "degats": 1041.6,
+     "portee": 4.56,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 10,
+   "n": "Tour des chasseurs",
+   "c": 20,
+   "r": 2.6,
+   "d": 7.7,
+   "cd": 0.52,
+   "ps": 10,
+   "col": "#78a94b",
+   "s": "arrow",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 1.3,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 0,
+   "faction": 1,
+   "role": "Tir rapide",
+   "tag": "frénésie · cadence",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 7.7,
+     "portee": 2.6,
+     "coutPourPasserAuSuivant": 30
+    },
+    {
+     "lv": 2,
+     "degats": 15.4,
+     "portee": 2.7300000000000004,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 3,
+     "degats": 30.8,
+     "portee": 2.8600000000000003,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 4,
+     "degats": 61.6,
+     "portee": 2.9899999999999998,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 5,
+     "degats": 123.2,
+     "portee": 3.12,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 11,
+   "n": "Totem du berserker",
+   "c": 35,
+   "r": 1.4,
+   "d": 20.7,
+   "cd": 0.572,
+   "me": 1,
+   "gr": 1,
+   "col": "#78a94b",
+   "s": "slash",
+   "tag": "frénésie · corps-à-corps",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 1.3,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 4,
+   "faction": 1,
+   "role": "Garde rapprochée",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 20.7,
+     "portee": 1.4,
+     "coutPourPasserAuSuivant": 55
+    },
+    {
+     "lv": 2,
+     "degats": 41.4,
+     "portee": 1.47,
+     "coutPourPasserAuSuivant": 105
+    },
+    {
+     "lv": 3,
+     "degats": 82.8,
+     "portee": 1.54,
+     "coutPourPasserAuSuivant": 210
+    },
+    {
+     "lv": 4,
+     "degats": 165.6,
+     "portee": 1.6099999999999999,
+     "coutPourPasserAuSuivant": 420
+    },
+    {
+     "lv": 5,
+     "degats": 331.2,
+     "portee": 1.68,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 12,
+   "n": "Totem de glace",
+   "c": 40,
+   "r": 2.33,
+   "d": 3.7,
+   "cd": 0.936,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#78a94b",
+   "s": "frost",
+   "tag": "frénésie · ralentit",
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 1.3,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 2,
+   "faction": 1,
+   "role": "Contrôle",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 3.7,
+     "portee": 2.33,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 2,
+     "degats": 7.4,
+     "portee": 2.4465000000000003,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 3,
+     "degats": 14.8,
+     "portee": 2.563,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 4,
+     "degats": 29.6,
+     "portee": 2.6795,
+     "coutPourPasserAuSuivant": 480
+    },
+    {
+     "lv": 5,
+     "degats": 59.2,
+     "portee": 2.796,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 13,
+   "n": "Canon des clans",
+   "c": 55,
+   "r": 2.33,
+   "d": 21.5,
+   "cd": 1.248,
+   "ps": 6.5,
+   "sp": 1.1,
+   "gr": 1,
+   "col": "#78a94b",
+   "s": "canon",
+   "tag": "frénésie · zone",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 1.3,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 1,
+   "faction": 1,
+   "role": "Artillerie",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 21.5,
+     "portee": 2.33,
+     "coutPourPasserAuSuivant": 85
+    },
+    {
+     "lv": 2,
+     "degats": 43,
+     "portee": 2.4465000000000003,
+     "coutPourPasserAuSuivant": 165
+    },
+    {
+     "lv": 3,
+     "degats": 86,
+     "portee": 2.563,
+     "coutPourPasserAuSuivant": 330
+    },
+    {
+     "lv": 4,
+     "degats": 172,
+     "portee": 2.6795,
+     "coutPourPasserAuSuivant": 660
+    },
+    {
+     "lv": 5,
+     "degats": 344,
+     "portee": 2.796,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 14,
+   "n": "Fourneau de guerre",
+   "c": 85,
+   "r": 1.86,
+   "d": 3.4,
+   "cd": 0.125,
+   "fl": 1,
+   "col": "#78a94b",
+   "s": "flame",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 1.3,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 5,
+   "faction": 1,
+   "role": "Dégâts continus",
+   "tag": "frénésie · zone courte",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 3.4,
+     "portee": 1.86,
+     "coutPourPasserAuSuivant": 130
+    },
+    {
+     "lv": 2,
+     "degats": 6.8,
+     "portee": 1.9530000000000003,
+     "coutPourPasserAuSuivant": 255
+    },
+    {
+     "lv": 3,
+     "degats": 13.6,
+     "portee": 2.0460000000000003,
+     "coutPourPasserAuSuivant": 510
+    },
+    {
+     "lv": 4,
+     "degats": 27.2,
+     "portee": 2.139,
+     "coutPourPasserAuSuivant": 1020
+    },
+    {
+     "lv": 5,
+     "degats": 54.4,
+     "portee": 2.232,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 15,
+   "n": "Chaman des flammes",
+   "c": 85,
+   "r": 2.98,
+   "d": 39.7,
+   "cd": 1.456,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#78a94b",
+   "s": "mage",
+   "tag": "frénésie · détection",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 1.3,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 3,
+   "faction": 1,
+   "role": "Arcanes",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 39.7,
+     "portee": 2.98,
+     "coutPourPasserAuSuivant": 130
+    },
+    {
+     "lv": 2,
+     "degats": 79.4,
+     "portee": 3.129,
+     "coutPourPasserAuSuivant": 255
+    },
+    {
+     "lv": 3,
+     "degats": 158.8,
+     "portee": 3.278,
+     "coutPourPasserAuSuivant": 510
+    },
+    {
+     "lv": 4,
+     "degats": 317.6,
+     "portee": 3.4269999999999996,
+     "coutPourPasserAuSuivant": 1020
+    },
+    {
+     "lv": 5,
+     "degats": 635.2,
+     "portee": 3.576,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 16,
+   "n": "Tour des éclaireurs",
+   "c": 25,
+   "r": 2.92,
+   "d": 8.2,
+   "cd": 0.447,
+   "ps": 10,
+   "col": "#78a94b",
+   "s": "arrow",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 1.3,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 0,
+   "faction": 1,
+   "role": "Tireur d’élite",
+   "tag": "frénésie · longue portée",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 8.2,
+     "portee": 2.92,
+     "coutPourPasserAuSuivant": 40
+    },
+    {
+     "lv": 2,
+     "degats": 16.4,
+     "portee": 3.066,
+     "coutPourPasserAuSuivant": 75
+    },
+    {
+     "lv": 3,
+     "degats": 32.8,
+     "portee": 3.212,
+     "coutPourPasserAuSuivant": 150
+    },
+    {
+     "lv": 4,
+     "degats": 65.6,
+     "portee": 3.3579999999999997,
+     "coutPourPasserAuSuivant": 300
+    },
+    {
+     "lv": 5,
+     "degats": 131.2,
+     "portee": 3.504,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 17,
+   "n": "Garde-lame",
+   "c": 40,
+   "r": 1.4,
+   "d": 27,
+   "cd": 0.641,
+   "me": 1,
+   "gr": 1,
+   "col": "#78a94b",
+   "s": "slash",
+   "tag": "frénésie · frappe lourde",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 1.3,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 4,
+   "faction": 1,
+   "role": "Champion",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 27,
+     "portee": 1.4,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 2,
+     "degats": 54,
+     "portee": 1.47,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 3,
+     "degats": 108,
+     "portee": 1.54,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 4,
+     "degats": 216,
+     "portee": 1.6099999999999999,
+     "coutPourPasserAuSuivant": 480
+    },
+    {
+     "lv": 5,
+     "degats": 432,
+     "portee": 1.68,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 18,
+   "n": "Totem des esprits",
+   "c": 45,
+   "r": 2.33,
+   "d": 4,
+   "cd": 0.936,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#78a94b",
+   "s": "frost",
+   "tag": "frénésie · contrôle renforcé",
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 1.3,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 2,
+   "faction": 1,
+   "role": "Entrave",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 4,
+     "portee": 2.33,
+     "coutPourPasserAuSuivant": 70
+    },
+    {
+     "lv": 2,
+     "degats": 8,
+     "portee": 2.4465000000000003,
+     "coutPourPasserAuSuivant": 135
+    },
+    {
+     "lv": 3,
+     "degats": 16,
+     "portee": 2.563,
+     "coutPourPasserAuSuivant": 270
+    },
+    {
+     "lv": 4,
+     "degats": 32,
+     "portee": 2.6795,
+     "coutPourPasserAuSuivant": 540
+    },
+    {
+     "lv": 5,
+     "degats": 64,
+     "portee": 2.796,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 19,
+   "n": "Grand sorcier orc",
+   "c": 125,
+   "r": 3.21,
+   "d": 64.4,
+   "cd": 1.456,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#78a94b",
+   "s": "mage",
+   "tag": "frénésie · dégâts élevés",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 1.3,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 3,
+   "faction": 1,
+   "role": "Archimage",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 64.4,
+     "portee": 3.21,
+     "coutPourPasserAuSuivant": 190
+    },
+    {
+     "lv": 2,
+     "degats": 128.8,
+     "portee": 3.3705000000000003,
+     "coutPourPasserAuSuivant": 375
+    },
+    {
+     "lv": 3,
+     "degats": 257.6,
+     "portee": 3.531,
+     "coutPourPasserAuSuivant": 750
+    },
+    {
+     "lv": 4,
+     "degats": 515.2,
+     "portee": 3.6914999999999996,
+     "coutPourPasserAuSuivant": 1500
+    },
+    {
+     "lv": 5,
+     "degats": 1030.4,
+     "portee": 3.852,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 20,
+   "n": "Arbre sentinelle",
+   "c": 20,
+   "r": 2.8,
+   "d": 7.7,
+   "cd": 0.51,
+   "ps": 10,
+   "col": "#69bd83",
+   "s": "arrow",
+   "sl": 0.72,
+   "sf": 0.82,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 0,
+   "faction": 2,
+   "role": "Tir rapide",
+   "tag": "racines · cadence",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 7.7,
+     "portee": 2.8,
+     "coutPourPasserAuSuivant": 30
+    },
+    {
+     "lv": 2,
+     "degats": 15.4,
+     "portee": 2.94,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 3,
+     "degats": 30.8,
+     "portee": 3.08,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 4,
+     "degats": 61.6,
+     "portee": 3.2199999999999998,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 5,
+     "degats": 123.2,
+     "portee": 3.36,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 21,
+   "n": "Gardien des racines",
+   "c": 30,
+   "r": 1.5,
+   "d": 20.7,
+   "cd": 0.561,
+   "me": 1,
+   "gr": 1,
+   "col": "#69bd83",
+   "s": "slash",
+   "tag": "racines · corps-à-corps",
+   "sl": 0.72,
+   "sf": 0.82,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 4,
+   "faction": 2,
+   "role": "Garde rapprochée",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 20.7,
+     "portee": 1.5,
+     "coutPourPasserAuSuivant": 45
+    },
+    {
+     "lv": 2,
+     "degats": 41.4,
+     "portee": 1.5750000000000002,
+     "coutPourPasserAuSuivant": 90
+    },
+    {
+     "lv": 3,
+     "degats": 82.8,
+     "portee": 1.6500000000000001,
+     "coutPourPasserAuSuivant": 180
+    },
+    {
+     "lv": 4,
+     "degats": 165.6,
+     "portee": 1.7249999999999999,
+     "coutPourPasserAuSuivant": 360
+    },
+    {
+     "lv": 5,
+     "degats": 331.2,
+     "portee": 1.7999999999999998,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 22,
+   "n": "Pierre de rosée",
+   "c": 40,
+   "r": 2.5,
+   "d": 3.7,
+   "cd": 0.918,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#69bd83",
+   "s": "frost",
+   "tag": "racines · ralentit",
+   "sf": 0.82,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 2,
+   "faction": 2,
+   "role": "Contrôle",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 3.7,
+     "portee": 2.5,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 2,
+     "degats": 7.4,
+     "portee": 2.625,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 3,
+     "degats": 14.8,
+     "portee": 2.75,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 4,
+     "degats": 29.6,
+     "portee": 2.875,
+     "coutPourPasserAuSuivant": 480
+    },
+    {
+     "lv": 5,
+     "degats": 59.2,
+     "portee": 3,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 23,
+   "n": "Fleur explosive",
+   "c": 55,
+   "r": 2.5,
+   "d": 21.5,
+   "cd": 1.224,
+   "ps": 6.5,
+   "sp": 1.1,
+   "gr": 1,
+   "col": "#69bd83",
+   "s": "canon",
+   "tag": "racines · zone",
+   "sl": 0.72,
+   "sf": 0.82,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 1,
+   "faction": 2,
+   "role": "Artillerie",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 21.5,
+     "portee": 2.5,
+     "coutPourPasserAuSuivant": 85
+    },
+    {
+     "lv": 2,
+     "degats": 43,
+     "portee": 2.625,
+     "coutPourPasserAuSuivant": 165
+    },
+    {
+     "lv": 3,
+     "degats": 86,
+     "portee": 2.75,
+     "coutPourPasserAuSuivant": 330
+    },
+    {
+     "lv": 4,
+     "degats": 172,
+     "portee": 2.875,
+     "coutPourPasserAuSuivant": 660
+    },
+    {
+     "lv": 5,
+     "degats": 344,
+     "portee": 3,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 24,
+   "n": "Cœur ardent",
+   "c": 85,
+   "r": 2,
+   "d": 3.4,
+   "cd": 0.122,
+   "fl": 1,
+   "col": "#69bd83",
+   "s": "flame",
+   "sl": 0.72,
+   "sf": 0.82,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 5,
+   "faction": 2,
+   "role": "Dégâts continus",
+   "tag": "racines · zone courte",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 3.4,
+     "portee": 2,
+     "coutPourPasserAuSuivant": 130
+    },
+    {
+     "lv": 2,
+     "degats": 6.8,
+     "portee": 2.1,
+     "coutPourPasserAuSuivant": 255
+    },
+    {
+     "lv": 3,
+     "degats": 13.6,
+     "portee": 2.2,
+     "coutPourPasserAuSuivant": 510
+    },
+    {
+     "lv": 4,
+     "degats": 27.2,
+     "portee": 2.3,
+     "coutPourPasserAuSuivant": 1020
+    },
+    {
+     "lv": 5,
+     "degats": 54.4,
+     "portee": 2.4,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 25,
+   "n": "Cercle druidique",
+   "c": 85,
+   "r": 3.2,
+   "d": 39.7,
+   "cd": 1.428,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#69bd83",
+   "s": "mage",
+   "tag": "racines · détection",
+   "sl": 0.72,
+   "sf": 0.82,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 3,
+   "faction": 2,
+   "role": "Arcanes",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 39.7,
+     "portee": 3.2,
+     "coutPourPasserAuSuivant": 130
+    },
+    {
+     "lv": 2,
+     "degats": 79.4,
+     "portee": 3.3600000000000003,
+     "coutPourPasserAuSuivant": 255
+    },
+    {
+     "lv": 3,
+     "degats": 158.8,
+     "portee": 3.5200000000000005,
+     "coutPourPasserAuSuivant": 510
+    },
+    {
+     "lv": 4,
+     "degats": 317.6,
+     "portee": 3.6799999999999997,
+     "coutPourPasserAuSuivant": 1020
+    },
+    {
+     "lv": 5,
+     "degats": 635.2,
+     "portee": 3.84,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 26,
+   "n": "Nid des faucons",
+   "c": 25,
+   "r": 3.14,
+   "d": 8.2,
+   "cd": 0.439,
+   "ps": 10,
+   "col": "#69bd83",
+   "s": "arrow",
+   "sl": 0.72,
+   "sf": 0.82,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 0,
+   "faction": 2,
+   "role": "Tireur d’élite",
+   "tag": "racines · longue portée",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 8.2,
+     "portee": 3.14,
+     "coutPourPasserAuSuivant": 40
+    },
+    {
+     "lv": 2,
+     "degats": 16.4,
+     "portee": 3.297,
+     "coutPourPasserAuSuivant": 75
+    },
+    {
+     "lv": 3,
+     "degats": 32.8,
+     "portee": 3.4540000000000006,
+     "coutPourPasserAuSuivant": 150
+    },
+    {
+     "lv": 4,
+     "degats": 65.6,
+     "portee": 3.6109999999999998,
+     "coutPourPasserAuSuivant": 300
+    },
+    {
+     "lv": 5,
+     "degats": 131.2,
+     "portee": 3.768,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 27,
+   "n": "Dryade protectrice",
+   "c": 40,
+   "r": 1.5,
+   "d": 27,
+   "cd": 0.628,
+   "me": 1,
+   "gr": 1,
+   "col": "#69bd83",
+   "s": "slash",
+   "tag": "racines · frappe lourde",
+   "sl": 0.72,
+   "sf": 0.82,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 4,
+   "faction": 2,
+   "role": "Champion",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 27,
+     "portee": 1.5,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 2,
+     "degats": 54,
+     "portee": 1.5750000000000002,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 3,
+     "degats": 108,
+     "portee": 1.6500000000000001,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 4,
+     "degats": 216,
+     "portee": 1.7249999999999999,
+     "coutPourPasserAuSuivant": 480
+    },
+    {
+     "lv": 5,
+     "degats": 432,
+     "portee": 1.7999999999999998,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 28,
+   "n": "Cristal lunaire",
+   "c": 45,
+   "r": 2.5,
+   "d": 4,
+   "cd": 0.918,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#69bd83",
+   "s": "frost",
+   "tag": "racines · contrôle renforcé",
+   "sf": 0.82,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 2,
+   "faction": 2,
+   "role": "Entrave",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 4,
+     "portee": 2.5,
+     "coutPourPasserAuSuivant": 70
+    },
+    {
+     "lv": 2,
+     "degats": 8,
+     "portee": 2.625,
+     "coutPourPasserAuSuivant": 135
+    },
+    {
+     "lv": 3,
+     "degats": 16,
+     "portee": 2.75,
+     "coutPourPasserAuSuivant": 270
+    },
+    {
+     "lv": 4,
+     "degats": 32,
+     "portee": 2.875,
+     "coutPourPasserAuSuivant": 540
+    },
+    {
+     "lv": 5,
+     "degats": 64,
+     "portee": 3,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 29,
+   "n": "Ancien arcanique",
+   "c": 125,
+   "r": 3.46,
+   "d": 64.4,
+   "cd": 1.428,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#69bd83",
+   "s": "mage",
+   "tag": "racines · dégâts élevés",
+   "sl": 0.72,
+   "sf": 0.82,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 0,
+   "skin": 3,
+   "faction": 2,
+   "role": "Archimage",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 64.4,
+     "portee": 3.46,
+     "coutPourPasserAuSuivant": 190
+    },
+    {
+     "lv": 2,
+     "degats": 128.8,
+     "portee": 3.633,
+     "coutPourPasserAuSuivant": 375
+    },
+    {
+     "lv": 3,
+     "degats": 257.6,
+     "portee": 3.806,
+     "coutPourPasserAuSuivant": 750
+    },
+    {
+     "lv": 4,
+     "degats": 515.2,
+     "portee": 3.9789999999999996,
+     "coutPourPasserAuSuivant": 1500
+    },
+    {
+     "lv": 5,
+     "degats": 1030.4,
+     "portee": 4.152,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 30,
+   "n": "Tourelle de guet",
+   "c": 20,
+   "r": 2.86,
+   "d": 8.6,
+   "cd": 0.54,
+   "ps": 10,
+   "col": "#c58b55",
+   "s": "arrow",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0.55,
+   "mark": 0,
+   "skin": 0,
+   "faction": 3,
+   "role": "Tir rapide",
+   "tag": "perforant · cadence",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 8.6,
+     "portee": 2.86,
+     "coutPourPasserAuSuivant": 30
+    },
+    {
+     "lv": 2,
+     "degats": 17.2,
+     "portee": 3.003,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 3,
+     "degats": 34.4,
+     "portee": 3.146,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 4,
+     "degats": 68.8,
+     "portee": 3.2889999999999997,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 5,
+     "degats": 137.6,
+     "portee": 3.432,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 31,
+   "n": "Automate garde",
+   "c": 35,
+   "r": 1.53,
+   "d": 23.3,
+   "cd": 0.594,
+   "me": 1,
+   "gr": 1,
+   "col": "#c58b55",
+   "s": "slash",
+   "tag": "perforant · corps-à-corps",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0.55,
+   "mark": 0,
+   "skin": 4,
+   "faction": 3,
+   "role": "Garde rapprochée",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 23.3,
+     "portee": 1.53,
+     "coutPourPasserAuSuivant": 55
+    },
+    {
+     "lv": 2,
+     "degats": 46.6,
+     "portee": 1.6065,
+     "coutPourPasserAuSuivant": 105
+    },
+    {
+     "lv": 3,
+     "degats": 93.2,
+     "portee": 1.6830000000000003,
+     "coutPourPasserAuSuivant": 210
+    },
+    {
+     "lv": 4,
+     "degats": 186.4,
+     "portee": 1.7594999999999998,
+     "coutPourPasserAuSuivant": 420
+    },
+    {
+     "lv": 5,
+     "degats": 372.8,
+     "portee": 1.8359999999999999,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 32,
+   "n": "Cryo-forge",
+   "c": 40,
+   "r": 2.55,
+   "d": 4.1,
+   "cd": 0.972,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#c58b55",
+   "s": "frost",
+   "tag": "perforant · ralentit",
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0.55,
+   "mark": 0,
+   "skin": 2,
+   "faction": 3,
+   "role": "Contrôle",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 4.1,
+     "portee": 2.55,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 2,
+     "degats": 8.2,
+     "portee": 2.6774999999999998,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 3,
+     "degats": 16.4,
+     "portee": 2.805,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 4,
+     "degats": 32.8,
+     "portee": 2.9324999999999997,
+     "coutPourPasserAuSuivant": 480
+    },
+    {
+     "lv": 5,
+     "degats": 65.6,
+     "portee": 3.0599999999999996,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 33,
+   "n": "Mortier runique",
+   "c": 60,
+   "r": 2.55,
+   "d": 24.2,
+   "cd": 1.296,
+   "ps": 6.5,
+   "sp": 1.1,
+   "gr": 1,
+   "col": "#c58b55",
+   "s": "canon",
+   "tag": "perforant · zone",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0.55,
+   "mark": 0,
+   "skin": 1,
+   "faction": 3,
+   "role": "Artillerie",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 24.2,
+     "portee": 2.55,
+     "coutPourPasserAuSuivant": 90
+    },
+    {
+     "lv": 2,
+     "degats": 48.4,
+     "portee": 2.6774999999999998,
+     "coutPourPasserAuSuivant": 180
+    },
+    {
+     "lv": 3,
+     "degats": 96.8,
+     "portee": 2.805,
+     "coutPourPasserAuSuivant": 360
+    },
+    {
+     "lv": 4,
+     "degats": 193.6,
+     "portee": 2.9324999999999997,
+     "coutPourPasserAuSuivant": 720
+    },
+    {
+     "lv": 5,
+     "degats": 387.2,
+     "portee": 3.0599999999999996,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 34,
+   "n": "Forge incandescente",
+   "c": 90,
+   "r": 2.04,
+   "d": 3.8,
+   "cd": 0.13,
+   "fl": 1,
+   "col": "#c58b55",
+   "s": "flame",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0.55,
+   "mark": 0,
+   "skin": 5,
+   "faction": 3,
+   "role": "Dégâts continus",
+   "tag": "perforant · zone courte",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 3.8,
+     "portee": 2.04,
+     "coutPourPasserAuSuivant": 135
+    },
+    {
+     "lv": 2,
+     "degats": 7.6,
+     "portee": 2.1420000000000003,
+     "coutPourPasserAuSuivant": 270
+    },
+    {
+     "lv": 3,
+     "degats": 15.2,
+     "portee": 2.244,
+     "coutPourPasserAuSuivant": 540
+    },
+    {
+     "lv": 4,
+     "degats": 30.4,
+     "portee": 2.3459999999999996,
+     "coutPourPasserAuSuivant": 1080
+    },
+    {
+     "lv": 5,
+     "degats": 60.8,
+     "portee": 2.448,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 35,
+   "n": "Canon arcanique",
+   "c": 90,
+   "r": 3.26,
+   "d": 44.7,
+   "cd": 1.512,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#c58b55",
+   "s": "mage",
+   "tag": "perforant · détection",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0.55,
+   "mark": 0,
+   "skin": 3,
+   "faction": 3,
+   "role": "Arcanes",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 44.7,
+     "portee": 3.26,
+     "coutPourPasserAuSuivant": 135
+    },
+    {
+     "lv": 2,
+     "degats": 89.4,
+     "portee": 3.423,
+     "coutPourPasserAuSuivant": 270
+    },
+    {
+     "lv": 3,
+     "degats": 178.8,
+     "portee": 3.586,
+     "coutPourPasserAuSuivant": 540
+    },
+    {
+     "lv": 4,
+     "degats": 357.6,
+     "portee": 3.7489999999999997,
+     "coutPourPasserAuSuivant": 1080
+    },
+    {
+     "lv": 5,
+     "degats": 715.2,
+     "portee": 3.9119999999999995,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 36,
+   "n": "Baliste naine",
+   "c": 25,
+   "r": 3.2,
+   "d": 9.3,
+   "cd": 0.464,
+   "ps": 10,
+   "col": "#c58b55",
+   "s": "arrow",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0.55,
+   "mark": 0,
+   "skin": 0,
+   "faction": 3,
+   "role": "Tireur d’élite",
+   "tag": "perforant · longue portée",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 9.3,
+     "portee": 3.2,
+     "coutPourPasserAuSuivant": 40
+    },
+    {
+     "lv": 2,
+     "degats": 18.6,
+     "portee": 3.3600000000000003,
+     "coutPourPasserAuSuivant": 75
+    },
+    {
+     "lv": 3,
+     "degats": 37.2,
+     "portee": 3.5200000000000005,
+     "coutPourPasserAuSuivant": 150
+    },
+    {
+     "lv": 4,
+     "degats": 74.4,
+     "portee": 3.6799999999999997,
+     "coutPourPasserAuSuivant": 300
+    },
+    {
+     "lv": 5,
+     "degats": 148.8,
+     "portee": 3.84,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 37,
+   "n": "Sentinelle d’acier",
+   "c": 40,
+   "r": 1.53,
+   "d": 30.3,
+   "cd": 0.665,
+   "me": 1,
+   "gr": 1,
+   "col": "#c58b55",
+   "s": "slash",
+   "tag": "perforant · frappe lourde",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0.55,
+   "mark": 0,
+   "skin": 4,
+   "faction": 3,
+   "role": "Champion",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 30.3,
+     "portee": 1.53,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 2,
+     "degats": 60.6,
+     "portee": 1.6065,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 3,
+     "degats": 121.2,
+     "portee": 1.6830000000000003,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 4,
+     "degats": 242.4,
+     "portee": 1.7594999999999998,
+     "coutPourPasserAuSuivant": 480
+    },
+    {
+     "lv": 5,
+     "degats": 484.8,
+     "portee": 1.8359999999999999,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 38,
+   "n": "Générateur runique",
+   "c": 50,
+   "r": 2.55,
+   "d": 4.5,
+   "cd": 0.972,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#c58b55",
+   "s": "frost",
+   "tag": "perforant · contrôle renforcé",
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0.55,
+   "mark": 0,
+   "skin": 2,
+   "faction": 3,
+   "role": "Entrave",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 4.5,
+     "portee": 2.55,
+     "coutPourPasserAuSuivant": 75
+    },
+    {
+     "lv": 2,
+     "degats": 9,
+     "portee": 2.6774999999999998,
+     "coutPourPasserAuSuivant": 150
+    },
+    {
+     "lv": 3,
+     "degats": 18,
+     "portee": 2.805,
+     "coutPourPasserAuSuivant": 300
+    },
+    {
+     "lv": 4,
+     "degats": 36,
+     "portee": 2.9324999999999997,
+     "coutPourPasserAuSuivant": 600
+    },
+    {
+     "lv": 5,
+     "degats": 72,
+     "portee": 3.0599999999999996,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 39,
+   "n": "Maître ingénieur",
+   "c": 135,
+   "r": 3.53,
+   "d": 72.4,
+   "cd": 1.512,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#c58b55",
+   "s": "mage",
+   "tag": "perforant · dégâts élevés",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0.55,
+   "mark": 0,
+   "skin": 3,
+   "faction": 3,
+   "role": "Archimage",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 72.4,
+     "portee": 3.53,
+     "coutPourPasserAuSuivant": 205
+    },
+    {
+     "lv": 2,
+     "degats": 144.8,
+     "portee": 3.7065,
+     "coutPourPasserAuSuivant": 405
+    },
+    {
+     "lv": 3,
+     "degats": 289.6,
+     "portee": 3.883,
+     "coutPourPasserAuSuivant": 810
+    },
+    {
+     "lv": 4,
+     "degats": 579.2,
+     "portee": 4.0595,
+     "coutPourPasserAuSuivant": 1620
+    },
+    {
+     "lv": 5,
+     "degats": 1158.4,
+     "portee": 4.236,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 40,
+   "n": "Tour des damnés",
+   "c": 20,
+   "r": 2.77,
+   "d": 8.1,
+   "cd": 0.505,
+   "ps": 10,
+   "col": "#a879c9",
+   "s": "arrow",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 1.14,
+   "skin": 0,
+   "faction": 4,
+   "role": "Tir rapide",
+   "tag": "malédiction · cadence",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 8.1,
+     "portee": 2.77,
+     "coutPourPasserAuSuivant": 30
+    },
+    {
+     "lv": 2,
+     "degats": 16.2,
+     "portee": 2.9085,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 3,
+     "degats": 32.4,
+     "portee": 3.047,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 4,
+     "degats": 64.8,
+     "portee": 3.1854999999999998,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 5,
+     "degats": 129.6,
+     "portee": 3.324,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 41,
+   "n": "Chevalier funeste",
+   "c": 35,
+   "r": 1.48,
+   "d": 21.8,
+   "cd": 0.556,
+   "me": 1,
+   "gr": 1,
+   "col": "#a879c9",
+   "s": "slash",
+   "tag": "malédiction · corps-à-corps",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 1.14,
+   "skin": 4,
+   "faction": 4,
+   "role": "Garde rapprochée",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 21.8,
+     "portee": 1.48,
+     "coutPourPasserAuSuivant": 55
+    },
+    {
+     "lv": 2,
+     "degats": 43.6,
+     "portee": 1.554,
+     "coutPourPasserAuSuivant": 105
+    },
+    {
+     "lv": 3,
+     "degats": 87.2,
+     "portee": 1.6280000000000001,
+     "coutPourPasserAuSuivant": 210
+    },
+    {
+     "lv": 4,
+     "degats": 174.4,
+     "portee": 1.702,
+     "coutPourPasserAuSuivant": 420
+    },
+    {
+     "lv": 5,
+     "degats": 348.8,
+     "portee": 1.776,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 42,
+   "n": "Obélisque maudit",
+   "c": 40,
+   "r": 2.48,
+   "d": 3.9,
+   "cd": 0.909,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#a879c9",
+   "s": "frost",
+   "tag": "malédiction · ralentit",
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 1.14,
+   "skin": 2,
+   "faction": 4,
+   "role": "Contrôle",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 3.9,
+     "portee": 2.48,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 2,
+     "degats": 7.8,
+     "portee": 2.604,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 3,
+     "degats": 15.6,
+     "portee": 2.728,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 4,
+     "degats": 31.2,
+     "portee": 2.852,
+     "coutPourPasserAuSuivant": 480
+    },
+    {
+     "lv": 5,
+     "degats": 62.4,
+     "portee": 2.976,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 43,
+   "n": "Mortier infernal",
+   "c": 55,
+   "r": 2.48,
+   "d": 22.6,
+   "cd": 1.212,
+   "ps": 6.5,
+   "sp": 1.1,
+   "gr": 1,
+   "col": "#a879c9",
+   "s": "canon",
+   "tag": "malédiction · zone",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 1.14,
+   "skin": 1,
+   "faction": 4,
+   "role": "Artillerie",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 22.6,
+     "portee": 2.48,
+     "coutPourPasserAuSuivant": 85
+    },
+    {
+     "lv": 2,
+     "degats": 45.2,
+     "portee": 2.604,
+     "coutPourPasserAuSuivant": 165
+    },
+    {
+     "lv": 3,
+     "degats": 90.4,
+     "portee": 2.728,
+     "coutPourPasserAuSuivant": 330
+    },
+    {
+     "lv": 4,
+     "degats": 180.8,
+     "portee": 2.852,
+     "coutPourPasserAuSuivant": 660
+    },
+    {
+     "lv": 5,
+     "degats": 361.6,
+     "portee": 2.976,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 44,
+   "n": "Puits de lave",
+   "c": 85,
+   "r": 1.98,
+   "d": 3.6,
+   "cd": 0.121,
+   "fl": 1,
+   "col": "#a879c9",
+   "s": "flame",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 1.14,
+   "skin": 5,
+   "faction": 4,
+   "role": "Dégâts continus",
+   "tag": "malédiction · zone courte",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 3.6,
+     "portee": 1.98,
+     "coutPourPasserAuSuivant": 130
+    },
+    {
+     "lv": 2,
+     "degats": 7.2,
+     "portee": 2.079,
+     "coutPourPasserAuSuivant": 255
+    },
+    {
+     "lv": 3,
+     "degats": 14.4,
+     "portee": 2.178,
+     "coutPourPasserAuSuivant": 510
+    },
+    {
+     "lv": 4,
+     "degats": 28.8,
+     "portee": 2.2769999999999997,
+     "coutPourPasserAuSuivant": 1020
+    },
+    {
+     "lv": 5,
+     "degats": 57.6,
+     "portee": 2.376,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 45,
+   "n": "Nexus du néant",
+   "c": 85,
+   "r": 3.17,
+   "d": 41.8,
+   "cd": 1.414,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#a879c9",
+   "s": "mage",
+   "tag": "malédiction · détection",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 1.14,
+   "skin": 3,
+   "faction": 4,
+   "role": "Arcanes",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 41.8,
+     "portee": 3.17,
+     "coutPourPasserAuSuivant": 130
+    },
+    {
+     "lv": 2,
+     "degats": 83.6,
+     "portee": 3.3285,
+     "coutPourPasserAuSuivant": 255
+    },
+    {
+     "lv": 3,
+     "degats": 167.2,
+     "portee": 3.487,
+     "coutPourPasserAuSuivant": 510
+    },
+    {
+     "lv": 4,
+     "degats": 334.4,
+     "portee": 3.6454999999999997,
+     "coutPourPasserAuSuivant": 1020
+    },
+    {
+     "lv": 5,
+     "degats": 668.8,
+     "portee": 3.804,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 46,
+   "n": "Œil démoniaque",
+   "c": 25,
+   "r": 3.1,
+   "d": 8.7,
+   "cd": 0.434,
+   "ps": 10,
+   "col": "#a879c9",
+   "s": "arrow",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 1.14,
+   "skin": 0,
+   "faction": 4,
+   "role": "Tireur d’élite",
+   "tag": "malédiction · longue portée",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 8.7,
+     "portee": 3.1,
+     "coutPourPasserAuSuivant": 40
+    },
+    {
+     "lv": 2,
+     "degats": 17.4,
+     "portee": 3.2550000000000003,
+     "coutPourPasserAuSuivant": 75
+    },
+    {
+     "lv": 3,
+     "degats": 34.8,
+     "portee": 3.4100000000000006,
+     "coutPourPasserAuSuivant": 150
+    },
+    {
+     "lv": 4,
+     "degats": 69.6,
+     "portee": 3.565,
+     "coutPourPasserAuSuivant": 300
+    },
+    {
+     "lv": 5,
+     "degats": 139.2,
+     "portee": 3.7199999999999998,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 47,
+   "n": "Gardien spectral",
+   "c": 40,
+   "r": 1.48,
+   "d": 28.4,
+   "cd": 0.622,
+   "me": 1,
+   "gr": 1,
+   "col": "#a879c9",
+   "s": "slash",
+   "tag": "malédiction · frappe lourde",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 1.14,
+   "skin": 4,
+   "faction": 4,
+   "role": "Champion",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 28.4,
+     "portee": 1.48,
+     "coutPourPasserAuSuivant": 60
+    },
+    {
+     "lv": 2,
+     "degats": 56.8,
+     "portee": 1.554,
+     "coutPourPasserAuSuivant": 120
+    },
+    {
+     "lv": 3,
+     "degats": 113.6,
+     "portee": 1.6280000000000001,
+     "coutPourPasserAuSuivant": 240
+    },
+    {
+     "lv": 4,
+     "degats": 227.2,
+     "portee": 1.702,
+     "coutPourPasserAuSuivant": 480
+    },
+    {
+     "lv": 5,
+     "degats": 454.4,
+     "portee": 1.776,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 48,
+   "n": "Cristal corrupteur",
+   "c": 45,
+   "r": 2.48,
+   "d": 4.2,
+   "cd": 0.909,
+   "ps": 8,
+   "sl": 1.5,
+   "fsp": 1.2,
+   "mag": 1,
+   "col": "#a879c9",
+   "s": "frost",
+   "tag": "malédiction · contrôle renforcé",
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 1.14,
+   "skin": 2,
+   "faction": 4,
+   "role": "Entrave",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 4.2,
+     "portee": 2.48,
+     "coutPourPasserAuSuivant": 70
+    },
+    {
+     "lv": 2,
+     "degats": 8.4,
+     "portee": 2.604,
+     "coutPourPasserAuSuivant": 135
+    },
+    {
+     "lv": 3,
+     "degats": 16.8,
+     "portee": 2.728,
+     "coutPourPasserAuSuivant": 270
+    },
+    {
+     "lv": 4,
+     "degats": 33.6,
+     "portee": 2.852,
+     "coutPourPasserAuSuivant": 540
+    },
+    {
+     "lv": 5,
+     "degats": 67.2,
+     "portee": 2.976,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  },
+  {
+   "k": 49,
+   "n": "Archimage noir",
+   "c": 125,
+   "r": 3.42,
+   "d": 67.7,
+   "cd": 1.414,
+   "ps": 7.5,
+   "mg": 1,
+   "mag": 1,
+   "col": "#a879c9",
+   "s": "mage",
+   "tag": "malédiction · dégâts élevés",
+   "sl": 0,
+   "sf": 0.5,
+   "airBonus": 0,
+   "execute": 0,
+   "pierce": 0,
+   "mark": 1.14,
+   "skin": 3,
+   "faction": 4,
+   "role": "Archimage",
+   "niveaux": [
+    {
+     "lv": 1,
+     "degats": 67.7,
+     "portee": 3.42,
+     "coutPourPasserAuSuivant": 190
+    },
+    {
+     "lv": 2,
+     "degats": 135.4,
+     "portee": 3.591,
+     "coutPourPasserAuSuivant": 375
+    },
+    {
+     "lv": 3,
+     "degats": 270.8,
+     "portee": 3.762,
+     "coutPourPasserAuSuivant": 750
+    },
+    {
+     "lv": 4,
+     "degats": 541.6,
+     "portee": 3.933,
+     "coutPourPasserAuSuivant": 1500
+    },
+    {
+     "lv": 5,
+     "degats": 1083.2,
+     "portee": 4.104,
+     "coutPourPasserAuSuivant": null
+    }
+   ]
+  }
+ ],
+ "monstres": [
+  {
+   "k": 0,
+   "n": "Sapeur gobelin",
+   "cat": "n",
+   "c": 10,
+   "hp": 12,
+   "s": 1.6,
+   "z": 0.75,
+   "g": "gob",
+   "col": "#8fce5a",
+   "i": 1
+  },
+  {
+   "k": 1,
+   "n": "Warg",
+   "cat": "n",
+   "c": 20,
+   "hp": 22,
+   "s": 2.4,
+   "z": 0.78,
+   "g": "wolf",
+   "col": "#9aa3ad",
+   "i": 2
+  },
+  {
+   "k": 2,
+   "n": "Brute orc",
+   "cat": "n",
+   "c": 65,
+   "hp": 82,
+   "s": 1.4,
+   "z": 0.95,
+   "g": "orc",
+   "col": "#5f9c45",
+   "i": 7
+  },
+  {
+   "k": 3,
+   "n": "Troll des glaces",
+   "cat": "n",
+   "c": 120,
+   "hp": 160,
+   "s": 1.5,
+   "z": 1.1,
+   "g": "troll",
+   "col": "#57aeb0",
+   "i": 13
+  },
+  {
+   "k": 4,
+   "n": "Golem runique",
+   "cat": "n",
+   "c": 300,
+   "hp": 420,
+   "s": 1,
+   "z": 1.2,
+   "g": "golem",
+   "col": "#9a9ca6",
+   "i": 34
+  },
+  {
+   "k": 5,
+   "n": "Cyclope des cendres",
+   "cat": "n",
+   "c": 1000,
+   "hp": 1500,
+   "s": 1.1,
+   "z": 1.5,
+   "g": "cyc",
+   "col": "#dba878",
+   "i": 120
+  },
+  {
+   "k": 6,
+   "n": "Chauve-souris",
+   "cat": "f",
+   "c": 30,
+   "hp": 16,
+   "s": 2,
+   "z": 0.75,
+   "g": "bat",
+   "fly": 1,
+   "col": "#7d5ba6",
+   "i": 2
+  },
+  {
+   "k": 7,
+   "n": "Griffon corrompu",
+   "cat": "f",
+   "c": 150,
+   "hp": 95,
+   "s": 1.9,
+   "z": 1,
+   "g": "griffon",
+   "fly": 1,
+   "col": "#d9a441",
+   "i": 10
+  },
+  {
+   "k": 8,
+   "n": "Dragon ancien",
+   "cat": "f",
+   "c": 450,
+   "hp": 400,
+   "s": 1.3,
+   "z": 1.3,
+   "g": "dragon",
+   "fly": 1,
+   "col": "#d6453d",
+   "i": 29
+  },
+  {
+   "k": 9,
+   "n": "Chaman de guerre",
+   "cat": "s",
+   "c": 80,
+   "hp": 70,
+   "s": 1.5,
+   "z": 0.85,
+   "g": "chaman",
+   "aura": 1,
+   "col": "#e8b23a",
+   "tag": "hâte",
+   "i": 5
+  },
+  {
+   "k": 10,
+   "n": "Prêtresse",
+   "cat": "s",
+   "c": 100,
+   "hp": 80,
+   "s": 1.4,
+   "z": 0.85,
+   "g": "healer",
+   "heal": 1,
+   "col": "#6fcf97",
+   "tag": "soin",
+   "i": 7
+  },
+  {
+   "k": 11,
+   "n": "Gelée mutante",
+   "cat": "s",
+   "c": 140,
+   "hp": 90,
+   "s": 1.3,
+   "z": 0.95,
+   "g": "slime",
+   "split": 1,
+   "col": "#b5e04a",
+   "tag": "se divise",
+   "i": 9
+  },
+  {
+   "k": 12,
+   "n": "Tortue",
+   "cat": "s",
+   "c": 180,
+   "hp": 150,
+   "s": 1.1,
+   "z": 1,
+   "g": "turtle",
+   "arm": 5,
+   "at": 90,
+   "col": "#8a6a3a",
+   "tag": "blindée",
+   "i": 12
+  },
+  {
+   "k": 13,
+   "n": "Briseur de runes",
+   "cat": "s",
+   "c": 200,
+   "hp": 130,
+   "s": 1.4,
+   "z": 1,
+   "g": "breaker",
+   "mi": 1,
+   "at": 120,
+   "col": "#b9c0c9",
+   "tag": "anti-magie",
+   "i": 13
+  },
+  {
+   "k": 14,
+   "n": "Spectre",
+   "cat": "s",
+   "c": 200,
+   "hp": 110,
+   "s": 1.5,
+   "z": 0.9,
+   "g": "spectre",
+   "inv": 1,
+   "at": 180,
+   "col": "#d7defa",
+   "tag": "invisible",
+   "i": 13
+  },
+  {
+   "k": 15,
+   "n": "Saboteur gobelin",
+   "cat": "s",
+   "c": 260,
+   "hp": 120,
+   "s": 1.5,
+   "z": 0.85,
+   "g": "sapper",
+   "stun": 1,
+   "at": 240,
+   "col": "#8fce5a",
+   "tag": "étourdit",
+   "i": 17
+  },
+  {
+   "k": 16,
+   "n": "Azh’Khar, seigneur des lames",
+   "cat": "s",
+   "c": 900,
+   "hp": 1900,
+   "s": 1.02,
+   "z": 1.35,
+   "g": "hero",
+   "arm": 4,
+   "stun": 1,
+   "at": 360,
+   "hero": 1,
+   "col": "#a77cff",
+   "tag": "HÉROS · étourdit · boss",
+   "i": 59
+  },
+  {
+   "k": 17,
+   "n": "Petit limon",
+   "cat": "x",
+   "c": 20,
+   "hp": 35,
+   "s": 1.6,
+   "z": 0.6,
+   "g": "slime",
+   "col": "#b5e04a",
+   "i": 1
+  }
+ ]
+}
