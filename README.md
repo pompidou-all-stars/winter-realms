@@ -44,6 +44,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.2 — 2026-11-14
+- Tower cards get role badges in bevelled gold frames (arrow, sword, snowflake, bomb, flame, star), a target badge (ground only / ground and air) and a magic marker, all drawn in code.
+- Long-press a tower card (or hover with the mouse) to preview its info panel without selecting it.
+- Interface only (`sim.js` untouched, no server redeploy).
+
 ### 2.1 — 2026-11-14
 - Clearer interface: an info panel describes the selected tower in plain French (damage per second, range, ground/air targets, effects, faction bonus, next-level gain); tower cards show damage/s, range and anti-air; prices turn red when gold is short; locked monsters show when they unlock.
 - Two-finger pinch zoom (1× to 3×) and pan on the board, mouse-wheel zoom, "Vue d'ensemble" reset button. Touch placement now happens on release so a two-finger gesture never builds a tower.

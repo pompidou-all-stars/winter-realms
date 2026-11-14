@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.1)
+# Winter Realms — Tower Wars (Édition 2.2)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -350,7 +350,12 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
   - **tour posée** : les mêmes informations au niveau actuel, avec le gain du niveau suivant et son prix ;
   - **Envoyer** : rappel de la règle (chaque envoi attaque tous les adversaires et augmente le revenu).
   - En portrait, la fiche a une hauteur fixe pour que le terrain ne change pas de taille.
-- **Cartes de tours** : prix, puis `⚔ dégâts/s ◎ portée`, et `✈` si la tour touche les volants. **Cartes de monstres** : prix et revenu gagné ; un monstre verrouillé affiche « 🔒 dès m:ss ».
+- **Cartes de tours** : prix, puis `⚔ dégâts/s ◎ portée`, et `✈` si la tour touche les volants.
+- **Pastilles de rôle** (depuis la 2.2) : sur l'icône de chaque carte de tour (et dans la fiche), des petites pastilles carrées à cadre doré biseauté, dans l'esprit des icônes de commande des jeux de stratégie (glyphes dessinés en code, fonctions `drawBadge` et `drawTowerBadges`, table `BADGE`) :
+  - **en haut à droite, le rôle** (archétype `T.s`) : flèche (Archer), épée (Garde), flocon (Givre), bombe (Canon), flamme (Flammes), étoile (Mage) ;
+  - **en bas à gauche, les cibles** : montagne = sol uniquement (`T.gr`), aile = sol et air ;
+  - **petite étoile violette** à côté : tour magique (`T.mag`), sans effet sur le Briseur de runes.
+- **Aperçu sans sélectionner** (depuis la 2.2) : un **appui long** (400 ms) sur une carte de tour affiche sa fiche (liseré doré) sans changer la tour sélectionnée ; en relâchant, la fiche revient à la tour sélectionnée. À la souris, le **survol** fait la même chose. Un simple toucher sélectionne la tour, comme avant. **Cartes de monstres** : prix et revenu gagné ; un monstre verrouillé affiche « 🔒 dès m:ss ».
 - **Poser une tour** : toucher une case. Au doigt, la tour est posée **au relâcher** (pour qu'un geste à deux doigts ne pose rien). **Glisser** le doigt vers d'autres cases en pose plusieurs d'affilée. À la souris, la pose est immédiate.
 - **Zoom et déplacement** (depuis la 2.1) : **deux doigts** pour zoomer (de 1× à 3×) et pour faire glisser la carte ; **molette** à la souris. Le bouton « Vue d'ensemble » apparaît quand on a zoomé et ramène au zoom normal. Sur la vignette du terrain affiché, un cadre blanc montre la partie visible. Une astuce l'annonce au lancement d'une partie solo.
 - **Toucher une tour** : ouvre sa fiche (voir plus haut), avec les boutons Améliorer, Vendre et Fermer.
@@ -583,3 +588,4 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 | 2026-11-14 | 2.0.1 | Outillage : **versions et retour arrière** (§14). Étiquette automatique à chaque fusion dans `main` (`vX.Y.Z`, ou `vX.Y.Z.N` sans changement du jeu), Releases GitHub, versions historiques 1.4 à 2.0.1 étiquetées, procédure « reviens à la version … ». **Aucun changement de jeu.** |
 | 2026-11-14 | 2.0.1 | Correctif outillage : le déploiement automatique du serveur passe de Node 20 à **Node 22** (Wrangler 4 refuse Node 20 ; le premier déploiement automatique avait échoué). **Aucun changement de jeu.** |
 | 2026-11-14 | 2.1 | **Interface plus claire** : fiche d'information de la tour (dégâts/s, portée, cibles, effets, bonus de faction chiffré, gain du niveau suivant), cartes de tours avec dégâts/s, portée et ✈, prix en rouge si l'or manque, monstres verrouillés avec heure de déblocage. **Zoom (1× à 3×) et déplacement à deux doigts**, molette, bouton « Vue d'ensemble », cadre de la partie visible sur la vignette. Pose au doigt au relâcher. Correction du paysage sur téléphone (haut et bas coupés). Tests navigateur complétés (19 vérifications par orientation), 5ᵉ capture (zoom). **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
+| 2026-11-14 | 2.2 | **Pastilles de rôle des tours** : sur chaque carte de tour, une pastille de rôle (flèche, épée, flocon, bombe, flamme, étoile), une pastille de cibles (sol uniquement ou sol et air) et une marque « magique », dans des cadres dorés biseautés dessinés en code. **Appui long** (ou survol à la souris) sur une carte : aperçu de sa fiche sans la sélectionner. Interface uniquement : `sim.js` inchangé, pas de redéploiement du serveur. |
