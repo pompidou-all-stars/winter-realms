@@ -45,6 +45,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.11 — 2026-11-14
+- Tooling: the AI maze "chunked generation" test no longer fails at random on GitHub (it now checks the number of chunks, with wider time margins). No game change.
 - New video-game look for the interface (winter heroic fantasy): redesigned start menu (winter night, mountains, falling snow, emblem, golden title, short description and illustrated rules, faction crests, raised difficulty buttons); in game, night-blue panels with gold trim, raised buttons, framed cards, golden board frame.
 - More room for the board: the button to view other players' boards is back in the top bar; the top bar, tabs and info panel are more compact, with the same information.
 - Interface only: `sim.js` untouched, no server redeploy.
