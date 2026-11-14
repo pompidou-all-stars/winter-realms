@@ -1,0 +1,44 @@
+# Redéploie le serveur multijoueur (Cloudflare Workers) à chaque fusion dans main
+# qui touche sim.js ou server/. On peut aussi le lancer à la main depuis l'onglet Actions.
+# Secrets nécessaires (Settings → Secrets and variables → Actions) :
+#   CLOUDFLARE_API_TOKEN   jeton API Cloudflare (modèle « Edit Cloudflare Workers »)
+#   CLOUDFLARE_ACCOUNT_ID  identifiant du compte Cloudflare
+name: Déployer le serveur
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'sim.js'
+      - 'server/**'
+      - '.github/workflows/deploy-server.yml'
+  workflow_dispatch:
+
+# Un seul déploiement à la fois ; un nouveau remplace celui en attente.
+concurrency:
+  group: deploy-server
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+
+      - name: Installer les dépendances
+        working-directory: server
+        run: npm ci
+
+      - name: Déployer sur Cloudflare
+        working-directory: server
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
