@@ -40,11 +40,12 @@ Details (in French): CLAUDE.md, sections 12 and 13.
 
 On the site, enter a nickname, click **Créer un salon** and share the link (or the 4-letter code). Friends click the link (or type the code and **Rejoindre**), pick a faction, and the room leader clicks **Lancer la partie**. Empty seats are played by AIs.
 
-The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](server/). **After any change to `sim.js` or `server/`, redeploy it**: `cd server` then `npx wrangler deploy` (see CLAUDE.md, section 9 bis).
+The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](server/). It is **redeployed automatically** by a GitHub Action whenever a change to `sim.js` or `server/` is merged into `main` (see CLAUDE.md, section 9 bis). Manual fallback: `cd server` then `npx wrangler deploy`.
 
 ## Changelog
 
 ### Tooling — 2026-11-14
+- The multiplayer server now redeploys automatically (GitHub Action) when `sim.js` or `server/` changes on `main`. No game changes.
 - Automated tests in `tests/`: game mechanics, 15 seeded AI-vs-AI games replayed exactly against a frozen copy of the 1.7 engine, mobile browser journey (portrait and landscape).
 - Phone screenshots, before/after visual comparison, three separate reports (technical, gameplay, visual), simulation tests on every pull request (GitHub Actions).
 - No change to `sim.js` or `index.html`: the game is unchanged.
