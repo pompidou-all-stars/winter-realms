@@ -73,6 +73,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 - **Autour du jeu** (ces dossiers ne sont pas chargés par la page) :
   - `server/` : le serveur multijoueur (Cloudflare Workers), qui importe `sim.js` tel quel (voir §9 bis) ;
   - `tests/` : les tests automatiques, les captures et les bilans (voir §12) ;
+  - `art/` : les scripts Blender qui fabriquent les modèles 3D, et `assets/3d/` : les modèles exportés (GLB optimisés), voir §15 ;
   - `.github/` : la vérification automatique des Pull Requests (`tests.yml`), le déploiement automatique du serveur (`deploy-server.yml`, voir §9 bis), l'étiquetage automatique des versions (`versions.yml` et `versionner.sh`, voir §14) et le modèle de description de PR.
 - **Pour jouer en local**, il faut un petit serveur web : `npx http-server` à la racine, puis ouvrir http://localhost:8080. Un `file://` ne charge pas toujours `sim.js`, surtout dans les aperçus intégrés. **Pour tester**, voir §12 : `node tests/tout.js`.
 - **Seule ressource externe** : la police Google Fonts *Fredoka*.
@@ -429,7 +430,7 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 ## 10. Choix de conception à respecter
 
 1. **Pas d'étape de build** : `index.html` + `sim.js`, jouable hors ligne en solo (sauf la police). **La simulation reste dans `sim.js`, sans DOM ni son**, pour être partagée avec le serveur multijoueur.
-2. **Tout est dessiné en code** (Canvas 2D) et **tous les sons sont synthétisés** : pas d'images ni de fichiers audio.
+2. **Assets 3D générés par des scripts versionnés, aucun asset externe sans licence claire** (décision du concepteur, passage à la 3D). Les modèles 3D sont fabriqués par les scripts Python de `art/` (§15) ; on ne versionne ni fichier `.blend` ni modèle téléchargé. Le rendu 2D reste dessiné en code (Canvas 2D) et **tous les sons restent synthétisés** (pas de fichiers audio).
 3. **Univers fantasy original** : noms, personnages et visuels propres au jeu. On ne copie pas les personnages, les visuels ou les noms d'un jeu existant.
 4. **Style « maquette 2.5D » en relief** : ombres portées, dalles biseautées, éclairage doux, personnages caricaturaux (grosse tête, gros nez).
    - Depuis la v1.6, chaque terrain est un **plateau-diorama** : un socle épais aux bords arrondis et des dalles surélevées avec une tranche visible. Une **palette de biome** propre à chaque faction (bord, reflets, ombres, détails) colore le terrain.
@@ -477,6 +478,7 @@ Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en
   - `tables` : les 50 tours, les 18 monstres, les archétypes, les factions et la difficulté, comparés à la référence et recalculés à partir des formules.
   - `construction`, `deplacements`, `combats`, `economie`, `vagues` (avec l'IA), `fin-de-partie` : les mécaniques.
   - `parties-ia` : 15 parties complètes (5 factions × 3 difficultés) rejouées à l'identique et comparées, état par état, à la référence.
+- `assets/modeles-3d.test.js` : un modèle 3D par tour et par monstre de `sim.js`, budgets téléphone respectés (≤ 3 000 triangles et ≤ 150 Ko par modèle, ≤ 3 Mo au total), monstres animés, pièce « Tourelle » présente, compression meshopt. Lancé aussi par `--simulation` (GitHub).
 - `navigateur/parcours.test.js` : le **parcours automatisé** d'un joueur dans Chromium au format téléphone (390 × 844 en portrait, 844 × 390 en paysage) : accueil, faction, difficulté, construction en deux touchers (aperçu, confirmation, déplacement de l'aperçu, glisser sans effet) et refus, panneau de tour, envoi, vignettes, fiche d'information, monstres verrouillés, zoom et déplacement à deux doigts (sans pose accidentelle), pose exacte en mode zoomé, « Vue d'ensemble », revenu, mise en page. **Ce n'est pas une garantie de compatibilité avec tous les téléphones** : Safari sur iPhone, les anciens Android et les vrais écrans tactiles ne sont pas testés.
 - `moteurs/v1.7/` : une **copie figée** du moteur, extraite du commit `c868ff9` (empreinte SHA-256 `e0cd2f78…615f6f`, voir `PROVENANCE.md`). Le `sim.js` des versions 2.0 et 2.0.1 lui est identique octet pour octet.
 - `references/` : les valeurs de référence (statistiques, parties), **produites à partir du moteur figé**, jamais à partir de `main`.
@@ -582,6 +584,35 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 
 ---
 
+## 15. Modèles 3D (prototype de rendu 3D, en cours)
+
+Décidé avec le concepteur : le jeu passe progressivement en 3D. Pendant la transition, **le rendu 2D reste disponible** ; `sim.js` ne change pas.
+
+### 15.1 Fabrication (`art/`)
+- **Les scripts sont la source de vérité** : Blender 5.3 sur le PC du concepteur, piloté par le MCP « blender ». Aucun `.blend` versionné.
+- Convention : **1 unité = 1 case**, Z vers le haut, le modèle regarde vers −Y (vers la sortie), pieds en z = 0. Couleurs en hexadécimal sRGB comme dans `index.html`.
+- `art/communs/` : pièces partagées.
+  - `outils.py` : formes de base (cylindre, boîte, sphère, cône, tore, prisme), matériaux, **peinture des sommets** (dégradé sombre en bas → clair en haut + léger grain, attribut `Col`), budget de facettes (`SIMPLE` pour les petits personnages) ;
+  - `factions.py` : palettes (`PAL`, `SOL`, `BIOME`, reprises de la 2D et avivées) et **socles** des 5 factions ;
+  - `personnages.py` : personnage caricatural paramétrable (proportions, nez, oreilles, défenses, casque, capuche, barbe, robe, cape, couronne, plumes, un œil…) et armes ;
+  - `betes.py` : quadrupèdes, volants (ailes membrane ou plumes), gelées ;
+  - `animations.py` : animations par pièces, sans squelette (`marche`, `trot`, `saut`, `flotte`, `vol`) ;
+  - `echelles.py` : **tailles des monstres**, `hauteur = 0,40 × z^1,8` (z de `CR`) : Sapeur gobelin 0,24 case, Brute orc 0,36, Troll 0,47, Golem 0,55, Cyclope 0,83. Les tours font environ 1,1 à 1,4 case ;
+  - `tours_communes.py` : les **6 archétypes** (archer, garde, givre, canon, flammes, mage) déclinés par `STYLE` de faction (murs, toit, chemin de ronde, équipage, mage, champion, couleur de magie). Les emplacements 6 à 9 sont des versions plus grandes des emplacements 0, 1, 2 et 5 ;
+  - `rendu.py` : rendus de validation (EEVEE, caméra orthographique, lumière chaude, contre-jour).
+- `art/tours/<faction>.py` : les 10 tours de chaque faction (noms de `sim.js`). `art/monstres/<monstre>.py` : un script par monstre. `art/decor/portail_chateau.py` : portail, château (drapeau recoloré à la couleur du joueur) et plateau de référence.
+- Styles de faction : **Alliance** pierre blanche, toits bleus et or ; **Horde** rondins, peaux rouges, défenses d'os ; **Sylvestres** troncs, racines, feuillage, mousse ; **Nains** acier riveté hexagonal, cuivre, dômes et cheminées ; **Légion des ombres** obsidienne, épines, anneaux runiques cyan.
+- **Pièces nommées** utilisées par le jeu : `Tourelle` (pivote vers la cible), `Cristal`, `Eclats`, `Flamme`, `Anneaux`, `Orbe` (animées en code), `Drapeau` (couleur du joueur) ; animations glTF `marche` (au sol) et `vol` (volants).
+
+### 15.2 Export et budgets
+- `art/exporter.py` (dans Blender) : construit chaque modèle seul, **cuit la couleur dans les sommets**, donne un matériau unique `Peint` (ou `Lueur_<couleur>` pour les pièces lumineuses), **fusionne les pièces qui bougent ensemble** (≈ 10 pièces par modèle au lieu d'une centaine), puis exporte en GLB dans `art/_brut/` (non versionné).
+- `node art/optimiser.mjs` : glTF-Transform 4.2.1 (compression meshopt, soudure, rééchantillonnage), vers `assets/3d/{tours,monstres,decor}/`.
+- **Budgets prototype** : ≤ 3 000 triangles et ≤ 150 Ko par tour ou monstre, ≤ 3 Mo au total (vérifiés par `tests/assets/modeles-3d.test.js`). État actuel : 70 modèles, 1,94 Mo, 50 Ko au plus par modèle.
+- Planches de validation : `art/planches.py` (une planche par faction, trois pour les monstres), images dans `captures/art/` (non versionné).
+- Pour tout refaire, dans Blender : `ART = r'<dépôt>\art'`, `exec(open(ART + r'\atelier.py', encoding='utf-8').read())`, `exporter.tout(r'<dépôt>')`, puis `node art/optimiser.mjs`.
+
+---
+
 ## Journal des modifications
 
 | Date | Version | Modification |
@@ -600,3 +631,4 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 | 2026-11-14 | 2.1 | **Interface plus claire** : fiche d'information de la tour (dégâts/s, portée, cibles, effets, bonus de faction chiffré, gain du niveau suivant), cartes de tours avec dégâts/s, portée et ✈, prix en rouge si l'or manque, monstres verrouillés avec heure de déblocage. **Zoom (1× à 3×) et déplacement à deux doigts**, molette, bouton « Vue d'ensemble », cadre de la partie visible sur la vignette. Pose au doigt au relâcher. Correction du paysage sur téléphone (haut et bas coupés). Tests navigateur complétés (19 vérifications par orientation), 5ᵉ capture (zoom). **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
 | 2026-11-14 | 2.2 | **Construction en deux touchers** : le 1er toucher montre un aperçu (tour fantôme, portée, prix), le 2e sur la même case construit ; une case impossible est signalée dès le 1er toucher ; glisser le doigt ne construit plus rien. Tests navigateur complétés (22 vérifications par orientation). **Règles du jeu inchangées** (`sim.js` non modifié). |
 | 2026-11-14 | 2.3 | **Carte plus grande sur téléphone et pastilles de rôle des tours**. Carte : les 4 vignettes des joueurs quittent le HUD et s'ouvrent dans un panneau flottant par-dessus le terrain, depuis un bouton-icône en haut à gauche. Vies du joueur ajoutées dans le HUD (❤). Bannière « ↩ revenir au tien » cliquable. Mini-cartes un peu plus grandes. Tours : pastilles de rôle (flèche, épée, flocon, bombe, flamme, étoile), de cibles (sol ou sol et air) et de magie dans des cadres dorés biseautés dessinés en code ; texte des cartes « ⚔ N dégâts/s » et « ◎ portée N » ; appui long (ou survol) sur une carte pour voir sa fiche sans la sélectionner. Interface uniquement : `sim.js` inchangé. Test du parcours mobile adapté (ouvrir le panneau avant de toucher une vignette). |
+| 2026-11-14 | 2.3 | **Modèles 3D** (préparation du rendu 3D, §15) : scripts Blender versionnés dans `art/`, 50 tours (5 factions × 10), 18 monstres animés, portail et château, exportés en GLB optimisés dans `assets/3d/` (1,94 Mo). Style heroic fantasy cartoon validé par le concepteur. Règle de conception n°2 remplacée (assets 3D générés par scripts, aucun asset externe sans licence claire). Test des budgets 3D. **Jeu inchangé** (`index.html` et `sim.js` non modifiés). |
