@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.0)
+# Winter Realms — Tower Wars (Édition 2.0.1)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -325,6 +325,12 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 - **Déconnexion** : le terrain du joueur reste en jeu, sans être repris par une IA. En revenant avec le même navigateur, il retrouve son siège (son jeton `wr-token` est gardé dans `localStorage`).
 - Un joueur qui arrive pendant une partie, ou dans un salon complet, la regarde en **spectateur**.
 - Couleurs des sièges : or, rouge, bleu, violet.
+- **Accès réservé à la France** (depuis la v2.0.1) :
+  - le serveur refuse (403) toute connexion dont le pays détecté par Cloudflare (`request.cf.country`) ne figure pas dans `ALLOWED_COUNTRIES` (`server/wrangler.toml`, actuellement `"FR"`) ;
+  - la page affiche alors « Jeu en ligne indisponible ici », et le solo reste jouable ;
+  - en local, `server/.dev.vars` désactive ce filtre ;
+  - pour ajouter un pays, par exemple la Belgique : `ALLOWED_COUNTRIES = "FR,BE"`, puis redéployer.
+  - **Limites** : ce filtre ne protège que le serveur multijoueur, pas le site GitHub Pages. Il bloque un ami en voyage à l'étranger, ainsi que les VPN et relais privés (iCloud Private Relay) qui sortent hors de France. À l'inverse, un VPN français permet de le contourner. C'est un frein, pas une vraie sécurité.
 
 ### Architecture
 - `server/src/worker.js` : le **Worker** Cloudflare reçoit `GET /room/:CODE` en WebSocket et le redirige vers le **Durable Object `GameRoom`** de ce salon (`idFromName(CODE)`).
@@ -389,3 +395,4 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 | 2026-11-14 | 1.6.1 | Correction des racines sylvestres : ralentissement ×0,82 pendant 0,72 s sur toutes leurs tours (le Givre garde son propre ralentissement). Le ralentissement le plus fort l'emporte. Fin des monstres figés et des volants bloqués pour toujours. |
 | 2026-11-14 | 1.7 | Technique : la simulation passe dans `sim.js` (classe `Game`, sons notés sous forme d'événements, actions via `Game.action`), en préparation du multijoueur. La fin de partie survient quand il ne reste qu'un terrain, ou plus aucun humain. **Aucun changement de règles en solo.** |
 | 2026-11-14 | 2.0 | **Multijoueur en ligne** : salons de 2 à 4 humains (IA sur les places libres), code ou lien d'invitation, chef de salon, spectateurs, reconnexion. Serveur Cloudflare Workers et Durable Objects (`server/`, plan gratuit). Site publié sur GitHub Pages. |
+| 2026-11-14 | 2.0.1 | Jeu en ligne **réservé à la France** (`ALLOWED_COUNTRIES`, contrôlé par le serveur), avec un message clair côté page. Le solo reste disponible partout. |
