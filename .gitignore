@@ -4,3 +4,8 @@ node_modules/
 # sorties des tests (régénérées à chaque lancement)
 captures/
 rapports/
+# fichiers de travail Blender (les scripts art/ sont la source, pas les .blend)
+*.blend
+*.blend1
+__pycache__/
+apercus/
