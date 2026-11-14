@@ -9,7 +9,7 @@ const {SCENARIOS,COURTS,jouer}=require('../outils/parties');
 const liste=process.env.WR_COMPLET=='1'?SCENARIOS:COURTS;
 
 for(const sc of liste){
- test(`Partie entre IA — ${['Humains','Créatures','Végétaux','Robots','Magiques'][sc.faction]}, ${['Normal','Difficile','Brutal'][sc.difficulte]} (graine ${sc.graine})`,()=>{
+ test(`Partie entre IA — ${['Alliance','Horde','Sylvestres','Nains','Légion'][sc.faction]}, ${['Normal','Difficile','Brutal'][sc.difficulte]} (graine ${sc.graine})`,()=>{
   const r=jouer(MOTEURS.actuel,sc);
   if(process.env.WR_PARTIES)fs.appendFileSync(process.env.WR_PARTIES,JSON.stringify(r)+'\n'); // pour le bilan gameplay
   assert.equal(r.invalide,false,'valeur invalide (NaN) détectée');
