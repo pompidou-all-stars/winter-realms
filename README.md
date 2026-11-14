@@ -44,6 +44,10 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.6 — 2026-11-14
+- AI mazes pay off earlier: each candidate maze is graded on its path length after 15, 25, 40 and 60 towers, not only when finished. With 40 towers, the median path goes from 57 to 66 cells.
+- Useless walls (not touching the path and not making it longer) are removed from AI plans, so the gold goes to towers that matter.
+
 ### 2.5.1 — 2026-11-14
 - Fixes multiplayer: after 2–3 minutes (as soon as a ground monster reached your board), tapping the board crashed the page, the board froze and towers could no longer be built. Monsters received from the server now carry an approximate target cell. Client-only fix (no server redeploy).
 
