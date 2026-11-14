@@ -1,23 +1,27 @@
-/* Parties complètes entre IA (5 factions × 3 difficultés), rejouées avec une graine fixe.
-   Chaque partie doit se dérouler EXACTEMENT comme la référence 1.7 : mêmes états toutes les 30 s de jeu, même fin.
-   Mode rapide (WR_RAPIDE=1) : seulement les 5 parties en difficulté Normal. */
+/* Parties complètes entre IA, avec une graine fixe chacune.
+   Par défaut : une partie par difficulté (3 parties). Mode complet (WR_COMPLET=1, node tests/tout.js --complet) : les 15 (5 factions × 3 difficultés).
+   Chaque partie doit se terminer en moins de 30 min de jeu, sans valeur invalide (NaN), avec un vainqueur cohérent.
+   Pas de comparaison à une partie enregistrée : un changement d'équilibrage ou d'IA ne fait pas échouer ces tests. */
 'use strict';
-const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),path=require('path');
-const {RACINE,MOTEURS}=require('../outils/moteur');
-const {SCENARIOS,jouer}=require('../outils/parties');
-const REF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','parties-v1.7.json'),'utf8'));
-const rapide=process.env.WR_RAPIDE=='1';
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs');
+const {MOTEURS}=require('../outils/moteur');
+const {SCENARIOS,COURTS,jouer}=require('../outils/parties');
+const liste=process.env.WR_COMPLET=='1'?SCENARIOS:COURTS;
 
-for(const sc of SCENARIOS){if(rapide&&sc.difficulte>0)continue;
- test(`Partie de référence — ${['Alliance','Horde','Sylvestres','Nains','Légion'][sc.faction]}, ${['Normal','Difficile','Brutal'][sc.difficulte]} (graine ${sc.graine})`,()=>{
-  const r=jouer(MOTEURS.actuel,sc),ref=REF.parties.find(p=>p.graine==sc.graine);
+for(const sc of liste){
+ test(`Partie entre IA — ${['Alliance','Horde','Sylvestres','Nains','Légion'][sc.faction]}, ${['Normal','Difficile','Brutal'][sc.difficulte]} (graine ${sc.graine})`,()=>{
+  const r=jouer(MOTEURS.actuel,sc);
   if(process.env.WR_PARTIES)fs.appendFileSync(process.env.WR_PARTIES,JSON.stringify(r)+'\n'); // pour le bilan gameplay
-  assert.ok(ref,'référence introuvable');
   assert.equal(r.invalide,false,'valeur invalide (NaN) détectée');
   assert.equal(r.terminee,true,'la partie ne s\'est pas terminée en 30 min de jeu');
-  const i=r.controles.findIndex((c,j)=>c!==ref.controles[j]);
-  if(i>=0)assert.fail(`la partie diverge de la référence vers ${(i+1)*30} s de jeu`);
-  assert.deepEqual({duree:r.duree,gagnant:r.gagnant,vies:r.vies,revenus:r.revenus,tours:r.tours,envois:r.envois,final:r.final},
-   {duree:ref.duree,gagnant:ref.gagnant,vies:ref.vies,revenus:ref.revenus,tours:ref.tours,envois:ref.envois,final:ref.final});
+  assert.ok(r.gagnant>=-1&&r.gagnant<4,'vainqueur incohérent');
+  assert.ok(r.tours.some(n=>n>0),'aucune tour construite');
+  assert.ok(r.envois.slice(1).some(n=>n>0),'aucune IA n\'a attaqué');
  });
 }
+
+/* 2 minutes de jeu suffisent : l'IA a déjà construit et attaqué */
+test('Une même graine rejoue exactement la même partie (2 premières minutes)',()=>{
+ const sc=SCENARIOS[0],a=jouer(MOTEURS.actuel,sc,{dureeMax:120}),b=jouer(MOTEURS.actuel,sc,{dureeMax:120});
+ assert.deepEqual(a.controles,b.controles);assert.equal(a.final,b.final);
+});

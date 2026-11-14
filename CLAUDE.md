@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.4)
+# Winter Realms — Tower Wars (Édition 2.6)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -69,15 +69,15 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 - **Le jeu tient en deux fichiers, sans build ni dépendances** :
   - `sim.js` contient **toute la simulation** : tables de données, `class Board`, IA, et `class Game`, qui fait tourner une partie de 4 terrains. Il ne touche ni au DOM ni au son, ce qui permet au serveur multijoueur de le réutiliser tel quel. Les sons y sont seulement notés dans `board.ev` (un `!` devant signifie « toujours audible pour le propriétaire du terrain »). Les événements de partie (revenu, élimination, fin) vont dans `game.log`.
   - `index.html` contient l'interface, le dessin et les sons. Il charge `sim.js` avec `<script src="sim.js">`.
-  - **Toutes les actions du joueur passent par `doAction()`**, qui appelle `Game.action()`. Cette fonction renvoie `''` si l'action réussit, sinon un code d'erreur : `poor`, `blocked`, `locked`, `max`, `over` ou `bad`.
+  - **Toutes les actions du joueur passent par `doAction()`**, qui appelle `Game.action()`. Cette fonction renvoie `''` si l'action réussit, sinon un code d'erreur : `poor`, `blocked`, `locked`, `max`, `busy` (tour en chantier, depuis la 2.4), `over` ou `bad`.
 - **Autour du jeu** (ces dossiers ne sont pas chargés par la page) :
   - `server/` : le serveur multijoueur (Cloudflare Workers), qui importe `sim.js` tel quel (voir §9 bis) ;
   - `tests/` : les tests automatiques, les captures et les bilans (voir §12) ;
-  - `art/` : les scripts Blender qui fabriquent les modèles 3D, et `assets/3d/` : les modèles exportés (GLB optimisés), voir §15 ;
-  - `.github/` : la vérification automatique des Pull Requests (`tests.yml`), le déploiement automatique du serveur (`deploy-server.yml`, voir §9 bis), l'étiquetage automatique des versions (`versions.yml` et `versionner.sh`, voir §14) et le modèle de description de PR.
+  - `art/` : les **recettes des modèles 3D** (un script Blender par asset) et l'outil de génération ; `assets/3d/` : les fichiers 3D produits (GLB) et leur manifeste (voir §15 et `art/LISEZMOI.md`) ;
+  - `.github/` : la vérification automatique des Pull Requests (`tests.yml`), le déploiement automatique du serveur (`deploy-server.yml`, voir §9 bis), l'étiquetage automatique des versions (`versions.yml` et `versionner.sh`, voir §14), la régénération des assets 3D (`assets-3d.yml`, voir §15) et le modèle de description de PR.
 - **Pour jouer en local**, il faut un petit serveur web : `npx http-server` à la racine, puis ouvrir http://localhost:8080. Un `file://` ne charge pas toujours `sim.js`, surtout dans les aperçus intégrés. **Pour tester**, voir §12 : `node tests/tout.js`.
 - **Seule ressource externe** : la police Google Fonts *Fredoka*. three.js est **copié dans le dépôt** (`vendor/three/`, r170, licence MIT) et n'est chargé qu'en mode 3D.
-- **Rendu 3D (prototype, depuis la 2.4)** : avec `?rendu=3d` dans l'adresse (ou le lien « Essayer la vue 3D » de l'accueil), le module `rendu3d.js` dessine le terrain avec three.js et les modèles de `assets/3d/`. Le rendu 2D reste celui par défaut. Voir §15.3.
+- **Rendu 3D (prototype, depuis la 2.6)** : avec `?rendu=3d` dans l'adresse (ou le lien « Essayer la vue 3D » de l'accueil), le module `rendu3d.js` dessine le terrain avec three.js et les modèles de `assets/3d/`. Le rendu 2D reste celui par défaut. Voir §15.2.
 - **Rendu** : Canvas 2D. Tous les visuels (tours, monstres, effets) sont **dessinés en code**, sans images. La netteté s'adapte à l'écran (`devicePixelRatio`, plafonné à 3).
 - **Vue du terrain** (depuis la 2.1) : le canevas `#main` couvre toute la zone de jeu. Le plateau y est dessiné par `dessinerVue()` avec un zoom et un décalage (`VUE.z`, `VUE.ox`, `VUE.oy`), et son cadre est dessiné dans le canevas. `caseVersEcran(x, y)` donne la position d'une case à l'écran (elle sert aussi aux tests).
 - **Sons** : synthétisés avec Web Audio (oscillateurs et bruit), **aucun fichier audio**.
@@ -95,6 +95,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
   | `CR` | Les monstres |
   | `DIFF` | Les niveaux de difficulté |
   | `HPK`, `GRACE`, `GROUP`, `AURA_R` | Constantes de gameplay |
+  | `BUILD_OR`, `BUILD_MIN`, `BUILD_MAX`, `BUILD_DIFF` | Temps de construction : 1 s par `BUILD_OR` pièces d'or, borné, multiplié selon la difficulté pour les humains (§4.4) |
 - **Sections de `sim.js`** : tables de données → simulation (`class Board`) → IA (`aiDefend`, `aiAttack`, `aiAct`) → partie (`class Game`).
 - **Sections du script de `index.html`** : sons → dessin → interface (dont le multijoueur, objet `NET`) → sons et événements → boucle principale (`loop`).
 - **Retouches des emplacements 6 à 9** (§4.2) : elles sont écrites directement dans le calcul de `TW` (`late&&j==6?…`), pas dans une table.
@@ -178,6 +179,26 @@ Formules : `coût = max(10, arrondi(coût_base × puissance × coût_faction / 5
 - **Les dégâts doublent à chaque niveau** (`dégâts × 2^(niveau−1)`).
 - La portée augmente de **5 % par niveau**.
 - La tour grandit visuellement à chaque niveau.
+- Chaque amélioration prend du temps (voir §4.4).
+
+### 4.4 Temps de construction (depuis la 2.4)
+- **Ratio** : **1 seconde pour 50 pièces d'or** dépensées (`BUILD_OR`), au minimum **0,5 s** (`BUILD_MIN`) et au maximum **8 s** (`BUILD_MAX`), puis multiplié selon la difficulté : `temps = min(8, max(0,5, prix / 50)) × multiplicateur`.
+- **Multiplicateur de difficulté** (`BUILD_DIFF`, méthode `Board.bm()`) : il ne touche que les **humains**, comme les bonus de difficulté du §7 ne touchent que les IA. Les IA gardent toujours ×1.
+  | Difficulté | Humains | IA |
+  |---|---|---|
+  | Normal | ×1 | ×1 |
+  | Difficile | ×1,25 | ×1 |
+  | Brutal | ×1,5 | ×1 |
+- Il s'applique à la **pose** (prix de la tour) et à **chaque amélioration** (prix de l'amélioration). Exemples en Normal : Archer 20 or → 0,5 s ; Mage 85 or → 1,7 s ; Archimage 130 or → 2,6 s ; Archer du niveau 4 au 5 (240 or) → 4,8 s ; toute amélioration à 400 or ou plus → 8 s. En Brutal, un humain met 1,5 fois plus longtemps (Archimage 3,9 s, au plus 12 s).
+- **Pendant le chantier**, la tour (champ `t.b` : secondes restantes, `t.bt` : durée totale) :
+  - ne tire pas, et une tour Mage ne révèle pas les Spectres ;
+  - ne peut pas être améliorée (code d'erreur `busy`) ;
+  - n'est pas visée par l'étourdissement des Saboteurs et du héros ;
+  - **bloque déjà le chemin** (la case est occupée dès la pose) ;
+  - peut être vendue, au tarif normal de 70 %.
+- Pendant une amélioration, le niveau affiché est déjà le nouveau ; la tour ne tire pas jusqu'à la fin des travaux.
+- La transformation d'une tour en Mage par l'IA (§8) déclenche aussi un chantier (prix du Mage).
+- **Visuel** : tour en transparence, échafaudage en bois, marteau qui frappe et barre de progression dorée sous la case. La fiche affiche « 🔨 Construction : N s » avant la pose, puis le compte à rebours ; le bouton Améliorer indique la durée de l'amélioration.
 
 ---
 
@@ -318,7 +339,7 @@ Vitesse en cases par seconde.
 | Difficile | ×1,25 | +30 |
 | Brutal | ×1,50 | +60 |
 
-Le joueur, lui, garde toujours un revenu ×1.
+Le joueur, lui, garde toujours un revenu ×1. Depuis la 2.4, la difficulté rallonge aussi le temps de construction des humains : ×1, ×1,25 ou ×1,5 (§4.4).
 
 ---
 
@@ -328,11 +349,26 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 - **défense**, qui reçoit 15 % à 80 % des gains selon la **pression** subie (`pen` : jusqu'où les monstres avancent sur son terrain), si elle a perdu une vie récemment, ou si sa défense est trop faible par rapport au revenu de ses adversaires ;
 - **attaque** pour le reste. Si elle est en danger avec moins de 12 vies, la moitié de sa réserve d'attaque passe en défense.
 
+**Labyrinthe** (depuis la 2.5) : chaque IA reçoit un **plan cible** (`A.mz`) au début de la partie.
+- **Génération** (`mzStep`) : 4 candidats. Chacun part d'une forme tirée au hasard (serpentin horizontal à couloirs de 1 ou 2, serpentin vertical, semis aléatoire), puis il est affiné par une recherche locale avec recuit léger : on ajoute ou retire une case ou un petit segment. Score = longueur du chemin − 0,3 × nombre de tours.
+  - Itérations par candidat : 2 000 / 2 500 / 3 200 selon la difficulté.
+  - Le plan retenu est tiré parmi les 3 meilleurs en Normal (50/30/20 %), parmi les 2 meilleurs en Difficile (60/40 %), et c'est le meilleur en Brutal.
+  - Un plan complet fait environ 100 cases de chemin, contre 16 en ligne droite.
+- **Hasard propre** : la graine est tirée une fois de `Math.random`, ce qui rend la génération indépendante du découpage dans le temps.
+- **Découpage** : la génération avance de 600 essais par pas de jeu (≈ 1 à 2,5 ms) ; elle dure environ 20 ms au total. Elle est terminée avant la première action, ou bien elle est finie d'un coup à la première action. Un parcours en largeur sur grille plate (`plen`) prend environ 1,3 µs.
+- **Ordre de construction** : à partir du plan complet, on retire une à une la tour qui raccourcit le moins le chemin (à égalité, la moins utile au chemin actuel et au couloir des volants). On construit dans l'ordre inverse, si bien que le chemin s'allonge presque à chaque tour. En début de partie, les premières tours vont près du chemin droit et du couloir aérien (colonne 6).
+- **Rôles des cases** (`mzRoles`) :
+  - **Givre** : 2 à 6 emplacements (`L/15`), répartis à intervalles réguliers le long du chemin final. Ils sont construits en Givre seulement tant que leur nombre reste sous `1 + 15 % des tours` ; sinon un Archer est posé, puis transformé plus tard.
+  - **Mage** : jusqu'à 6 emplacements choisis pour que leur détection couvre tout le chemin. Ce sont des Archers tant qu'il n'y a pas de **menace de Spectres** : temps ≥ 2:30 et un adversaire avec un revenu ≥ 35, ou un Spectre déjà reçu (`specSeen`). Dès la menace, ils sont transformés en Mages (prix réel du Mage de la faction).
+  - **Couloir aérien** (|x − 6| ≤ 2) : Archer, ou Flammes au centre s'il y a beaucoup de chemin autour. Jamais de Canon ni de Garde.
+  - **Ailleurs** : Canon dans les virages, Garde entre deux couloirs, Archer sinon, avec un peu de hasard.
+  - Si plus de 35 % des PV reçus volent (`flyIn/hpIn`), les Canons et Gardes prévus près du centre deviennent des Archers, et les améliorations favorisent le couloir aérien.
+  - Les versions renforcées (emplacements 6 à 9) sont utilisées quand l'IA a assez de tours et d'or.
+
 **Défense** (`aiDefend`), jusqu'à 3 actions par tour :
-- elle place ses tours selon un plan fixe (`PLAN`), dans l'ordre des rangées 8, 6, 10, 4, 12, 2, 14, en partant du centre ;
-- elle choisit la tour selon ce qu'elle a déjà : Archer ou Garde au début, puis Givre, Flammes et Mage au centre, Canon ailleurs ;
-- à partir de 10 tours, ou quand il n'y a plus de place, elle **améliore** la tour la plus rentable, celle qui couvre le plus de chemin et de couloir aérien par pièce d'or ;
-- après **2:20**, elle **transforme** des tours faibles du centre en Mages, jusqu'à `min(5, 2 + minutes/5)` Mages.
+- d'abord, une **transformation** si besoin (Mage ou Givre sur sa case, seulement pour une tour de niveau 1 ou 2 qui n'est pas en chantier ; la tour transformée repart en chantier) ;
+- sinon, elle **améliore** la tour la plus rentable (celle qui couvre le plus de chemin et de couloir aérien par pièce d'or, jamais une tour en chantier), dès que le plan est terminé, ou par hasard à partir de 10 tours (35 %, puis 60 % à partir de 24 tours) ;
+- sinon, elle **construit** la prochaine case du plan. Si un monstre l'occupe, elle essaie les 3 suivantes, mais ne saute jamais une case faute d'or. L'IA ne pose jamais de tour hors de son plan, ce qui corrige le blocage d'avant la 2.5 (l'IA cessait de construire vers 36 tours).
 
 **Attaque** (`aiAttack`) :
 - rien pendant les **25 premières secondes** (`GRACE`) ;
@@ -371,7 +407,7 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
   - à la souris : deux clics sur la même case.
 - **Zoom et déplacement** (depuis la 2.1) : **deux doigts** pour zoomer (de 1× à 3×) et pour faire glisser la carte ; **molette** à la souris. Le bouton « Vue d'ensemble » apparaît quand on a zoomé et ramène au zoom normal. Sur la vignette du terrain affiché, un cadre blanc montre la partie visible. Une astuce l'annonce au lancement d'une partie solo.
 - **Toucher une tour** : ouvre sa fiche (voir plus haut), avec les boutons Améliorer, Vendre et Fermer.
-- **Vue 3D** (prototype, depuis la 2.4) : lien « Essayer la vue 3D (prototype) » sous les boutons de difficulté de l'accueil (il ajoute `?rendu=3d`) ; « Revenir à la vue 2D » pour l'inverse. Mêmes commandes qu'en 2D (§15.3). En 3D, il faut toucher le **pied** d'une tour (sa case au sol) pour l'ouvrir.
+- **Vue 3D** (prototype, depuis la 2.6) : lien « Essayer la vue 3D (prototype) » sous les boutons de difficulté de l'accueil (il ajoute `?rendu=3d`) ; « Revenir à la vue 2D » pour l'inverse. Mêmes commandes qu'en 2D (§15.2). En 3D, il faut toucher le **pied** d'une tour (sa case au sol) pour l'ouvrir.
 - **Paysage** (depuis la 2.1) : la colonne de droite défile si elle est trop haute ; avant, le haut de l'écran et le bas du terrain étaient coupés sur téléphone.
 - **Retours visuels** : case rouge si la pose est refusée, textes flottants (+or, −1 vie, niveau), et un message en bas de l'écran (« Pas assez d'or », « le chemin serait bloqué », etc.).
 
@@ -399,8 +435,9 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 ### Architecture
 - `server/src/worker.js` : le **Worker** Cloudflare reçoit `GET /room/:CODE` en WebSocket et le redirige vers le **Durable Object `GameRoom`** de ce salon (`idFromName(CODE)`).
 - `GameRoom` fait tourner `Game` (de `sim.js`, importé tel quel) **toutes les 50 ms** et envoie un **instantané toutes les 100 ms** : or, revenu, vies, tours, monstres, projectiles, nouveaux effets et sons. Le serveur fait autorité : les actions des joueurs sont validées par `Game.action()`.
-- La page (`NET` dans `index.html`) envoie des actions (`{t:'act', a:{type, x, y, k}}`) et dessine les instantanés avec les fonctions de dessin existantes. Elle lisse les positions des monstres et des projectiles entre deux instantanés, et recalcule le chemin (`Board.dist`) à partir de la grille des tours.
+- La page (`NET` dans `index.html`) envoie des actions (`{t:'act', a:{type, x, y, k}}`) et dessine les instantanés avec les fonctions de dessin existantes. Elle lisse les positions des monstres et des projectiles entre deux instantanés, et recalcule le chemin (`Board.dist`) à partir de la grille des tours. L'instantané ne transmet pas la case visée par un monstre (`tx`, `ty`) : la page prend la case la plus proche de sa position (depuis la 2.5.1), ce qui suffit au contrôle de pose `peutConstruire` (le serveur valide de toute façon chaque pose).
 - Messages du client : `hello`, `faction`, `diff`, `start`, `act`. Messages du serveur : `lobby`, `start`, `snap`, `res`.
+- Dans l'instantané, chaque tour est un tableau `[x, y, k, lv, inv, a, sw, stun, b, bt]` ; `b` et `bt` (temps de chantier restant et total, depuis la 2.4) valent 0 hors chantier.
 - Origines autorisées : la constante `ORIGINS` dans `worker.js` (GitHub Pages, localhost, fichiers locaux).
 - Adresse du serveur : la constante `SERVER` dans `index.html`, à `wss://winter-realms.winter-realms-server.workers.dev` en production et `ws://localhost:8787` en local. On peut forcer une autre adresse avec `?serveur=wss://…`.
 
@@ -432,7 +469,7 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 ## 10. Choix de conception à respecter
 
 1. **Pas d'étape de build** : `index.html` + `sim.js`, jouable hors ligne en solo (sauf la police). **La simulation reste dans `sim.js`, sans DOM ni son**, pour être partagée avec le serveur multijoueur.
-2. **Assets 3D générés par des scripts versionnés, aucun asset externe sans licence claire** (décision du concepteur, passage à la 3D). Les modèles 3D sont fabriqués par les scripts Python de `art/` (§15) ; on ne versionne ni fichier `.blend` ni modèle téléchargé. Le rendu 2D reste dessiné en code (Canvas 2D) et **tous les sons restent synthétisés** (pas de fichiers audio).
+2. **Tout est produit par du code** et **tous les sons sont synthétisés** : pas de fichiers audio. Le rendu 2D est dessiné en code (Canvas 2D). Les **modèles 3D** (depuis la préparation de la 3D) sont des fichiers GLB **générés par des scripts Blender versionnés** dans `art/` (§15), jamais retouchés à la main ; **aucun asset externe sans licence CC0**.
 3. **Univers fantasy original** : noms, personnages et visuels propres au jeu. On ne copie pas les personnages, les visuels ou les noms d'un jeu existant.
 4. **Style « maquette 2.5D » en relief** : ombres portées, dalles biseautées, éclairage doux, personnages caricaturaux (grosse tête, gros nez).
    - Depuis la v1.6, chaque terrain est un **plateau-diorama** : un socle épais aux bords arrondis et des dalles surélevées avec une tranche visible. Une **palette de biome** propre à chaque faction (bord, reflets, ombres, détails) colore le terrain.
@@ -452,9 +489,10 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 - Le texte d'accueil annonce « +25 % / +50 % de revenu » pour les IA : c'est cohérent avec `DIFF`.
 - **Constaté par les tests** (2.0.1). Ce sont des comportements réels du code, **non corrigés**, qui attendent une décision du concepteur :
   - plusieurs monstres qui sortent au même instant peuvent faire passer les vies **sous zéro** en interne (l'affichage montre 0) ;
-  - l'IA décide de transformer une tour en Mage avec un prix de Mage **fixé à 90** dans le code, alors que le vrai prix varie de 85 à 90 selon la faction ;
+  - ~~prix du Mage fixé à 90 pour la transformation~~ : disparu en 2.5 (l'IA utilise le vrai prix de la faction) ;
   - dès sa première action, chaque IA pose **jusqu'à 3 tours** (règle « jusqu'à 3 actions par tour ») ;
   - le §1 dit « aucun `localStorage` », mais depuis la v2.0 la page y garde le pseudo et le jeton multijoueur (§9 bis) ;
+  - **2.4, temps de construction** : après validation par le concepteur, le moteur 2.4 a été figé (`tests/moteurs/v2.4/`) et les tests comparent désormais le jeu aux références 2.4. Les tests de mécanique qui supposaient une tour active dès sa pose attendent maintenant la fin du chantier (`pret(b)` dans `tests/outils/moteur.js`) ;
   - les tableaux chiffrés de ce document (§4.1, §5.1, §6.2, §7) correspondent exactement au code (vérifié par `node tests/outils/audit-doc.js`).
 
 ---
@@ -464,46 +502,43 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 ### 12.1 Lancer les tests
 | Commande | Ce qu'elle fait | Durée |
 |---|---|---|
-| `node tests/tout.js` | Tout : simulation (mécaniques et 15 parties entre IA) et parcours mobile dans un navigateur | ≈ 1 min |
-| `node tests/tout.js --simulation` | Simulation seule. C'est ce que GitHub lance à chaque Pull Request. | ≈ 35 s |
-| `node tests/tout.js --rapide` | Simulation avec 5 parties au lieu de 15, pour les petites retouches | ≈ 20 s |
-| `node tests/bilan.js [version]` | Les **trois bilans** dans `rapports/bilan.html`, avec la comparaison visuelle par rapport à `version` (par défaut `origin/main`) | ≈ 3 min |
+| `node tests/tout.js` | Tout : simulation (mécaniques et **une partie entre IA par difficulté**) et parcours mobile dans un navigateur | ≈ 2 min 30 |
+| `node tests/tout.js --simulation` | Simulation seule. C'est ce que GitHub lance à chaque Pull Request. (`--rapide` en est un synonyme.) | ≈ 1 min 30 |
+| `node tests/tout.js --complet` | Ajoute les **15 parties entre IA complètes** (5 factions × 3 difficultés). À lancer à la main après un changement d'équilibrage ou d'IA ; jamais lancé par GitHub. | plusieurs minutes |
+| `node tests/bilan.js [version] [--complet]` | Les **trois bilans** dans `rapports/bilan.html`, avec la comparaison visuelle par rapport à `version` (par défaut `origin/main`). `--complet` : 15 parties au lieu de 3. | ≈ 4 min |
 | `node tests/captures.js` | 10 captures (5 écrans × portrait et paysage) dans `captures/actuel/` | ≈ 1 min |
 | `node tests/captures.js --3d` | Les mêmes captures avec le rendu 3D, dans `captures/3d/` | ≈ 10 min (WebGL logiciel) |
 | `node tests/comparer-visuel.js [version]` | Avant/après visuel seul, dans `captures/comparaison/` | ≈ 2 min 30 |
 | `node tests/outils/audit-doc.js` | Compare les tableaux chiffrés de ce document au code et liste les écarts, sans rien corriger | 1 s |
+| `python art/outils/generer.py [asset…] [--verifier] [--apercus dossier]` | Génère (ou vérifie) les fichiers 3D à partir des scripts de `art/` ; demande Blender 5.3 (`pip install bpy==5.3.0`) | quelques s par asset |
 
 Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en plus **Playwright** et Chromium, présents dans l'environnement de Claude mais **pas ajoutés au projet**. Sans eux, ces tests sont ignorés avec un message clair.
 
 ### 12.2 Ce que contient `tests/`
-- `simulation/` : les tests du moteur (`sim.js`). Ils **caractérisent le comportement réel de la version actuelle** : ils décrivent ce que le jeu fait, sans ajouter de règle.
-  - `integrite` : le moteur figé et les références n'ont pas été modifiés.
-  - `tables` : les 50 tours, les 18 monstres, les archétypes, les factions et la difficulté, comparés à la référence et recalculés à partir des formules.
-  - `construction`, `deplacements`, `combats`, `economie`, `vagues` (avec l'IA), `fin-de-partie` : les mécaniques.
-  - `parties-ia` : 15 parties complètes (5 factions × 3 difficultés) rejouées à l'identique et comparées, état par état, à la référence.
-- `navigateur/parcours-3d.test.js` (2.4) : le même parcours avec `?rendu=3d` (portrait et paysage) : chargement de WebGL et des modèles, plateau dessiné, construction en deux touchers avec tour fantôme et portée, refus, panneau et amélioration, monstres en 3D chez l'adversaire, zoom et déplacement à deux doigts, pose exacte en mode zoomé, aucune erreur JavaScript. WebGL y tourne en **rendu logiciel SwiftShader** (`lancer({webgl:true})`), sans carte graphique.
+- `simulation/` : les tests du moteur (`sim.js`). Ils vérifient que le jeu fonctionne (mécaniques, formules, parties qui se terminent). **Il n'y a pas de moteur figé ni de parties enregistrées** (supprimés en 2.5) : un changement d'équilibrage ou d'IA ne fait échouer que les tests qui décrivent précisément la mécanique modifiée, et on met ces tests à jour dans le même commit.
+  - `tables` : forme des tables (50 tours, 18 monstres…), statistiques valides, et chaque tour recalculée à partir des formules. Les chiffres eux-mêmes peuvent changer librement.
+  - `construction`, `chantier` (temps de construction, depuis la 2.4), `deplacements`, `combats`, `economie`, `vagues` (avec l'IA), `fin-de-partie` : les mécaniques. Les tests qui ont besoin d'une tour active appellent `pret(b)`, qui fait avancer le terrain jusqu'à la fin des chantiers.
+  - `parties-ia` : **une partie complète par difficulté** (Alliance en Normal, Horde en Difficile, Sylvestres en Brutal ; les 15 avec `--complet`) qui doit se terminer en moins de 30 min de jeu, sans valeur invalide, avec des tours construites et des attaques ; plus les 2 premières minutes d'une partie rejouées deux fois avec la même graine, qui doivent être identiques.
+- `simulation/modeles-3d.test.js` (2.6) : un modèle 3D pour chaque tour (`tours/<faction>-<j>`) et chaque clé de monstre (`monstres/<g>`), portail et château présents, monstres animés (`marche` ou `vol`), pièce `Tourelle` sur les tours qui visent, compression meshopt.
+- `navigateur/parcours-3d.test.js` (2.6) : le même parcours avec `?rendu=3d` (portrait et paysage) : chargement de WebGL et des modèles, plateau dessiné, construction en deux touchers avec tour fantôme et portée, refus, panneau et amélioration, monstres en 3D chez l'adversaire, zoom et déplacement à deux doigts, pose exacte en mode zoomé, aucune erreur JavaScript. WebGL y tourne en **rendu logiciel SwiftShader** (`lancer({webgl:true})`), sans carte graphique.
 - Variable `WR_CANAL` : utiliser un navigateur déjà installé à la place du Chromium de Playwright (par exemple `WR_CANAL=msedge` sur Windows). `NODE_PATH` peut pointer vers un Playwright installé hors du dépôt.
-- `assets/modeles-3d.test.js` : un modèle 3D par tour et par monstre de `sim.js`, budgets téléphone respectés (≤ 3 000 triangles et ≤ 150 Ko par modèle, ≤ 3 Mo au total), monstres animés, pièce « Tourelle » présente, compression meshopt. Lancé aussi par `--simulation` (GitHub).
 - `navigateur/parcours.test.js` : le **parcours automatisé** d'un joueur dans Chromium au format téléphone (390 × 844 en portrait, 844 × 390 en paysage) : accueil, faction, difficulté, construction en deux touchers (aperçu, confirmation, déplacement de l'aperçu, glisser sans effet) et refus, panneau de tour, envoi, vignettes, fiche d'information, monstres verrouillés, zoom et déplacement à deux doigts (sans pose accidentelle), pose exacte en mode zoomé, « Vue d'ensemble », revenu, mise en page. **Ce n'est pas une garantie de compatibilité avec tous les téléphones** : Safari sur iPhone, les anciens Android et les vrais écrans tactiles ne sont pas testés.
-- `moteurs/v1.7/` : une **copie figée** du moteur, extraite du commit `c868ff9` (empreinte SHA-256 `e0cd2f78…615f6f`, voir `PROVENANCE.md`). Le `sim.js` des versions 2.0 et 2.0.1 lui est identique octet pour octet.
-- `references/` : les valeurs de référence (statistiques, parties), **produites à partir du moteur figé**, jamais à partir de `main`.
 - `outils/` : chargement du moteur dans un environnement isolé, hasard à graine, serveur web local, pilotage du navigateur, affichage en français, audit de la documentation.
 
 ### 12.3 Reproductibilité sans toucher au jeu
-Les tests chargent `sim.js` dans un environnement isolé et y remplacent `Math.random` par un **hasard à graine** (`tests/outils/hasard.js`). Une même graine donne donc toujours la même partie. **Tous les tests utilisent une graine fixe** (1 par défaut, une graine par partie de référence) : un test ne dépend jamais du vrai hasard, donc il réussit ou échoue toujours de la même façon. Dans le navigateur, le même hasard est injecté avant le chargement de la page, et l'horloge est figée. **Le jeu publié n'est pas modifié.**
+Les tests chargent `sim.js` dans un environnement isolé et y remplacent `Math.random` par un **hasard à graine** (`tests/outils/hasard.js`). Une même graine donne donc toujours la même partie. **Tous les tests utilisent une graine fixe** (1 par défaut, une graine par partie entre IA) : un test ne dépend jamais du vrai hasard, donc il réussit ou échoue toujours de la même façon. Dans le navigateur, le même hasard est injecté avant le chargement de la page, et l'horloge est figée. **Le jeu publié n'est pas modifié.**
 
 ### 12.4 Règles
-1. **On ne régénère jamais une référence pour faire passer un test.** `tests/outils/creer-references.js` refuse d'ailleurs d'écraser un fichier existant.
-2. Quand une évolution **change volontairement le gameplay**, les tests concernés échouent : c'est normal. On présente alors le bilan gameplay (avant → après). Une fois l'évolution validée par le concepteur, on ajoute un **nouveau moteur figé** (`tests/moteurs/vX.Y/`) et de **nouvelles références**, sans supprimer les anciennes. Les tests sont mis à jour dans le même commit, et le commit le dit explicitement.
-3. Un désaccord entre le code et ce document est **signalé, pas corrigé d'office** : le concepteur décide.
-4. Ne jamais désactiver ou ignorer un test pour obtenir un résultat vert.
+1. Quand une évolution **change volontairement une mécanique**, on met à jour les tests qui la décrivent dans le même commit. Le bilan gameplay (avant → après, par rapport à `main`) montre ce qui a changé.
+2. Un désaccord entre le code et ce document est **signalé, pas corrigé d'office** : le concepteur décide.
+3. Ne jamais désactiver ou ignorer un test pour obtenir un résultat vert.
 
 ### 12.5 Les trois bilans
 Chaque évolution est présentée avec trois bilans **séparés** (`node tests/bilan.js`) :
 | Bilan | Contenu | Verdicts |
 |---|---|---|
-| 🔧 **Technique** | Les tests s'exécutent, le moteur figé est intact, le parcours mobile fonctionne, aucune erreur JavaScript. Liste des fichiers modifiés. | ✅ réussi / ❌ en échec |
-| 🎮 **Gameplay** | Mécaniques caractérisées, statistiques changées (avant → après), 15 parties entre IA, écarts entre la documentation et le code | ✅ identique à la référence / ⚠️ changé : **à valider par le concepteur** |
+| 🔧 **Technique** | Les tests s'exécutent, le parcours mobile fonctionne, aucune erreur JavaScript. Liste des fichiers modifiés. | ✅ réussi / ❌ en échec |
+| 🎮 **Gameplay** | Mécaniques vérifiées, statistiques changées et parties entre IA (3, ou 15 avec `--complet`), comparées au `sim.js` de `main` (avant → après), écarts entre la documentation et le code | ✅ identique à `main` / ⚠️ changé : **à valider par le concepteur** |
 | 🎨 **Visuel** | Captures portrait et paysage, avant \| après \| différences, pourcentage de pixels changés | ✅ identique / ⚠️ changé : **à valider par le concepteur** / ⏸ non vérifiable |
 
 **Une réussite technique ne vaut jamais validation du gameplay ni du rendu.** Le gameplay et le visuel ne sont « validés » que par le concepteur.
@@ -579,7 +614,7 @@ Claude ne peut pas créer d'étiquette lui-même (l'environnement cloud n'autori
 ### 14.2 Revenir à une version (« rollback »)
 Le concepteur dit à Claude : « **reviens à la version vX.Y.Z** ». Claude :
 1. crée une branche à partir de `main` à jour et y **restaure tous les fichiers** de l'étiquette demandée (`git restore --source vX.Y.Z -- .`, l'historique est conservé, rien n'est effacé) ;
-2. présente les trois bilans (comparaison visuelle avec `main`, gameplay comparé à la référence) ;
+2. présente les trois bilans (comparaison visuelle avec `main`, gameplay comparé à `main`) ;
 3. ouvre une PR « Revient à la version vX.Y.Z » et attend l'accord explicite du concepteur avant de fusionner ;
 4. à la fusion : le site GitHub Pages revient à cette version, le **serveur est redéployé automatiquement** si `sim.js` ou `server/` changent (§9 bis), et une nouvelle étiquette est posée (un retour arrière est lui-même une version, donc on peut l'annuler de la même façon).
 
@@ -589,44 +624,41 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 
 ---
 
-## 15. Modèles et rendu 3D (prototype)
+## 15. Assets 3D (préparation)
 
-Décidé avec le concepteur : le jeu passe progressivement en 3D. Pendant la transition, **le rendu 2D reste disponible** ; `sim.js` ne change pas.
+Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
+- **Un script Python Blender par asset** dans `art/` : c'est la **source** du modèle. `art/outils/generer.py` l'exécute dans une scène vide, exporte `assets/3d/<asset>.glb` et met à jour `assets/3d/manifeste.json` (taille, triangles, empreinte du script). Le même programme fonctionne sur le PC du concepteur (Blender 5.3) et dans le cloud (module `bpy==5.3.0`, sans écran ni carte graphique).
+- **Noms** : `tours/<faction>-<j>` pour `TW[faction × 10 + j]`, `monstres/<g>` pour le monstre de clé `CR[…].g`, `decor/<nom>`, `exemples/<nom>` (non utilisés par le jeu) ; pièces partagées dans `art/communs/`.
+- **Conventions** : 1 unité = 1 case, origine au sol au centre de la case, couleurs de faction lues dans `FACTIONS` ; un seul modèle par tour et par monstre (niveaux et petites animations gérés par le jeu).
+- **Budgets** (`art/budgets.json`) : tour et monstre ≤ 3 000 triangles et 150 Ko, décor ≤ 6 000 triangles et 300 Ko, total ≤ 8 Mo.
+- **Contrôles** : `tests/simulation/assets3d.test.js` (chaque PR, sans Blender : manifeste complet, aucun fichier en retard sur son script, GLB valides, budgets) ; action GitHub **« Assets 3D »** (`.github/workflows/assets-3d.yml`, PR qui touchent `art/` ou `assets/3d/`) : régénère tout avec Blender 5.3, vérifie et joint les images d'aperçu.
+- **Qui fait quoi** : la conception d'un nouveau modèle ou d'un nouveau style se fait de préférence sur le PC du concepteur (Blender + MCP, en direct ou via Remote Control) ; les retouches mineures peuvent être faites par n'importe quel contributeur ou une session cloud, en modifiant le script puis en régénérant.
+- **Repli obligatoire** : le jeu doit fonctionner même si un modèle manque (un contributeur peut ajouter un monstre avant son modèle 3D).
+- **Fins de ligne** : `.gitattributes` impose LF dans le dépôt (les empreintes vérifiées par les tests en dépendent) et traite les fichiers 3D et images comme binaires. Les fichiers `.blend` ne sont pas versionnés.
 
-### 15.1 Fabrication (`art/`)
-- **Les scripts sont la source de vérité** : Blender 5.3 sur le PC du concepteur, piloté par le MCP « blender ». Aucun `.blend` versionné.
-- Convention : **1 unité = 1 case**, Z vers le haut, le modèle regarde vers −Y (vers la sortie), pieds en z = 0. Couleurs en hexadécimal sRGB comme dans `index.html`.
-- `art/communs/` : pièces partagées.
-  - `outils.py` : formes de base (cylindre, boîte, sphère, cône, tore, prisme), matériaux, **peinture des sommets** (dégradé sombre en bas → clair en haut + léger grain, attribut `Col`), budget de facettes (`SIMPLE` pour les petits personnages) ;
-  - `factions.py` : palettes (`PAL`, `SOL`, `BIOME`, reprises de la 2D et avivées) et **socles** des 5 factions ;
-  - `personnages.py` : personnage caricatural paramétrable (proportions, nez, oreilles, défenses, casque, capuche, barbe, robe, cape, couronne, plumes, un œil…) et armes ;
-  - `betes.py` : quadrupèdes, volants (ailes membrane ou plumes), gelées ;
-  - `animations.py` : animations par pièces, sans squelette (`marche`, `trot`, `saut`, `flotte`, `vol`) ;
-  - `echelles.py` : **tailles des monstres**, `hauteur = 0,40 × z^1,8` (z de `CR`) : Sapeur gobelin 0,24 case, Brute orc 0,36, Troll 0,47, Golem 0,55, Cyclope 0,83. Les tours font environ 1,1 à 1,4 case ;
-  - `tours_communes.py` : les **6 archétypes** (archer, garde, givre, canon, flammes, mage) déclinés par `STYLE` de faction (murs, toit, chemin de ronde, équipage, mage, champion, couleur de magie). Les emplacements 6 à 9 sont des versions plus grandes des emplacements 0, 1, 2 et 5 ;
-  - `rendu.py` : rendus de validation (EEVEE, caméra orthographique, lumière chaude, contre-jour).
-- `art/tours/<faction>.py` : les 10 tours de chaque faction (noms de `sim.js`). `art/monstres/<monstre>.py` : un script par monstre. `art/decor/portail_chateau.py` : portail, château (drapeau recoloré à la couleur du joueur) et plateau de référence.
-- Styles de faction : **Alliance** pierre blanche, toits bleus et or ; **Horde** rondins, peaux rouges, défenses d'os ; **Sylvestres** troncs, racines, feuillage, mousse ; **Nains** acier riveté hexagonal, cuivre, dômes et cheminées ; **Légion des ombres** obsidienne, épines, anneaux runiques cyan.
-- **Pièces nommées** utilisées par le jeu : `Tourelle` (pivote vers la cible), `Cristal`, `Eclats`, `Flamme`, `Anneaux`, `Orbe` (animées en code), `Drapeau` (couleur du joueur) ; animations glTF `marche` (au sol) et `vol` (volants).
+### 15.1 Modèles du jeu : style et pièces communes (depuis la 2.6)
+- **Style validé par le concepteur** : heroic fantasy flamboyante, cartoon mais fin (proportions trapues, épaulières, détails sculptés, liserés dorés), couleurs vives, **dégradé peint** sur chaque modèle (sombre en bas, clair en haut, léger grain), dans l'esprit d'un jeu de stratégie fantasy classique mais avec des modèles originaux.
+- **Styles de faction** : **Alliance** pierre blanche, toits bleus et or ; **Horde** rondins, peaux rouges, défenses d'os ; **Sylvestres** troncs, racines, feuillage, mousse ; **Nains** acier riveté hexagonal, cuivre, dômes et cheminées ; **Légion des ombres** obsidienne, épines, anneaux runiques cyan.
+- **Tours** : `art/tours/<faction>-<j>.py` (50 scripts) appellent `communs/tours_communes.py`, qui décline les **6 archétypes** (archer, garde, givre, canon, flammes, mage) selon le `STYLE` de la faction (murs, toit, chemin de ronde, équipage, mage, champion, couleur de magie). Les emplacements 6 à 9 sont des versions plus grandes des emplacements 0, 1, 2 et 5 (baliste, champion à cape et bouclier, cristal à éclats, archimage à anneaux).
+- **Monstres** : `art/monstres/<g>.py` (17 scripts, un par clé `CR[…].g` ; le Petit limon utilise le modèle `slime`, réduit par le jeu). Tailles dans `communs/echelles.py` : `hauteur = 0,40 × z^1,8` (z de `CR`) : Sapeur gobelin 0,24 case, Brute orc 0,36, Troll 0,47, Golem 0,55, Cyclope 0,83 ; les tours font 1,1 à 1,4 case.
+- **Décor** : `art/decor/portail.py` et `art/decor/chateau.py` (drapeau recoloré par le jeu à la couleur du joueur).
+- **Pièces communes** (`art/communs/`) : `outils.py` (formes, matériaux, peinture des sommets, budget de facettes), `factions.py` (palettes et socles des 5 factions), `personnages.py` (personnage caricatural paramétrable et armes), `betes.py` (quadrupèdes, volants, gelées), `animations.py` (animations par pièces, sans squelette : `marche`, `trot`, `saut`, `flotte`, `vol`), `echelles.py`, `tours_communes.py`, `decor.py`, `export_jeu.py`, `rendu.py` (rendus de validation).
+- **Export pour le jeu** (`communs/export_jeu.py`, appelé à la fin de chaque `construire`) : la couleur de chaque pièce est **cuite dans ses sommets** et un matériau unique `Peint` la lit (les pièces lumineuses gardent un matériau `Lueur_<couleur>`) ; les pièces qui bougent ensemble sont **fusionnées** (une dizaine de pièces par modèle au lieu d'une centaine, pour le téléphone). `generer.py` exporte aussi les **pivots** (objets vides) et les **animations** (pistes NLA), et compresse en **meshopt**.
+- **Pièces nommées** utilisées par le jeu : `Tourelle` (pivote vers la cible), `Cristal`, `Eclats`, `Flamme`, `Anneaux`, `Orbe`, `AnneauFlottant`, portail `Anneau1..3` (animées en code), `Drapeau` (couleur du joueur) ; animations glTF `marche` (au sol) et `vol` (volants).
+- **Concevoir dans Blender ouvert (MCP)** : `exec(open(r'<dépôt>\art\outils\atelier.py', encoding='utf-8').read())` recharge les pièces communes ; `atelier_asset('tours/alliance-0')` construit un asset dans la scène ; `art/outils/planches.py` fait les planches de validation (une par faction, trois pour les monstres).
 
-### 15.3 Rendu 3D dans le jeu (`rendu3d.js`, depuis la 2.4)
+### 15.2 Rendu 3D dans le jeu (`rendu3d.js`, depuis la 2.6)
 - **Activation** : `?rendu=3d` dans l'adresse, ou le lien « Essayer la vue 3D (prototype) » de l'écran d'accueil (« Revenir à la vue 2D » pour l'inverse). Sans ce paramètre, rien de nouveau n'est chargé et la 2D est inchangée. Si WebGL ou le module manquent, le jeu revient en 2D avec un message.
 - **Chargement** : `index.html` déclare un *importmap* (`three` → `vendor/three/three.module.min.js`, `three/addons/` → `vendor/three/addons/`) et importe `rendu3d.js` à la demande (`charger3D`). Pas d'étape de build. Les modèles des factions en jeu et tous les monstres sont préchargés ; les autres au besoin.
+- **Repli** : si un modèle manque (fichier absent ou illisible), le jeu affiche une forme simple à la couleur de la tour ou du monstre (règle de §15).
 - **Caméra** : orthographique, inclinée à **42°**. Une case (x, y) est en (x, 0, y) dans le monde ; à l'écran, `sx = ox + x·s` et `sy = oy + (y·KY − h·KH)·s`, avec `KY = sin 42°`, `KH = cos 42°`. C'est la formule de la 2D avec un tassement vertical `R3D.KY` : `fit`, `borner`, `zoomer`, `caseVersEcran`, `caseSous` (case sous le doigt), le pincement et le cadre de la vignette l'utilisent. En 2D, `KY = 1` et `TOPM = 0`, donc rien ne change. `TOPM` = 1,2 case libre au-dessus du plateau pour les tours hautes.
-- **Commandes** : identiques à la 2D (construction en deux touchers, zoom 1× à 3× et déplacement à deux doigts, molette, panneau de tour), car le canevas 2D `#main` reste par-dessus le canevas WebGL `#main3d` et reçoit les gestes.
-- **Ce qui est dessiné en 3D** : plateau-diorama (dalles en damier aux couleurs de la faction, décor déterministe : cailloux, herbes, fleurs), portail (anneaux qui tournent), château (drapeau à la couleur du joueur), chemin en pointillés animés, tours (la `Tourelle` vise la cible, le garde frappe, cristaux, flammes, anneaux et orbes animés, taille et points d'or selon le niveau, étoiles quand elle est étourdie), monstres (animation de marche ou de vol, vitesse selon le monstre et le ralentissement, orientation selon le déplacement, halo au sol ralenti/hâté/soigné, cercles d'aura du Chaman et de la Prêtresse, Spectre translucide quand il est caché), projectiles (flèche, boulet en cloche, éclat de givre, orbe arcanique), effets (explosion, impact, portée, fumée, flammes, coup d'épée, éclair, case refusée), tour fantôme et cercle de portée de l'aperçu.
-- **Surcouche 2D** (sur `#main`) : barres de vie, textes flottants (or, « −1 vie », niveau), terrain éliminé.
+- **Commandes** : identiques à la 2D (construction en deux touchers, zoom 1× à 3× et déplacement à deux doigts, molette, panneau de tour), car le canevas 2D `#main` reste par-dessus le canevas WebGL `#main3d` et reçoit les gestes. Il faut toucher le **pied** d'une tour (sa case au sol) pour l'ouvrir.
+- **Ce qui est dessiné en 3D** : plateau-diorama (dalles en damier aux couleurs de la faction, décor déterministe), portail (anneaux qui tournent), château (drapeau à la couleur du joueur), chemin en pointillés animés, tours (la `Tourelle` vise la cible, le garde frappe, cristaux, flammes, anneaux et orbes animés, taille et points d'or selon le niveau, étoiles quand elle est étourdie, **échafaudage** et tour qui monte pendant le chantier), monstres (animation de marche ou de vol, vitesse selon le monstre et le ralentissement, orientation selon le déplacement, halo au sol ralenti/hâté/soigné, cercles d'aura du Chaman et de la Prêtresse, Spectre translucide quand il est caché), projectiles (flèche, boulet en cloche, éclat de givre, orbe arcanique), effets (explosion, impact, portée, fumée, flammes, coup d'épée, éclair, case refusée), tour fantôme et cercle de portée de l'aperçu.
+- **Surcouche 2D** (sur `#main`) : barres de vie, barre de progression des chantiers, textes flottants (or, « −1 vie », niveau), terrain éliminé.
 - **Monstres agrandis ×1,4 en jeu** (`ECH_MONSTRES`) pour rester lisibles sur téléphone ; les rapports de taille de `echelles.py` sont gardés.
 - **Lumières** : ciel et sol, soleil chaud avec ombres douces (carte 2048), contre-jour. Netteté plafonnée à ×2.
 - Le multijoueur fonctionne aussi en 3D : le module lit les terrains reconstruits à partir des instantanés, comme `draw()`.
-- **Page d'aperçu** : `apercu-3d.html` montre chaque modèle (tours, monstres, décor) en rotation avec son animation, son nombre de triangles et sa taille ; `?modele=nains_9` ouvre directement un modèle.
-
-### 15.2 Export et budgets
-- `art/exporter.py` (dans Blender) : construit chaque modèle seul, **cuit la couleur dans les sommets**, donne un matériau unique `Peint` (ou `Lueur_<couleur>` pour les pièces lumineuses), **fusionne les pièces qui bougent ensemble** (≈ 10 pièces par modèle au lieu d'une centaine), puis exporte en GLB dans `art/_brut/` (non versionné).
-- `node art/optimiser.mjs` : glTF-Transform 4.2.1 (compression meshopt, soudure, rééchantillonnage), vers `assets/3d/{tours,monstres,decor}/`.
-- **Budgets prototype** : ≤ 3 000 triangles et ≤ 150 Ko par tour ou monstre, ≤ 3 Mo au total (vérifiés par `tests/assets/modeles-3d.test.js`). État actuel : 70 modèles, 1,94 Mo, 50 Ko au plus par modèle.
-- Planches de validation : `art/planches.py` (une planche par faction, trois pour les monstres), images dans `captures/art/` (non versionné).
-- Pour tout refaire, dans Blender : `ART = r'<dépôt>\art'`, `exec(open(ART + r'\atelier.py', encoding='utf-8').read())`, `exporter.tout(r'<dépôt>')`, puis `node art/optimiser.mjs`.
+- **Page d'aperçu** : `apercu-3d.html` montre chaque modèle du manifeste (tours, monstres, décor) en rotation avec son animation, son nombre de triangles et sa taille ; `?modele=nains-9` ouvre directement un modèle.
 
 ---
 
@@ -648,5 +680,10 @@ Décidé avec le concepteur : le jeu passe progressivement en 3D. Pendant la tra
 | 2026-11-14 | 2.1 | **Interface plus claire** : fiche d'information de la tour (dégâts/s, portée, cibles, effets, bonus de faction chiffré, gain du niveau suivant), cartes de tours avec dégâts/s, portée et ✈, prix en rouge si l'or manque, monstres verrouillés avec heure de déblocage. **Zoom (1× à 3×) et déplacement à deux doigts**, molette, bouton « Vue d'ensemble », cadre de la partie visible sur la vignette. Pose au doigt au relâcher. Correction du paysage sur téléphone (haut et bas coupés). Tests navigateur complétés (19 vérifications par orientation), 5ᵉ capture (zoom). **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
 | 2026-11-14 | 2.2 | **Construction en deux touchers** : le 1er toucher montre un aperçu (tour fantôme, portée, prix), le 2e sur la même case construit ; une case impossible est signalée dès le 1er toucher ; glisser le doigt ne construit plus rien. Tests navigateur complétés (22 vérifications par orientation). **Règles du jeu inchangées** (`sim.js` non modifié). |
 | 2026-11-14 | 2.3 | **Carte plus grande sur téléphone et pastilles de rôle des tours**. Carte : les 4 vignettes des joueurs quittent le HUD et s'ouvrent dans un panneau flottant par-dessus le terrain, depuis un bouton-icône en haut à gauche. Vies du joueur ajoutées dans le HUD (❤). Bannière « ↩ revenir au tien » cliquable. Mini-cartes un peu plus grandes. Tours : pastilles de rôle (flèche, épée, flocon, bombe, flamme, étoile), de cibles (sol ou sol et air) et de magie dans des cadres dorés biseautés dessinés en code ; texte des cartes « ⚔ N dégâts/s » et « ◎ portée N » ; appui long (ou survol) sur une carte pour voir sa fiche sans la sélectionner. Interface uniquement : `sim.js` inchangé. Test du parcours mobile adapté (ouvrir le panneau avant de toucher une vignette). |
-| 2026-11-14 | 2.3 | **Modèles 3D** (préparation du rendu 3D, §15) : scripts Blender versionnés dans `art/`, 50 tours (5 factions × 10), 18 monstres animés, portail et château, exportés en GLB optimisés dans `assets/3d/` (1,94 Mo). Style heroic fantasy cartoon validé par le concepteur. Règle de conception n°2 remplacée (assets 3D générés par scripts, aucun asset externe sans licence claire). Test des budgets 3D. **Jeu inchangé** (`index.html` et `sim.js` non modifiés). |
-| 2026-11-14 | 2.4 | **Rendu 3D jouable (prototype)** avec `?rendu=3d` ou le lien de l'accueil : `rendu3d.js` et three.js r170 copié dans `vendor/three/` (importmap, sans build). Caméra orthographique inclinée à 42°, plateau-diorama, tours et monstres animés, projectiles et effets, chemin, construction en deux touchers avec tour fantôme, zoom et déplacement à deux doigts, panneau de tour (§15.3). La 2D reste le rendu par défaut et est inchangée. Tests : parcours mobile en 3D (WebGL logiciel), captures `--3d`, variable `WR_CANAL`. **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
+| 2026-11-14 | 2.3 | Outillage : **préparation des assets 3D** (§15, `art/LISEZMOI.md`) : un script Blender par asset dans `art/`, génération identique sur PC et dans le cloud (`art/outils/generer.py`, Blender 5.3), manifeste et budgets, test de cohérence sur chaque PR, action GitHub « Assets 3D » avec aperçus, exemple `exemples/caisse`. Règle de conception n°2 adaptée aux modèles 3D générés par script. `.gitattributes` (fins de ligne LF, fichiers binaires). **Aucun changement de jeu.** |
+| 2026-11-14 | 2.4 | **Temps de construction des tours** : 1 s pour 50 or dépensés, entre 0,5 et 8 s, multiplié pour les humains par ×1 / ×1,25 / ×1,5 selon la difficulté (les IA restent à ×1), à la pose comme à chaque amélioration (§4.4). Pendant le chantier, la tour ne tire pas, ne révèle pas les Spectres, ne peut pas être améliorée (`busy`) et n'est pas étourdie ; elle bloque déjà le chemin. L'IA n'améliore pas une tour en chantier. Visuel : tour en transparence, échafaudage, marteau et barre de progression ; durée affichée dans la fiche, le bouton Améliorer et le message de pose. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur). Tests de mécanique adaptés pour attendre la fin du chantier, nouveau fichier de tests `chantier`. |
+| 2026-11-14 | 2.5 | **IA : labyrinthes optimisés et variés**. Plan cible par IA (formes tirées au hasard puis affinées par recherche locale, environ 100 cases de chemin une fois complet), ordre de construction qui allonge le chemin presque à chaque tour, Givre répartis le long du chemin, Mages détecteurs placés seulement quand un adversaire peut envoyer des Spectres, tours anti-aériennes sur le couloir des volants, adaptation aux volants reçus. Corrige le blocage de l'IA vers 36 tours. Génération découpée dans le temps (≈ 20 ms en tout, ≤ 2,5 ms par pas). Les transformations de l'IA respectent le temps de construction. `sim.js` modifié (redéploiement du serveur). Nouveau test `labyrinthe` ; le test « première tour de l'IA » suit désormais son plan. |
+| 2026-11-14 | 2.5 | Outillage : **fin du moteur figé** (`tests/moteurs/`, `tests/references/`, `creer-references.js`, test `integrite` supprimés, y compris le moteur 2.4 figé). Les tests vérifient le bon fonctionnement sans comparer à des parties enregistrées ; le bilan gameplay compare directement au `sim.js` de `main` (statistiques et 15 parties). Plus de « gel » à faire après chaque changement de gameplay. |
+| 2026-11-14 | 2.5 | Outillage : **tests plus courts**. Par défaut, une seule partie entre IA par difficulté au lieu de 15, et la vérification de reproductibilité ne rejoue que 2 minutes. Les 15 parties restent disponibles avec `--complet` (tests et bilan). La vérification GitHub passe de 9 min à environ 1 min 30 (délai maximal ramené à 10 min). **Aucun changement de jeu.** |
+| 2026-11-14 | 2.5.1 | **Correctif multijoueur** : après 2 ou 3 minutes, dès qu'un monstre au sol arrivait sur le terrain du joueur, `peutConstruire` lisait la case visée `tx`/`ty`, absente des instantanés du serveur. L'erreur arrêtait la boucle de dessin : terrain figé et grisé, plus aucune tour posable. La page donne maintenant à chaque monstre reçu la case la plus proche de sa position. `index.html` seul (pas de redéploiement du serveur). |
+| 2026-11-14 | 2.6 | **Rendu 3D jouable (prototype)** avec `?rendu=3d` ou le lien de l'accueil (§15.2) : `rendu3d.js` et three.js r170 copié dans `vendor/three/` (importmap, sans build), caméra orthographique inclinée à 42°, plateau-diorama, tours et monstres animés, chantiers, projectiles et effets, chemin, construction en deux touchers avec tour fantôme, zoom et déplacement à deux doigts, panneau de tour. **Modèles 3D de tout le jeu** (§15.1) : 50 tours (5 factions × 10, style heroic fantasy cartoon validé par le concepteur), 17 monstres animés et le portail et le château, un script par asset dans `art/` selon `art/LISEZMOI.md` ; pièces communes dans `art/communs/` ; `generer.py` exporte maintenant aussi les pivots et les animations, et compresse en meshopt. Page `apercu-3d.html`. La 2D reste le rendu par défaut et est inchangée. Tests : `modeles-3d`, parcours mobile en 3D (WebGL logiciel), captures `--3d`, `WR_CANAL`. **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |

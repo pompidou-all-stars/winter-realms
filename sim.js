@@ -65,13 +65,16 @@ const CR=[
 for(const T of CR)T.i=T.cat=='n'?Math.round(T.c/10*(1+.1*Math.log10(T.c/10))):Math.round(T.c*.065);
 const byCat=c=>CR.map((T,k)=>k).filter(k=>CR[k].cat==c).sort((a,b)=>CR[a].c-CR[b].c),NORM=byCat('n'),FLY=byCat('f'),idx=f=>CR.findIndex(T=>T[f]),AURA=idx('aura'),SPEC=idx('inv'),HEAL=idx('heal'),SPLIT=idx('split'),TURT=idx('arm'),BRK=idx('mi'),SAP=idx('stun'),KID=CR.findIndex(T=>T.cat=='x'),AURA_R=1.7;
 const DIFF=[{n:'Normal',b:1,g:0},{n:'Difficile',b:1.25,g:30},{n:'Brutal',b:1.5,g:60}];
-const HPK=.55,GRACE=25,GROUP=4,flyH=k=>CR[k].fly?CR[k].z*.35:0;
+const HPK=.55,GRACE=25,GROUP=4,
+/* temps de construction : 1 s pour BUILD_OR pièces d'or dépensées (achat ou amélioration), entre BUILD_MIN et BUILD_MAX secondes,
+   multiplié pour les humains par BUILD_DIFF selon la difficulté (les IA gardent ×1, comme pour le revenu) */
+ BUILD_OR=50,BUILD_MIN=.5,BUILD_MAX=8,BUILD_DIFF=[1,1.25,1.5],buildT=(c,m=1)=>Math.min(BUILD_MAX,Math.max(BUILD_MIN,c/BUILD_OR))*m,flyH=k=>CR[k].fly?CR[k].z*.35:0;
 const dmg=t=>TW[t.k].d*2**(t.lv-1),rng=t=>TW[t.k].r*(1+.05*(t.lv-1)),upCost=t=>Math.round(TW[t.k].c*1.5*2**(t.lv-1)/5)*5,topY=t=>.28+.045*(t.lv-1);
 
 /* ---------- simulation ---------- */
 class Board{
  constructor(i,name,col,ai,classId=0){this.i=i;this.name=name;this.col=col;this.ai=ai;this.classId=classId;this.dead=0;this.aiT=1+i*.2;this.ev=[];this.G=null;
-  this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=100;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=60;this.ap=40;this.lastG=100;this.d=this.dist()}
+  this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=100;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=60;this.ap=40;this.lastG=100;this.flyIn=0;this.hpIn=0;this.specSeen=0;this.mz=null;this.d=this.dist()}
  dist(){const d=Array.from({length:R},()=>Array(C).fill(INF)),q=[[EX[0],EX[1]]];d[EX[1]][EX[0]]=0;
   for(let i=0;i<q.length;i++){const[x,y]=q[i];for(const[dx,dy]of DIRS){const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R||this.g[b][a]||d[b][a]<INF)continue;d[b][a]=d[y][x]+1;q.push([a,b])}}return d}
  place(x,y,k){const T=TW[k];
@@ -80,11 +83,13 @@ class Board{
   if(this.cr.some(c=>!CR[c.k].fly&&((Math.abs(c.x-x)<.9&&Math.abs(c.y-y)<.9)||(c.tx==x&&c.ty==y))))return false;
   this.g[y][x]=1;const nd=this.dist();
   if(nd[SP[1]][SP[0]]>=INF||this.cr.some(c=>!CR[c.k].fly&&nd[c.ty][c.tx]>=INF)){this.g[y][x]=0;return false}
-  this.d=nd;this.gold-=T.c;this.t.push({x,y,k,cd:0,a:.7,lv:1,inv:T.c,sw:0});
+  this.d=nd;this.gold-=T.c;const bt=buildT(T.c,this.bm());this.t.push({x,y,k,cd:0,a:.7,lv:1,inv:T.c,sw:0,b:bt,bt});
   this.fx.push({type:'range',x:x+.5,y:y+.5,r:T.r,t:.6,d:.6,col:T.col});this.ev.push('build');return true}
+ /* multiplicateur de temps de construction : selon la difficulté pour un humain, ×1 pour une IA */
+ bm(){return this.G&&!this.ai?BUILD_DIFF[this.G.LV]||1:1}
  sell(x,y){const i=this.t.findIndex(t=>t.x==x&&t.y==y);if(i<0)return false;const b=Math.floor(this.t[i].inv*.7);this.gold+=b;this.t.splice(i,1);this.g[y][x]=0;this.d=this.dist();
   this.fx.push({type:'text',x:x+.5,y:y+.4,txt:'+'+b,col:'#ffd95e',t:.7,d:.7});this.ev.push('sell');return true}
- upgrade(t){const c=upCost(t);if(t.lv>=5||this.gold<c)return false;this.gold-=c;t.inv+=c;t.lv++;
+ upgrade(t){const c=upCost(t);if(t.lv>=5||t.b>0||this.gold<c)return false;this.gold-=c;t.inv+=c;t.lv++;t.b=t.bt=buildT(c,this.bm());
   this.fx.push({type:'text',x:t.x+.5,y:t.y,txt:'Niveau '+t.lv,col:'#ffd95e',t:.9,d:.9},{type:'range',x:t.x+.5,y:t.y+.5,r:rng(t),t:.6,d:.6,col:TW[t.k].col});this.ev.push('up');return true}
  send(k,m){for(let i=0;i<GROUP;i++)this.q.push({k,m,t:i*.38+Math.random()*.25})}
  /* dégâts : l'anti-magie ignore Mage et Givre, la carapace retire un montant fixe à chaque coup */
@@ -105,13 +110,13 @@ class Board{
   else this.fx.push({type:'ring',x:p.tx,y:p.ty,r:T.skin==3?.45:.26,t:.2,d:.2,col:T.skin==0?'#ffffff':'#e39bff'})}
  update(dt){
   this.hurt=Math.max(0,this.hurt-dt);
-  for(const s of this.q){s.t-=dt;if(s.t<=0){const hp=CR[s.k].hp*s.m*HPK;this.cr.push({id:++UID,k:s.k,x:SP[0],y:SP[1],tx:SP[0],ty:SP[1],hp,max:hp,sl:0,sf:.5,f:1,ph:Math.random()*6,ox:(Math.random()-.5)*.3,oy:(Math.random()-.5)*.22,arm:(CR[s.k].arm||0)*s.m,cs:2})}}
+  for(const s of this.q){s.t-=dt;if(s.t<=0){const hp=CR[s.k].hp*s.m*HPK;this.hpIn+=hp;if(CR[s.k].fly)this.flyIn+=hp;if(CR[s.k].inv)this.specSeen=1;this.cr.push({id:++UID,k:s.k,x:SP[0],y:SP[1],tx:SP[0],ty:SP[1],hp,max:hp,sl:0,sf:.5,f:1,ph:Math.random()*6,ox:(Math.random()-.5)*.3,oy:(Math.random()-.5)*.22,arm:(CR[s.k].arm||0)*s.m,cs:2})}}
   this.q=this.q.filter(s=>s.t>0);
-  const au=this.cr.filter(c=>CR[c.k].aura),mg=this.t.filter(t=>TW[t.k].mg),hl=this.cr.filter(c=>CR[c.k].heal);
+  const au=this.cr.filter(c=>CR[c.k].aura),mg=this.t.filter(t=>TW[t.k].mg&&!(t.b>0)),hl=this.cr.filter(c=>CR[c.k].heal);
   for(const c of this.cr){const T=CR[c.k];c.sl=Math.max(0,c.sl-dt);c.mark=Math.max(0,(c.mark||0)-dt);c.h=!T.aura&&au.some(a=>Math.hypot(a.x-c.x,a.y-c.y)<AURA_R);
    c.hid=T.inv&&!mg.some(m=>Math.hypot(c.x-m.x,c.y-m.y)<=rng(m));
    c.hl=c.hp<c.max&&hl.some(a=>a!==c&&Math.hypot(a.x-c.x,a.y-c.y)<AURA_R);if(c.hl)c.hp=Math.min(c.max,c.hp+c.max*.05*dt);
-   if(T.stun){c.cs-=dt;if(c.cs<=0){let bt=null,bd=2.3;for(const t of this.t){const d=Math.hypot(t.x-c.x,t.y-c.y);if(d<bd&&!(t.stun>0)){bd=d;bt=t}}
+   if(T.stun){c.cs-=dt;if(c.cs<=0){let bt=null,bd=2.3;for(const t of this.t){const d=Math.hypot(t.x-c.x,t.y-c.y);if(d<bd&&!(t.stun>0)&&!(t.b>0)){bd=d;bt=t}}
     if(bt){bt.stun=2;c.cs=3.5;this.fx.push({type:'zap',x:c.x+.5,y:c.y+.3,x2:bt.x+.5,y2:bt.y+.5-topY(bt),t:.3,d:.3});this.ev.push('zap')}else c.cs=.3}}
    let sp=T.s*(c.sl>0?c.sf:1)*(c.h?1.4:1)*dt;
    if(T.fly){const dx=EX[0]-c.x,dy=EX[1]-c.y,dd=Math.hypot(dx,dy);if(dd<=sp)c.leak=1;else{c.x+=dx/dd*sp;c.y+=dy/dd*sp}continue}
@@ -123,7 +128,8 @@ class Board{
     const m=Math.min(sp,dd);c.x+=dx/dd*m;c.y+=dy/dd*m;sp-=m}}
   this.pen*=Math.pow(.955,dt);const tot=this.d[SP[1]][SP[0]]||1;
   for(const c of this.cr){const pr=CR[c.k].fly?1-Math.hypot(EX[0]-c.x,EX[1]-c.y)/12:1-(this.d[c.ty][c.tx]+Math.hypot(c.tx-c.x,c.ty-c.y))/tot;if(pr>this.pen)this.pen=pr}
-  for(const t of this.t){if(t.stun>0){t.stun-=dt;continue}t.cd-=dt;if(t.sw>0)t.sw-=dt;if(t.cd>0)continue;const T=TW[t.k],r=rng(t),dm=dmg(t);let tg=null,bd=INF;
+  for(const t of this.t){if(t.b>0){t.b-=dt;if(t.b<=0){t.b=0;t.cd=0;this.fx.push({type:'range',x:t.x+.5,y:t.y+.5,r:rng(t),t:.6,d:.6,col:TW[t.k].col})}continue}
+   if(t.stun>0){t.stun-=dt;continue}t.cd-=dt;if(t.sw>0)t.sw-=dt;if(t.cd>0)continue;const T=TW[t.k],r=rng(t),dm=dmg(t);let tg=null,bd=INF;
    for(const c of this.cr){const F=CR[c.k].fly;if(c.hid||(T.gr&&F)||(T.mag&&CR[c.k].mi))continue;if(Math.hypot(c.x-t.x,c.y-t.y)>r)continue;
     const rem=F?Math.hypot(EX[0]-c.x,EX[1]-c.y):this.d[c.ty][c.tx]+Math.hypot(c.tx-c.x,c.ty-c.y);if(rem<bd){bd=rem;tg=c}}
    if(!tg)continue;t.cd=T.cd;t.a=Math.atan2(tg.y-t.y,tg.x-t.x);
@@ -147,20 +153,82 @@ class Board{
 }
 
 /* ---------- IA ---------- */
-const PLAN=[];for(const y of[8,6,10,4,12,2,14])for(const x of((y/2)%2?[6,5,7,4,8,3,9,2,10,1,11,0,12]:[6,7,5,8,4,9,3,10,2,11,1,12,0]))PLAN.push([x,y]);
 const invest=b=>b.t.reduce((s,t)=>s+t.inv,0),airInv=b=>b.t.reduce((s,t)=>s+(!TW[t.k].gr&&Math.abs(t.x-6)<=2?t.inv:0),0),mages=b=>b.t.filter(t=>TW[t.k].mg).length;
 function pathCells(b){const out=[];let x=SP[0],y=SP[1];out.push([x,y]);for(let n=0;n<200&&b.d[y][x]>0&&b.d[y][x]<INF;n++){for(const[dx,dy]of DIRS){const a=x+dx,c=y+dy;if(a>=0&&c>=0&&a<C&&c<R&&b.d[c][a]==b.d[y][x]-1){x=a;y=c;break}}out.push([x,y])}return out}
+
+/* --- labyrinthe de l'IA (2.5) : chaque terrain IA reçoit un plan cible au début de la partie ---
+   grille plate (case i = y*C+x, 1 = mur), parcours en largeur rapide, hasard propre (graine tirée une fois) pour que le découpage dans le temps ne change rien. */
+const N=C*R,SPI=SP[1]*C+SP[0],EXI=EX[1]*C+EX[0],NB=new Int16Array(N*5),QB=new Int16Array(N),DB=new Int16Array(N);
+for(let i=0;i<N;i++){const x=i%C,y=i/C|0;let k=0;for(const[dx,dy]of DIRS){const a=x+dx,b=y+dy;if(a>=0&&b>=0&&a<C&&b<R)NB[i*5+1+k++]=b*C+a}NB[i*5]=k}
+/* longueur du plus court chemin apparition → sortie, -1 si bloqué (DB garde les distances à la sortie) */
+function plen(w){DB.fill(-1);DB[EXI]=0;QB[0]=EXI;let h=0,t=1;while(h<t){const i=QB[h++],d=DB[i]+1,o=i*5;for(let k=1;k<=NB[o];k++){const j=NB[o+k];if(!w[j]&&DB[j]<0){DB[j]=d;if(j==SPI)return d;QB[t++]=j}}}return -1}
+function mzPath(w){if(plen(w)<0)return[];const out=[SPI];let i=SPI;for(let d=DB[SPI];d>0;d--){const o=i*5;for(let k=1;k<=NB[o];k++){const j=NB[o+k];if(!w[j]&&DB[j]==d-1){i=j;break}}out.push(i)}return out}
+const rnd32=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const MZ_LAM=.3,MZ_NC=4,MZ_K=[2000,2500,3200],MZ_PICK=[[.5,.3,.2],[.6,.4],[1]];
+/* forme de départ tirée au hasard : serpentin horizontal (couloirs de 1 ou 2), serpentin vertical, ou semis aléatoire */
+function mzTemplate(r){const w=new Uint8Array(N),f=r()<.35?0:r()<.25?1:2;
+ if(f==0){const p=r()<.7?2:3;let side=r()<.5;for(let y=2+(r()*2|0);y<R-1;y+=p){const gw=1+(p==3&&r()<.5);for(let x=0;x<C;x++)if(side?x<C-gw:x>=gw)w[y*C+x]=1;side=!side}}
+ else if(f==1){let top=r()<.5;for(let x=r()<.5?1:0;x<C;x+=2){for(let y=1;y<R-1;y++)if(top?y>1:y<R-2)w[y*C+x]=1;top=!top}}
+ else for(let i=0;i<N;i++)w[i]=r()<.35?1:0;
+ w[SPI]=w[EXI]=0;while(plen(w)<0)w[r()*N|0]=0;
+ let n=0;for(let i=0;i<N;i++)n+=w[i];const L=plen(w);return {w,f,n,L,s:L-MZ_LAM*n,best:w.slice(),bs:L-MZ_LAM*n,it:0}}
+/* recherche locale (recuit léger) : on ajoute ou retire une case ou un petit segment, on garde si le chemin s'allonge sans trop de tours */
+function mzClimb(c,r,K,steps){for(let e=0;e<steps&&c.it<K;e++,c.it++){const w=c.w,T=2*(1-c.it/K)+.05,i=r()*N|0;if(i==SPI||i==EXI)continue;
+ const seg=[i];if(r()<.3){const[dx,dy]=DIRS[r()*4|0];let x=i%C,y=i/C|0;for(let k=1+(r()*3|0);k>0;k--){x+=dx;y+=dy;if(x<0||y<0||x>=C||y>=R)break;const j=y*C+x;if(j!=SPI&&j!=EXI)seg.push(j)}}
+ const v=w[i]?0:1,ch=seg.filter(j=>w[j]!=v);for(const j of ch)w[j]=v;const L=plen(w),n=c.n+(v?ch.length:-ch.length),s=L-MZ_LAM*n;
+ if(L>=0&&(s>=c.s||r()<Math.exp((s-c.s)/T))){c.L=L;c.n=n;c.s=s;if(s>c.bs){c.bs=s;c.best=w.slice()}}else for(const j of ch)w[j]=1-v}}
+/* fait avancer la génération du plan d'au plus « steps » essais (un essai ≈ un parcours en largeur) ; renvoie le plan quand il est prêt */
+function mzStep(A,steps){let M=A.mz;if(M&&M.ok)return M;
+ if(!M)M=A.mz={r:rnd32(Math.random()*4294967296>>>0),c:[],ok:0};const r=M.r,LV=A.G?A.G.LV|0:0,K=MZ_K[LV];
+ while(steps>0&&!M.left){let c=M.c[M.c.length-1];if(!c||c.it>=K){if(M.c.length>=MZ_NC){mzChoose(M,LV);break}c=mzTemplate(r);M.c.push(c)}const s=Math.min(steps,K-c.it);mzClimb(c,r,K,s);steps-=s}
+ while(steps>0&&M.left&&M.left.length)steps-=mzRemove(M);
+ if(!M.left||M.left.length)return null;
+ mzRoles(A,M);M.ok=1;return M}
+const MZX=new Int8Array(N),MZY=new Int8Array(N);for(let i=0;i<N;i++){MZX[i]=i%C;MZY[i]=i/C|0}
+const near=(i,j,d)=>{const dx=MZX[i]-MZX[j],dy=MZY[i]-MZY[j];return dx*dx+dy*dy<=d*d};
+/* choix du plan parmi les candidats (le meilleur en Brutal, un des 2 ou 3 meilleurs sinon) */
+function mzChoose(M,LV){const r=M.r;M.c.sort((a,b)=>b.bs-a.bs);const P=MZ_PICK[LV];let q=r(),ch=0;for(;ch<P.length-1;ch++){q-=P[ch];if(q<=0)break}
+ const w=M.c[ch].best;M.f=M.c[ch].f;M.c=null;M.w=w.slice();M.cur=w.slice();M.left=[];for(let i=0;i<N;i++)if(w[i])M.left.push(i);M.walls=M.left.slice();M.rev=[]}
+/* ordre de construction : on retire une à une, depuis le plan complet, la tour qui raccourcit le moins le chemin (puis la moins utile au chemin actuel et au couloir aérien) ;
+   construire dans l'ordre inverse allonge le chemin presque à chaque tour et, au début, place les tours près du chemin droit et des volants */
+function mzRemove(M){const cur=M.cur,left=M.left,r=M.r,L0=plen(cur),Pc=mzPath(cur);let bi=0,bk=INF;
+ const smp=left.length<=24?left.map((_,k)=>k):Array.from({length:24},()=>r()*left.length|0);
+ for(const k of smp){const i=left[k];cur[i]=0;const L=plen(cur);cur[i]=1;let cv=0;for(const j of Pc)if(near(i,j,2.5))cv++;
+  const key=(L0-L)+.05*cv+(Math.abs(MZX[i]-6)<=2?.3:0)+r()*.2;if(key<bk){bk=key;bi=k}}
+ const i=left[bi];left.splice(bi,1);cur[i]=0;M.rev.push(i);return smp.length+2}
+/* rôles (emplacement j de la faction) : Givre répartis le long du chemin final, Mages pour que leur détection couvre tout le chemin, air près du couloir des volants */
+function mzRoles(A,M){const base=A.classId*10,rg=j=>TW[base+j].r,w=M.w,P=mzPath(w),walls=M.walls,role=new Int8Array(N).fill(-1);
+ M.ord=M.rev.reverse();M.L=P.length-1;delete M.cur;delete M.rev;delete M.left;delete M.walls;
+ const cov=(i,d)=>{let n=0;for(const j of P)if(near(i,j,d))n++;return n},gain=(i,d,cv)=>{let v=0;for(let n=0;n<P.length;n++)if(!cv[n]&&near(i,P[n],d))v++;return v},mark=(i,d,cv)=>{for(let n=0;n<P.length;n++)if(near(i,P[n],d))cv[n]=1};
+ const ng=Math.min(6,Math.max(2,Math.round(M.L/15))),cG=new Uint8Array(P.length);
+ for(let k=0;k<ng;k++){const tgt=P[Math.floor(P.length*(k+.5)/ng)];let bi=-1,bv=0;for(const i of walls){if(role[i]>=0||!near(i,tgt,rg(2)))continue;const v=gain(i,rg(2),cG);if(v>bv){bv=v;bi=i}}
+  if(bi>=0){role[bi]=2;mark(bi,rg(2),cG)}}
+ const cM=new Uint8Array(P.length);for(let k=0;k<6;k++){let bi=-1,bv=2;for(const i of walls){if(role[i]>=0)continue;const v=gain(i,rg(5),cM);if(v>bv){bv=v;bi=i}}
+  if(bi<0)break;role[bi]=5;mark(bi,rg(5),cM)}
+ /* hors couloir aérien : Canon dans les virages (beaucoup de chemin autour), Garde entre deux couloirs, sinon Archer ; un peu de hasard pour varier */
+ for(const i of walls)if(role[i]<0){const ax=Math.abs(MZX[i]-6),cc=cov(i,rg(3)),cg=cov(i,Math.max(rg(1),1.45));
+  role[i]=ax<=2?(ax<=1&&cov(i,rg(4))>=7?4:0):cc>=12||(cg>=4&&M.r()<.3)?3:cg>=4?1:cc>=8?3:0}
+ M.role=role}
+/* tour à poser sur la case i du plan selon la situation (-1 : attendre d'avoir l'or) */
+function mzKind(A,i,n,bud,thr,fs){const M=A.mz,base=A.classId*10,x=i%C,cnt=js=>A.t.filter(t=>js.includes(t.k-base)).length;let j=M.role[i];
+ if(j==5&&!thr)j=0;if(j==2&&cnt([2,8])>=1+n*.15)j=0;if((j==1||j==3)&&fs>.35&&Math.abs(x-6)<=3)j=0;
+ if(n<5&&TW[base+j].c>bud)j=0;
+ const e={0:6,1:7,2:8,5:9}[j];if(e!==undefined&&n>=(j==5?16:j==2?12:8)&&(j!=5||A.G.time>360)&&bud>=TW[base+e].c)j=e;
+ return TW[base+j].c<=bud?base+j:-1}
 /* Chaque pièce gagnée est répartie entre deux bourses, défense et attaque, selon la pression subie (pen = jusqu'où les monstres avancent chez elle). */
-function aiDefend(A){const time=A.G.time,bud=Math.min(A.dp,A.gold),g0=A.gold,free=PLAN.filter(([x,y])=>!A.g[y][x]),ups=A.t.filter(t=>t.lv<5&&bud>=upCost(t)),n=A.t.length,cnt=k=>A.t.filter(t=>t.k==k).length;let ok=false;
- if(time>140&&mages(A)<Math.min(5,2+Math.floor(time/300))){const c=A.t.filter(t=>!TW[t.k].mg&&t.lv<=2&&Math.abs(t.x-6)<=3&&bud>=90-Math.floor(t.inv*.7));
-  if(c.length){const t=c[Math.floor(Math.random()*c.length)];const mc=TW[A.classId*10+5].c-Math.floor(t.inv*.7);if(A.gold<mc)return false;A.gold-=mc;t.k=A.classId*10+5;t.lv=1;t.inv=TW[t.k].c;A.dp-=g0-A.gold;return true}}
- /* amélioration : la tour qui couvre le plus de chemin (et de couloir aérien) pour son prix */
- if(ups.length&&(!free.length||(n>=10&&Math.random()<(n>=24?.6:.35)))){const path=pathCells(A),val=t=>{const T=TW[t.k],r=rng(t);let c=0;for(const[x,y]of path)if(Math.hypot(x-t.x,y-t.y)<=r)c++;if(!T.gr)for(let y=0;y<R;y++)if(Math.hypot(6-t.x,y-t.y)<=r)c+=.6;
+function aiDefend(A){const M=mzStep(A,INF),time=A.G.time,bud=Math.min(A.dp,A.gold),g0=A.gold,base=A.classId*10,n=A.t.length,ups=A.t.filter(t=>t.lv<5&&!(t.b>0)&&bud>=upCost(t));let ok=false;
+ const fs=(A.flyIn||0)/((A.hpIn||0)+1),thr=A.specSeen||(time>=150&&A.G.foes(A).some(b=>b.inc>=35));
+ /* transformations : Mages sur leurs cases quand des Spectres deviennent possibles, Givre sur les siens quand le plafond le permet */
+ for(const t of A.t){const i=t.y*C+t.x,j=M.role[i],cur=t.k-base;if(t.lv>2||t.b>0)continue;
+  const want=j==5&&thr&&!TW[t.k].mg?5:j==2&&cur!=2&&cur!=8&&A.t.filter(o=>o.k-base==2||o.k-base==8).length<1+n*.15?2:-1;if(want<0)continue;
+  const k=base+want,mc=TW[k].c-Math.floor(t.inv*.7);if(bud<mc)continue;A.gold-=mc;t.k=k;t.lv=1;t.inv=TW[k].c;t.b=t.bt=buildT(t.inv,A.bm());A.ev.push('build');A.dp-=g0-A.gold;return true}
+ const todo=M.ord.filter(i=>!A.g[i/C|0][i%C]);
+ /* amélioration : la tour qui couvre le plus de chemin (et de couloir aérien, d'autant plus que des volants arrivent) pour son prix */
+ if(ups.length&&(!todo.length||(n>=10&&Math.random()<(n>=24?.6:.35)))){const path=pathCells(A),aw=.6*(1+2*fs),val=t=>{const T=TW[t.k],r=rng(t);let c=0;for(const[x,y]of path)if(Math.hypot(x-t.x,y-t.y)<=r)c++;if(!T.gr)for(let y=0;y<R;y++)if(Math.hypot(6-t.x,y-t.y)<=r)c+=aw;
    return c*T.d/T.cd*(T.sp?2.5:T.fl?3:T.fsp?1.6:T.mg?1.4:1)/T.c};
   ups.sort((a,b)=>val(b)-val(a));ok=A.upgrade(ups[Math.random()<.75?0:Math.floor(Math.random()*ups.length)])}
- else{let tries=0;for(const[x,y]of free){const g=bud,ctr=Math.abs(x-6)<=1;
-  const base=A.classId*10,k=n<3?(ctr?base:base+1):ctr?(g>=40&&cnt(base+2)<1+n/9?base+2:g>=70&&cnt(base+4)<n/7?base+4:g>=90&&cnt(base+5)<1+n/10?base+5:base):(g>=50&&cnt(base+3)<n/6?base+3:g>=30&&Math.random()<.7?base+1:base);
-  if(TW[k].c<=bud&&A.place(x,y,k)){ok=true;break}if(++tries>=3)break}}
+ /* construction : la prochaine case du plan ; si elle est occupée par un monstre, on essaie les suivantes, mais on n'en saute pas une faute d'or */
+ else for(const i of todo.slice(0,4)){const k=mzKind(A,i,n,bud,thr,fs);if(k<0)break;if(A.place(i%C,i/C|0,k)){ok=true;break}}
  A.dp-=g0-A.gold;return ok}
 /* attaque : elle empile plusieurs revenus puis lâche une grosse vague, composée selon les faiblesses des adversaires */
 function aiAttack(A){const time=A.G.time;let bud=Math.min(A.ap,A.gold),sent=false;if(time<GRACE||bud<Math.min(6000,Math.max(60,A.inc*3)))return false;
@@ -191,18 +259,18 @@ class Game{
  eff(b){return b.ai?Math.round(b.inc*DIFF[this.LV].b):b.inc}
  /* un envoi part chez tous les adversaires encore en jeu */
  send(from,k){const T=CR[k];if(from.gold<T.c||this.time<(T.at||0))return false;from.gold-=T.c;from.inc+=T.i;for(const b of this.foes(from))b.send(k,1+this.time/200);return true}
- /* action d'un joueur humain : renvoie '' si accepté, sinon un code d'erreur (poor, blocked, locked, max, over, bad) */
+ /* action d'un joueur humain : renvoie '' si accepté, sinon un code d'erreur (poor, blocked, locked, max, busy, over, bad) */
  action(i,a){const b=this.B[i];if(!b||b.dead||b.ai||this.over||!a)return 'over';
   const x=a.x|0,y=a.y|0,k=a.k|0;
   if(a.type=='place'){const T=TW[k];if(!T)return 'bad';if(b.place(x,y,k))return '';return b.gold<T.c?'poor':'blocked'}
   if(a.type=='sell')return b.sell(x,y)?'':'bad';
-  if(a.type=='upgrade'){const t=b.t.find(t=>t.x==x&&t.y==y);if(!t)return 'bad';return b.upgrade(t)?'':t.lv>=5?'max':'poor'}
+  if(a.type=='upgrade'){const t=b.t.find(t=>t.x==x&&t.y==y);if(!t)return 'bad';return b.upgrade(t)?'':t.lv>=5?'max':t.b>0?'busy':'poor'}
   if(a.type=='send'){const T=CR[k];if(!T||T.cat=='x')return 'bad';if(this.time<(T.at||0))return 'locked';return this.send(b,k)?'':'poor'}
   return 'bad'}
  /* avance la partie de dt secondes (dt ≤ 0,05) ; les événements de partie vont dans this.log */
  step(dt){if(this.over)return;const B=this.B;this.time+=dt;this.tick-=dt;
   if(this.tick<=0){this.tick+=10;for(const b of B)if(!b.dead)b.gold+=this.eff(b);this.log.push({type:'income'})}
-  for(const b of B)if(b.ai&&!b.dead){b.aiT-=dt;if(b.aiT<=0){b.aiT=.6;aiAct(b)}}
+  for(const b of B)if(b.ai&&!b.dead){mzStep(b,600);b.aiT-=dt;if(b.aiT<=0){b.aiT=.6;aiAct(b)}}
   for(const b of B)if(!b.dead)b.update(dt);
   for(const b of B)if(!b.dead&&b.lives<=0){b.dead=1;b.cr=[];b.q=[];b.pr=[];this.log.push({type:'out',i:b.i})}
   /* fin : un seul terrain debout, ou plus aucun humain en jeu */

@@ -1,18 +1,18 @@
 /* Les trois bilans d'une évolution : 🔧 technique, 🎮 gameplay, 🎨 visuel.
-   Usage : node tests/bilan.js [version-avant] [--sans-visuel]     (version-avant par défaut : origin/main)
+   Usage : node tests/bilan.js [version-avant] [--sans-visuel] [--complet]     (version-avant par défaut : origin/main ; --complet : 15 parties entre IA au lieu de 3)
    Produit rapports/bilan.html (lisible sur téléphone) et affiche un résumé.
-   Règle : une réussite technique ne valide JAMAIS le gameplay ni le rendu. Ces deux bilans disent seulement
-   « identique à la référence » ou « changé : à examiner », la validation revient au concepteur. */
+   Règle : une réussite technique ne valide JAMAIS le gameplay ni le rendu. Ces deux bilans comparent à « version-avant »
+   et disent seulement « identique » ou « changé : à examiner », la validation revient au concepteur. */
 'use strict';
 const fs=require('fs'),path=require('path'),{spawnSync,execFileSync}=require('child_process');
-const {charger,sha256,MOTEURS,RACINE}=require('./outils/moteur');
+const {charger,RACINE}=require('./outils/moteur');
+const {SCENARIOS,jouer}=require('./outils/parties');
 const {auditer}=require('./outils/audit-doc');
 const N=require('./outils/navigateur');
 
 const args=process.argv.slice(2),avant=args.find(a=>!a.startsWith('--'))||'origin/main',sansVisuel=args.includes('--sans-visuel');
 const DOSSIER=path.join(RACINE,'rapports');fs.rmSync(DOSSIER,{recursive:true,force:true});fs.mkdirSync(DOSSIER,{recursive:true});
-const EMPREINTE_V17='e0cd2f786b5a3aa616d7446a787436b77d1e30b1bd930e7849a1f1a2a0615f6f';
-const FICHIERS_TECHNIQUES=['integrite.test.js','parcours.test.js'];
+const FICHIERS_TECHNIQUES=['parcours.test.js','assets3d.test.js'];
 const FACTIONS=['Alliance','Horde','Sylvestres','Nains','Légion'],NIVEAUX=['Normal','Difficile','Brutal'];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const git=(...a)=>{try{return execFileSync('git',a,{cwd:RACINE,encoding:'utf8',stdio:['ignore','pipe','ignore']}).trim()}catch(e){return null}};
@@ -21,7 +21,7 @@ async function main(){
  const debut=Date.now();console.log(`Bilan en cours (référence visuelle : ${avant})…\n`);
  /* ---------- exécution des tests ---------- */
  const fRes=path.join(DOSSIER,'resultats.json'),fParties=path.join(DOSSIER,'parties.jsonl');
- const run=spawnSync(process.execPath,[path.join(__dirname,'tout.js'),...(N.disponible()?[]:['--simulation'])],{cwd:RACINE,encoding:'utf8',env:{...process.env,WR_RESULTATS:fRes,WR_PARTIES:fParties}});
+ const run=spawnSync(process.execPath,[path.join(__dirname,'tout.js'),...(N.disponible()?[]:['--simulation']),...(args.includes('--complet')?['--complet']:[])],{cwd:RACINE,encoding:'utf8',env:{...process.env,WR_RESULTATS:fRes,WR_PARTIES:fParties}});
  fs.writeFileSync(path.join(DOSSIER,'tests.log'),(run.stdout||'')+(run.stderr||''));
  const res=fs.existsSync(fRes)?JSON.parse(fs.readFileSync(fRes,'utf8')):[];
  const tech=res.filter(r=>FICHIERS_TECHNIQUES.includes(r.fichier)),jeu=res.filter(r=>!FICHIERS_TECHNIQUES.includes(r.fichier));
@@ -41,23 +41,25 @@ async function main(){
    'Vérification automatique GitHub (« Tests de simulation ») : à lire sur la Pull Request.'],
   echecs:T.ko};
 
- /* ---------- 🎮 gameplay ---------- */
- const S=charger('actuel'),REF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','statistiques-v1.7.json'),'utf8'));
+ /* ---------- 🎮 gameplay : comparaison avec le sim.js de « avant » (par défaut origin/main) ---------- */
+ const S=charger('actuel'),codeApres=fs.readFileSync(path.join(RACINE,'sim.js'),'utf8'),codeAvant=git('show',avant+':sim.js'),memeMoteur=codeAvant===codeApres;
+ const SA=codeAvant?charger({code:codeAvant}):null;
  const clone=o=>JSON.parse(JSON.stringify(o)),diffs=[];
  const cmp=(nom,a,b)=>{for(const k of new Set([...Object.keys(a),...Object.keys(b)]))if(JSON.stringify(a[k])!==JSON.stringify(b[k]))diffs.push({nom,champ:k,avant:b[k],apres:a[k]})};
- S.TW.forEach((t,k)=>{const r=REF.tours[k];if(!r){diffs.push({nom:t.n,champ:'(nouvelle tour)',avant:'—',apres:'ajoutée'});return}const {k:_,niveaux,...f}=r;cmp(t.n,clone(t),f)});
- S.CR.forEach((t,k)=>{const r=REF.monstres[k];if(!r){diffs.push({nom:t.n,champ:'(nouveau monstre)',avant:'—',apres:'ajouté'});return}const {k:_,...f}=r;cmp(t.n,clone(t),f)});
- cmp('Constantes',clone({C:S.C,R:S.R,SP:S.SP,EX:S.EX,HPK:S.HPK,GRACE:S.GRACE,GROUP:S.GROUP,AURA_R:S.AURA_R}),REF.constantes);
+ if(SA){S.TW.forEach((t,k)=>{const r=SA.TW[k];if(!r){diffs.push({nom:t.n,champ:'(nouvelle tour)',avant:'—',apres:'ajoutée'});return}cmp(t.n,clone(t),clone(r))});
+  S.CR.forEach((t,k)=>{const r=SA.CR[k];if(!r){diffs.push({nom:t.n,champ:'(nouveau monstre)',avant:'—',apres:'ajouté'});return}cmp(t.n,clone(t),clone(r))});
+  cmp('Constantes',clone({C:S.C,R:S.R,SP:S.SP,EX:S.EX}),clone({C:SA.C,R:SA.R,SP:SA.SP,EX:SA.EX}));cmp('Difficultés',clone(S.DIFF),clone(SA.DIFF))}
  const parties=fs.existsSync(fParties)?fs.readFileSync(fParties,'utf8').trim().split('\n').filter(Boolean).map(l=>JSON.parse(l)):[];
- const PREF=JSON.parse(fs.readFileSync(path.join(RACINE,'tests','references','parties-v1.7.json'),'utf8')).parties;
- const audit=auditer(S),moteurV17=sha256(MOTEURS.actuel)===EMPREINTE_V17;
- const jeuIdentique=J.ko.length==0&&diffs.length==0&&parties.length==15;
+ /* mêmes parties (mêmes graines) jouées avec le moteur d'avant ; inutile si sim.js n'a pas changé */
+ const PREF=!codeAvant?[]:memeMoteur?parties:SCENARIOS.filter(sc=>parties.some(p=>p.graine==sc.graine)).map(sc=>jouer({code:codeAvant},sc));
+ const audit=auditer(S);
+ const jeuIdentique=J.ko.length==0&&memeMoteur;
  const gameplay={verdict:jeuIdentique?'identique':'change',
-  resume:jeuIdentique?'Identique à la référence 1.7 : aucun changement de gameplay détecté':`Différent de la référence 1.7 : à examiner et à valider par vous`,
-  details:[`Moteur de jeu (sim.js) : ${moteurV17?'identique octet pour octet à la version 1.7 figée':'modifié par rapport à la version 1.7 figée'}.`,
-   `Mécaniques caractérisées (construction, déplacements, combats, économie, vagues, fin de partie, IA, tables) : ${J.ok} conformes, ${J.ko.length} différentes.`,
-   `Statistiques des tours et monstres : ${diffs.length?diffs.length+' valeur(s) changée(s)':'aucune valeur changée'}.`,
-   `Parties de référence entre IA : ${parties.length} jouées, ${parties.filter(p=>{const r=PREF.find(x=>x.graine==p.graine);return r&&r.final==p.final}).length} identiques à la référence.`,
+  resume:jeuIdentique?`Identique à ${avant} : sim.js n'a pas changé`:J.ko.length?`${J.ko.length} mécanique(s) en échec : à examiner`:`Moteur modifié par rapport à ${avant} : à examiner et à valider par vous`,
+  details:[`Moteur de jeu (sim.js) : ${!codeAvant?`introuvable dans ${avant}`:memeMoteur?`identique à ${avant}`:`modifié par rapport à ${avant}`}.`,
+   `Mécaniques vérifiées (construction, déplacements, combats, économie, vagues, fin de partie, IA, labyrinthe, tables) : ${J.ok} conformes, ${J.ko.length} en échec.`,
+   `Statistiques des tours et monstres : ${diffs.length?diffs.length+' valeur(s) changée(s)':'aucune valeur changée'} par rapport à ${avant}.`,
+   `Parties entre IA : ${parties.length} jouées, ${parties.filter(p=>{const r=PREF.find(x=>x.graine==p.graine);return r&&r.final==p.final}).length} identiques à celles de ${avant}.`,
    `Documentation (CLAUDE.md) comparée au code : ${audit.verifie.tours} tours, ${audit.verifie.monstres} monstres, ${audit.verifie.archetypes} archétypes, ${audit.verifie.difficultes} difficultés — ${audit.ecarts.length?audit.ecarts.length+' écart(s), non corrigé(s)':'aucun écart'}.`],
   echecs:J.ko,diffs,parties,PREF,audit};
 
@@ -111,11 +113,11 @@ td,th{border-bottom:1px solid var(--line);padding:4px 6px;text-align:left;white-
  h+=boite('🔧 Technique — tests et erreurs',technique,coul[technique.verdict]);
  if(technique.echecs.length)h+=`<h3>Échecs</h3><ul>${technique.echecs.map(e=>`<li>${esc(e.nom)} → ${esc(e.message)}</li>`).join('')}</ul>`;h+='</section>';
  h+=boite('🎮 Gameplay — mécaniques, statistiques, équilibrage',gameplay,coul[gameplay.verdict]);
- if(gameplay.echecs.length)h+=`<h3>Mécaniques différentes de la référence</h3><ul>${gameplay.echecs.map(e=>`<li>${esc(e.nom)} → ${esc(e.message)}</li>`).join('')}</ul>`;
- if(gameplay.diffs.length)h+=`<h3>Valeurs changées</h3><table><tr><th>Élément</th><th>Valeur</th><th>Référence 1.7</th><th>Maintenant</th></tr>${gameplay.diffs.map(d=>`<tr><td>${esc(d.nom)}</td><td>${esc(d.champ)}</td><td>${esc(JSON.stringify(d.avant))}</td><td>${esc(JSON.stringify(d.apres))}</td></tr>`).join('')}</table>`;
+ if(gameplay.echecs.length)h+=`<h3>Mécaniques en échec</h3><ul>${gameplay.echecs.map(e=>`<li>${esc(e.nom)} → ${esc(e.message)}</li>`).join('')}</ul>`;
+ if(gameplay.diffs.length)h+=`<h3>Valeurs changées</h3><table><tr><th>Élément</th><th>Valeur</th><th>Avant</th><th>Maintenant</th></tr>${gameplay.diffs.map(d=>`<tr><td>${esc(d.nom)}</td><td>${esc(d.champ)}</td><td>${esc(JSON.stringify(d.avant))}</td><td>${esc(JSON.stringify(d.apres))}</td></tr>`).join('')}</table>`;
  if(gameplay.parties.length){const m=l=>l.reduce((s,p)=>s+p.duree,0)/l.length/60;
-  h+=`<h3>Parties entre IA (le siège « joueur » est joué par l'IA)</h3><p class="note">Durée moyenne : ${m(gameplay.parties).toFixed(1)} min (référence : ${m(gameplay.PREF).toFixed(1)} min). « Joueur éliminé » = la partie s'arrête quand le siège joueur tombe, comme en solo.</p><table><tr><th>Faction joueur</th><th>Difficulté</th><th>Durée</th><th>Issue</th><th>Revenus finaux</th><th>Réf.</th></tr>`;
-  for(const p of gameplay.parties){const r=gameplay.PREF.find(x=>x.graine==p.graine)||{};h+=`<tr><td>${FACTIONS[p.faction]}</td><td>${NIVEAUX[p.difficulte]}</td><td>${(p.duree/60).toFixed(1)} min</td><td>${p.gagnant==0?'Joueur gagne':'Joueur éliminé'}</td><td>${p.revenus.join(' / ')}</td><td>${r.final==p.final?'= identique':'≠ différente'}</td></tr>`}h+='</table>'}
+  h+=`<h3>Parties entre IA (le siège « joueur » est joué par l'IA)</h3><p class="note">Durée moyenne : ${m(gameplay.parties).toFixed(1)} min (avant : ${gameplay.PREF.length?m(gameplay.PREF).toFixed(1):'?'} min). « Joueur éliminé » = la partie s'arrête quand le siège joueur tombe, comme en solo.</p><table><tr><th>Faction joueur</th><th>Difficulté</th><th>Durée</th><th>Issue</th><th>Revenus finaux</th><th>Avant</th></tr>`;
+  for(const p of gameplay.parties){const r=gameplay.PREF.find(x=>x.graine==p.graine)||{};h+=`<tr><td>${FACTIONS[p.faction]}</td><td>${NIVEAUX[p.difficulte]}</td><td>${(p.duree/60).toFixed(1)} min</td><td>${p.gagnant==0?'Joueur gagne':'Joueur éliminé'}</td><td>${p.revenus.join(' / ')}</td><td>${r.final==p.final?'= identique':r.duree?'≠ '+(r.duree/60).toFixed(1)+' min, '+(r.gagnant==0?'joueur gagne':'joueur éliminé'):'—'}</td></tr>`}h+='</table>'}
  h+=`<h3>Écarts entre CLAUDE.md et le code</h3>${gameplay.audit.ecarts.length?`<table><tr><th>Où</th><th>Quoi</th><th>Doc</th><th>Code</th></tr>${gameplay.audit.ecarts.map(e=>`<tr><td>${esc(e.ou)}</td><td>${esc(e.quoi)}</td><td>${esc(e.doc)}</td><td>${esc(e.code)}</td></tr>`).join('')}</table><p class="note">Signalés seulement, jamais corrigés automatiquement.</p>`:'<p>Aucun écart sur les tableaux chiffrés.</p>'}</section>`;
  h+=boite('🎨 Visuel — captures et comparaison',visuel,coul[visuel.verdict]);
  for(const e of v){const src=imgs[e.image||e.apres];h+=`<h3>${e.identique?'✅':'⚠️'} ${esc(e.titre)} — ${e.format} — ${e.pc==null?'pas d\'image avant':e.pc.toFixed(2)+' % de pixels changés'}</h3>${src?`<img alt="${esc(e.titre)}" src="${src}">`:''}`}

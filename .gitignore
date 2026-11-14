@@ -4,8 +4,8 @@ node_modules/
 # sorties des tests (rÃ©gÃ©nÃ©rÃ©es Ã  chaque lancement)
 captures/
 rapports/
-
-# cache Python des scripts Blender
+# fichiers de travail Blender (les scripts art/ sont la source, pas les .blend)
+*.blend
+*.blend1
 __pycache__/
-# GLB bruts exportés par Blender (régénérés par art/exporter.py)
-art/_brut/
+apercus/
