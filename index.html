@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.3</title>
+<title>Winter Realms — Tower Wars · Édition 2.4</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+<!-- 2.4 : three.js (copie figée dans vendor/three), chargé seulement en mode ?rendu=3d -->
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
 <style>
 :root{--bg:#16221a;--panel:#27382b;--panel2:#33483a;--ink:#f6ecd0;--dim:#b9c4ab;--gold:#f2c14e;--red:#e4572e;color-scheme:dark}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -127,6 +129,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 #ldiff button{font-size:14px!important;padding:6px 10px!important;background:var(--panel2)!important;color:var(--ink)!important}
 #ldiff button.on{background:var(--gold)!important;color:#3a2a05!important}
 #ov button.ghost{background:transparent;color:var(--dim);font-size:14px;text-decoration:underline}
+#vue3d{margin:6px 0 0;font-size:14px}#vue3d a{color:var(--gold)}
 body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:none!important}
 </style></head><body>
 <div id="app">
@@ -152,7 +155,7 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
  <button type="button" data-faction="2" aria-pressed="false" onclick="window.chooseFaction(2)"><span class="ficon">🌿</span><span><strong>Peuples sylvestres</strong><small>Contrôle · racines et ralentissements</small></span></button>
  <button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">⚒️</span><span><strong>Clans nains</strong><small>Artillerie · perforation des armures</small></span></button>
  <button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">☠️</span><span><strong>Légion des ombres</strong><small>Malédictions · amplification des dégâts</small></span></button>
- </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><p id="difficultyLabel" hidden>Choisis la difficulté</p><div id="lv"><button id="go0" disabled>Normal</button><button id="go1" disabled>Difficile</button><button id="go2" disabled>Brutal</button></div>
+ </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><p id="difficultyLabel" hidden>Choisis la difficulté</p><div id="lv"><button id="go0" disabled>Normal</button><button id="go1" disabled>Difficile</button><button id="go2" disabled>Brutal</button></div><p id="vue3d"><a id="mode3d" href="?rendu=3d">Essayer la vue 3D (prototype)</a></p>
  <div id="online"><h2>Jouer entre amis</h2><input id="pname" maxlength="16" placeholder="Ton pseudo" autocomplete="nickname">
   <div class="orow"><button id="mkRoom" type="button">Créer un salon</button><input id="rcode" maxlength="4" placeholder="CODE" autocapitalize="characters"><button id="joinRoom" type="button">Rejoindre</button></div></div>
  <div id="lobby" hidden><h2>Salon <b id="lcode"></b></h2><p id="lhelp">Partage ce lien à tes amis :</p><div class="orow"><input id="llink" readonly><button id="lcopy" type="button">Copier</button></div>
@@ -462,7 +465,7 @@ function draw(b,g,s,t){
  for(const f of b.fx)drawFx(g,f,s);
  if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,C*s,R*s);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',C*s/2,R*s/2)}}
 /* sur la vignette du terrain affiché, un cadre montre la partie visible quand on a zoomé */
-function cadreMini(g){const s=cell*VUE.z,m=MINI;g.strokeStyle='#fff';g.lineWidth=1;g.strokeRect(Math.max(0,-VUE.ox/s*m)+.5,Math.max(0,-VUE.oy/s*m)+.5,Math.min(C,VUE.w/s)*m-1,Math.min(R,VUE.h/s)*m-1)}
+function cadreMini(g){const s=cell*VUE.z,m=MINI,sy=s*R3D.KY;g.strokeStyle='#fff';g.lineWidth=1;g.strokeRect(Math.max(0,-VUE.ox/s*m)+.5,Math.max(0,-VUE.oy/sy*m)+.5,Math.min(C,VUE.w/s)*m-1,Math.min(R,VUE.h/sy)*m-1)}
 function drawMini(b,g,m){g.fillStyle=b.dead?'#333':'#426c3e';g.fillRect(0,0,C*m,R*m);
  for(const t of b.t){g.fillStyle=TW[t.k].col;g.fillRect(t.x*m+.5,t.y*m+.5,m-1,m-1)}
  for(const c of b.cr){g.fillStyle=CR[c.k].fly?'#fff':'#ffd23f';g.fillRect((c.x+.5)*m-1,(c.y+.5)*m-1,2,2)}}
@@ -550,18 +553,39 @@ function setup(cv,w,h){const r=dpr();cv.width=Math.round(w*r);cv.height=Math.rou
 /* ---------- vue du terrain : zoom (1× à 3×) et déplacement ----------
    Le canevas couvre toute la zone de jeu ; le plateau y est dessiné avec un décalage (VUE.ox, VUE.oy) et une taille de case cell × VUE.z. */
 const VUE={z:1,ox:0,oy:0,w:0,h:0},ZMAX=3;let cadre='#27382b';
-function fit(){const r=stage.getBoundingClientRect();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);cell=Math.max(16,Math.floor(Math.min((r.width-6)/C,(r.height-6)/R)));mx=setup(main,VUE.w,VUE.h);borner()}
+/* 2.4 : rendu 3D (prototype), activé par ?rendu=3d. Le module rendu3d.js est chargé à la demande.
+   En 3D, la caméra est orthographique et inclinée : à l'écran, les rangées du terrain sont tassées d'un facteur KY,
+   et TOPM cases sont gardées libres au-dessus du plateau pour les tours hautes. En 2D, KY = 1 et TOPM = 0 (rien ne change). */
+const R3D={on:QS.get('rendu')=='3d',api:null,KY:1,TOPM:0,echec:false};
+function fit(){const r=stage.getBoundingClientRect();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);cell=Math.max(16,Math.floor(Math.min((r.width-6)/C,(r.height-6)/(R*R3D.KY+R3D.TOPM))));mx=setup(main,VUE.w,VUE.h);if(R3D.api)R3D.api.taille(VUE.w,VUE.h,dpr());borner()}
 /* garde le plateau dans la zone visible : centré s'il est plus petit, sinon jamais plus de 8 px de vide au bord */
-function borner(){const s=cell*VUE.z,W=C*s,H=R*s,m=8;
- VUE.ox=W<=VUE.w?(VUE.w-W)/2:Math.min(m,Math.max(VUE.w-W-m,VUE.ox));VUE.oy=H<=VUE.h?(VUE.h-H)/2:Math.min(m,Math.max(VUE.h-H-m,VUE.oy));
+function borner(){const s=cell*VUE.z,W=C*s,H=(R*R3D.KY+R3D.TOPM)*s,m=8,hm=R3D.TOPM*s;
+ VUE.ox=W<=VUE.w?(VUE.w-W)/2:Math.min(m,Math.max(VUE.w-W-m,VUE.ox));VUE.oy=hm+(H<=VUE.h?(VUE.h-H)/2:Math.min(m,Math.max(VUE.h-H-m,VUE.oy-hm)));
  const zr=$('zoomReset');if(zr)zr.hidden=VUE.z<1.02}
 /* zoome autour d'un point de l'écran (px, py en pixels de la page) en gardant sous ce point la même case */
-function zoomer(nz,px,py){const r=main.getBoundingClientRect(),x=px-r.left,y=py-r.top,bx=(x-VUE.ox)/(cell*VUE.z),by=(y-VUE.oy)/(cell*VUE.z);
- VUE.z=Math.min(ZMAX,Math.max(1,nz));VUE.ox=x-bx*cell*VUE.z;VUE.oy=y-by*cell*VUE.z;borner()}
+function zoomer(nz,px,py){const r=main.getBoundingClientRect(),x=px-r.left,y=py-r.top,bx=(x-VUE.ox)/(cell*VUE.z),by=(y-VUE.oy)/(cell*VUE.z*R3D.KY);
+ VUE.z=Math.min(ZMAX,Math.max(1,nz));VUE.ox=x-bx*cell*VUE.z;VUE.oy=y-by*cell*VUE.z*R3D.KY;borner()}
 function vueEnsemble(){VUE.z=1;borner()}
 /* centre d'une case du terrain, en coordonnées de la page (utilisé aussi par les tests) */
-function caseVersEcran(x,y){const r=main.getBoundingClientRect(),s=cell*VUE.z;return {x:r.left+VUE.ox+(x+.5)*s,y:r.top+VUE.oy+(y+.5)*s}}
-function dessinerVue(t){const g=mx,s=cell*VUE.z,W=C*s,H=R*s,rr=Math.min(10*VUE.z,30);g.clearRect(0,0,VUE.w,VUE.h);g.save();g.translate(VUE.ox,VUE.oy);
+function caseVersEcran(x,y){const r=main.getBoundingClientRect(),s=cell*VUE.z;return {x:r.left+VUE.ox+(x+.5)*s,y:r.top+VUE.oy+(y+.5)*s*R3D.KY}}
+/* case du terrain sous un point de la page */
+function caseSous(cx,cy){const r=main.getBoundingClientRect(),s=cell*VUE.z;return {x:Math.floor((cx-r.left-VUE.ox)/s),y:Math.floor((cy-r.top-VUE.oy)/(s*R3D.KY))}}
+function charger3D(){if(!R3D.on)return;
+ import('./rendu3d.js').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R});stage.insertBefore(R3D.api.canvas,main);
+  R3D.KY=R3D.api.KY;R3D.TOPM=R3D.api.TOPM;fit();vueEnsemble();
+  R3D.pret=R3D.api.precharger([...new Set(B.map(b=>b.classId))]).then(()=>{R3D.charge=true})})
+ .catch(e=>{console.warn(e);R3D.on=false;R3D.echec=true;toast('3D indisponible sur cet appareil : retour à la 2D')})}
+/* état du rendu 3D, lu par les tests */
+window.R3D_ETAT=()=>({on:R3D.on,charge:!!R3D.charge,echec:R3D.echec,KY:R3D.KY,scene:R3D.api?R3D.api.etat():null});
+/* image en 3D, puis surcouche 2D (barres de vie, textes flottants, terrain éliminé) sur le canevas #main */
+function dessinerVue3D(t){const g=mx,b=VB(),s=cell*VUE.z,A=R3D.api,E=(x,z,h)=>A.versEcran(x,z,h,VUE,cell);g.clearRect(0,0,VUE.w,VUE.h);
+ A.dessiner(b,t,VUE,cell,{pick:b===P&&b.t.includes(pick)?pick:null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
+ for(const c of b.cr){const hp=c.hp/c.max;if(hp>=1)continue;const p=E(c.x+.5+(c.ox||0),c.y+.5+(c.oy||0),A.hauteurMonstre(c.k)),w=s*.6;
+  g.fillStyle='rgba(0,0,0,.6)';g.fillRect(p.x-w/2,p.y-s*.12,w,s*.09);g.fillStyle=c.sl>0?'#5dc8ff':hp>.4?'#7cdc6a':'#ff6b4a';g.fillRect(p.x-w/2,p.y-s*.12,w*Math.max(0,hp),s*.09)}
+ for(const f of b.fx)if(f.type=='text'){const p=1-f.t/f.d,q=E(f.x,f.y+.4,.9+p*.6);g.save();g.globalAlpha=Math.max(0,1-p);
+  g.font='700 '+Math.round(s*.36)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='rgba(0,0,0,.6)';g.strokeText(f.txt,q.x,q.y);g.fillStyle=f.col;g.fillText(f.txt,q.x,q.y);g.restore()}
+ if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,VUE.w,VUE.h);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';const q=E(C/2,R/2,0);g.fillText('Éliminé',q.x,q.y)}}
+function dessinerVue(t){if(R3D.api){dessinerVue3D(t);return}const g=mx,s=cell*VUE.z,W=C*s,H=R*s,rr=Math.min(10*VUE.z,30);g.clearRect(0,0,VUE.w,VUE.h);g.save();g.translate(VUE.ox,VUE.oy);
  g.save();g.shadowColor='rgba(0,0,0,.56)';g.shadowBlur=32;g.shadowOffsetY=14;g.fillStyle=cadre;g.beginPath();g.roundRect(-3,-3,W+6,H+6,rr+3);g.fill();g.restore();
  g.beginPath();g.roundRect(0,0,W,H,rr);g.fillStyle='#18251c';g.fill();g.clip();draw(VB(),g,s,t);g.restore()}
 function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true},1900)}
@@ -703,7 +727,7 @@ function annulerProjet(){projet=null}
 function confirmerConstruction(x,y){const k=projet.k;projet=null;
  if(NET.on){if(P.gold<TW[k].c){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr('poor');return}NET.act({type:'place',x,y,k},true);return}
  const e2=G.action(me,{type:'place',x,y,k});if(e2){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(e2)}}
-function act(e){if(over)return;const r=main.getBoundingClientRect(),s=cell*VUE.z,x=Math.floor((e.clientX-r.left-VUE.ox)/s),y=Math.floor((e.clientY-r.top-VUE.oy)/s);
+function act(e){if(over)return;const {x,y}=caseSous(e.clientX,e.clientY);
  if(x<0||y<0||x>=C||y>=R)return;
  const tw=P.t.find(t=>t.x==x&&t.y==y);
  if(tw){projet=null;if(tab!='t')setTab('t');pick=tw;render();sfx('tap');return}
@@ -720,7 +744,7 @@ function act(e){if(over)return;const r=main.getBoundingClientRect(),s=cell*VUE.z
    - souris : même chose avec des clics, molette pour zoomer. */
 const DOIGTS=new Map();let geste=null,attente=null,gesteFini=false;
 const dist2=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y)||1,milieu=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
-const caseDe=e=>{const r=main.getBoundingClientRect(),s=cell*VUE.z;return Math.floor((e.clientX-r.left-VUE.ox)/s)+','+Math.floor((e.clientY-r.top-VUE.oy)/s)};
+const caseDe=e=>{const c=caseSous(e.clientX,e.clientY);return c.x+','+c.y};
 main.addEventListener('pointerdown',e=>{try{main.setPointerCapture(e.pointerId)}catch(_){}
  DOIGTS.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(DOIGTS.size==2){attente=null;const [a,b]=[...DOIGTS.values()];geste={d:dist2(a,b),m:milieu(a,b),z:VUE.z,ox:VUE.ox,oy:VUE.oy};return}
@@ -729,8 +753,8 @@ main.addEventListener('pointerdown',e=>{try{main.setPointerCapture(e.pointerId)}
  else attente={clientX:e.clientX,clientY:e.clientY,id:e.pointerId}});
 main.addEventListener('pointermove',e=>{if(DOIGTS.has(e.pointerId))DOIGTS.set(e.pointerId,{x:e.clientX,y:e.clientY});
  if(geste){if(DOIGTS.size<2)return;const [a,b]=[...DOIGTS.values()],m=milieu(a,b),r=main.getBoundingClientRect(),s0=cell*geste.z;
-  const bx=(geste.m.x-r.left-geste.ox)/s0,by=(geste.m.y-r.top-geste.oy)/s0;
-  VUE.z=Math.min(ZMAX,Math.max(1,geste.z*dist2(a,b)/geste.d));VUE.ox=m.x-r.left-bx*cell*VUE.z;VUE.oy=m.y-r.top-by*cell*VUE.z;borner();return}
+  const bx=(geste.m.x-r.left-geste.ox)/s0,by=(geste.m.y-r.top-geste.oy)/(s0*R3D.KY);
+  VUE.z=Math.min(ZMAX,Math.max(1,geste.z*dist2(a,b)/geste.d));VUE.ox=m.x-r.left-bx*cell*VUE.z;VUE.oy=m.y-r.top-by*cell*VUE.z*R3D.KY;borner();return}
  if(attente&&e.pointerId==attente.id&&caseDe(e)!=caseDe(attente))attente=null});
 for(const n of['pointerup','pointercancel'])main.addEventListener(n,e=>{const tap=attente&&e.pointerId==attente.id&&n=='pointerup'&&!geste;
  if(tap){if(view!=me)toast('Tu regardes le terrain de '+B[view].name);else act(attente)}
@@ -780,6 +804,9 @@ function loop(now){const dt=Math.min(.05,Math.max(0,(now-last)/1000));last=now;
 
 fit();if(typeof ResizeObserver!='undefined')new ResizeObserver(fit).observe(stage);else addEventListener('resize',fit);
 G=new Game(soloSeats(chosenClass),0);G.over=true;LV=0;useBoards(G.B,0);started=true;over=true;requestAnimationFrame(loop);
+/* 2.4 : lien vers l'autre rendu (2D ↔ 3D) sur l'écran d'accueil, puis chargement du rendu 3D si demandé */
+{const a=$('mode3d');if(a){const q=new URLSearchParams(location.search);if(R3D.on)q.delete('rendu');else q.set('rendu','3d');a.href=location.pathname+(q.toString()?'?'+q:'');a.textContent=R3D.on?'Revenir à la vue 2D':'Essayer la vue 3D (prototype)'}}
+charger3D();
 /* lien d'invitation ?salon=CODE : on rejoint directement si le pseudo est déjà connu */
 if(QS.get('salon')){$('rcode').value=QS.get('salon').toUpperCase().slice(0,4);if(store.get('wr-name'))NET.join($('rcode').value);else{$('pname').focus();$('sub').textContent='Tu es invité·e dans le salon '+$('rcode').value+' : choisis un pseudo puis touche « Rejoindre ».'}}
 </script></body></html>

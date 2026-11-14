@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.3)
+# Winter Realms — Tower Wars (Édition 2.4)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -76,7 +76,8 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
   - `art/` : les scripts Blender qui fabriquent les modèles 3D, et `assets/3d/` : les modèles exportés (GLB optimisés), voir §15 ;
   - `.github/` : la vérification automatique des Pull Requests (`tests.yml`), le déploiement automatique du serveur (`deploy-server.yml`, voir §9 bis), l'étiquetage automatique des versions (`versions.yml` et `versionner.sh`, voir §14) et le modèle de description de PR.
 - **Pour jouer en local**, il faut un petit serveur web : `npx http-server` à la racine, puis ouvrir http://localhost:8080. Un `file://` ne charge pas toujours `sim.js`, surtout dans les aperçus intégrés. **Pour tester**, voir §12 : `node tests/tout.js`.
-- **Seule ressource externe** : la police Google Fonts *Fredoka*.
+- **Seule ressource externe** : la police Google Fonts *Fredoka*. three.js est **copié dans le dépôt** (`vendor/three/`, r170, licence MIT) et n'est chargé qu'en mode 3D.
+- **Rendu 3D (prototype, depuis la 2.4)** : avec `?rendu=3d` dans l'adresse (ou le lien « Essayer la vue 3D » de l'accueil), le module `rendu3d.js` dessine le terrain avec three.js et les modèles de `assets/3d/`. Le rendu 2D reste celui par défaut. Voir §15.3.
 - **Rendu** : Canvas 2D. Tous les visuels (tours, monstres, effets) sont **dessinés en code**, sans images. La netteté s'adapte à l'écran (`devicePixelRatio`, plafonné à 3).
 - **Vue du terrain** (depuis la 2.1) : le canevas `#main` couvre toute la zone de jeu. Le plateau y est dessiné par `dessinerVue()` avec un zoom et un décalage (`VUE.z`, `VUE.ox`, `VUE.oy`), et son cadre est dessiné dans le canevas. `caseVersEcran(x, y)` donne la position d'une case à l'écran (elle sert aussi aux tests).
 - **Sons** : synthétisés avec Web Audio (oscillateurs et bruit), **aucun fichier audio**.
@@ -370,6 +371,7 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
   - à la souris : deux clics sur la même case.
 - **Zoom et déplacement** (depuis la 2.1) : **deux doigts** pour zoomer (de 1× à 3×) et pour faire glisser la carte ; **molette** à la souris. Le bouton « Vue d'ensemble » apparaît quand on a zoomé et ramène au zoom normal. Sur la vignette du terrain affiché, un cadre blanc montre la partie visible. Une astuce l'annonce au lancement d'une partie solo.
 - **Toucher une tour** : ouvre sa fiche (voir plus haut), avec les boutons Améliorer, Vendre et Fermer.
+- **Vue 3D** (prototype, depuis la 2.4) : lien « Essayer la vue 3D (prototype) » sous les boutons de difficulté de l'accueil (il ajoute `?rendu=3d`) ; « Revenir à la vue 2D » pour l'inverse. Mêmes commandes qu'en 2D (§15.3). En 3D, il faut toucher le **pied** d'une tour (sa case au sol) pour l'ouvrir.
 - **Paysage** (depuis la 2.1) : la colonne de droite défile si elle est trop haute ; avant, le haut de l'écran et le bas du terrain étaient coupés sur téléphone.
 - **Retours visuels** : case rouge si la pose est refusée, textes flottants (+or, −1 vie, niveau), et un message en bas de l'écran (« Pas assez d'or », « le chemin serait bloqué », etc.).
 
@@ -467,6 +469,7 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 | `node tests/tout.js --rapide` | Simulation avec 5 parties au lieu de 15, pour les petites retouches | ≈ 20 s |
 | `node tests/bilan.js [version]` | Les **trois bilans** dans `rapports/bilan.html`, avec la comparaison visuelle par rapport à `version` (par défaut `origin/main`) | ≈ 3 min |
 | `node tests/captures.js` | 10 captures (5 écrans × portrait et paysage) dans `captures/actuel/` | ≈ 1 min |
+| `node tests/captures.js --3d` | Les mêmes captures avec le rendu 3D, dans `captures/3d/` | ≈ 10 min (WebGL logiciel) |
 | `node tests/comparer-visuel.js [version]` | Avant/après visuel seul, dans `captures/comparaison/` | ≈ 2 min 30 |
 | `node tests/outils/audit-doc.js` | Compare les tableaux chiffrés de ce document au code et liste les écarts, sans rien corriger | 1 s |
 
@@ -478,6 +481,8 @@ Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en
   - `tables` : les 50 tours, les 18 monstres, les archétypes, les factions et la difficulté, comparés à la référence et recalculés à partir des formules.
   - `construction`, `deplacements`, `combats`, `economie`, `vagues` (avec l'IA), `fin-de-partie` : les mécaniques.
   - `parties-ia` : 15 parties complètes (5 factions × 3 difficultés) rejouées à l'identique et comparées, état par état, à la référence.
+- `navigateur/parcours-3d.test.js` (2.4) : le même parcours avec `?rendu=3d` (portrait et paysage) : chargement de WebGL et des modèles, plateau dessiné, construction en deux touchers avec tour fantôme et portée, refus, panneau et amélioration, monstres en 3D chez l'adversaire, zoom et déplacement à deux doigts, pose exacte en mode zoomé, aucune erreur JavaScript. WebGL y tourne en **rendu logiciel SwiftShader** (`lancer({webgl:true})`), sans carte graphique.
+- Variable `WR_CANAL` : utiliser un navigateur déjà installé à la place du Chromium de Playwright (par exemple `WR_CANAL=msedge` sur Windows). `NODE_PATH` peut pointer vers un Playwright installé hors du dépôt.
 - `assets/modeles-3d.test.js` : un modèle 3D par tour et par monstre de `sim.js`, budgets téléphone respectés (≤ 3 000 triangles et ≤ 150 Ko par modèle, ≤ 3 Mo au total), monstres animés, pièce « Tourelle » présente, compression meshopt. Lancé aussi par `--simulation` (GitHub).
 - `navigateur/parcours.test.js` : le **parcours automatisé** d'un joueur dans Chromium au format téléphone (390 × 844 en portrait, 844 × 390 en paysage) : accueil, faction, difficulté, construction en deux touchers (aperçu, confirmation, déplacement de l'aperçu, glisser sans effet) et refus, panneau de tour, envoi, vignettes, fiche d'information, monstres verrouillés, zoom et déplacement à deux doigts (sans pose accidentelle), pose exacte en mode zoomé, « Vue d'ensemble », revenu, mise en page. **Ce n'est pas une garantie de compatibilité avec tous les téléphones** : Safari sur iPhone, les anciens Android et les vrais écrans tactiles ne sont pas testés.
 - `moteurs/v1.7/` : une **copie figée** du moteur, extraite du commit `c868ff9` (empreinte SHA-256 `e0cd2f78…615f6f`, voir `PROVENANCE.md`). Le `sim.js` des versions 2.0 et 2.0.1 lui est identique octet pour octet.
@@ -584,7 +589,7 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 
 ---
 
-## 15. Modèles 3D (prototype de rendu 3D, en cours)
+## 15. Modèles et rendu 3D (prototype)
 
 Décidé avec le concepteur : le jeu passe progressivement en 3D. Pendant la transition, **le rendu 2D reste disponible** ; `sim.js` ne change pas.
 
@@ -603,6 +608,18 @@ Décidé avec le concepteur : le jeu passe progressivement en 3D. Pendant la tra
 - `art/tours/<faction>.py` : les 10 tours de chaque faction (noms de `sim.js`). `art/monstres/<monstre>.py` : un script par monstre. `art/decor/portail_chateau.py` : portail, château (drapeau recoloré à la couleur du joueur) et plateau de référence.
 - Styles de faction : **Alliance** pierre blanche, toits bleus et or ; **Horde** rondins, peaux rouges, défenses d'os ; **Sylvestres** troncs, racines, feuillage, mousse ; **Nains** acier riveté hexagonal, cuivre, dômes et cheminées ; **Légion des ombres** obsidienne, épines, anneaux runiques cyan.
 - **Pièces nommées** utilisées par le jeu : `Tourelle` (pivote vers la cible), `Cristal`, `Eclats`, `Flamme`, `Anneaux`, `Orbe` (animées en code), `Drapeau` (couleur du joueur) ; animations glTF `marche` (au sol) et `vol` (volants).
+
+### 15.3 Rendu 3D dans le jeu (`rendu3d.js`, depuis la 2.4)
+- **Activation** : `?rendu=3d` dans l'adresse, ou le lien « Essayer la vue 3D (prototype) » de l'écran d'accueil (« Revenir à la vue 2D » pour l'inverse). Sans ce paramètre, rien de nouveau n'est chargé et la 2D est inchangée. Si WebGL ou le module manquent, le jeu revient en 2D avec un message.
+- **Chargement** : `index.html` déclare un *importmap* (`three` → `vendor/three/three.module.min.js`, `three/addons/` → `vendor/three/addons/`) et importe `rendu3d.js` à la demande (`charger3D`). Pas d'étape de build. Les modèles des factions en jeu et tous les monstres sont préchargés ; les autres au besoin.
+- **Caméra** : orthographique, inclinée à **42°**. Une case (x, y) est en (x, 0, y) dans le monde ; à l'écran, `sx = ox + x·s` et `sy = oy + (y·KY − h·KH)·s`, avec `KY = sin 42°`, `KH = cos 42°`. C'est la formule de la 2D avec un tassement vertical `R3D.KY` : `fit`, `borner`, `zoomer`, `caseVersEcran`, `caseSous` (case sous le doigt), le pincement et le cadre de la vignette l'utilisent. En 2D, `KY = 1` et `TOPM = 0`, donc rien ne change. `TOPM` = 1,2 case libre au-dessus du plateau pour les tours hautes.
+- **Commandes** : identiques à la 2D (construction en deux touchers, zoom 1× à 3× et déplacement à deux doigts, molette, panneau de tour), car le canevas 2D `#main` reste par-dessus le canevas WebGL `#main3d` et reçoit les gestes.
+- **Ce qui est dessiné en 3D** : plateau-diorama (dalles en damier aux couleurs de la faction, décor déterministe : cailloux, herbes, fleurs), portail (anneaux qui tournent), château (drapeau à la couleur du joueur), chemin en pointillés animés, tours (la `Tourelle` vise la cible, le garde frappe, cristaux, flammes, anneaux et orbes animés, taille et points d'or selon le niveau, étoiles quand elle est étourdie), monstres (animation de marche ou de vol, vitesse selon le monstre et le ralentissement, orientation selon le déplacement, halo au sol ralenti/hâté/soigné, cercles d'aura du Chaman et de la Prêtresse, Spectre translucide quand il est caché), projectiles (flèche, boulet en cloche, éclat de givre, orbe arcanique), effets (explosion, impact, portée, fumée, flammes, coup d'épée, éclair, case refusée), tour fantôme et cercle de portée de l'aperçu.
+- **Surcouche 2D** (sur `#main`) : barres de vie, textes flottants (or, « −1 vie », niveau), terrain éliminé.
+- **Monstres agrandis ×1,4 en jeu** (`ECH_MONSTRES`) pour rester lisibles sur téléphone ; les rapports de taille de `echelles.py` sont gardés.
+- **Lumières** : ciel et sol, soleil chaud avec ombres douces (carte 2048), contre-jour. Netteté plafonnée à ×2.
+- Le multijoueur fonctionne aussi en 3D : le module lit les terrains reconstruits à partir des instantanés, comme `draw()`.
+- **Page d'aperçu** : `apercu-3d.html` montre chaque modèle (tours, monstres, décor) en rotation avec son animation, son nombre de triangles et sa taille ; `?modele=nains_9` ouvre directement un modèle.
 
 ### 15.2 Export et budgets
 - `art/exporter.py` (dans Blender) : construit chaque modèle seul, **cuit la couleur dans les sommets**, donne un matériau unique `Peint` (ou `Lueur_<couleur>` pour les pièces lumineuses), **fusionne les pièces qui bougent ensemble** (≈ 10 pièces par modèle au lieu d'une centaine), puis exporte en GLB dans `art/_brut/` (non versionné).
@@ -632,3 +649,4 @@ Décidé avec le concepteur : le jeu passe progressivement en 3D. Pendant la tra
 | 2026-11-14 | 2.2 | **Construction en deux touchers** : le 1er toucher montre un aperçu (tour fantôme, portée, prix), le 2e sur la même case construit ; une case impossible est signalée dès le 1er toucher ; glisser le doigt ne construit plus rien. Tests navigateur complétés (22 vérifications par orientation). **Règles du jeu inchangées** (`sim.js` non modifié). |
 | 2026-11-14 | 2.3 | **Carte plus grande sur téléphone et pastilles de rôle des tours**. Carte : les 4 vignettes des joueurs quittent le HUD et s'ouvrent dans un panneau flottant par-dessus le terrain, depuis un bouton-icône en haut à gauche. Vies du joueur ajoutées dans le HUD (❤). Bannière « ↩ revenir au tien » cliquable. Mini-cartes un peu plus grandes. Tours : pastilles de rôle (flèche, épée, flocon, bombe, flamme, étoile), de cibles (sol ou sol et air) et de magie dans des cadres dorés biseautés dessinés en code ; texte des cartes « ⚔ N dégâts/s » et « ◎ portée N » ; appui long (ou survol) sur une carte pour voir sa fiche sans la sélectionner. Interface uniquement : `sim.js` inchangé. Test du parcours mobile adapté (ouvrir le panneau avant de toucher une vignette). |
 | 2026-11-14 | 2.3 | **Modèles 3D** (préparation du rendu 3D, §15) : scripts Blender versionnés dans `art/`, 50 tours (5 factions × 10), 18 monstres animés, portail et château, exportés en GLB optimisés dans `assets/3d/` (1,94 Mo). Style heroic fantasy cartoon validé par le concepteur. Règle de conception n°2 remplacée (assets 3D générés par scripts, aucun asset externe sans licence claire). Test des budgets 3D. **Jeu inchangé** (`index.html` et `sim.js` non modifiés). |
+| 2026-11-14 | 2.4 | **Rendu 3D jouable (prototype)** avec `?rendu=3d` ou le lien de l'accueil : `rendu3d.js` et three.js r170 copié dans `vendor/three/` (importmap, sans build). Caméra orthographique inclinée à 42°, plateau-diorama, tours et monstres animés, projectiles et effets, chemin, construction en deux touchers avec tour fantôme, zoom et déplacement à deux doigts, panneau de tour (§15.3). La 2D reste le rendu par défaut et est inchangée. Tests : parcours mobile en 3D (WebGL logiciel), captures `--3d`, variable `WR_CANAL`. **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
