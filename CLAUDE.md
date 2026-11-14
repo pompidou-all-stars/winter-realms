@@ -487,31 +487,27 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en plus **Playwright** et Chromium, présents dans l'environnement de Claude mais **pas ajoutés au projet**. Sans eux, ces tests sont ignorés avec un message clair.
 
 ### 12.2 Ce que contient `tests/`
-- `simulation/` : les tests du moteur (`sim.js`). Ils **caractérisent le comportement réel de la version actuelle** : ils décrivent ce que le jeu fait, sans ajouter de règle.
-  - `integrite` : le moteur figé et les références n'ont pas été modifiés.
-  - `tables` : les 50 tours, les 18 monstres, les archétypes, les factions et la difficulté, comparés à la référence et recalculés à partir des formules.
+- `simulation/` : les tests du moteur (`sim.js`). Ils vérifient que le jeu fonctionne (mécaniques, formules, parties qui se terminent). **Il n'y a pas de moteur figé ni de parties enregistrées** (supprimés en 2.4) : un changement d'équilibrage ou d'IA ne fait échouer que les tests qui décrivent précisément la mécanique modifiée, et on met ces tests à jour dans le même commit.
+  - `tables` : forme des tables (50 tours, 18 monstres…), statistiques valides, et chaque tour recalculée à partir des formules. Les chiffres eux-mêmes peuvent changer librement.
   - `construction`, `deplacements`, `combats`, `economie`, `vagues` (avec l'IA), `fin-de-partie` : les mécaniques.
-  - `parties-ia` : 15 parties complètes (5 factions × 3 difficultés) rejouées à l'identique et comparées, état par état, à la référence.
+  - `parties-ia` : 15 parties complètes (5 factions × 3 difficultés) qui doivent se terminer en moins de 30 min de jeu, sans valeur invalide, avec des tours construites et des attaques ; plus une partie rejouée deux fois avec la même graine, qui doit être identique.
 - `navigateur/parcours.test.js` : le **parcours automatisé** d'un joueur dans Chromium au format téléphone (390 × 844 en portrait, 844 × 390 en paysage) : accueil, faction, difficulté, construction en deux touchers (aperçu, confirmation, déplacement de l'aperçu, glisser sans effet) et refus, panneau de tour, envoi, vignettes, fiche d'information, monstres verrouillés, zoom et déplacement à deux doigts (sans pose accidentelle), pose exacte en mode zoomé, « Vue d'ensemble », revenu, mise en page. **Ce n'est pas une garantie de compatibilité avec tous les téléphones** : Safari sur iPhone, les anciens Android et les vrais écrans tactiles ne sont pas testés.
-- `moteurs/v1.7/` : une **copie figée** du moteur, extraite du commit `c868ff9` (empreinte SHA-256 `e0cd2f78…615f6f`, voir `PROVENANCE.md`). Le `sim.js` des versions 2.0 et 2.0.1 lui est identique octet pour octet.
-- `references/` : les valeurs de référence (statistiques, parties), **produites à partir du moteur figé**, jamais à partir de `main`.
 - `outils/` : chargement du moteur dans un environnement isolé, hasard à graine, serveur web local, pilotage du navigateur, affichage en français, audit de la documentation.
 
 ### 12.3 Reproductibilité sans toucher au jeu
-Les tests chargent `sim.js` dans un environnement isolé et y remplacent `Math.random` par un **hasard à graine** (`tests/outils/hasard.js`). Une même graine donne donc toujours la même partie. **Tous les tests utilisent une graine fixe** (1 par défaut, une graine par partie de référence) : un test ne dépend jamais du vrai hasard, donc il réussit ou échoue toujours de la même façon. Dans le navigateur, le même hasard est injecté avant le chargement de la page, et l'horloge est figée. **Le jeu publié n'est pas modifié.**
+Les tests chargent `sim.js` dans un environnement isolé et y remplacent `Math.random` par un **hasard à graine** (`tests/outils/hasard.js`). Une même graine donne donc toujours la même partie. **Tous les tests utilisent une graine fixe** (1 par défaut, une graine par partie entre IA) : un test ne dépend jamais du vrai hasard, donc il réussit ou échoue toujours de la même façon. Dans le navigateur, le même hasard est injecté avant le chargement de la page, et l'horloge est figée. **Le jeu publié n'est pas modifié.**
 
 ### 12.4 Règles
-1. **On ne régénère jamais une référence pour faire passer un test.** `tests/outils/creer-references.js` refuse d'ailleurs d'écraser un fichier existant.
-2. Quand une évolution **change volontairement le gameplay**, les tests concernés échouent : c'est normal. On présente alors le bilan gameplay (avant → après). Une fois l'évolution validée par le concepteur, on ajoute un **nouveau moteur figé** (`tests/moteurs/vX.Y/`) et de **nouvelles références**, sans supprimer les anciennes. Les tests sont mis à jour dans le même commit, et le commit le dit explicitement.
-3. Un désaccord entre le code et ce document est **signalé, pas corrigé d'office** : le concepteur décide.
-4. Ne jamais désactiver ou ignorer un test pour obtenir un résultat vert.
+1. Quand une évolution **change volontairement une mécanique**, on met à jour les tests qui la décrivent dans le même commit. Le bilan gameplay (avant → après, par rapport à `main`) montre ce qui a changé.
+2. Un désaccord entre le code et ce document est **signalé, pas corrigé d'office** : le concepteur décide.
+3. Ne jamais désactiver ou ignorer un test pour obtenir un résultat vert.
 
 ### 12.5 Les trois bilans
 Chaque évolution est présentée avec trois bilans **séparés** (`node tests/bilan.js`) :
 | Bilan | Contenu | Verdicts |
 |---|---|---|
-| 🔧 **Technique** | Les tests s'exécutent, le moteur figé est intact, le parcours mobile fonctionne, aucune erreur JavaScript. Liste des fichiers modifiés. | ✅ réussi / ❌ en échec |
-| 🎮 **Gameplay** | Mécaniques caractérisées, statistiques changées (avant → après), 15 parties entre IA, écarts entre la documentation et le code | ✅ identique à la référence / ⚠️ changé : **à valider par le concepteur** |
+| 🔧 **Technique** | Les tests s'exécutent, le parcours mobile fonctionne, aucune erreur JavaScript. Liste des fichiers modifiés. | ✅ réussi / ❌ en échec |
+| 🎮 **Gameplay** | Mécaniques vérifiées, statistiques changées et 15 parties entre IA, comparées au `sim.js` de `main` (avant → après), écarts entre la documentation et le code | ✅ identique à `main` / ⚠️ changé : **à valider par le concepteur** |
 | 🎨 **Visuel** | Captures portrait et paysage, avant \| après \| différences, pourcentage de pixels changés | ✅ identique / ⚠️ changé : **à valider par le concepteur** / ⏸ non vérifiable |
 
 **Une réussite technique ne vaut jamais validation du gameplay ni du rendu.** Le gameplay et le visuel ne sont « validés » que par le concepteur.
@@ -587,7 +583,7 @@ Claude ne peut pas créer d'étiquette lui-même (l'environnement cloud n'autori
 ### 14.2 Revenir à une version (« rollback »)
 Le concepteur dit à Claude : « **reviens à la version vX.Y.Z** ». Claude :
 1. crée une branche à partir de `main` à jour et y **restaure tous les fichiers** de l'étiquette demandée (`git restore --source vX.Y.Z -- .`, l'historique est conservé, rien n'est effacé) ;
-2. présente les trois bilans (comparaison visuelle avec `main`, gameplay comparé à la référence) ;
+2. présente les trois bilans (comparaison visuelle avec `main`, gameplay comparé à `main`) ;
 3. ouvre une PR « Revient à la version vX.Y.Z » et attend l'accord explicite du concepteur avant de fusionner ;
 4. à la fusion : le site GitHub Pages revient à cette version, le **serveur est redéployé automatiquement** si `sim.js` ou `server/` changent (§9 bis), et une nouvelle étiquette est posée (un retour arrière est lui-même une version, donc on peut l'annuler de la même façon).
 
@@ -616,3 +612,4 @@ Attention : revenir à une version **antérieure à v2.0.1.1** retire aussi les 
 | 2026-11-14 | 2.2 | **Construction en deux touchers** : le 1er toucher montre un aperçu (tour fantôme, portée, prix), le 2e sur la même case construit ; une case impossible est signalée dès le 1er toucher ; glisser le doigt ne construit plus rien. Tests navigateur complétés (22 vérifications par orientation). **Règles du jeu inchangées** (`sim.js` non modifié). |
 | 2026-11-14 | 2.3 | **Carte plus grande sur téléphone et pastilles de rôle des tours**. Carte : les 4 vignettes des joueurs quittent le HUD et s'ouvrent dans un panneau flottant par-dessus le terrain, depuis un bouton-icône en haut à gauche. Vies du joueur ajoutées dans le HUD (❤). Bannière « ↩ revenir au tien » cliquable. Mini-cartes un peu plus grandes. Tours : pastilles de rôle (flèche, épée, flocon, bombe, flamme, étoile), de cibles (sol ou sol et air) et de magie dans des cadres dorés biseautés dessinés en code ; texte des cartes « ⚔ N dégâts/s » et « ◎ portée N » ; appui long (ou survol) sur une carte pour voir sa fiche sans la sélectionner. Interface uniquement : `sim.js` inchangé. Test du parcours mobile adapté (ouvrir le panneau avant de toucher une vignette). |
 | 2026-11-14 | 2.4 | **IA : labyrinthes optimisés et variés**. Plan cible par IA (formes tirées au hasard puis affinées par recherche locale, environ 100 cases de chemin une fois complet), ordre de construction qui allonge le chemin presque à chaque tour, Givre répartis le long du chemin, Mages détecteurs placés seulement quand un adversaire peut envoyer des Spectres, tours anti-aériennes sur le couloir des volants, adaptation aux volants reçus. Corrige le blocage de l'IA vers 36 tours. Génération découpée dans le temps (≈ 20 ms en tout, ≤ 2,5 ms par pas). `sim.js` modifié (redéploiement du serveur). Nouveau test `labyrinthe` ; le test « première tour de l'IA » suit désormais son plan. |
+| 2026-11-14 | 2.4 | Outillage : **fin du moteur figé** (`tests/moteurs/`, `tests/references/`, `creer-references.js`, test `integrite` supprimés). Les tests vérifient le bon fonctionnement sans comparer à des parties enregistrées ; le bilan gameplay compare directement au `sim.js` de `main` (statistiques et 15 parties). Plus de « gel » à faire après chaque changement de gameplay. |

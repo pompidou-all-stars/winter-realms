@@ -49,6 +49,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 - The AI builds its maze in an order that keeps the path long at every stage, starting near the centre to hit both the straight path and the flyers early on.
 - Frost towers are spread evenly along the maze. Mages are placed to detect Spectres along the whole path, only once an opponent can afford to send them. Anti-air towers sit on the flyers' line, more of them when flyers arrive.
 - Fixes a bug where the AI stopped building after about 36 towers.
+- Tooling: no more frozen engine copies or recorded reference games. Tests check that the game works, and the gameplay report compares directly with `main`.
 
 ### 2.3 — 2026-11-14
 - Bigger board on phones: the four player thumbnails leave the top bar and open in a floating panel over the board, from a map icon in the top-left corner. Tap a thumbnail to watch that board; tap the banner to come back.

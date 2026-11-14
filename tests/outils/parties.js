@@ -5,7 +5,7 @@
 const crypto=require('crypto');
 const {charger}=require('./moteur');
 
-/* les 15 parties de référence : 5 factions × 3 difficultés, une graine fixe chacune */
+/* les 15 parties entre IA : 5 factions × 3 difficultés, une graine fixe chacune */
 const SCENARIOS=[];for(let d=0;d<3;d++)for(let f=0;f<5;f++)SCENARIOS.push({nom:`faction ${f}, difficulté ${d}`,faction:f,difficulte:d,graine:1000+d*10+f});
 const DT=.05,DUREE_MAX=1800,POINTS_CONTROLE=30;
 
