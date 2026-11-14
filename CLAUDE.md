@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.7)
+# Winter Realms — Tower Wars (Édition 2.8)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -690,3 +690,13 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-14 | 2.5.1 | **Correctif multijoueur** : après 2 ou 3 minutes, dès qu'un monstre au sol arrivait sur le terrain du joueur, `peutConstruire` lisait la case visée `tx`/`ty`, absente des instantanés du serveur. L'erreur arrêtait la boucle de dessin : terrain figé et grisé, plus aucune tour posable. La page donne maintenant à chaque monstre reçu la case la plus proche de sa position. `index.html` seul (pas de redéploiement du serveur). |
 | 2026-11-14 | 2.6 | **IA : labyrinthes efficaces dès le milieu de partie**. Les candidats sont notés sur la longueur du chemin après 15, 25, 40 et 60 tours (et une fois complets), plus seulement à la fin. Les murs qui ne touchent pas le chemin et ne l'allongent pas sont retirés du plan. Avec 40 tours, le chemin passe d'une médiane de 57 à 66 cases (minimum 40 → 56) ; plans de 57 à 74 tours au lieu de 66 à 89. Génération ≈ 25 à 40 ms (≤ 3 ms par pas). `sim.js` modifié (redéploiement du serveur). Deux tests ajoutés à `labyrinthe`. |
 | 2026-11-14 | 2.7 | **Rendu 3D jouable (prototype)** avec `?rendu=3d` ou le lien de l'accueil (§15.2) : `rendu3d.js` et three.js r170 copié dans `vendor/three/` (importmap, sans build), caméra orthographique inclinée à 42°, plateau-diorama, tours et monstres animés, chantiers, projectiles et effets, chemin, construction en deux touchers avec tour fantôme, zoom et déplacement à deux doigts, panneau de tour. **Modèles 3D de tout le jeu** (§15.1) : 50 tours (5 factions × 10, style heroic fantasy cartoon validé par le concepteur), 17 monstres animés et le portail et le château, un script par asset dans `art/` selon `art/LISEZMOI.md` ; pièces communes dans `art/communs/` ; `generer.py` exporte maintenant aussi les pivots et les animations, et compresse en meshopt. Page `apercu-3d.html`. La 2D reste le rendu par défaut et est inchangée. Tests : `modeles-3d`, parcours mobile en 3D (WebGL logiciel), captures `--3d`, `WR_CANAL`. **Règles du jeu inchangées** (`sim.js` non modifié, pas de redéploiement du serveur). |
+
+
+## Édition 2.8 — Identités des cinq factions (2026-11-14)
+
+Les cinq factions jouables sont désormais, dans cet ordre : **Humains** (archers, chevaliers, mages ; bonus anti-aérien), **Robots** (drones, automates et canons ; perforation), **Créatures** (mutants expressifs et prédateurs ; exécution), **Végétaux** (arbres, fleurs et dryades ; racines), **Magiques** (spectres et arcanistes ; malédiction). Chacune conserve 10 unités, soit 50 tours/personnages. Les rôles et les emplacements sont préservés pour la compatibilité de simulation et multijoueur ; les coefficients de gameplay suivent désormais l'identité des factions. Les personnages restent des unités fixes de défense.
+
+Les illustrations 2D ajoutent des détails propres aux archers humains, aux robots, aux créatures et aux végétaux. **Les modèles Blender/3D existants restent à refaire** : cette étape ne prétend pas les remplacer.
+
+### Journal des modifications
+- 2.8 : renomme et réorganise les cinq factions, remplace les noms des 50 unités, actualise la sélection et différencie les silhouettes 2D.
