@@ -97,9 +97,10 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
  test('Le revenu tombe à 10 s de jeu',async()=>{
   const avant=(await N.etat(p)).or;await N.avancer(p,10000);const e=await N.etat(p);assert.ok(e.temps>10);assert.equal(e.or,avant+11);
  });
- if(format=='paysage')test('En paysage, le HUD et les commandes passent sur le côté du terrain',async()=>{
-  const s=await p.locator('#stage').boundingBox(),h=await p.locator('#hud').boundingBox(),c=await p.locator('#ctl').boundingBox();
-  assert.ok(h.x>=s.x+s.width-1&&c.x>=s.x+s.width-1,'HUD et commandes à droite du terrain');
+ if(format=='paysage')test('En paysage (2.12), le terrain est au centre : bandeau et fiche à gauche, onglets et boutons à droite',async()=>{
+  const s=await p.locator('#stage').boundingBox(),h=await p.locator('#hud').boundingBox(),f=await p.locator('#fiche').boundingBox(),t=await p.locator('#tabs').boundingBox(),b=await p.locator('#bar').boundingBox();
+  assert.ok(h.x+h.width<=s.x+1&&f.x+f.width<=s.x+1,'bandeau et fiche à gauche du terrain');
+  assert.ok(t.x>=s.x+s.width-1&&b.x>=s.x+s.width-1,'onglets et boutons à droite du terrain');
  });
  else test('En portrait, le HUD est au-dessus du terrain et les commandes en dessous',async()=>{
   const s=await p.locator('#stage').boundingBox(),h=await p.locator('#hud').boundingBox(),c=await p.locator('#ctl').boundingBox();
