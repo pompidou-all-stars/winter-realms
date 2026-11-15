@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.11</title>
+<title>Winter Realms — Tower Wars · Édition 2.12</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -50,7 +50,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 #tfill{display:block;height:100%;background:linear-gradient(90deg,#c98b22,#ffe597);transform-origin:left;transform:scaleX(0)}
 #stage{grid-area:stage;position:relative;min-height:0;min-width:0;overflow:hidden}
 #main{position:absolute;left:0;top:0;touch-action:none}
-#zoomReset{position:absolute;right:6px;top:6px;width:auto;padding:0 10px;gap:5px;display:flex;align-items:center;font-size:12px;font-weight:700;background:#0a1322d8;color:var(--ink);border:1px solid var(--liseré);border-radius:8px;height:30px}
+#zoomReset{position:absolute;right:10px;bottom:52px;width:auto;padding:0 10px;gap:5px;display:flex;align-items:center;font-size:12px;font-weight:700;background:#0a1322d8;color:var(--ink);border:1px solid var(--liseré);border-radius:8px;height:30px}
 #zoomReset svg{width:16px;height:16px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #banner,#toast{position:absolute;left:50%;transform:translateX(-50%);padding:5px 12px;border-radius:8px;font-size:13px;white-space:nowrap;pointer-events:none}
 #banner{bottom:48px;color:#fff;font-weight:700;pointer-events:auto;box-shadow:0 4px 14px #0008;border:1px solid #fff6;text-shadow:0 1px 2px #0008}
@@ -94,17 +94,16 @@ button{font:inherit;color:inherit;cursor:pointer}
 #bar button.dis small{color:#ff8a7a}
 #bar button:active{transform:scale(.95)}
 @media (orientation:landscape) and (min-width:560px){
- #app{grid-template:"stage hud" auto "stage ctl" 1fr / 1fr minmax(230px,310px)}
- #row1{flex-wrap:wrap;row-gap:4px}
- #tabs{flex-wrap:wrap}
+ /* 2.12 : trois colonnes, le terrain au centre : à gauche le bandeau et la fiche, à droite les onglets et les boutons */
+ #app{grid-template:"hud stage tabs" auto "fiche stage bar" minmax(0,1fr) / minmax(180px,236px) minmax(0,1fr) minmax(196px,268px)}
+ #ctl{display:contents}
+ #tabs{grid-area:tabs;flex-wrap:wrap}
  #tabs .tw{flex:1 1 100%}
- #bar{flex-wrap:wrap;overflow:visible;align-content:flex-start}
- #bar button{flex:1 1 28%}
- /* 2.1 : la colonne de droite défile au lieu de pousser l'écran (le haut et le bas étaient coupés sur téléphone) */
- #app{grid-template-rows:auto minmax(0,1fr)}
- #ctl{min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:4px}
- #fiche{height:auto;flex:0 0 auto}
+ #row1{flex-wrap:wrap;row-gap:4px}
+ #fiche{grid-area:fiche;height:auto;min-height:0;flex-direction:column;align-items:flex-start;justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain}
  #fiche .ex{-webkit-line-clamp:unset;display:block}
+ #bar{grid-area:bar;flex-wrap:wrap;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;align-content:flex-start;min-height:0}
+ #bar button{flex:1 1 40%}
 }
 
 /* ===== Écran d'accueil (2.11) : menu de jeu vidéo, nuit d'hiver, montagnes et neige ===== */
@@ -185,6 +184,44 @@ button{font:inherit;color:inherit;cursor:pointer}
 #ov button.ghost{background:transparent;border:0;box-shadow:none;color:var(--dim);font-size:14px;text-decoration:underline;text-shadow:none}
 #vue3d{margin:4px 0 0;font-size:14px}#vue3d a{color:var(--gold)}
 body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:none!important}
+
+/* ===== 2.12 : direction artistique « givre elfique » =====
+   Inspirée des barres de commande des jeux de stratégie : cadre d'écran ornementé, bandeau de ressources serti,
+   onglets en relief, boutons de commande carrés et sertis avec le prix en médaillon. Ornements en filigrane argenté
+   (volutes, feuilles en amande, gemmes de glace), texture de givre ; tout est dessiné en code (SVG et CSS). */
+:root{--orne-argent:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M30 3H34M30 61H34M3 30V34M61 30V34' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M30 8H34M30 56H34M8 30V34M56 30V34' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cg%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3C/svg%3E");--orne-or:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M30 3H34M30 61H34M3 30V34M61 30V34' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M30 8H34M30 56H34M8 30V34M56 30V34' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cg%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3C/svg%3E");--orne-rouge:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M30 3H34M30 61H34M3 30V34M61 30V34' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M30 8H34M30 56H34M8 30V34M56 30V34' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cg%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3C/svg%3E");--orne-ecran:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cdefs%3E%3Cg id='c'%3E%3Cpath d='M4 70 C4 30 30 4 70 4' fill='none' stroke='%23d9ecff' stroke-width='2.4'/%3E%3Cpath d='M11 70 C11 36 36 11 70 11' fill='none' stroke='%238fb6d9' stroke-width='1'/%3E%3Cpath d='M4 70 C10 50 24 44 34 50 C42 55 36 64 29 62' fill='none' stroke='%23d9ecff' stroke-width='1.5'/%3E%3Cpath d='M70 4 C50 10 44 24 50 34 C55 42 64 36 62 29' fill='none' stroke='%23d9ecff' stroke-width='1.5'/%3E%3Cpath d='M16 16 C24 6 40 6 46 10 C40 19 26 25 16 16z' fill='%239fc3e6' opacity='.55'/%3E%3Cpath d='M16 16 C6 24 6 40 10 46 C19 40 25 26 16 16z' fill='%239fc3e6' opacity='.55'/%3E%3Cg stroke='%23eaf6ff' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M20 20 L30 30M25 25l4-1M25 25l-1 4'/%3E%3C/g%3E%3Ccircle cx='18' cy='18' r='4.2' fill='%239be7ff' stroke='%23eaf6ff' stroke-width='1.2'/%3E%3C/g%3E%3C/defs%3E%3Cpath d='M70 4H50M70 116H50M4 50V70M116 50V70' stroke='%23d9ecff' stroke-width='2.4'/%3E%3Cuse href='%23c'/%3E%3Cuse href='%23c' transform='translate(120 0) scale(-1 1)'/%3E%3Cuse href='%23c' transform='translate(0 120) scale(1 -1)'/%3E%3Cuse href='%23c' transform='translate(120 120) scale(-1 -1)'/%3E%3C/svg%3E");--givre:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6 .18' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .85  0 0 0 0 .93  0 0 0 0 1  0 0 0 .7 -.38'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23f)'/%3E%3C/svg%3E")}
+/* cadre de tout l'écran : coins à volutes, lignes argentées et voile de givre sur les bords */
+#app{position:relative;padding:calc(9px + env(safe-area-inset-top,0px)) calc(9px + env(safe-area-inset-right,0px)) calc(9px + env(safe-area-inset-bottom,0px)) calc(9px + env(safe-area-inset-left,0px))}
+#app:before{content:'';position:absolute;inset:max(1px,env(safe-area-inset-top,0px)) max(1px,env(safe-area-inset-right,0px)) max(1px,env(safe-area-inset-bottom,0px)) max(1px,env(safe-area-inset-left,0px));border:30px solid transparent;border-image:var(--orne-ecran) 60 / 30px / 0 round;pointer-events:none;z-index:20;opacity:.85}
+#app:after{content:'';position:absolute;inset:0;pointer-events:none;z-index:19;box-shadow:inset 0 0 22px #bfe3ff40,inset 0 0 3px #d9ecff80;background:var(--givre);-webkit-mask:linear-gradient(#000,transparent 9%,transparent 91%,#000),linear-gradient(90deg,#000,transparent 7%,transparent 93%,#000);mask:linear-gradient(#000,transparent 9%,transparent 91%,#000),linear-gradient(90deg,#000,transparent 7%,transparent 93%,#000);opacity:.55}
+/* panneaux sertis : fond verre de nuit + givre, cadre argenté à volutes */
+#hud,#fiche,#tabs .tw,#tabs .mon,#chips{position:relative;background-image:var(--givre),linear-gradient(180deg,#1d3150f2,#0f1a2ef2);background-size:180px,auto;border:1px solid #8fb6d955}
+#hud:after,#fiche:after,#tabs .tw:after,#tabs .mon:after,#bar button:after{content:'';position:absolute;inset:-3px;border:12px solid transparent;border-image:var(--orne-argent) 32 / 12px / 0 stretch;pointer-events:none}
+#hud{border-radius:6px;padding:4px 6px 7px}
+#fiche{border-radius:6px}
+#tabs .tw.on{background-image:var(--givre),var(--or-fond);background-size:180px,auto}
+#tabs .tw.on:after{border-image-source:var(--orne-or)}
+#tabs .mon{background-image:var(--givre),linear-gradient(180deg,#3a1d1af2,#22100ef2)}
+#tabs .mon:after{border-image-source:var(--orne-rouge)}
+#fiche.envoyer{background-image:var(--givre),linear-gradient(180deg,#3a1d1af2,#22100ef2)}#fiche.envoyer:after{border-image-source:var(--orne-rouge)}
+/* ressources : pierres de lune serties */
+.res{background:linear-gradient(180deg,#07101e,#0d1a2e);border:1px solid #8fb6d944;box-shadow:inset 0 2px 4px #000c,0 1px 0 #ffffff1a}
+.ib{background:radial-gradient(circle at 50% 30%,#4a6e9e,#1a2c4c 70%);border:1px solid #d9ecff88;box-shadow:inset 0 1px 0 #ffffff40,0 0 0 1px #0a1322,0 2px 4px #000a}
+/* boutons de commande : emplacements carrés sertis (barre de sorts), icône sur fond de glace, prix en médaillon */
+#bar{gap:6px;padding:3px 2px 4px}
+#bar button{border-radius:5px;border:1px solid #8fb6d955;padding:3px 5px 4px;background-image:var(--givre),radial-gradient(ellipse at 50% 28%,#2d4a74,#0f1a2e 72%);background-size:180px,auto}
+#bar button:after{inset:-2px;border-width:10px;border-image-width:10px}
+#bar button canvas{filter:drop-shadow(0 3px 3px #000a)}
+#bar button.sel{background-image:var(--givre),radial-gradient(ellipse at 50% 28%,#5b7fae,#1a2c4c 72%);border-color:#ffe597;box-shadow:0 0 12px #f2c14e66,inset 0 0 10px #f2c14e33}
+#bar button.sel:after{border-image-source:var(--orne-or)}
+#bar.mon button{background-image:var(--givre),radial-gradient(ellipse at 50% 28%,#5a2a24,#1e0f0d 72%)}
+#bar.mon button:after{border-image-source:var(--orne-rouge)}
+#bar button small:empty{display:none}
+#bar button small{display:inline-block;margin-top:1px;padding:0 6px 0 4px;border-radius:9px;background:#060c18cc;border:1px solid #c9a24a88}
+/* le plateau 3D se fond dans le décor */
+#stage{border-radius:6px}
+#zoomReset{border-radius:99px;background:radial-gradient(circle at 50% 30%,#3a5a88ee,#132240ee 75%);border:1px solid #d9ecffaa;box-shadow:0 0 0 2px #0a1322,0 4px 12px #000b;z-index:4}
+#chips{border-radius:6px}
 </style></head><body>
 <div id="app">
  <div id="hud">
@@ -634,7 +671,10 @@ const VUE={z:1,ox:0,oy:0,w:0,h:0},ZMAX=3;let cadre='#c9a24a';
    En 3D, la caméra est orthographique et inclinée : à l'écran, les rangées du terrain sont tassées d'un facteur KY,
    et TOPM cases sont gardées libres au-dessus du plateau pour les tours hautes. En 2D, KY = 1 et TOPM = 0 (rien ne change). */
 const R3D={on:QS.get('rendu')!='2d',api:null,KY:1,TOPM:0,echec:false};
-function fit(){const r=stage.getBoundingClientRect();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);cell=Math.max(16,Math.floor(Math.min((r.width-6)/C,(r.height-6)/(R*R3D.KY+R3D.TOPM))));mx=setup(main,VUE.w,VUE.h);if(R3D.api)R3D.api.taille(VUE.w,VUE.h,dpr());borner()}
+/* 2.12 : en 3D, l'inclinaison de la caméra s'adapte au format de la zone de jeu pour que le plateau la remplisse
+   (KY visé : hauteur disponible / largeur disponible, borné entre 34° et 66° d'élévation ; la marge du haut TOPM suit l'inclinaison) */
+function inclinerSelonFormat(w,h){if(!R3D.api||!R3D.api.incliner)return;for(let i=0;i<3;i++){const ky=Math.min(1,Math.max(.1,((h-6)/(w-6)*C-R3D.TOPM)/R));R3D.KY=R3D.api.incliner(Math.asin(ky)*180/Math.PI);R3D.TOPM=R3D.api.TOPM}}
+function fit(){const r=stage.getBoundingClientRect();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);inclinerSelonFormat(VUE.w,VUE.h);cell=Math.max(16,Math.floor(Math.min((r.width-6)/C,(r.height-6)/(R*R3D.KY+R3D.TOPM))));mx=setup(main,VUE.w,VUE.h);if(R3D.api)R3D.api.taille(VUE.w,VUE.h,dpr());borner()}
 /* garde le plateau dans la zone visible : centré s'il est plus petit, sinon jamais plus de 8 px de vide au bord */
 function borner(){const s=cell*VUE.z,W=C*s,H=(R*R3D.KY+R3D.TOPM)*s,m=8,hm=R3D.TOPM*s;
  VUE.ox=W<=VUE.w?(VUE.w-W)/2:Math.min(m,Math.max(VUE.w-W-m,VUE.ox));VUE.oy=hm+(H<=VUE.h?(VUE.h-H)/2:Math.min(m,Math.max(VUE.h-H-m,VUE.oy-hm)));
@@ -649,7 +689,7 @@ function caseVersEcran(x,y){const r=main.getBoundingClientRect(),s=cell*VUE.z;re
 function caseSous(cx,cy){const r=main.getBoundingClientRect(),s=cell*VUE.z;return {x:Math.floor((cx-r.left-VUE.ox)/s),y:Math.floor((cy-r.top-VUE.oy)/(s*R3D.KY))}}
 function charger3D(){if(!R3D.on)return;
  import('./rendu3d.js').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R});stage.insertBefore(R3D.api.canvas,main);
-  R3D.KY=R3D.api.KY;R3D.TOPM=R3D.api.TOPM;fit();vueEnsemble();
+  R3D.KY=R3D.api.KY;R3D.TOPM=R3D.api.TOPM;fit();vueEnsemble();render();
   R3D.pret=R3D.api.precharger([...new Set(B.map(b=>b.classId))]).then(()=>{R3D.charge=true})})
  .catch(e=>{console.warn(e);R3D.on=false;R3D.echec=true;toast('3D indisponible sur cet appareil : retour à la 2D')})}
 /* état du rendu 3D, lu par les tests */
@@ -720,6 +760,12 @@ function drawBadge(g,x,y,s,kind){const c=BADGE[kind];g.save();
 /* pastilles d'une tour dans une icône 40×40 : rôle en haut à droite, cibles en bas à gauche, magie à côté */
 function drawTowerBadges(g,k,w=56,h=46){const T=TW[k];drawBadge(g,w-21,1,20,T.s);drawBadge(g,1,h-18,17,T.gr?'sol':'air');if(T.mag)drawBadge(g,20,h-14,13,'magie')}
 /* icône de carte de tour (2.2) : plus large que haute pour loger les pastilles autour de la tour */
+/* 2.12 : en 3D, les icônes des boutons et de la fiche sont remplacées par un rendu du modèle 3D (les pastilles des tours restent) */
+const V3D=new Map();
+function icone3D(cv,type,k,w,h){if(!R3D.api||!R3D.api.vignette||!cv)return;const cle=type+k+'|'+w;
+ const peindre=im=>{const g=cv.getContext('2d'),r=dpr();g.setTransform(r,0,0,r,0,0);g.clearRect(0,0,w,h);g.drawImage(im,0,0,w,h);if(type=='tour')drawTowerBadges(g,k,w,h)};
+ const im=V3D.get(cle);if(im){if(im.complete&&im.naturalWidth)peindre(im);else im.addEventListener('load',()=>peindre(im),{once:true});return}
+ const i=new Image();V3D.set(cle,i);R3D.api.vignette(type,k,w,h).then(u=>{if(u){i.onload=()=>{if(cv.isConnected)peindre(i)};i.src=u}else V3D.delete(cle)})}
 const towerIcon=(k,lv)=>icon(g=>{drawTower(g,k,28,27,30,.7,0,lv,0);drawTowerBadges(g,k)},56,46);
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 /* messages d'erreur renvoyés par Game.action */
@@ -750,7 +796,7 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
  const bf=bonusFaction(T.faction);if(bf)part(bf);
  txt.append(tt,st,ex);
- f.append(towerIcon(k,lv),txt)}
+ const ic=towerIcon(k,lv);f.append(ic,txt);icone3D(ic,'tour',k,56,46)}
 function ficheEnvoi(){const f=$('fiche');f.textContent='';f.className='envoyer';f.dataset.mode='envoyer';
  const d=document.createElement('div');d.className='txt';const b=document.createElement('b');b.textContent='Envoyer des monstres';
  d.append(b,document.createElement('br'),'Chaque envoi attaque tous tes adversaires (4 monstres chacun) et augmente ton revenu pour toute la partie.');f.appendChild(d)}
@@ -759,9 +805,9 @@ function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P
   if(t.b>0)add(icon(IC.up),'Améliorer','en chantier…',0,()=>showErr('busy'),1,'patiente');
   else if(t.lv<5)add(icon(IC.up),'Améliorer',upCost(t)+' or',upCost(t),()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()},1,'niveau '+(t.lv+1)+' · '+fr(btJ(upCost(t)))+' s');
   add(icon(IC.coin),'Vendre','+'+Math.floor(t.inv*.7)+' or',0,()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()});
-  add(icon(IC.x),'Fermer',' ',0,()=>{pick=null;render()});return}
- if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(towerIcon(k,1),T.n,T.c+' or',T.c,()=>{sel=k;if(projet)projet.k=k;render()},sel==k,'⚔ '+dps(k,1)+' dégâts/s\n◎ portée '+fr(T.r));apercu(bar.lastChild,k)})}
- else{ficheEnvoi();byCat(tab).forEach(k=>{const T=CR[k],lock=time<(T.at||0);add(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.n,T.c+' or · +'+T.i+' revenu',T.c,()=>playerSend(k),0,lock?'🔒 dès '+mmss(T.at):T.tag||'',T.at);bar.lastChild.dataset.tag=T.tag||''})}}
+  add(icon(IC.x),'Fermer','',0,()=>{pick=null;render()});return}
+ if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(towerIcon(k,1),T.n,T.c+' or',T.c,()=>{sel=k;if(projet)projet.k=k;render()},sel==k,'⚔ '+dps(k,1)+' dégâts/s\n◎ portée '+fr(T.r));icone3D(bar.lastChild.querySelector('canvas'),'tour',k,56,46);apercu(bar.lastChild,k)})}
+ else{ficheEnvoi();byCat(tab).forEach(k=>{const T=CR[k],lock=time<(T.at||0);add(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.n,T.c+' or · +'+T.i+' revenu',T.c,()=>playerSend(k),0,lock?'🔒 dès '+mmss(T.at):T.tag||'',T.at);bar.lastChild.dataset.tag=T.tag||'';icone3D(bar.lastChild.querySelector('canvas'),'monstre',k,40,40)})}}
 /* 2.2 : aperçu de la fiche sans changer la sélection. Appui long (400 ms) au doigt, survol à la souris. */
 let apT=0;
 function apercu(b,k){const voir=()=>{if(tab=='t'&&!pick){remplirFiche('construire',k);$('fiche').classList.add('apercu')}},

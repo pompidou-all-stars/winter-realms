@@ -12,7 +12,10 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
-export const E = 42 * Math.PI / 180, KY = Math.sin(E), KH = Math.cos(E), TOPM = 1.2;
+/* élévation de la caméra : 42° par défaut ; depuis la 2.12, index.html l'adapte au format de l'écran (incliner)
+   pour que le plateau occupe toute la place (plus redressée en portrait, plus rasante en paysage) */
+export let E = 42 * Math.PI / 180, KY = Math.sin(E), KH = Math.cos(E), TOPM = 1.6 * KH; /* TOPM : place gardée au-dessus du plateau pour les tours hautes (1,2 case à 42°) */
+export const E_MIN = 34, E_MAX = 66;
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
@@ -39,7 +42,10 @@ export function creer(J) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#1a2433');
   const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, .1, 200);
-  cam.position.set(0, 60 * Math.sin(E), 60 * Math.cos(E)); cam.lookAt(0, 0, 0);
+  function placerCamera() { cam.position.set(0, 60 * Math.sin(E), 60 * Math.cos(E)); cam.up.set(0, 1, 0); cam.lookAt(0, 0, 0) }
+  placerCamera();
+  /* change l'élévation (en degrés, bornée) et renvoie le nouveau tassement vertical KY */
+  function incliner(deg) { deg = Math.min(E_MAX, Math.max(E_MIN, deg)); E = deg * Math.PI / 180; KY = Math.sin(E); KH = Math.cos(E); TOPM = 1.6 * KH; placerCamera(); return KY }
 
   /* lumières : ciel et sol (ambiance), soleil chaud avec ombres, contre-jour */
   scene.add(new THREE.HemisphereLight('#e4efff', '#6a7890', 1.15));
@@ -421,8 +427,33 @@ export function creer(J) {
   /* point du monde (gx, gz au sol, hauteur h) → pixels du canevas */
   function versEcran(gx, gz, h, VUE, cell) { const s = cell * VUE.z; return {x: VUE.ox + gx * s, y: VUE.oy + (gz * KY - h * KH) * s} }
 
+  /* 2.12 : vignettes des boutons (tours et monstres) rendues à partir des modèles 3D, vue de trois quarts,
+     avec un petit moteur de rendu à part (fond transparent). Renvoie l'image en data URL, ou null si le modèle manque. */
+  let rv = null; const vignettes = new Map();
+  function vignette(type, k, w, h) {
+    const cle = type + k + '|' + w + 'x' + h; if (vignettes.has(cle)) return vignettes.get(cle);
+    const p = charger(type === 'tour' ? urlTour(k) : urlMonstre(k)).then(g => {
+      if (!g) return null;
+      if (!rv) {
+        rv = {r: new THREE.WebGLRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true}), s: new THREE.Scene(), c: new THREE.PerspectiveCamera(26, 1, .05, 60)};
+        rv.r.outputColorSpace = THREE.SRGBColorSpace; rv.r.setClearColor(0, 0);
+        rv.s.add(new THREE.HemisphereLight('#eef5ff', '#56627c', 1.7));
+        const d = new THREE.DirectionalLight('#fff4e0', 2.6); d.position.set(-2, 4, 3); rv.s.add(d);
+        const b = new THREE.DirectionalLight('#9fd0ff', 1.3); b.position.set(3, 2, -3); rv.s.add(b);
+      }
+      const o = g.scene.clone(true), piv = new THREE.Group(); piv.add(o); piv.rotation.y = type === 'tour' ? -.55 : -.7;
+      const box = new THREE.Box3().setFromObject(piv), ct = box.getCenter(new THREE.Vector3()), rad = Math.max(.05, box.getSize(new THREE.Vector3()).length() / 2);
+      o.position.sub(ct.applyAxisAngle(new THREE.Vector3(0, 1, 0), -piv.rotation.y)); rv.s.add(piv);
+      const dist = rad / Math.sin(rv.c.fov * Math.PI / 360) * (type === 'tour' ? .78 : .72);
+      rv.c.aspect = w / h; rv.c.position.set(0, dist * .38, dist * .92); rv.c.lookAt(0, type === 'tour' ? -rad * .05 : 0, 0); rv.c.updateProjectionMatrix();
+      rv.r.setPixelRatio(2); rv.r.setSize(w, h, false); rv.r.render(rv.s, rv.c);
+      const url = rv.r.domElement.toDataURL('image/png'); rv.s.remove(piv); return url;
+    }).catch(e => { console.warn(e); return null });
+    vignettes.set(cle, p); return p;
+  }
+
   /* compteurs pour les tests : objets 3D présents et appels de dessin de la dernière image */
   const etat = () => ({tours: tours.size, monstres: monstres.size, projectiles: projs.size, effets: effets.size, fantome: !!(fantome && fantome.r.parent),
     portee: portee.visible, dessins: renderer.info.render.calls, triangles: renderer.info.render.triangles});
-  return {canvas, dessiner, taille, versEcran, precharger, hauteurMonstre: HAUT, KY, TOPM, renderer, etat};
+  return {canvas, dessiner, taille, versEcran, precharger, hauteurMonstre: HAUT, get KY() { return KY }, get TOPM() { return TOPM }, incliner, vignette, renderer, etat};
 }
