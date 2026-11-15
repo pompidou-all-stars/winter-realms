@@ -44,6 +44,9 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.11 (assets) — 2026-11-15
+- 3D assets: 8 new monster models prepared for the upcoming tier system (frost skeleton, war boar, yeti, war bear, war mammoth, frost giant, ice imp, armoured beetle). Not used by the game yet. No game change.
+
 ### 2.11 — 2026-11-14
 - Tooling: the AI maze "chunked generation" test no longer fails at random on GitHub (it now checks the number of chunks, with wider time margins). No game change.
 - New video-game look for the interface (winter heroic fantasy): redesigned start menu (winter night, mountains, falling snow, emblem, golden title, short description and illustrated rules, faction crests, raised difficulty buttons); in game, night-blue panels with gold trim, raised buttons, framed cards, golden board frame.

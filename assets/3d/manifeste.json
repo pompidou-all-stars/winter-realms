@@ -41,6 +41,36 @@
    "empreinte_source": "8c96b3bed3dfae4a919f02f93aa06ebed3948c881fd2d9b98d7f27b65c7385e0",
    "blender": "5.3"
   },
+  "monstres/bear": {
+   "id": "monstres/bear",
+   "categorie": "monstre",
+   "titre": "Ours de guerre",
+   "fichier": "assets/3d/monstres/bear.glb",
+   "triangles": 1538,
+   "octets": 49288,
+   "empreinte_source": "3693242e2d25241b9183151d414de6f1c96690d5f98194a843e9da53d5313200",
+   "blender": "5.3"
+  },
+  "monstres/beetle": {
+   "id": "monstres/beetle",
+   "categorie": "monstre",
+   "titre": "Scarabée cuirassé",
+   "fichier": "assets/3d/monstres/beetle.glb",
+   "triangles": 1388,
+   "octets": 43304,
+   "empreinte_source": "0dea267c5769c44cba8c0b9d1ce46f7cb0765bc6c8ef31be69210128224a0cca",
+   "blender": "5.3"
+  },
+  "monstres/boar": {
+   "id": "monstres/boar",
+   "categorie": "monstre",
+   "titre": "Sanglier de guerre",
+   "fichier": "assets/3d/monstres/boar.glb",
+   "triangles": 1404,
+   "octets": 41632,
+   "empreinte_source": "8b8ffc8a9706034e5cb57e8741d46f226d32e417017b942fc2da858fa0ce52fb",
+   "blender": "5.3"
+  },
   "monstres/breaker": {
    "id": "monstres/breaker",
    "categorie": "monstre",
@@ -79,6 +109,16 @@
    "triangles": 918,
    "octets": 30304,
    "empreinte_source": "65fe25c115b00bc57c65b8a32bacee83736399c455315265ef56122e3b81fbeb",
+   "blender": "5.3"
+  },
+  "monstres/giant": {
+   "id": "monstres/giant",
+   "categorie": "monstre",
+   "titre": "Géant du givre",
+   "fichier": "assets/3d/monstres/giant.glb",
+   "triangles": 2194,
+   "octets": 69224,
+   "empreinte_source": "ff4045ef8f2fc05c7eb118b057fc4c19a6c78df1d80d56f61af0b0fd7e081c82",
    "blender": "5.3"
   },
   "monstres/gob": {
@@ -131,6 +171,26 @@
    "empreinte_source": "5644b6c604d4ecd07ca739f7a0dceb189156a7d4edc2dd3a8623d46e7859c1c5",
    "blender": "5.3"
   },
+  "monstres/imp": {
+   "id": "monstres/imp",
+   "categorie": "monstre",
+   "titre": "Lutin des glaces",
+   "fichier": "assets/3d/monstres/imp.glb",
+   "triangles": 1428,
+   "octets": 54620,
+   "empreinte_source": "8be52ad1ebf39fcc752381bd2dd980f7601c0c31bb3951332dc3b27c1b4f6904",
+   "blender": "5.3"
+  },
+  "monstres/mammoth": {
+   "id": "monstres/mammoth",
+   "categorie": "monstre",
+   "titre": "Mammouth de guerre",
+   "fichier": "assets/3d/monstres/mammoth.glb",
+   "triangles": 1762,
+   "octets": 54780,
+   "empreinte_source": "47b7488f40a9acd54a875758e8d9b4e0acb7fbb786a57bdfdaa4db26d9c3079c",
+   "blender": "5.3"
+  },
   "monstres/orc": {
    "id": "monstres/orc",
    "categorie": "monstre",
@@ -149,6 +209,16 @@
    "triangles": 1984,
    "octets": 61032,
    "empreinte_source": "6c634778a4c761706e1aa10c9662953925b027eaaa41d30f98bda5ca98db3340",
+   "blender": "5.3"
+  },
+  "monstres/skel": {
+   "id": "monstres/skel",
+   "categorie": "monstre",
+   "titre": "Squelette du givre",
+   "fichier": "assets/3d/monstres/skel.glb",
+   "triangles": 2084,
+   "octets": 61428,
+   "empreinte_source": "b3da0d4a2fa3d98118b11d2011d032e4ae9fb0f56d867d0205669ddcc5bf7286",
    "blender": "5.3"
   },
   "monstres/slime": {
@@ -199,6 +269,16 @@
    "triangles": 1094,
    "octets": 36868,
    "empreinte_source": "854adb4fdbe71a2516e9286887424d3068a724415afcc1684f58a128bf116647",
+   "blender": "5.3"
+  },
+  "monstres/yeti": {
+   "id": "monstres/yeti",
+   "categorie": "monstre",
+   "titre": "Yéti",
+   "fichier": "assets/3d/monstres/yeti.glb",
+   "triangles": 2084,
+   "octets": 62932,
+   "empreinte_source": "7b8fb81842fb23f61ce41de5bf91ad21ff9a77e3eda7fc2a2fca3a3d0dd3e52b",
    "blender": "5.3"
   },
   "tours/alliance-0": {
