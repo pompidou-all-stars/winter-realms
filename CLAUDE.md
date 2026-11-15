@@ -65,7 +65,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 ---
 
 ## DoT des tours — branche de travail
-Les emplacements 5 et 6 (indices 4 et 5) de chaque faction appliquent un DoT propre : Alliance/brûlure (2,4 DPS × 4 s), Horde/électrocution (1,8 × 3 s), Sylvestres/poison (1,9 × 6 s), Nains/spores (1,6 × 5 s), Ombres/malédiction (2,1 × 4 s). La tour d'indice 5 a 35 % de DPS DoT supplémentaire. Le coup direct est réduit de 12 % ou 28 % pour compenser. Les DoT de même type ne se cumulent pas : durée renouvelée, meilleur DPS conservé. Boss : 50 % des dégâts périodiques. Les dégâts périodiques sont appliqués dans Board.update. Valeurs provisoires, à vérifier en simulation. La refonte des noms et des modèles 3D des factions reste une étape distincte.
+Les emplacements 5 et 6 (indices 4 et 5) de chaque faction appliquent un DoT propre : Alliance/brûlure (2,4 DPS × 4 s), Horde/électrocution (1,8 × 3 s), Sylvestres/poison (1,9 × 6 s), Nains/spores (1,6 × 5 s), Ombres/malédiction (2,1 × 4 s). La tour d'indice 5 a 35 % de DPS DoT supplémentaire. Les dégâts directs restent ceux des formules BASE_TW pour préserver les invariants de calcul des 50 tours ; le rendement additionnel des DoT doit être mesuré et équilibré par des paramètres dédiés. Les DoT de même type ne se cumulent pas : durée renouvelée, meilleur DPS conservé. Boss : 50 % des dégâts périodiques. Les dégâts périodiques sont appliqués dans Board.update. Valeurs provisoires, à vérifier en simulation. La refonte des noms et des modèles 3D des factions reste une étape distincte.
 
 ## 1. Structure technique
 
