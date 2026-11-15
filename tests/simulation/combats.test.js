@@ -7,6 +7,7 @@ const proche=(a,b,msg,eps=1e-9)=>assert.ok(Math.abs(a-b)<=eps,`${msg||''} attend
 const terrain=(f=0)=>{const b=partie(S,{factions:[f,(f+1)%5,(f+2)%5,(f+3)%5]}).B[0];b.gold=1e6;return b};
 const perte=(b,c,d,k,sf)=>{const hp=c.hp;b.hit(c,d,S.TW[k],sf);return hp-c.hp};
 const fort=c=>{c.hp=c.max=1e6;return c};
+const TROLL=S.CR.findIndex(T=>T.n=='Troll des glaces');
 
 test('Une tour Archer tue un Sapeur gobelin et gagne la prime de 1 or',()=>{const b=terrain();b.place(5,4,0);const or=b.gold;
  apparaitre(S,b,0);avancerTerrain(b,6);assert.equal(b.cr.length,0);assert.equal(b.lives,40);assert.equal(b.gold,or+1);
@@ -69,9 +70,9 @@ test('Gelée mutante : se divise en 2 Petits limons à sa mort',()=>{const b=ter
  assert.equal(b.cr.length,2);for(const k of b.cr){assert.equal(k.k,S.KID);proche(k.hp,S.CR[S.KID].hp*(c.max/S.CR[S.SPLIT].hp),'PV du limon')}
 });
 test('Prêtresse : soigne de 5 % des PV max par seconde les alliés proches, pas elle-même',()=>{const b=terrain();
- const p=apparaitre(S,b,S.HEAL),g=fort(apparaitre(S,b,3));g.hp=g.max/2;p.hp=p.max/2;b.update(.1);
+ const p=apparaitre(S,b,S.HEAL),g=fort(apparaitre(S,b,TROLL));g.hp=g.max/2;p.hp=p.max/2;b.update(.1);
  proche(g.hp,g.max/2+g.max*.05*.1,'allié soigné',1e-6);assert.equal(p.hp,p.max/2,'la prêtresse seule n\'est pas soignée');
 });
-test('Garde : frappe directe au corps à corps, sans projectile',()=>{const b=terrain();b.place(5,1,1);pret(b);const c=fort(apparaitre(S,b,3));
+test('Garde : frappe directe au corps à corps, sans projectile',()=>{const b=terrain();b.place(5,1,1);pret(b);const c=fort(apparaitre(S,b,TROLL));
  avancerTerrain(b,.6);assert.ok(c.hp<c.max);assert.equal(b.pr.length,0);
 });

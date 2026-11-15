@@ -42,28 +42,97 @@ const TW=FACTIONS.flatMap((F,fi)=>F.towers.map((name,j)=>{
   col:F.color,skin:ARCH[j],faction:fi,role:role.name,tag:bal.tag+' · '+role.tag};
 }));
 const ORDER=Array.from({length:10},(_,i)=>i);
-/* cat : n = sol, f = volant, s = spécial. Revenu des monstres au sol sur une courbe croissante (10 → 1, 100 → 11, 1000 → 120). */
+/* cat : n = sol, f = volant, s = spécial (magique ou boss), x = né d'une division (jamais envoyé). Revenu des monstres au sol sur une courbe croissante (10 → 1, 100 → 11, 1000 → 120).
+   t : palier (2.13). Le palier 1 est ouvert dès le début ; les paliers 2 et 3 s'achètent (PAL_C). Chaque palier : 12 monstres au sol, 3 volants, 8 magiques, 1 boss.
+   Capacités : aura (hâte), inv (invisible), split (se divise en « kid »), acc (accéléré), mi (anti-magie), heal (soin), arm (armure), stun (étourdit), hero (boss). */
 const CR=[
- {n:'Sapeur gobelin',cat:'n',c:10,hp:12,s:1.6,z:.75,g:'gob',col:'#8fce5a'},
- {n:'Warg',cat:'n',c:20,hp:22,s:2.4,z:.78,g:'wolf',col:'#9aa3ad'},
- {n:'Brute orc',cat:'n',c:65,hp:82,s:1.4,z:.95,g:'orc',col:'#5f9c45'},
- {n:'Troll des glaces',cat:'n',c:120,hp:160,s:1.5,z:1.1,g:'troll',col:'#57aeb0'},
- {n:'Golem runique',cat:'n',c:300,hp:420,s:1,z:1.2,g:'golem',col:'#9a9ca6'},
- {n:'Cyclope des cendres',cat:'n',c:1000,hp:1500,s:1.1,z:1.5,g:'cyc',col:'#dba878'},
- {n:'Chauve-souris',cat:'f',c:30,hp:16,s:2,z:.75,g:'bat',fly:1,col:'#7d5ba6'},
- {n:'Griffon corrompu',cat:'f',c:150,hp:95,s:1.9,z:1,g:'griffon',fly:1,col:'#d9a441'},
- {n:'Dragon ancien',cat:'f',c:450,hp:400,s:1.3,z:1.3,g:'dragon',fly:1,col:'#d6453d'},
- {n:'Chaman de guerre',cat:'s',c:80,hp:70,s:1.5,z:.85,g:'chaman',aura:1,col:'#e8b23a',tag:'hâte'},
- {n:'Prêtresse',cat:'s',c:100,hp:80,s:1.4,z:.85,g:'healer',heal:1,col:'#6fcf97',tag:'soin'},
- {n:'Gelée mutante',cat:'s',c:140,hp:90,s:1.3,z:.95,g:'slime',split:1,col:'#b5e04a',tag:'se divise'},
- {n:'Tortue',cat:'s',c:180,hp:150,s:1.1,z:1,g:'turtle',arm:5,at:90,col:'#8a6a3a',tag:'blindée'},
- {n:'Briseur de runes',cat:'s',c:200,hp:130,s:1.4,z:1,g:'breaker',mi:1,at:120,col:'#b9c0c9',tag:'anti-magie'},
- {n:'Spectre',cat:'s',c:200,hp:110,s:1.5,z:.9,g:'spectre',inv:1,at:180,col:'#d7defa',tag:'invisible'},
- {n:'Saboteur gobelin',cat:'s',c:260,hp:120,s:1.5,z:.85,g:'sapper',stun:1,at:240,col:'#8fce5a',tag:'étourdit'},
- {n:"Azh’Khar, seigneur des lames",cat:'s',c:900,hp:1900,s:1.02,z:1.35,g:'hero',arm:4,stun:1,at:360,hero:1,col:'#a77cff',tag:'HÉROS · étourdit · boss'},
- {n:'Petit limon',cat:'x',c:20,hp:35,s:1.6,z:.6,g:'slime',col:'#b5e04a'}];
-for(const T of CR)T.i=T.cat=='n'?Math.round(T.c/10*(1+.1*Math.log10(T.c/10))):Math.round(T.c*.065);
-const byCat=c=>CR.map((T,k)=>k).filter(k=>CR[k].cat==c).sort((a,b)=>CR[a].c-CR[b].c),NORM=byCat('n'),FLY=byCat('f'),idx=f=>CR.findIndex(T=>T[f]),AURA=idx('aura'),SPEC=idx('inv'),HEAL=idx('heal'),SPLIT=idx('split'),TURT=idx('arm'),BRK=idx('mi'),SAP=idx('stun'),KID=CR.findIndex(T=>T.cat=='x'),AURA_R=1.7;
+ /* ---- palier 1 ---- */
+ {n:'Sapeur gobelin',cat:'n',t:1,c:10,hp:12,s:1.6,z:.75,g:'gob',col:'#8fce5a'},
+ {n:'Rat des neiges',cat:'n',t:1,c:15,hp:15,s:2.2,z:.7,g:'rat',col:'#d9dfe4'},
+ {n:'Warg',cat:'n',t:1,c:20,hp:22,s:2.4,z:.78,g:'wolf',col:'#9aa3ad'},
+ {n:'Kobold',cat:'n',t:1,c:25,hp:30,s:1.6,z:.78,g:'kobold',col:'#d9733a'},
+ {n:'Squelette du givre',cat:'n',t:1,c:35,hp:42,s:1.5,z:.85,g:'skel',col:'#e6e2d2'},
+ {n:'Sanglier de guerre',cat:'n',t:1,c:45,hp:52,s:2,z:.9,g:'boar',col:'#7a4a2e'},
+ {n:'Gnoll',cat:'n',t:1,c:55,hp:68,s:1.6,z:.9,g:'gnoll',col:'#c9a25a'},
+ {n:'Brute orc',cat:'n',t:1,c:65,hp:82,s:1.4,z:.95,g:'orc',col:'#5f9c45'},
+ {n:'Maraudeur',cat:'n',t:1,c:75,hp:95,s:1.5,z:.9,g:'raider',col:'#4f5a3a'},
+ {n:'Myconide',cat:'n',t:1,c:85,hp:115,s:1.1,z:.95,g:'myco',col:'#c8322a'},
+ {n:'Yéti',cat:'n',t:1,c:100,hp:135,s:1.3,z:1.15,g:'yeti',col:'#e2eaf0'},
+ {n:'Troll des glaces',cat:'n',t:1,c:120,hp:160,s:1.5,z:1.1,g:'troll',col:'#57aeb0'},
+ {n:'Chauve-souris',cat:'f',t:1,c:30,hp:16,s:2,z:.75,g:'bat',fly:1,col:'#7d5ba6'},
+ {n:'Guêpe des glaces',cat:'f',t:1,c:50,hp:26,s:2.3,z:.7,g:'wasp',fly:1,col:'#f5c534'},
+ {n:'Harpie',cat:'f',t:1,c:90,hp:55,s:1.9,z:.85,g:'harpy',fly:1,col:'#9aa4b8'},
+ {n:'Chaman de guerre',cat:'s',t:1,c:80,hp:70,s:1.5,z:.85,g:'chaman',aura:1,col:'#e8b23a',tag:'hâte'},
+ {n:'Spectre',cat:'s',t:1,c:150,hp:90,s:1.5,z:.9,g:'spectre',inv:1,col:'#d7defa',tag:'invisible'},
+ {n:'Gelée mutante',cat:'s',t:1,c:140,hp:90,s:1.3,z:.95,g:'slime',split:'Petit limon',col:'#b5e04a',tag:'se divise'},
+ {n:'Lutin des glaces',cat:'s',t:1,c:110,hp:70,s:1.5,z:.7,g:'imp',acc:1,col:'#6fc6e8',tag:'accéléré'},
+ {n:'Briseur de runes',cat:'s',t:1,c:170,hp:120,s:1.4,z:1,g:'breaker',mi:1,col:'#b9c0c9',tag:'anti-magie'},
+ {n:'Prêtresse',cat:'s',t:1,c:100,hp:80,s:1.4,z:.85,g:'healer',heal:1,col:'#6fcf97',tag:'soin'},
+ {n:'Tortue',cat:'s',t:1,c:160,hp:140,s:1.1,z:1,g:'turtle',arm:5,col:'#8a6a3a',tag:'blindée'},
+ {n:'Saboteur gobelin',cat:'s',t:1,c:190,hp:110,s:1.5,z:.85,g:'sapper',stun:1,col:'#8fce5a',tag:'étourdit'},
+ {n:'Roi gobelin',cat:'s',t:1,c:450,hp:900,s:1,z:1.2,g:'gobking',arm:2,stun:1,hero:1,col:'#e0b44e',tag:'BOSS · étourdit'},
+ /* ---- palier 2 ---- */
+ {n:'Homme-lézard',cat:'n',t:2,c:150,hp:200,s:1.6,z:1.05,g:'lizard',col:'#4f9a5a'},
+ {n:'Chevalier noir',cat:'n',t:2,c:180,hp:250,s:1.2,z:1.1,g:'knight',col:'#3a3d48'},
+ {n:'Gargouille',cat:'n',t:2,c:210,hp:285,s:1.3,z:1.1,g:'gargoyle',col:'#8a8f99'},
+ {n:'Loup-garou',cat:'n',t:2,c:240,hp:310,s:1.9,z:1.15,g:'werewolf',col:'#6f6458'},
+ {n:'Ours de guerre',cat:'n',t:2,c:270,hp:370,s:1.5,z:1.15,g:'bear',col:'#6a4630'},
+ {n:'Golem runique',cat:'n',t:2,c:300,hp:420,s:1,z:1.2,g:'golem',col:'#9a9ca6'},
+ {n:'Ogre',cat:'n',t:2,c:330,hp:460,s:1.1,z:1.2,g:'ogre',col:'#c2a86a'},
+ {n:'Minotaure',cat:'n',t:2,c:370,hp:500,s:1.4,z:1.2,g:'minotaur',col:'#7a4a2e'},
+ {n:'Automate blindé',cat:'n',t:2,c:410,hp:580,s:1,z:1.2,g:'automaton',col:'#b07a3a'},
+ {n:'Wendigo',cat:'n',t:2,c:450,hp:610,s:1.6,z:1.25,g:'wendigo',col:'#3a3330'},
+ {n:'Rhinocéros de guerre',cat:'n',t:2,c:500,hp:720,s:1.5,z:1.3,g:'rhino',col:'#8a8f99'},
+ {n:'Mammouth de guerre',cat:'n',t:2,c:600,hp:900,s:.9,z:1.45,g:'mammoth',col:'#6e4a30'},
+ {n:'Griffon corrompu',cat:'f',t:2,c:150,hp:95,s:1.9,z:1,g:'griffon',fly:1,col:'#d9a441'},
+ {n:'Vouivre',cat:'f',t:2,c:260,hp:180,s:1.8,z:1.15,g:'wyvern',fly:1,col:'#3fa060'},
+ {n:'Manticore',cat:'f',t:2,c:380,hp:290,s:1.6,z:1.2,g:'manticore',fly:1,col:'#c8743a'},
+ {n:'Tambour de guerre',cat:'s',t:2,c:300,hp:300,s:1.4,z:1.05,g:'drummer',aura:1,col:'#4f9a3a',tag:'hâte'},
+ {n:'Assassin des ombres',cat:'s',t:2,c:380,hp:300,s:1.6,z:1,g:'assassin',inv:1,col:'#4a2a6a',tag:'invisible'},
+ {n:'Golem de boue',cat:'s',t:2,c:400,hp:320,s:1.2,z:1.15,g:'mudgolem',split:'Petite boue',col:'#6b4a2a',tag:'se divise'},
+ {n:'Centaure messager',cat:'s',t:2,c:340,hp:260,s:1.6,z:1.15,g:'centaur',acc:1,col:'#3a6ab0',tag:'accéléré'},
+ {n:'Inquisiteur',cat:'s',t:2,c:450,hp:380,s:1.3,z:1.1,g:'inquisitor',mi:1,col:'#d9dce2',tag:'anti-magie'},
+ {n:'Druidesse',cat:'s',t:2,c:330,hp:280,s:1.4,z:1.05,g:'druid',heal:1,col:'#4a7a3a',tag:'soin'},
+ {n:'Scarabée cuirassé',cat:'s',t:2,c:430,hp:380,s:1.2,z:.95,g:'beetle',arm:12,col:'#2f8a7a',tag:'blindé'},
+ {n:'Ingénieur nain renégat',cat:'s',t:2,c:480,hp:360,s:1.4,z:1,g:'engineer',stun:1,col:'#c8562a',tag:'étourdit'},
+ {n:'Cyclope des cendres',cat:'s',t:2,c:1400,hp:2800,s:1,z:1.5,g:'cyc',arm:6,stun:1,hero:1,col:'#dba878',tag:'BOSS · étourdit'},
+ /* ---- palier 3 ---- */
+ {n:'Roi-liche',cat:'n',t:3,c:900,hp:1200,s:1.2,z:1.3,g:'lich',col:'#4a3470'},
+ {n:'Seigneur de guerre orc',cat:'n',t:3,c:1000,hp:1350,s:1.3,z:1.35,g:'warlord',col:'#3a2c2c'},
+ {n:'Élémentaire de feu',cat:'n',t:3,c:1100,hp:1400,s:1.5,z:1.4,g:'fireel',col:'#ff7a1a'},
+ {n:'Démon des abysses',cat:'n',t:3,c:1250,hp:1700,s:1.4,z:1.5,g:'demon',col:'#a82a2a'},
+ {n:'Golem de lave',cat:'n',t:3,c:1400,hp:2000,s:.9,z:1.5,g:'lavagolem',col:'#3a3330'},
+ {n:'Ver des neiges',cat:'n',t:3,c:1550,hp:2100,s:1.2,z:1.5,g:'wyrm',col:'#eef2f5'},
+ {n:'Chimère',cat:'n',t:3,c:1700,hp:2250,s:1.5,z:1.5,g:'chimera',col:'#d9a441'},
+ {n:'Géant du givre',cat:'n',t:3,c:1900,hp:2700,s:1,z:1.6,g:'giant',col:'#8fb3d4'},
+ {n:'Sylvain corrompu',cat:'n',t:3,c:2100,hp:3000,s:.9,z:1.6,g:'treant',col:'#5a4030'},
+ {n:'Mastodonte de fer',cat:'n',t:3,c:2400,hp:3500,s:.8,z:1.6,g:'juggernaut',col:'#6c717b'},
+ {n:'Béhémoth',cat:'n',t:3,c:2700,hp:3900,s:1.1,z:1.7,g:'behemoth',col:'#4a3a5a'},
+ {n:'Colosse de pierre',cat:'n',t:3,c:3000,hp:4500,s:.85,z:1.75,g:'colossus',col:'#c9b48a'},
+ {n:'Dragon ancien',cat:'f',t:3,c:900,hp:800,s:1.3,z:1.3,g:'dragon',fly:1,col:'#d6453d'},
+ {n:'Phénix de givre',cat:'f',t:3,c:1200,hp:1000,s:1.6,z:1.3,g:'phoenix',fly:1,col:'#9fdcff'},
+ {n:'Oiseau-roc',cat:'f',t:3,c:1600,hp:1400,s:1.4,z:1.45,g:'roc',fly:1,col:'#7a5634'},
+ {n:'Héraut de guerre',cat:'s',t:3,c:1100,hp:1100,s:1.3,z:1.3,g:'herald',aura:1,col:'#e0b44e',tag:'hâte'},
+ {n:'Faucheuse',cat:'s',t:3,c:1300,hp:1050,s:1.5,z:1.3,g:'reaper',inv:1,col:'#24252d',tag:'invisible'},
+ {n:'Hydre',cat:'s',t:3,c:1400,hp:1100,s:1.1,z:1.45,g:'hydra',split:'Tête d’hydre',col:'#2f7a6a',tag:'se divise'},
+ {n:'Destrier de cauchemar',cat:'s',t:3,c:1200,hp:950,s:1.6,z:1.3,g:'nightmare',acc:1,col:'#a04aff',tag:'accéléré'},
+ {n:'Dévoreur de mana',cat:'s',t:3,c:1500,hp:1300,s:1.2,z:1.35,g:'manaeater',mi:1,col:'#5a2a7a',tag:'anti-magie'},
+ {n:'Grande prêtresse de sang',cat:'s',t:3,c:1250,hp:1000,s:1.3,z:1.25,g:'bloodpriest',heal:1,col:'#8a2232',tag:'soin'},
+ {n:'Tortue-dragon',cat:'s',t:3,c:1600,hp:1400,s:1,z:1.45,g:'dragonturtle',arm:25,col:'#8a3a2a',tag:'blindée'},
+ {n:'Golem du tonnerre',cat:'s',t:3,c:1700,hp:1400,s:1.1,z:1.45,g:'thunder',stun:1,col:'#3a4a6a',tag:'étourdit'},
+ {n:"Azh’Khar, seigneur des lames",cat:'s',t:3,c:3500,hp:7000,s:1.02,z:1.35,g:'hero',arm:15,stun:1,hero:1,col:'#a77cff',tag:'BOSS · étourdit'},
+ /* ---- nés d'une division (cat x, jamais envoyés) ---- */
+ {n:'Petit limon',cat:'x',t:1,c:20,hp:35,s:1.6,z:.6,g:'slime',col:'#b5e04a'},
+ {n:'Petite boue',cat:'x',t:2,c:60,hp:110,s:1.4,z:.8,g:'mudgolem',col:'#6b4a2a'},
+ {n:'Tête d’hydre',cat:'x',t:3,c:200,hp:380,s:1.3,z:.95,g:'hydra',col:'#2f7a6a'}];
+for(const T of CR){T.i=T.cat=='n'?Math.round(T.c/10*(1+.1*Math.log10(T.c/10))):Math.round(T.c*.065);if(T.split)T.kid=CR.findIndex(U=>U.n==T.split)}
+/* paliers (2.13) : prix d'ouverture des paliers 1, 2 et 3 ; accéléré : vitesse × (1 + ACC × secondes de vie), au plus × ACC_MAX */
+const PAL_C=[0,300,1500],ACC=.1,ACC_MAX=2;
+const byCat=c=>CR.map((T,k)=>k).filter(k=>CR[k].cat==c).sort((a,b)=>CR[a].c-CR[b].c),NORM=byCat('n'),FLY=byCat('f'),idx=f=>CR.findIndex(T=>T[f]),
+ /* listes par capacité (tous paliers, par prix croissant) pour l'IA ; AURA, SPEC… restent le monstre du palier 1 */
+ byF=f=>CR.map((T,k)=>k).filter(k=>CR[k][f]&&!CR[k].hero&&CR[k].cat!='x').sort((a,b)=>CR[a].c-CR[b].c),
+ AURAS=byF('aura'),SPECS=byF('inv'),HEALS=byF('heal'),SPLITS=byF('split'),ACCS=byF('acc'),ARMS=byF('arm'),MIS=byF('mi'),STUNS=byF('stun'),BOSS=CR.map((T,k)=>k).filter(k=>CR[k].hero),
+ AURA=idx('aura'),SPEC=idx('inv'),HEAL=idx('heal'),SPLIT=idx('split'),TURT=idx('arm'),BRK=idx('mi'),SAP=idx('stun'),KID=CR.findIndex(T=>T.cat=='x'),AURA_R=1.7;
 const DIFF=[{n:'Normal',b:1,g:0},{n:'Difficile',b:1.25,g:30},{n:'Brutal',b:1.5,g:60}];
 const HPK=.55,GRACE=25,GROUP=4,
 /* temps de construction : 1 s pour BUILD_OR pièces d'or dépensées (achat ou amélioration), entre BUILD_MIN et BUILD_MAX secondes,
@@ -83,7 +152,7 @@ class Grid{constructor(){this.b=Array.from({length:C*R},()=>[]);this.u=[];this.o
 const GRID_MIN=12;
 class Board{
  constructor(i,name,col,ai,classId=0){this.i=i;this.name=name;this.col=col;this.ai=ai;this.classId=classId;this.dead=0;this.aiT=1+i*.2;this.ev=[];this.G=null;
-  this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=100;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=60;this.ap=40;this.lastG=100;this.flyIn=0;this.hpIn=0;this.specSeen=0;this.mz=null;this.d=this.dist()}
+  this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=100;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=60;this.ap=40;this.lastG=100;this.flyIn=0;this.hpIn=0;this.specSeen=0;this.tier=1;this.mz=null;this.d=this.dist()}
  dist(){const d=Array.from({length:R},()=>Array(C).fill(INF)),q=[[EX[0],EX[1]]];d[EX[1]][EX[0]]=0;
   for(let i=0;i<q.length;i++){const[x,y]=q[i];for(const[dx,dy]of DIRS){const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R||this.g[b][a]||d[b][a]<INF)continue;d[b][a]=d[y][x]+1;q.push([a,b])}}return d}
  place(x,y,k){const T=TW[k];
@@ -125,12 +194,12 @@ class Board{
   /* hâte et soin : avec beaucoup de Chamans ou de Prêtresses, on ne regarde que ceux des cases voisines. Ils bougent pendant la boucle (au plus 3,4 cases/s × dt),
      d'où la marge ajoutée au rayon ; la distance exacte est ensuite vérifiée comme avant. */
   const ar=AURA_R+3.4*dt+.01,auG=au.length>GRID_MIN&&(this.ag||(this.ag=new Grid())).fill(au),hlG=hl.length>GRID_MIN&&(this.hg||(this.hg=new Grid())).fill(hl);
-  for(const c of this.cr){const T=CR[c.k];c.sl=Math.max(0,c.sl-dt);c.mark=Math.max(0,(c.mark||0)-dt);c.h=!T.aura&&(auG?auG.near(c.x,c.y,ar).some(n=>Math.hypot(au[n].x-c.x,au[n].y-c.y)<AURA_R):au.some(a=>Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));
+  for(const c of this.cr){const T=CR[c.k];c.sl=Math.max(0,c.sl-dt);if(T.acc)c.age=(c.age||0)+dt;c.mark=Math.max(0,(c.mark||0)-dt);c.h=!T.aura&&(auG?auG.near(c.x,c.y,ar).some(n=>Math.hypot(au[n].x-c.x,au[n].y-c.y)<AURA_R):au.some(a=>Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));
    c.hid=T.inv&&!mg.some(m=>Math.hypot(c.x-m.x,c.y-m.y)<=rng(m));
    c.hl=c.hp<c.max&&(hlG?hlG.near(c.x,c.y,ar).some(n=>hl[n]!==c&&Math.hypot(hl[n].x-c.x,hl[n].y-c.y)<AURA_R):hl.some(a=>a!==c&&Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));if(c.hl)c.hp=Math.min(c.max,c.hp+c.max*.05*dt);
    if(T.stun){c.cs-=dt;if(c.cs<=0){let bt=null,bd=2.3;for(const t of this.t){const d=Math.hypot(t.x-c.x,t.y-c.y);if(d<bd&&!(t.stun>0)&&!(t.b>0)){bd=d;bt=t}}
     if(bt){bt.stun=2;c.cs=3.5;this.fx.push({type:'zap',x:c.x+.5,y:c.y+.3,x2:bt.x+.5,y2:bt.y+.5-topY(bt),t:.3,d:.3});this.ev.push('zap')}else c.cs=.3}}
-   let sp=T.s*(c.sl>0?c.sf:1)*(c.h?1.4:1)*dt;
+   let sp=T.s*(c.sl>0?c.sf:1)*(c.h?1.4:1)*(T.acc?Math.min(ACC_MAX,1+ACC*c.age):1)*dt;
    if(T.fly){const dx=EX[0]-c.x,dy=EX[1]-c.y,dd=Math.hypot(dx,dy);if(dd<=sp)c.leak=1;else{c.x+=dx/dd*sp;c.y+=dy/dd*sp}continue}
    while(sp>0){const dx=c.tx-c.x,dy=c.ty-c.y,dd=Math.hypot(dx,dy);
     if(dd<1e-4){if(c.tx==EX[0]&&c.ty==EX[1]){c.leak=1;break}
@@ -161,7 +230,7 @@ class Board{
    if(c.leak){this.lives--;this.hurt=6;this.fx.push({type:'text',x:EX[0]+.5,y:EX[1]+.2,txt:'-1 vie',col:'#ff7b6e',t:.9,d:.9});this.ev.push('!leak')}
    else if(c.hp<=0){c.dead=1;const b=Math.max(1,Math.round(CR[c.k].c/10)),fy=flyH(c.k);this.gold+=b;
     this.fx.push({type:'puff',x:c.x+.5,y:c.y+.5-fy,col:CR[c.k].col,t:.35,d:.35},{type:'text',x:c.x+.5,y:c.y+.2-fy,txt:'+'+b,col:'#ffd95e',t:.7,d:.7});this.ev.push('die');
-    if(CR[c.k].split){const m=c.max/CR[c.k].hp;for(let i=0;i<2;i++)kids.push({id:++UID,k:KID,x:c.x,y:c.y,tx:c.tx,ty:c.ty,hp:CR[KID].hp*m,max:CR[KID].hp*m,sl:0,sf:.5,f:c.f,ph:Math.random()*6,ox:(i-.5)*.3,oy:(Math.random()-.5)*.2,arm:0,cs:9})}}}
+    if(CR[c.k].split){const m=c.max/CR[c.k].hp,K=CR[c.k].kid;for(let i=0;i<2;i++)kids.push({id:++UID,k:K,x:c.x,y:c.y,tx:c.tx,ty:c.ty,hp:CR[K].hp*m,max:CR[K].hp*m,sl:0,sf:.5,f:c.f,ph:Math.random()*6,ox:(i-.5)*.3,oy:(Math.random()-.5)*.2,arm:0,cs:9})}}}
   this.cr=this.cr.filter(c=>!c.dead&&!c.leak).concat(kids);
   for(const f of this.fx){f.t-=dt;if(f.vx!==undefined){f.x+=f.vx*dt;f.y+=f.vy*dt}}this.fx=this.fx.filter(f=>f.t>0)}
 }
@@ -256,14 +325,17 @@ function aiDefend(A){const M=mzStep(A,INF),time=A.G.time,bud=Math.min(A.dp,A.gol
  A.dp-=g0-A.gold;return ok}
 /* attaque : elle empile plusieurs revenus puis lâche une grosse vague, composée selon les faiblesses des adversaires */
 function aiAttack(A){const time=A.G.time;let bud=Math.min(A.ap,A.gold),sent=false;if(time<GRACE||bud<Math.min(6000,Math.max(60,A.inc*3)))return false;
+ /* 2.13 : ouvre le palier suivant quand sa réserve d'attaque le permet (palier 2 dès 2:30, palier 3 dès 7:00) */
+ const pc=PAL_C[A.tier];if(pc!==undefined&&time>=(A.tier==1?150:420)&&bud>=pc*1.5){const g=A.gold;if(A.G.unlock(A)){bud-=g-A.gold;A.ap-=g-A.gold}}
  const fo=A.G.foes(A),share=ks=>{let a=0,b=0;for(const o of fo)for(const t of o.t){b+=t.inv;if(ks.includes(t.k))a+=t.inv}return b?a/b:0};
  const weakAir=fo.some(b=>airInv(b)<50+time*1.5),noMage=fo.some(b=>!mages(b)),phys=share(fo.flatMap(b=>[b.classId*10,b.classId*10+4])),magic=share(fo.flatMap(b=>[b.classId*10+2,b.classId*10+5]));
- const ok=k=>bud>=CR[k].c&&time>=(CR[k].at||0),top=l=>l.filter(ok).pop(),go=k=>{const g=A.gold;if(!A.G.send(A,k))return false;sent=true;bud-=g-A.gold;A.ap-=g-A.gold;return true};
- if(bud>=500)for(const k of[HEAL,AURA])if(ok(k)&&Math.random()<.6)go(k);
- for(let n=0;n<12;n++){const opts=[[top(NORM),5],[top(FLY),weakAir?4:1],[SPEC,noMage?4:.8],[TURT,phys>.45?2.5:.7],[BRK,magic>.3?2.5:.6],[SPLIT,.7],[SAP,1]].filter(o=>o[0]!==undefined&&ok(o[0]));
+ /* dans chaque liste, le monstre le plus cher que la réserve paie, parmi les paliers ouverts */
+ const ok=k=>bud>=CR[k].c&&CR[k].t<=A.tier,top=l=>l.filter(ok).pop(),go=k=>{const g=A.gold;if(!A.G.send(A,k))return false;sent=true;bud-=g-A.gold;A.ap-=g-A.gold;return true};
+ if(bud>=500)for(const l of[HEALS,AURAS]){const k=top(l);if(k!==undefined&&Math.random()<.6)go(k)}
+ for(let n=0;n<12;n++){const opts=[[top(NORM),5],[top(FLY),weakAir?4:1],[top(SPECS),noMage?4:.8],[top(ARMS),phys>.45?2.5:.7],[top(MIS),magic>.3?2.5:.6],[top(SPLITS),.7],[top(ACCS),.7],[top(STUNS),1]].filter(o=>o[0]!==undefined);
   if(!opts.length)break;let r=Math.random()*opts.reduce((s,o)=>s+o[1],0),k=opts[0][0];for(const o of opts){r-=o[1];if(r<=0){k=o[0];break}}
   if(!go(k))break}
- const hero=CR.findIndex(T=>T.hero);if(hero>=0&&ok(hero)&&time>420&&Math.random()<.28)go(hero);
+ const boss=top(BOSS);if(boss!==undefined&&time>(CR[boss].t==1?240:420)&&Math.random()<.28)go(boss);
  return sent}
 function aiAct(A){const time=A.G.time,gain=A.gold-A.lastG,danger=A.hurt>0,need=(A.G.foes(A).reduce((s,b)=>s+b.inc,0)*4+20)*(1+time/400);
  const f=danger||A.pen>.85?.8:A.pen>.65?.55:invest(A)<need*.35?.5:A.pen>.45?.3:.15;
@@ -281,15 +353,18 @@ class Game{
   this.B=seats.map((s,i)=>{const b=new Board(i,s.name,s.col,s.ai?1:0,s.classId);b.G=this;if(b.ai){b.gold+=DIFF[LV].g;b.dp+=DIFF[LV].g;b.lastG=b.gold}return b})}
  foes(b){return this.B.filter(o=>o!==b&&!o.dead)}
  eff(b){return b.ai?Math.round(b.inc*DIFF[this.LV].b):b.inc}
+ /* 2.13 : ouvre le palier de monstres suivant (paliers 2 et 3 payants) */
+ unlock(b){const c=PAL_C[b.tier];if(c===undefined||b.gold<c)return false;b.gold-=c;b.tier++;b.ev.push('up');return true}
  /* un envoi part chez tous les adversaires encore en jeu */
- send(from,k){const T=CR[k];if(from.gold<T.c||this.time<(T.at||0))return false;from.gold-=T.c;from.inc+=T.i;for(const b of this.foes(from))b.send(k,1+this.time/200);return true}
+ send(from,k){const T=CR[k];if(from.gold<T.c||T.t>from.tier)return false;from.gold-=T.c;from.inc+=T.i;for(const b of this.foes(from))b.send(k,1+this.time/200);return true}
  /* action d'un joueur humain : renvoie '' si accepté, sinon un code d'erreur (poor, blocked, locked, max, busy, over, bad) */
  action(i,a){const b=this.B[i];if(!b||b.dead||b.ai||this.over||!a)return 'over';
   const x=a.x|0,y=a.y|0,k=a.k|0;
   if(a.type=='place'){const T=TW[k];if(!T)return 'bad';if(b.place(x,y,k))return '';return b.gold<T.c?'poor':'blocked'}
   if(a.type=='sell')return b.sell(x,y)?'':'bad';
   if(a.type=='upgrade'){const t=b.t.find(t=>t.x==x&&t.y==y);if(!t)return 'bad';return b.upgrade(t)?'':t.lv>=5?'max':t.b>0?'busy':'poor'}
-  if(a.type=='send'){const T=CR[k];if(!T||T.cat=='x')return 'bad';if(this.time<(T.at||0))return 'locked';return this.send(b,k)?'':'poor'}
+  if(a.type=='send'){const T=CR[k];if(!T||T.cat=='x')return 'bad';if(T.t>b.tier)return 'locked';return this.send(b,k)?'':'poor'}
+  if(a.type=='tier'){if(b.tier>=PAL_C.length)return 'max';return this.unlock(b)?'':'poor'}
   return 'bad'}
  /* avance la partie de dt secondes (dt ≤ 0,05) ; les événements de partie vont dans this.log */
  step(dt){if(this.over)return;const B=this.B;this.time+=dt;this.tick-=dt;
@@ -301,4 +376,4 @@ class Game{
   const alive=B.filter(b=>!b.dead);
   if(alive.length<=1||!alive.some(b=>!b.ai)){this.over=true;this.winner=alive.length==1?alive[0].i:-1;this.log.push({type:'end',winner:this.winner})}}
 }
-if(typeof module!='undefined'&&module.exports)module.exports={C,R,SP,EX,INF,TW,CR,DIFF,FACTIONS,Board,Game};
+if(typeof module!='undefined'&&module.exports)module.exports={C,R,SP,EX,INF,TW,CR,PAL_C,DIFF,FACTIONS,Board,Game};

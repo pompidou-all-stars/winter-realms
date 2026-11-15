@@ -96,7 +96,7 @@ export class GameRoom{
 
  /* instantané : tout ce qu'il faut pour dessiner les 4 terrains (positions arrondies au centième) */
  snap(full){const g=this.game;
-  return {t:'snap',time:r2(g.time),tick:r2(g.tick),log:full?[]:g.log.splice(0),B:g.B.map(b=>({gold:Math.floor(b.gold),inc:b.inc,lives:b.lives,dead:b.dead,
+  return {t:'snap',time:r2(g.time),tick:r2(g.tick),log:full?[]:g.log.splice(0),B:g.B.map(b=>({gold:Math.floor(b.gold),inc:b.inc,lives:b.lives,dead:b.dead,tier:b.tier,
    t:b.t.map(t=>[t.x,t.y,t.k,t.lv,t.inv,r2(t.a),t.sw>0?1:0,t.stun>0?1:0,t.b>0?r2(t.b):0,t.b>0?r2(t.bt):0]),
    c:b.cr.map(c=>[c.id,c.k,r2(c.x),r2(c.y),r2(Math.max(0,c.hp/c.max)),(c.sl>0?1:0)|(c.h?2:0)|(c.hl?4:0)|(c.hid?8:0),c.f,r2(c.ph),r2(c.ox),r2(c.oy)]),
    p:b.pr.map(p=>[p.id,p.k,r2(p.x),r2(p.y),r2(p.tx),r2(p.ty),r2(p.tot),r2(p.a)]),

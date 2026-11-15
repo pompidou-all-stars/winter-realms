@@ -26,12 +26,12 @@ function auditer(S=charger('actuel')){
    if(!proche(num(c[5]),T.cd,.0006))ecart(ou,'recharge',c[5],T.cd);
    if(num(c[6])!==Math.round(T.d/T.cd))ecart(ou,'DPS',c[6],Math.round(T.d/T.cd));
    if(!proche(num(c[7]),T.r,.006))ecart(ou,'portée',c[7],T.r)}
-  /* §6.2 : Monstre | Catégorie | Coût | +revenu | PV de base | Vitesse | Disponible à | Capacité */
+  /* §6.2 : Monstre | Catégorie | Coût | +revenu | PV de base | Vitesse | Palier | Capacité */
   if(section.startsWith('### 6.2')&&c[0]!=='Monstre'){const k=S.CR.findIndex(T=>T.n.replace('’',"'")==c[0].replace('’',"'"));const ou=`§6.2 ${c[0]}`;
    if(k<0){ecart(ou,'monstre','présent dans la doc','absent du code');continue}const T=S.CR[k];verifie.monstres++;
    if(num(c[2])!==T.c)ecart(ou,'coût',c[2],T.c);if(num(c[3])!==T.i)ecart(ou,'+revenu',c[3],T.i);
    if(num(c[4])!==T.hp)ecart(ou,'PV de base',c[4],T.hp);if(num(c[5])!==T.s)ecart(ou,'vitesse',c[5],T.s);
-   if(c[6]!==mmss(T.at||0))ecart(ou,'disponible à',c[6],mmss(T.at||0))}
+   if(num(c[6])!==T.t)ecart(ou,'palier',c[6],T.t)}
   /* §4.1 : Archétype | Coût | Portée | Dégâts | Recharge | … */
   if(section.startsWith('### 4.1')&&c[0]!=='Archétype'){const B=S.BASE_TW.find(b=>b.n==c[0]);if(!B)continue;const ou=`§4.1 ${c[0]}`;verifie.archetypes++;
    if(num(c[1])!==B.c)ecart(ou,'coût',c[1],B.c);if(num(c[2])!==B.r)ecart(ou,'portée',c[2],B.r);if(num(c[3])!==B.d)ecart(ou,'dégâts',c[3],B.d);if(num(c[4])!==B.cd)ecart(ou,'recharge',c[4],B.cd)}

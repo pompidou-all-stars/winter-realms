@@ -44,6 +44,12 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.13 — 2026-11-15
+- Monster tiers: 3 tiers of 24 monsters (12 ground, 3 flying, 8 magic, 1 boss), 72 monsters instead of 17. Tier 1 is open from the start; tier 2 costs 300 gold and tier 3 costs 1,500 gold. Time unlocks are gone.
+- New "accelerated" ability (speeds up the longer it lives); three splitting monsters; one boss per tier.
+- The AI opens tiers and sends the strongest monster it can afford in each family.
+- Send tab: tier badges to pick or open a tier. `sim.js` and `server/` changed (automatic server redeploy).
+
 ### 2.12 (assets) — 2026-11-15
 - 3D assets: monster models for the upcoming tier system (3 tiers × 24 monsters, list in `art/monstres/PALIERS.md`). Not used by the game yet. No game change.
 ### 2.12 — 2026-11-15

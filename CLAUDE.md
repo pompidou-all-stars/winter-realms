@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.12)
+# Winter Realms — Tower Wars (Édition 2.13)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -95,6 +95,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
   | `CR` | Les monstres |
   | `DIFF` | Les niveaux de difficulté |
   | `HPK`, `GRACE`, `GROUP`, `AURA_R` | Constantes de gameplay |
+  | `PAL_C`, `ACC`, `ACC_MAX` | Prix des paliers de monstres et vitesse des monstres accélérés (§6, depuis la 2.13) |
   | `BUILD_OR`, `BUILD_MIN`, `BUILD_MAX`, `BUILD_DIFF` | Temps de construction : 1 s par `BUILD_OR` pièces d'or, borné, multiplié selon la difficulté pour les humains (§4.4) |
 - **Sections de `sim.js`** : tables de données → simulation (`class Board`) → IA (`aiDefend`, `aiAttack`, `aiAct`) → partie (`class Game`).
 - **Sections du script de `index.html`** : sons → dessin → interface (dont le multijoueur, objet `NET`) → sons et événements → boucle principale (`loop`).
@@ -299,35 +300,98 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 - **Revenu gagné par envoi** :
   - monstres au sol : `arrondi(coût/10 × (1 + 0,1 × log10(coût/10)))`, une courbe croissante ;
   - autres monstres : `arrondi(coût × 0,065)`.
-- Certains monstres ne peuvent être envoyés qu'après un **temps de jeu minimum**.
+- **Paliers** (depuis la 2.13, à la place des déblocages par le temps) : les monstres sont rangés en **3 paliers de 24** (12 au sol, 3 volants, 8 magiques, 1 boss). Le palier 1 est ouvert dès le début ; chaque joueur ouvre ensuite le palier 2 pour **300 or** puis le palier 3 pour **1 500 or** (`PAL_C`, action `tier`), une fois pour toute la partie. Un monstre d'un palier fermé est refusé (`locked`). Les 8 capacités magiques de chaque palier : hâte, invisible, se divise, accéléré, anti-magie, soin, armure, étourdissement. Les monstres au sol restent les plus rentables pour le revenu (courbe ci-dessus, contre 6,5 % du coût pour les autres).
 
 ### 6.2 Liste
-Vitesse en cases par seconde.
+Vitesse en cases par seconde. Dans chaque palier, les monstres sont rangés par catégorie puis par coût.
 
-| Monstre | Catégorie | Coût | +revenu | PV de base | Vitesse | Disponible à | Capacité |
+| Monstre | Catégorie | Coût | +revenu | PV de base | Vitesse | Palier | Capacité |
 |---|---|---|---|---|---|---|---|
-| Sapeur gobelin | Sol | 10 | +1 | 12 | 1,6 | 0:00 | — |
-| Warg | Sol | 20 | +2 | 22 | 2,4 | 0:00 | Rapide |
-| Brute orc | Sol | 65 | +7 | 82 | 1,4 | 0:00 | — |
-| Troll des glaces | Sol | 120 | +13 | 160 | 1,5 | 0:00 | — |
-| Golem runique | Sol | 300 | +34 | 420 | 1,0 | 0:00 | — |
-| Cyclope des cendres | Sol | 1000 | +120 | 1500 | 1,1 | 0:00 | — |
-| Chauve-souris | Volant | 30 | +2 | 16 | 2,0 | 0:00 | Vol |
-| Griffon corrompu | Volant | 150 | +10 | 95 | 1,9 | 0:00 | Vol |
-| Dragon ancien | Volant | 450 | +29 | 400 | 1,3 | 0:00 | Vol |
-| Chaman de guerre | Spécial | 80 | +5 | 70 | 1,5 | 0:00 | **Hâte** : les alliés à moins de 1,7 case vont 1,4 fois plus vite |
-| Prêtresse | Spécial | 100 | +7 | 80 | 1,4 | 0:00 | **Soin** : les alliés à moins de 1,7 case regagnent 5 % de leurs PV max par seconde |
-| Gelée mutante | Spécial | 140 | +9 | 90 | 1,3 | 0:00 | **Se divise** en 2 Petits limons (35 PV de base, vitesse 1,6) à sa mort |
-| Tortue | Spécial | 180 | +12 | 150 | 1,1 | 1:30 | **Blindée** : armure 5 |
-| Briseur de runes | Spécial | 200 | +13 | 130 | 1,4 | 2:00 | **Anti-magie** : insensible au Givre et au Mage |
-| Spectre | Spécial | 200 | +13 | 110 | 1,5 | 3:00 | **Invisible** sauf à portée d'une tour Mage |
-| Saboteur gobelin | Spécial | 260 | +17 | 120 | 1,5 | 4:00 | **Étourdit** la tour la plus proche |
-| Azh'Khar, seigneur des lames | Spécial (héros) | 900 | +59 | 1900 | 1,02 | 6:00 | **Boss** : armure 4 et étourdissement |
+| Sapeur gobelin | Sol | 10 | +1 | 12 | 1,6 | 1 | — |
+| Rat des neiges | Sol | 15 | +2 | 15 | 2,2 | 1 | — |
+| Warg | Sol | 20 | +2 | 22 | 2,4 | 1 | — |
+| Kobold | Sol | 25 | +3 | 30 | 1,6 | 1 | — |
+| Squelette du givre | Sol | 35 | +4 | 42 | 1,5 | 1 | — |
+| Sanglier de guerre | Sol | 45 | +5 | 52 | 2 | 1 | — |
+| Gnoll | Sol | 55 | +6 | 68 | 1,6 | 1 | — |
+| Brute orc | Sol | 65 | +7 | 82 | 1,4 | 1 | — |
+| Maraudeur | Sol | 75 | +8 | 95 | 1,5 | 1 | — |
+| Myconide | Sol | 85 | +9 | 115 | 1,1 | 1 | — |
+| Yéti | Sol | 100 | +11 | 135 | 1,3 | 1 | — |
+| Troll des glaces | Sol | 120 | +13 | 160 | 1,5 | 1 | — |
+| Chauve-souris | Volant | 30 | +2 | 16 | 2 | 1 | Vol |
+| Guêpe des glaces | Volant | 50 | +3 | 26 | 2,3 | 1 | Vol |
+| Harpie | Volant | 90 | +6 | 55 | 1,9 | 1 | Vol |
+| Chaman de guerre | Magique | 80 | +5 | 70 | 1,5 | 1 | **Hâte** : les alliés à moins de 1,7 case vont 1,4 fois plus vite |
+| Prêtresse | Magique | 100 | +7 | 80 | 1,4 | 1 | **Soin** : les alliés à moins de 1,7 case regagnent 5 % de leurs PV max par seconde |
+| Lutin des glaces | Magique | 110 | +7 | 70 | 1,5 | 1 | **Accéléré** : vitesse × (1 + 0,1 × secondes de vie), au plus × 2 |
+| Gelée mutante | Magique | 140 | +9 | 90 | 1,3 | 1 | **Se divise** en 2 Petit limon à sa mort |
+| Spectre | Magique | 150 | +10 | 90 | 1,5 | 1 | **Invisible** sauf à portée d'une tour Mage |
+| Tortue | Magique | 160 | +10 | 140 | 1,1 | 1 | **Blindé** : armure 5 |
+| Briseur de runes | Magique | 170 | +11 | 120 | 1,4 | 1 | **Anti-magie** : insensible au Givre et au Mage |
+| Saboteur gobelin | Magique | 190 | +12 | 110 | 1,5 | 1 | **Étourdit** la tour la plus proche |
+| Roi gobelin | Boss | 450 | +29 | 900 | 1 | 1 | **Boss** : armure 2 et étourdissement |
+| Homme-lézard | Sol | 150 | +17 | 200 | 1,6 | 2 | — |
+| Chevalier noir | Sol | 180 | +20 | 250 | 1,2 | 2 | — |
+| Gargouille | Sol | 210 | +24 | 285 | 1,3 | 2 | — |
+| Loup-garou | Sol | 240 | +27 | 310 | 1,9 | 2 | — |
+| Ours de guerre | Sol | 270 | +31 | 370 | 1,5 | 2 | — |
+| Golem runique | Sol | 300 | +34 | 420 | 1 | 2 | — |
+| Ogre | Sol | 330 | +38 | 460 | 1,1 | 2 | — |
+| Minotaure | Sol | 370 | +43 | 500 | 1,4 | 2 | — |
+| Automate blindé | Sol | 410 | +48 | 580 | 1 | 2 | — |
+| Wendigo | Sol | 450 | +52 | 610 | 1,6 | 2 | — |
+| Rhinocéros de guerre | Sol | 500 | +58 | 720 | 1,5 | 2 | — |
+| Mammouth de guerre | Sol | 600 | +71 | 900 | 0,9 | 2 | — |
+| Griffon corrompu | Volant | 150 | +10 | 95 | 1,9 | 2 | Vol |
+| Vouivre | Volant | 260 | +17 | 180 | 1,8 | 2 | Vol |
+| Manticore | Volant | 380 | +25 | 290 | 1,6 | 2 | Vol |
+| Tambour de guerre | Magique | 300 | +20 | 300 | 1,4 | 2 | **Hâte** : les alliés à moins de 1,7 case vont 1,4 fois plus vite |
+| Druidesse | Magique | 330 | +21 | 280 | 1,4 | 2 | **Soin** : les alliés à moins de 1,7 case regagnent 5 % de leurs PV max par seconde |
+| Centaure messager | Magique | 340 | +22 | 260 | 1,6 | 2 | **Accéléré** : vitesse × (1 + 0,1 × secondes de vie), au plus × 2 |
+| Assassin des ombres | Magique | 380 | +25 | 300 | 1,6 | 2 | **Invisible** sauf à portée d'une tour Mage |
+| Golem de boue | Magique | 400 | +26 | 320 | 1,2 | 2 | **Se divise** en 2 Petite boue à sa mort |
+| Scarabée cuirassé | Magique | 430 | +28 | 380 | 1,2 | 2 | **Blindé** : armure 12 |
+| Inquisiteur | Magique | 450 | +29 | 380 | 1,3 | 2 | **Anti-magie** : insensible au Givre et au Mage |
+| Ingénieur nain renégat | Magique | 480 | +31 | 360 | 1,4 | 2 | **Étourdit** la tour la plus proche |
+| Cyclope des cendres | Boss | 1400 | +91 | 2800 | 1 | 2 | **Boss** : armure 6 et étourdissement |
+| Roi-liche | Sol | 900 | +108 | 1200 | 1,2 | 3 | — |
+| Seigneur de guerre orc | Sol | 1000 | +120 | 1350 | 1,3 | 3 | — |
+| Élémentaire de feu | Sol | 1100 | +132 | 1400 | 1,5 | 3 | — |
+| Démon des abysses | Sol | 1250 | +151 | 1700 | 1,4 | 3 | — |
+| Golem de lave | Sol | 1400 | +170 | 2000 | 0,9 | 3 | — |
+| Ver des neiges | Sol | 1550 | +189 | 2100 | 1,2 | 3 | — |
+| Chimère | Sol | 1700 | +208 | 2250 | 1,5 | 3 | — |
+| Géant du givre | Sol | 1900 | +233 | 2700 | 1 | 3 | — |
+| Sylvain corrompu | Sol | 2100 | +259 | 3000 | 0,9 | 3 | — |
+| Mastodonte de fer | Sol | 2400 | +297 | 3500 | 0,8 | 3 | — |
+| Béhémoth | Sol | 2700 | +336 | 3900 | 1,1 | 3 | — |
+| Colosse de pierre | Sol | 3000 | +374 | 4500 | 0,85 | 3 | — |
+| Dragon ancien | Volant | 900 | +59 | 800 | 1,3 | 3 | Vol |
+| Phénix de givre | Volant | 1200 | +78 | 1000 | 1,6 | 3 | Vol |
+| Oiseau-roc | Volant | 1600 | +104 | 1400 | 1,4 | 3 | Vol |
+| Héraut de guerre | Magique | 1100 | +72 | 1100 | 1,3 | 3 | **Hâte** : les alliés à moins de 1,7 case vont 1,4 fois plus vite |
+| Destrier de cauchemar | Magique | 1200 | +78 | 950 | 1,6 | 3 | **Accéléré** : vitesse × (1 + 0,1 × secondes de vie), au plus × 2 |
+| Grande prêtresse de sang | Magique | 1250 | +81 | 1000 | 1,3 | 3 | **Soin** : les alliés à moins de 1,7 case regagnent 5 % de leurs PV max par seconde |
+| Faucheuse | Magique | 1300 | +85 | 1050 | 1,5 | 3 | **Invisible** sauf à portée d'une tour Mage |
+| Hydre | Magique | 1400 | +91 | 1100 | 1,1 | 3 | **Se divise** en 2 Tête d’hydre à sa mort |
+| Dévoreur de mana | Magique | 1500 | +98 | 1300 | 1,2 | 3 | **Anti-magie** : insensible au Givre et au Mage |
+| Tortue-dragon | Magique | 1600 | +104 | 1400 | 1 | 3 | **Blindé** : armure 25 |
+| Golem du tonnerre | Magique | 1700 | +111 | 1400 | 1,1 | 3 | **Étourdit** la tour la plus proche |
+| Azh'Khar, seigneur des lames | Boss | 3500 | +228 | 7000 | 1,02 | 3 | **Boss** : armure 15 et étourdissement |
+| Petit limon | Né d'une division | 20 | +1 | 35 | 1,6 | 1 | — |
+| Petite boue | Né d'une division | 60 | +4 | 110 | 1,4 | 2 | — |
+| Tête d'hydre | Né d'une division | 200 | +13 | 380 | 1,3 | 3 | — |
+
+Les « nés d'une division » ne s'envoient pas : ils apparaissent par 2 à la mort de leur parent, avec ses PV multipliés de la même façon.
 
 ### 6.3 Détails des capacités
 - **Armure** : chaque coup perd un montant fixe de dégâts (`armure × multiplicateur de temps`), mais garde toujours au moins **20 %** des dégâts. Les Nains réduisent cette armure de 55 %.
 - **Étourdissement** : toutes les **3,5 s** (premier essai 2 s après l'apparition), le monstre étourdit pendant **2 s** la tour la plus proche dans un rayon de **2,3 cases**. Une tour déjà étourdie ne peut pas être ciblée.
 - **Invisibilité** : un Spectre caché ne peut être ni ciblé, ni touché par les explosions ou les flammes.
+- **Accéléré** (depuis la 2.13) : la vitesse est multipliée par `1 + 0,1 × secondes de vie` (`ACC`), au plus × 2 (`ACC_MAX`), avant les ralentissements et la hâte.
+- **Se divise** : à sa mort, le monstre laisse 2 petits (`kid`) : Gelée → Petit limon, Golem de boue → Petite boue, Hydre → Tête d'hydre.
+- **Boss** (un par palier) : armure et étourdissement, avec un halo violet en 2D.
 - **Hâte et soin** : un monstre n'en profite pas pour lui-même. Les zones d'effet sont affichées en cercles colorés (jaune pour la hâte, vert pour le soin).
 
 ---
@@ -375,9 +439,10 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 **Attaque** (`aiAttack`) :
 - rien pendant les **25 premières secondes** (`GRACE`) ;
 - elle accumule de l'or jusqu'à `min(6000, max(60, revenu × 3))`, puis envoie une grosse vague ;
-- elle compose cette vague selon les **faiblesses de ses adversaires** : des volants s'ils ont peu de défense aérienne, des Spectres s'ils n'ont pas de Mage, des Tortues s'ils ont beaucoup de tours « physiques », des Briseurs s'ils ont beaucoup de tours magiques ;
-- elle ajoute Prêtresse et Chaman si sa réserve dépasse 500 ;
-- elle envoie le héros après **7:00**, avec 28 % de chances à chaque vague.
+- elle compose cette vague selon les **faiblesses de ses adversaires** : des volants s'ils ont peu de défense aérienne, des invisibles s'ils n'ont pas de Mage, des blindés s'ils ont beaucoup de tours « physiques », des anti-magie s'ils ont beaucoup de tours magiques ;
+- **paliers** (2.13) : elle ouvre le palier 2 à partir de 2:30 et le palier 3 à partir de 7:00, dès que sa réserve d'attaque vaut 1,5 fois le prix ; dans chaque famille (sol, volants, invisibles, blindés, anti-magie, se divise, accélérés, étourdissants), elle envoie le monstre **le plus cher qu'elle peut payer parmi ses paliers ouverts** ;
+- elle ajoute le soigneur et le monstre de hâte les plus forts possibles si sa réserve dépasse 500 ;
+- elle envoie un boss (le plus fort de ses paliers) après **4:00** pour celui du palier 1, **7:00** pour les autres, avec 28 % de chances à chaque vague.
 
 ---
 
@@ -401,7 +466,7 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
   - **tour posée** : les mêmes informations au niveau actuel, avec le gain du niveau suivant et son prix ;
   - **Envoyer** : rappel de la règle (chaque envoi attaque tous les adversaires et augmente le revenu).
   - En portrait, la fiche a une hauteur fixe pour que le terrain ne change pas de taille.
-- **Cartes de tours** : prix, puis deux lignes en clair, « ⚔ N dégâts/s » et « ◎ portée N » (depuis la 2.3 ; avant, `⚔N/s ◎N ✈`). Le `✈` est remplacé par la pastille de cibles. **Cartes de monstres** : prix et revenu gagné ; un monstre verrouillé affiche « 🔒 dès m:ss ».
+- **Cartes de tours** : prix, puis deux lignes en clair, « ⚔ N dégâts/s » et « ◎ portée N » (depuis la 2.3 ; avant, `⚔N/s ◎N ✈`). Le `✈` est remplacé par la pastille de cibles. **Cartes de monstres** : prix et revenu gagné. **Paliers** (depuis la 2.13) : les onglets Sol, Volants et Spéciaux commencent par trois écussons « Palier 1 / 2 / 3 » ; un palier ouvert se touche pour afficher ses monstres, le palier suivant affiche son prix et « 🔓 ouvrir » (un toucher l'achète), le dernier reste « 🔒 » tant que le précédent est fermé. Seuls les monstres du palier affiché sont proposés. Les nouveaux monstres sans dessin 2D dédié sont dessinés en silhouette simple à leur couleur (`dessinMonstre`) ; en 3D, ils ont leur modèle.
 - **Pastilles de rôle** (depuis la 2.3) : sur l'icône de chaque carte de tour (56 × 46 px, fonction `towerIcon`) et dans la fiche, des pastilles carrées à cadre doré biseauté, dans l'esprit des icônes de commande des jeux de stratégie (glyphes dessinés en code, fonctions `drawBadge` et `drawTowerBadges`, table `BADGE`) :
   - **en haut à droite, le rôle** (archétype `T.s`) : flèche (Archer), épée (Garde), flocon (Givre), bombe (Canon), flamme (Flammes), étoile (Mage) ;
   - **en bas à gauche, les cibles** : montagne = sol uniquement (`T.gr`), aile = sol et air ;
@@ -525,7 +590,7 @@ Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en
 
 ### 12.2 Ce que contient `tests/`
 - `simulation/` : les tests du moteur (`sim.js`). Ils vérifient que le jeu fonctionne (mécaniques, formules, parties qui se terminent). **Il n'y a pas de moteur figé ni de parties enregistrées** (supprimés en 2.5) : un changement d'équilibrage ou d'IA ne fait échouer que les tests qui décrivent précisément la mécanique modifiée, et on met ces tests à jour dans le même commit.
-  - `tables` : forme des tables (50 tours, 18 monstres…), statistiques valides, et chaque tour recalculée à partir des formules. Les chiffres eux-mêmes peuvent changer librement.
+  - `tables` : forme des tables (50 tours, 75 monstres…), statistiques valides, et chaque tour recalculée à partir des formules. Les chiffres eux-mêmes peuvent changer librement.
   - `construction`, `chantier` (temps de construction, depuis la 2.4), `deplacements`, `combats`, `economie`, `vagues` (avec l'IA), `fin-de-partie` : les mécaniques. Les tests qui ont besoin d'une tour active appellent `pret(b)`, qui fait avancer le terrain jusqu'à la fin des chantiers.
   - `parties-ia` : **une partie complète par difficulté** (Alliance en Normal, Horde en Difficile, Sylvestres en Brutal ; les 15 avec `--complet`) qui doit se terminer en moins de 30 min de jeu, sans valeur invalide, avec des tours construites et des attaques ; plus les 2 premières minutes d'une partie rejouées deux fois avec la même graine, qui doivent être identiques.
 - `simulation/modeles-3d.test.js` (2.7) : un modèle 3D pour chaque tour (`tours/<faction>-<j>`) et chaque clé de monstre (`monstres/<g>`), portail et château présents, monstres animés (`marche` ou `vol`), pièce `Tourelle` sur les tours qui visent, compression meshopt.
@@ -709,3 +774,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-14 | 2.11 | Outillage : le test « génération découpée » de l'IA (`labyrinthe`) échouait souvent sur GitHub (tranche de 7 ms pour une limite de 6 ms) selon la charge des machines. Il vérifie désormais avec certitude que la génération se fait en au moins 3 tranches, et ne garde la durée que comme garde-fou : meilleure de 3 mesures, moins de 10 ms par tranche et 100 ms au total (avant : 6 et 60 ms). **Aucun changement de jeu.** |
 | 2026-11-15 | 2.12 | **Interface : terrain plus grand et habillage « givre elfique »**. Le terrain occupe toute la place : en 3D, l'inclinaison de la caméra s'adapte au format de l'écran (34° à 66°) ; en paysage, trois colonnes (bandeau et fiche à gauche, terrain au centre, onglets et boutons à droite). Bouton « Vue d'ensemble » posé sur le plateau. Habillage inspiré des barres de commande des jeux de stratégie : cadre d'écran à volutes elfiques et voile de givre, panneaux en verre de nuit à texture de givre et cadres argentés, cartes serties avec prix en médaillon (tout en SVG et CSS). En 3D, les icônes des tours et des monstres sont des rendus des modèles 3D. Interface uniquement : `sim.js` non modifié (pas de redéploiement du serveur). Test de mise en page paysage adapté. |
 | 2026-11-15 | 2.12 | Assets 3D : **modèles des monstres des paliers** (PR B : 3 paliers × 24 monstres, liste dans `art/monstres/PALIERS.md`), un script par modèle dans `art/monstres/` (§15.1). Ils ne sont pas encore utilisés par le jeu. **Aucun changement de jeu** (`sim.js` et `index.html` inchangés). |
+| 2026-11-15 | 2.13 | **Paliers de monstres** (§6) : 3 paliers de 24 monstres (12 au sol, 3 volants, 8 magiques : hâte, invisible, se divise, accéléré, anti-magie, soin, armure, étourdissement ; 1 boss), soit 72 monstres au lieu de 17, avec les modèles 3D de la PR 26. Palier 1 ouvert dès le début, palier 2 à 300 or, palier 3 à 1 500 or (`PAL_C`, action `tier`) ; les déblocages par le temps disparaissent. Nouvelle capacité **accéléré** ; trois monstres qui se divisent (Petit limon, Petite boue, Tête d'hydre) ; un boss par palier (Roi gobelin, Cyclope, Azh'Khar). L'IA ouvre les paliers (2:30 et 7:00 au plus tôt) et envoie le plus fort monstre de chaque famille parmi ses paliers ouverts. Interface : écussons de palier dans l'onglet Envoyer, silhouette 2D de secours. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur ; l'instantané transmet le palier). Tests : `vagues` (paliers, accéléré), `combats` et `economie` adaptés, parcours mobile (palier 2). Chiffres d'équilibrage proposés, **à valider par le concepteur**. |
