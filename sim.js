@@ -8,11 +8,11 @@ const BASE_TW=[
  {n:'Garde',c:30,r:1.5,d:20,cd:.55,me:1,gr:1,col:'#c0392b',s:'slash',tag:'sol'},
  {n:'Flammes',c:70,r:2,d:3,cd:.12,fl:1,col:'#e67e22',s:'flame'}];
 const FACTIONS=[
- {name:'Alliance',icon:'🛡️',color:'#d8b45c',dark:'#59451f',desc:'Portée supérieure et maîtrise des airs ; dégâts directs légèrement plus modestes.', towers:['Tour des archers','Bastion du chevalier','Obélisque de givre','Bombarde royale','Brasier du griffon','Sanctuaire solaire','Tour des sentinelles','Garde du lion','Cristal hivernal','Arcaniste royal']},
- {name:'Horde',icon:'🪓',color:'#78a94b',dark:'#294322',desc:'Assauts agressifs et exécution des ennemis affaiblis ; portée plus courte.', towers:['Tour des chasseurs','Totem du berserker','Totem de glace','Canon des clans','Fourneau de guerre','Chaman des flammes','Tour des éclaireurs','Garde-lame','Totem des esprits','Grand sorcier orc']},
- {name:'Sylvestres',icon:'🌿',color:'#69bd83',dark:'#214b38',desc:'Racines qui ralentissent et contrôlent les vagues ; dégâts bruts plus faibles.', towers:['Arbre sentinelle','Gardien des racines','Pierre de rosée','Fleur explosive','Cœur ardent','Cercle druidique','Nid des faucons','Dryade protectrice','Cristal lunaire','Ancien arcanique']},
- {name:'Nains',icon:'⚒️',color:'#c58b55',dark:'#56351f',desc:'Artillerie perforante contre les blindés ; cadence plus lente et tours coûteuses.', towers:['Tourelle de guet','Automate garde','Cryo-forge','Mortier runique','Forge incandescente','Canon arcanique','Baliste naine','Sentinelle d’acier','Générateur runique','Maître ingénieur']},
- {name:'Légion des ombres',icon:'☠️',color:'#a879c9',dark:'#39204d',desc:'Marque les cibles pour amplifier les frappes suivantes ; profil polyvalent sans extrême.', towers:['Tour des damnés','Chevalier funeste','Obélisque maudit','Mortier infernal','Puits de lave','Nexus du néant','Œil démoniaque','Gardien spectral','Cristal corrupteur','Archimage noir']}
+ {name:'Humains',icon:'🏰',color:'#d8b45c',dark:'#59451f',desc:'Archers, chevaliers et pyromanciens : portée et maîtrise des airs.',towers:['Archer royal','Chevalier du rempart','Cryomancien','Bombarde royale','Brasier du griffon','Pyromancien','Éclaireur d’élite','Paladin du lion','Mage de givre','Archimage royal']},
+ {name:'Robots',icon:'🤖',color:'#78b9cf',dark:'#234454',desc:'Automates et bobines électriques : frappes rapides et électrocution.',towers:['Drone sentinelle','Automate de combat','Cryo-drone','Canon à plasma','Émetteur Tesla','Bobine électrique','Drone sniper','Mécha gardien','Noyau cryogénique','Cerveau quantique']},
+ {name:'Créatures',icon:'🦎',color:'#a56fce',dark:'#493061',desc:'Essaims, griffes et créatures venimeuses : poison persistant.',towers:['Cracheur épineux','Ravageur à griffes','Gelée glaciale','Bombardier organique','Crache-venin','Reine toxique','Chasseur ailé','Béhémoth','Mante de givre','Cerveau de la ruche']},
+ {name:'Végétaux',icon:'🌳',color:'#69bd83',dark:'#214b38',desc:'Arbres, racines et champignons : contrôle du terrain et spores.',towers:['Arbre sentinelle','Gardien des racines','Fleur de givre','Gousse explosive','Champignon toxique','Druide des spores','Ronce tireuse','Ent protecteur','Cristal de sève','Ancien de la forêt']},
+ {name:'Magiques',icon:'🔮',color:'#a879c9',dark:'#39204d',desc:'Spectres, runes et sorciers : malédictions et magie puissante.',towers:['Œil arcanique','Chevalier spectral','Obélisque de givre','Orbe du néant','Spectre maudit','Sorcier des maléfices','Esprit veilleur','Gardien astral','Cristal corrupteur','Archimage du néant']}
 ];
 const ARCH=[0,4,2,1,5,3,0,4,2,3];
 /* Coefficients volontairement proches en rendement global : chaque avantage a une vraie contrepartie. */
@@ -41,6 +41,21 @@ const TW=FACTIONS.flatMap((F,fi)=>F.towers.map((name,j)=>{
   airBonus:bal.airBonus||0,execute:bal.execute||0,pierce:bal.pierce||0,mark:bal.mark||0,
   col:F.color,skin:ARCH[j],faction:fi,role:role.name,tag:bal.tag+' · '+role.tag};
 }));
+/* DoT par faction : un effet par cible et type, renouvelé sans empilement illimité.
+   dps = dégâts par seconde, dur = durée ; les boss subissent 50 % des DoT. */
+const DOT_TYPES=[
+ {type:'burn',dps:2.4,dur:4},
+ {type:'shock',dps:1.8,dur:3},
+ {type:'poison',dps:1.9,dur:6},
+ {type:'spores',dps:1.6,dur:5},
+ {type:'curse',dps:2.1,dur:4}
+];
+for(let fi=0;fi<5;fi++)for(const j of [4,5]){
+ const t=TW[fi*10+j],effect=DOT_TYPES[fi];
+ t.dot={...effect,dps:+(effect.dps*(j===5?1.35:1)).toFixed(2)};
+ /* Les dégâts directs restent ceux des formules BASE_TW : les DoT sont équilibrés séparément. */
+ t.tag+=' · '+({burn:'brûlure',shock:'électrocution',poison:'poison',spores:'spores',curse:'malédiction'}[effect.type]);
+}
 const ORDER=Array.from({length:10},(_,i)=>i);
 /* cat : n = sol, f = volant, s = spécial (magique ou boss), x = né d'une division (jamais envoyé). Revenu des monstres au sol sur une courbe croissante (10 → 1, 100 → 11, 1000 → 120).
    t : palier (2.13). Le palier 1 est ouvert dès le début ; les paliers 2 et 3 s'achètent (PAL_C). Chaque palier : 12 monstres au sol, 3 volants, 8 magiques, 1 boss.
@@ -178,6 +193,11 @@ class Board{
   if(T.mark){if((c.mark||0)>0)d*=T.mark;c.mark=1.35}
   if(c.arm){const armor=c.arm*(1-(T.pierce||0));d=Math.max(d*.2,d-armor)}
   c.hp-=d;
+  if(T.dot&&c.hp>0){
+   const dot=T.dot;c.dots||(c.dots={});
+   const old=c.dots[dot.type];
+   c.dots[dot.type]={left:dot.dur,dps:Math.max(old?old.dps:0,dot.dps)};
+  }
   /* ralentissement : le Givre garde son facteur selon le niveau ; les racines sylvestres (autres tours) appliquent T.sf (.82). Un ralentissement plus faible n'écrase jamais un plus fort en cours. */
   if(T.sl){const f=T.fsp?(sf||.5):T.sf;c.sf=c.sl>0?Math.min(c.sf||1,f):f;c.sl=Math.max(c.sl||0,T.sl)}
  }
@@ -194,7 +214,11 @@ class Board{
   /* hâte et soin : avec beaucoup de Chamans ou de Prêtresses, on ne regarde que ceux des cases voisines. Ils bougent pendant la boucle (au plus 3,4 cases/s × dt),
      d'où la marge ajoutée au rayon ; la distance exacte est ensuite vérifiée comme avant. */
   const ar=AURA_R+3.4*dt+.01,auG=au.length>GRID_MIN&&(this.ag||(this.ag=new Grid())).fill(au),hlG=hl.length>GRID_MIN&&(this.hg||(this.hg=new Grid())).fill(hl);
-  for(const c of this.cr){const T=CR[c.k];c.sl=Math.max(0,c.sl-dt);if(T.acc)c.age=(c.age||0)+dt;c.mark=Math.max(0,(c.mark||0)-dt);c.h=!T.aura&&(auG?auG.near(c.x,c.y,ar).some(n=>Math.hypot(au[n].x-c.x,au[n].y-c.y)<AURA_R):au.some(a=>Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));
+  for(const c of this.cr){const T=CR[c.k];if(c.dots)for(const [kind,e] of Object.entries(c.dots)){
+    const active=Math.min(dt,e.left);
+    if(active>0)c.hp-=e.dps*active*(T.hero?.5:1);
+    e.left-=dt;if(e.left<=0)delete c.dots[kind];
+   }c.sl=Math.max(0,c.sl-dt);if(T.acc)c.age=(c.age||0)+dt;c.mark=Math.max(0,(c.mark||0)-dt);c.h=!T.aura&&(auG?auG.near(c.x,c.y,ar).some(n=>Math.hypot(au[n].x-c.x,au[n].y-c.y)<AURA_R):au.some(a=>Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));
    c.hid=T.inv&&!mg.some(m=>Math.hypot(c.x-m.x,c.y-m.y)<=rng(m));
    c.hl=c.hp<c.max&&(hlG?hlG.near(c.x,c.y,ar).some(n=>hl[n]!==c&&Math.hypot(hl[n].x-c.x,hl[n].y-c.y)<AURA_R):hl.some(a=>a!==c&&Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));if(c.hl)c.hp=Math.min(c.max,c.hp+c.max*.05*dt);
    if(T.stun){c.cs-=dt;if(c.cs<=0){let bt=null,bd=2.3;for(const t of this.t){const d=Math.hypot(t.x-c.x,t.y-c.y);if(d<bd&&!(t.stun>0)&&!(t.b>0)){bd=d;bt=t}}

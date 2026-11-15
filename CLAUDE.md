@@ -64,6 +64,9 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 
 ---
 
+## Factions et DoT — branche de travail
+Cinq factions : Humains (index 0, brûlure), Robots (1, électrocution), Créatures (2, poison), Végétaux (3, spores), Magiques (4, malédiction). Chaque faction dispose de dix tours nommées et d'une icône distincte. Les tours des emplacements 5 et 6 appliquent un DoT ; même type non cumulable, durée renouvelée, meilleur DPS conservé, dégâts périodiques divisés par deux sur les boss. Les dégâts directs restent issus de BASE_TW, sans altération des formules. Les bonus de faction historiques de FACTION_BALANCE restent à revoir pour correspondre pleinement aux nouvelles identités ; les modèles 3D spécifiques restent à réaliser.
+
 ## 1. Structure technique
 
 - **Le jeu tient en deux fichiers, sans build ni dépendances** :
@@ -775,3 +778,7 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-15 | 2.12 | **Interface : terrain plus grand et habillage « givre elfique »**. Le terrain occupe toute la place : en 3D, l'inclinaison de la caméra s'adapte au format de l'écran (34° à 66°) ; en paysage, trois colonnes (bandeau et fiche à gauche, terrain au centre, onglets et boutons à droite). Bouton « Vue d'ensemble » posé sur le plateau. Habillage inspiré des barres de commande des jeux de stratégie : cadre d'écran à volutes elfiques et voile de givre, panneaux en verre de nuit à texture de givre et cadres argentés, cartes serties avec prix en médaillon (tout en SVG et CSS). En 3D, les icônes des tours et des monstres sont des rendus des modèles 3D. Interface uniquement : `sim.js` non modifié (pas de redéploiement du serveur). Test de mise en page paysage adapté. |
 | 2026-11-15 | 2.12 | Assets 3D : **modèles des monstres des paliers** (PR B : 3 paliers × 24 monstres, liste dans `art/monstres/PALIERS.md`), un script par modèle dans `art/monstres/` (§15.1). Ils ne sont pas encore utilisés par le jeu. **Aucun changement de jeu** (`sim.js` et `index.html` inchangés). |
 | 2026-11-15 | 2.13 | **Paliers de monstres** (§6) : 3 paliers de 24 monstres (12 au sol, 3 volants, 8 magiques : hâte, invisible, se divise, accéléré, anti-magie, soin, armure, étourdissement ; 1 boss), soit 72 monstres au lieu de 17, avec les modèles 3D de la PR 26. Palier 1 ouvert dès le début, palier 2 à 300 or, palier 3 à 1 500 or (`PAL_C`, action `tier`) ; les déblocages par le temps disparaissent. Nouvelle capacité **accéléré** ; trois monstres qui se divisent (Petit limon, Petite boue, Tête d'hydre) ; un boss par palier (Roi gobelin, Cyclope, Azh'Khar). L'IA ouvre les paliers (2:30 et 7:00 au plus tôt) et envoie le plus fort monstre de chaque famille parmi ses paliers ouverts. Interface : écussons de palier dans l'onglet Envoyer, silhouette 2D de secours. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur ; l'instantané transmet le palier). Tests : `vagues` (paliers, accéléré), `combats` et `economie` adaptés, parcours mobile (palier 2). Chiffres d'équilibrage proposés, **à valider par le concepteur**. |
+
+| 2026-11-15 | Branche tours DoT : brûlure, électrocution, poison, spores et malédiction, sans cumul illimité ; équilibrage initial à valider. |
+
+| 2026-11-15 | PR #29 : remplace les cinq noms, descriptions, icônes et 50 noms de tours par Humains, Robots, Créatures, Végétaux et Magiques ; écran de sélection synchronisé. |

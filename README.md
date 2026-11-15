@@ -8,6 +8,12 @@ Online: **https://pompidou-all-stars.github.io/winter-realms/** (updated automat
 
 Locally: serve the folder with any static web server (for example `npx http-server`) and open http://localhost:8080. Opening `index.html` directly from disk does not always load `sim.js`.
 
+## Cinq factions
+Humains (🏰), Robots (🤖), Créatures (🦎), Végétaux (🌳), Magiques (🔮). Chacune possède dix tours renommées ; les identités graphiques 3D détaillées restent à développer.
+
+## Tours à dégâts sur la durée (proposition)
+Les tours 5 et 6 de chaque faction infligent désormais un effet périodique propre à leur faction. Les effets identiques se renouvellent sans cumul illimité, et sont réduits de moitié sur les boss. Les dégâts directs sont ajustés en contrepartie. Équilibrage et identité visuelle finale à valider.
+
 ## Contributing
 
 The project is hosted by the [pompidou-all-stars](https://github.com/pompidou-all-stars) organization. Get a copy with:
