@@ -44,29 +44,29 @@ est une décision du concepteur. ✅ = modèle prêt.
 
 | Rôle | Monstre | Clé | z |
 |---|---|---|---|
-| Sol | Homme-lézard | `lizard` | 1,05 |
-| Sol | Chevalier noir | `knight` | 1,1 |
-| Sol | Gargouille | `gargoyle` | 1,1 |
-| Sol | Loup-garou | `werewolf` | 1,15 |
+| Sol | Homme-lézard ✅ | `lizard` | 1,05 |
+| Sol | Chevalier noir ✅ | `knight` | 1,1 |
+| Sol | Gargouille ✅ | `gargoyle` | 1,1 |
+| Sol | Loup-garou ✅ | `werewolf` | 1,15 |
 | Sol | Ours de guerre ✅ | `bear` | 1,15 |
-| Sol | Ogre | `ogre` | 1,2 |
-| Sol | Minotaure | `minotaur` | 1,2 |
+| Sol | Ogre ✅ | `ogre` | 1,2 |
+| Sol | Minotaure ✅ | `minotaur` | 1,2 |
 | Sol | Golem runique ✅ | `golem` | 1,2 |
-| Sol | Automate blindé | `automaton` | 1,2 |
-| Sol | Wendigo | `wendigo` | 1,25 |
-| Sol | Rhinocéros de guerre | `rhino` | 1,3 |
+| Sol | Automate blindé ✅ | `automaton` | 1,2 |
+| Sol | Wendigo ✅ | `wendigo` | 1,25 |
+| Sol | Rhinocéros de guerre ✅ | `rhino` | 1,3 |
 | Sol | Mammouth de guerre ✅ | `mammoth` | 1,45 |
 | Volant | Griffon corrompu ✅ | `griffon` | 1,0 |
-| Volant | Vouivre | `wyvern` | 1,15 |
-| Volant | Manticore | `manticore` | 1,2 |
-| Aura de vitesse | Tambour de guerre | `drummer` | 1,05 |
-| Invisible | Assassin des ombres | `assassin` | 1,0 |
-| Se divise | Golem de boue | `mudgolem` | 1,15 |
-| Accéléré | Centaure messager | `centaur` | 1,15 |
-| Anti-magie | Inquisiteur | `inquisitor` | 1,1 |
-| Soin | Druidesse | `druid` | 1,05 |
+| Volant | Vouivre ✅ | `wyvern` | 1,15 |
+| Volant | Manticore ✅ | `manticore` | 1,2 |
+| Aura de vitesse | Tambour de guerre ✅ | `drummer` | 1,05 |
+| Invisible | Assassin des ombres ✅ | `assassin` | 1,0 |
+| Se divise | Golem de boue ✅ | `mudgolem` | 1,15 |
+| Accéléré | Centaure messager ✅ | `centaur` | 1,15 |
+| Anti-magie | Inquisiteur ✅ | `inquisitor` | 1,1 |
+| Soin | Druidesse ✅ | `druid` | 1,05 |
 | Armure | Scarabée cuirassé ✅ | `beetle` | 0,95 |
-| Étourdissement | Ingénieur nain renégat | `engineer` | 1,0 |
+| Étourdissement | Ingénieur nain renégat ✅ | `engineer` | 1,0 |
 | Boss | Cyclope des cendres ✅ | `cyc` | 1,5 |
 
 ## Palier 3

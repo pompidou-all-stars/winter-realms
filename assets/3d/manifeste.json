@@ -31,6 +31,26 @@
    "empreinte_source": "afd97fd8d2123eb58d282246415ffa1c577edf9868284bb569f273d4fa67a0cf",
    "blender": "5.3"
   },
+  "monstres/assassin": {
+   "id": "monstres/assassin",
+   "categorie": "monstre",
+   "titre": "Assassin des ombres",
+   "fichier": "assets/3d/monstres/assassin.glb",
+   "triangles": 2050,
+   "octets": 62080,
+   "empreinte_source": "99f48b9c0f93cfad924e6753bc8f652d5eb80e7a587369dc697a898cdbea0c3a",
+   "blender": "5.3"
+  },
+  "monstres/automaton": {
+   "id": "monstres/automaton",
+   "categorie": "monstre",
+   "titre": "Automate blindé",
+   "fichier": "assets/3d/monstres/automaton.glb",
+   "triangles": 2244,
+   "octets": 61208,
+   "empreinte_source": "d3e18021bbe0d86c90918b49f79dd226a7888f7024a2cc93c1221c0830ab4bec",
+   "blender": "5.3"
+  },
   "monstres/bat": {
    "id": "monstres/bat",
    "categorie": "monstre",
@@ -81,6 +101,16 @@
    "empreinte_source": "3c783345bf14a825bdcf2267b1c5091956e6ad34e0c6ea42f9ab651ebd276da7",
    "blender": "5.3"
   },
+  "monstres/centaur": {
+   "id": "monstres/centaur",
+   "categorie": "monstre",
+   "titre": "Centaure messager",
+   "fichier": "assets/3d/monstres/centaur.glb",
+   "triangles": 1498,
+   "octets": 48724,
+   "empreinte_source": "651ba142d91aa6b05a5456690ccc2cfe6ee06a8c7b25c2d20b8826a24a4e2215",
+   "blender": "5.3"
+  },
   "monstres/chaman": {
    "id": "monstres/chaman",
    "categorie": "monstre",
@@ -109,6 +139,46 @@
    "triangles": 918,
    "octets": 30304,
    "empreinte_source": "65fe25c115b00bc57c65b8a32bacee83736399c455315265ef56122e3b81fbeb",
+   "blender": "5.3"
+  },
+  "monstres/druid": {
+   "id": "monstres/druid",
+   "categorie": "monstre",
+   "titre": "Druidesse",
+   "fichier": "assets/3d/monstres/druid.glb",
+   "triangles": 1830,
+   "octets": 58220,
+   "empreinte_source": "9e5fccccacbf14dad14d81dbf3e4372bb42d87aed362aef6e8db16c9c607652e",
+   "blender": "5.3"
+  },
+  "monstres/drummer": {
+   "id": "monstres/drummer",
+   "categorie": "monstre",
+   "titre": "Tambour de guerre",
+   "fichier": "assets/3d/monstres/drummer.glb",
+   "triangles": 2112,
+   "octets": 65112,
+   "empreinte_source": "71f8f9b674b40db3651466c1155d1a6dd6e546105662d63dd3a9862ea4577c79",
+   "blender": "5.3"
+  },
+  "monstres/engineer": {
+   "id": "monstres/engineer",
+   "categorie": "monstre",
+   "titre": "Ingénieur nain renégat",
+   "fichier": "assets/3d/monstres/engineer.glb",
+   "triangles": 2838,
+   "octets": 75776,
+   "empreinte_source": "c753dc5b46a20200df59b7ec64a17f90e766b674eb0228f8e2bd8ee8ab6192d2",
+   "blender": "5.3"
+  },
+  "monstres/gargoyle": {
+   "id": "monstres/gargoyle",
+   "categorie": "monstre",
+   "titre": "Gargouille",
+   "fichier": "assets/3d/monstres/gargoyle.glb",
+   "triangles": 1684,
+   "octets": 57792,
+   "empreinte_source": "32b30eed58d580b4214179598b22a8eb6d9da309a95215c4d7d6aa6a419a287f",
    "blender": "5.3"
   },
   "monstres/giant": {
@@ -211,6 +281,26 @@
    "empreinte_source": "8be52ad1ebf39fcc752381bd2dd980f7601c0c31bb3951332dc3b27c1b4f6904",
    "blender": "5.3"
   },
+  "monstres/inquisitor": {
+   "id": "monstres/inquisitor",
+   "categorie": "monstre",
+   "titre": "Inquisiteur",
+   "fichier": "assets/3d/monstres/inquisitor.glb",
+   "triangles": 2456,
+   "octets": 70796,
+   "empreinte_source": "dc804e7ac0023ce61c0ce3102160c1814935076e49b6e5fa83f3eaa8bbc192d4",
+   "blender": "5.3"
+  },
+  "monstres/knight": {
+   "id": "monstres/knight",
+   "categorie": "monstre",
+   "titre": "Chevalier noir",
+   "fichier": "assets/3d/monstres/knight.glb",
+   "triangles": 2184,
+   "octets": 65976,
+   "empreinte_source": "da5f09b24a147e1a822a2383e1ffb1c3e035f99b97c33cfaade85892fd9521b4",
+   "blender": "5.3"
+  },
   "monstres/kobold": {
    "id": "monstres/kobold",
    "categorie": "monstre",
@@ -219,6 +309,16 @@
    "triangles": 1548,
    "octets": 57812,
    "empreinte_source": "679d340e6fc76e1049d87fdd461f177867943ef250cd9c3dd18bda6f9e82f43e",
+   "blender": "5.3"
+  },
+  "monstres/lizard": {
+   "id": "monstres/lizard",
+   "categorie": "monstre",
+   "titre": "Homme-lézard",
+   "fichier": "assets/3d/monstres/lizard.glb",
+   "triangles": 1788,
+   "octets": 59212,
+   "empreinte_source": "3cf6fee09cc09f34b6e7a5b40601987e498d25c94c484ccaf532adebf5425194",
    "blender": "5.3"
   },
   "monstres/mammoth": {
@@ -231,6 +331,36 @@
    "empreinte_source": "47b7488f40a9acd54a875758e8d9b4e0acb7fbb786a57bdfdaa4db26d9c3079c",
    "blender": "5.3"
   },
+  "monstres/manticore": {
+   "id": "monstres/manticore",
+   "categorie": "monstre",
+   "titre": "Manticore",
+   "fichier": "assets/3d/monstres/manticore.glb",
+   "triangles": 950,
+   "octets": 33292,
+   "empreinte_source": "fe44074f485379b54be6a2e37d121bc2f9a270601596a4f8b2dc5708dfb11e14",
+   "blender": "5.3"
+  },
+  "monstres/minotaur": {
+   "id": "monstres/minotaur",
+   "categorie": "monstre",
+   "titre": "Minotaure",
+   "fichier": "assets/3d/monstres/minotaur.glb",
+   "triangles": 2112,
+   "octets": 60248,
+   "empreinte_source": "aeb4db3cb1ba1615a0dda729aac5d173f6fd11758aaea74fc1205eece327f45e",
+   "blender": "5.3"
+  },
+  "monstres/mudgolem": {
+   "id": "monstres/mudgolem",
+   "categorie": "monstre",
+   "titre": "Golem de boue",
+   "fichier": "assets/3d/monstres/mudgolem.glb",
+   "triangles": 936,
+   "octets": 20192,
+   "empreinte_source": "2596d55701b16d42c0e96e286fddc2e612feababb4052526ce00faaacca8e67a",
+   "blender": "5.3"
+  },
   "monstres/myco": {
    "id": "monstres/myco",
    "categorie": "monstre",
@@ -239,6 +369,16 @@
    "triangles": 896,
    "octets": 29736,
    "empreinte_source": "098a175cb68e34732db50ee12592451dc1a167dd627046278831c1013e8605af",
+   "blender": "5.3"
+  },
+  "monstres/ogre": {
+   "id": "monstres/ogre",
+   "categorie": "monstre",
+   "titre": "Ogre",
+   "fichier": "assets/3d/monstres/ogre.glb",
+   "triangles": 2282,
+   "octets": 62472,
+   "empreinte_source": "cb01f9fe6f64868a2dc1817c1fde6bd7103541c167db54917bb598943e9ff42e",
    "blender": "5.3"
   },
   "monstres/orc": {
@@ -269,6 +409,16 @@
    "triangles": 1020,
    "octets": 35220,
    "empreinte_source": "5aba3295e434cdbd34dfcf1ca3832f5022c99e7d258d4e626caf26f71fc8367c",
+   "blender": "5.3"
+  },
+  "monstres/rhino": {
+   "id": "monstres/rhino",
+   "categorie": "monstre",
+   "titre": "Rhinocéros de guerre",
+   "fichier": "assets/3d/monstres/rhino.glb",
+   "triangles": 1450,
+   "octets": 41676,
+   "empreinte_source": "020bffb3b6318759b1b083cd0f30dc6f8b4253f7dc62c44636cd5706f4fb90f4",
    "blender": "5.3"
   },
   "monstres/sapper": {
@@ -341,6 +491,26 @@
    "empreinte_source": "3d36755efedc1ac7509c3b4495f102a8be4401989a21dc130dc1c0eed2a4c66c",
    "blender": "5.3"
   },
+  "monstres/wendigo": {
+   "id": "monstres/wendigo",
+   "categorie": "monstre",
+   "titre": "Wendigo",
+   "fichier": "assets/3d/monstres/wendigo.glb",
+   "triangles": 1710,
+   "octets": 62780,
+   "empreinte_source": "c9bd4fbf43dcc2588ea7a567d9d7b9a2ed0739b3dd28c21091c89db31249d917",
+   "blender": "5.3"
+  },
+  "monstres/werewolf": {
+   "id": "monstres/werewolf",
+   "categorie": "monstre",
+   "titre": "Loup-garou",
+   "fichier": "assets/3d/monstres/werewolf.glb",
+   "triangles": 1678,
+   "octets": 58976,
+   "empreinte_source": "5b535f3ca32d85c931a1ac0414e323b166db35dbe261cc176879a02d2963375c",
+   "blender": "5.3"
+  },
   "monstres/wolf": {
    "id": "monstres/wolf",
    "categorie": "monstre",
@@ -349,6 +519,16 @@
    "triangles": 1094,
    "octets": 36868,
    "empreinte_source": "854adb4fdbe71a2516e9286887424d3068a724415afcc1684f58a128bf116647",
+   "blender": "5.3"
+  },
+  "monstres/wyvern": {
+   "id": "monstres/wyvern",
+   "categorie": "monstre",
+   "titre": "Vouivre",
+   "fichier": "assets/3d/monstres/wyvern.glb",
+   "triangles": 650,
+   "octets": 26084,
+   "empreinte_source": "30a86508c0357310be544a18ba94e6ac3119cd6a73304335724df285451595f2",
    "blender": "5.3"
   },
   "monstres/yeti": {
