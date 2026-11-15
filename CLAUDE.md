@@ -784,3 +784,5 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-15 | PR #29 : remplace les cinq noms, descriptions, icônes et 50 noms de tours par Humains, Robots, Créatures, Végétaux et Magiques ; écran de sélection synchronisé. |
 
 | 2026-11-15 | Correctif PR #29 : l'écran de sélection utilisait encore « Peuples sylvestres » et « Clans nains » ; remplacés par « Créatures » et « Végétaux ». Les ressources 3D historiques restent à refondre. |
+
+| 2026-11-15 | Rendu 3D PR #29 : remplace les anciennes tours GLB Alliance/Horde/Sylvestres/Nains/Ombres par des silhouettes procédurales distinctes (humains en armure, robots, créatures organiques, végétaux, spectres magiques), et adapte les teintes des terrains. Pas de nouveau fichier GLB nécessaire. |
