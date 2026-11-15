@@ -73,27 +73,27 @@ est une décision du concepteur. ✅ = modèle prêt.
 
 | Rôle | Monstre | Clé | z |
 |---|---|---|---|
-| Sol | Roi-liche | `lich` | 1,3 |
-| Sol | Seigneur de guerre orc | `warlord` | 1,35 |
-| Sol | Élémentaire de feu | `fireel` | 1,4 |
-| Sol | Démon des abysses | `demon` | 1,5 |
-| Sol | Golem de lave | `lavagolem` | 1,5 |
-| Sol | Ver des neiges | `wyrm` | 1,5 |
-| Sol | Chimère | `chimera` | 1,5 |
+| Sol | Roi-liche ✅ | `lich` | 1,3 |
+| Sol | Seigneur de guerre orc ✅ | `warlord` | 1,35 |
+| Sol | Élémentaire de feu ✅ | `fireel` | 1,4 |
+| Sol | Démon des abysses ✅ | `demon` | 1,5 |
+| Sol | Golem de lave ✅ | `lavagolem` | 1,5 |
+| Sol | Ver des neiges ✅ | `wyrm` | 1,5 |
+| Sol | Chimère ✅ | `chimera` | 1,5 |
 | Sol | Géant du givre ✅ | `giant` | 1,6 |
-| Sol | Sylvain corrompu | `treant` | 1,6 |
-| Sol | Mastodonte de fer | `juggernaut` | 1,6 |
-| Sol | Béhémoth | `behemoth` | 1,7 |
-| Sol | Colosse de pierre | `colossus` | 1,75 |
+| Sol | Sylvain corrompu ✅ | `treant` | 1,6 |
+| Sol | Mastodonte de fer ✅ | `juggernaut` | 1,6 |
+| Sol | Béhémoth ✅ | `behemoth` | 1,7 |
+| Sol | Colosse de pierre ✅ | `colossus` | 1,75 |
 | Volant | Dragon ancien ✅ | `dragon` | 1,3 |
-| Volant | Phénix de givre | `phoenix` | 1,3 |
-| Volant | Oiseau-roc | `roc` | 1,45 |
-| Aura de vitesse | Héraut de guerre | `herald` | 1,3 |
-| Invisible | Faucheuse | `reaper` | 1,3 |
-| Se divise | Hydre | `hydra` | 1,45 |
-| Accéléré | Destrier de cauchemar | `nightmare` | 1,3 |
-| Anti-magie | Dévoreur de mana | `manaeater` | 1,35 |
-| Soin | Grande prêtresse de sang | `bloodpriest` | 1,25 |
-| Armure | Tortue-dragon | `dragonturtle` | 1,45 |
-| Étourdissement | Golem du tonnerre | `thunder` | 1,45 |
+| Volant | Phénix de givre ✅ | `phoenix` | 1,3 |
+| Volant | Oiseau-roc ✅ | `roc` | 1,45 |
+| Aura de vitesse | Héraut de guerre ✅ | `herald` | 1,3 |
+| Invisible | Faucheuse ✅ | `reaper` | 1,3 |
+| Se divise | Hydre ✅ | `hydra` | 1,45 |
+| Accéléré | Destrier de cauchemar ✅ | `nightmare` | 1,3 |
+| Anti-magie | Dévoreur de mana ✅ | `manaeater` | 1,35 |
+| Soin | Grande prêtresse de sang ✅ | `bloodpriest` | 1,25 |
+| Armure | Tortue-dragon ✅ | `dragonturtle` | 1,45 |
+| Étourdissement | Golem du tonnerre ✅ | `thunder` | 1,45 |
 | Boss | Azh'Khar, seigneur des lames ✅ | `hero` | 1,35 |
