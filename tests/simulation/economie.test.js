@@ -26,5 +26,5 @@ test('Envoyer un monstre coûte son prix et augmente définitivement le revenu',
   assert.equal(G.action(0,{type:'send',k}),'',S.CR[k].n);assert.equal(b.gold,1e6-S.CR[k].c);assert.equal(b.inc,inc+S.CR[k].i,S.CR[k].n)}
 });
 test('Envoi refusé quand l\'or manque (« poor »), sans effet sur le revenu',()=>{const G=partie(S),b=G.B[0];
- assert.equal(G.action(0,{type:'send',k:S.FLY[2]}),'poor');assert.deepEqual([b.gold,b.inc],[100,10]);
+ assert.equal(G.action(0,{type:'send',k:S.CR.findIndex(T=>T.n=='Troll des glaces')}),'poor');assert.deepEqual([b.gold,b.inc],[100,10]);
 });

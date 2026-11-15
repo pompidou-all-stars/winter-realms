@@ -18,9 +18,25 @@ test('Les monstres se renforcent avec le temps : PV = PV de base × (1 + temps/2
  for(const t of [0,100,600]){const G=partie(S);G.time=t;G.B[0].gold=1e6;G.action(0,{type:'send',k:3});avancer(G,1.5);
   const m=1+t/200;for(const c of G.B[1].cr){assert.equal(c.max,S.CR[3].hp*m*.55);assert.equal(c.hp,c.max)}}
 });
-test('Monstres verrouillés avant leur heure (« locked »), disponibles ensuite',()=>{
- for(let k=0;k<17;k++){const at=S.CR[k].at||0;if(!at)continue;const G=partie(S);G.B[0].gold=1e6;
-  G.time=at-.1;assert.equal(G.action(0,{type:'send',k}),'locked',S.CR[k].n);G.time=at;assert.equal(G.action(0,{type:'send',k}),'',S.CR[k].n)}
+test('Paliers (2.13) : 3 paliers de 24 monstres (12 au sol, 3 volants, 8 magiques, 1 boss)',()=>{
+ const CAP=['aura','inv','split','acc','mi','heal','arm','stun'];
+ for(const t of [1,2,3]){const L=S.CR.filter(T=>T.t==t&&T.cat!='x');assert.equal(L.length,24,'palier '+t);
+  assert.equal(L.filter(T=>T.cat=='n').length,12);assert.equal(L.filter(T=>T.cat=='f').length,3);assert.equal(L.filter(T=>T.hero).length,1);
+  const mag=L.filter(T=>T.cat=='s'&&!T.hero);assert.equal(mag.length,8);for(const f of CAP)assert.equal(mag.filter(T=>T[f]).length,1,'palier '+t+' : '+f)}
+});
+test('Paliers (2.13) : un monstre d’un palier fermé est refusé (« locked ») ; ouvrir un palier coûte PAL_C et débloque ses monstres',()=>{
+ const G=partie(S),b=G.B[0];b.gold=1e6;const k2=S.CR.findIndex(T=>T.t==2&&T.cat=='n'),k3=S.CR.findIndex(T=>T.t==3&&T.cat=='n');
+ assert.equal(b.tier,1);assert.equal(G.action(0,{type:'send',k:k2}),'locked');
+ let or=b.gold;assert.equal(G.action(0,{type:'tier'}),'');assert.equal(b.tier,2);assert.equal(b.gold,or-S.PAL_C[1]);
+ assert.equal(G.action(0,{type:'send',k:k2}),'');assert.equal(G.action(0,{type:'send',k:k3}),'locked');
+ or=b.gold;assert.equal(G.action(0,{type:'tier'}),'');assert.equal(b.gold,or-S.PAL_C[2]);assert.equal(G.action(0,{type:'send',k:k3}),'');
+ assert.equal(G.action(0,{type:'tier'}),'max');
+ const G2=partie(S);assert.equal(G2.action(0,{type:'tier'}),'poor');assert.equal(G2.B[0].tier,1);
+});
+test('Accéléré (2.13) : la vitesse grandit avec le temps de vie, jusqu’au plafond',()=>{
+ const G=partie(S),b=G.B[0],k=S.CR.findIndex(T=>T.acc);b.q.push({k,m:1,t:0});b.update(0);const c=b.cr[0];c.hp=c.max=1e6;
+ const y0=c.y;b.update(.05);const v0=(c.y-y0)/.05;c.age=100;const y1=c.y;b.update(.05);const v1=(c.y-y1)/.05;
+ assert.ok(Math.abs(v1/v0-2)<.05,'vitesse ×2 au plafond, obtenu ×'+(v1/v0).toFixed(2));
 });
 test('Le Petit limon ne peut pas être envoyé (« bad »)',()=>{const G=partie(S);G.B[0].gold=1e6;assert.equal(G.action(0,{type:'send',k:S.KID}),'bad')});
 

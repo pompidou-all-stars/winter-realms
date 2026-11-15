@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.12</title>
+<title>Winter Realms — Tower Wars · Édition 2.13</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -401,10 +401,18 @@ function drawCreep(g,k,x,y,s,t,f,slow,hp,glow,alpha){const T=CR[k],u=s*T.z,lift=
  if(glow){g.fillStyle=glow;g.beginPath();g.ellipse(x,y+u*.38,u*.4,u*.15,0,0,7);g.fill()}
  g.fillStyle='rgba(0,0,0,.34)';g.beginPath();g.ellipse(x+s*.035,y+u*.42,u*(T.fly?.23:.31),u*.105,0,0,7);g.fill();
  g.save();g.translate(x,y-lift+(T.fly||T.inv?Math.sin(t*5)*u*.05:-Math.abs(Math.sin(t*10))*u*.04));g.scale(f,1);
- g.lineWidth=Math.max(1,u*.05);g.strokeStyle=OUT;g.lineJoin='round';DRAW[T.g](g,u,t);
+ g.lineWidth=Math.max(1,u*.05);g.strokeStyle=OUT;g.lineJoin='round';(DRAW[T.g]||dessinMonstre)(g,u,t,T);
  if(slow){g.globalAlpha*=.4;g.beginPath();g.arc(0,0,u*.36,0,7);g.fillStyle='#8fdcff';g.fill()}
  g.restore();g.restore();
  if(hp<1){const w=s*.6,by=y-lift-u*.72;g.fillStyle='rgba(0,0,0,.6)';g.fillRect(x-w/2,by,w,s*.09);g.fillStyle=slow?'#5dc8ff':hp>.4?'#7cdc6a':'#ff6b4a';g.fillRect(x-w/2,by,w*Math.max(0,hp),s*.09)}}
+/* 2.13 : monstre sans dessin 2D dédié (nouveaux monstres des paliers) : silhouette simple à sa couleur, ailes s'il vole */
+function dessinMonstre(g,u,t,T){const c=T.col;if(T.fly){const w=Math.sin(t*12)*u*.14;pg(g,c,-u*.1,-u*.05,-u*.52,-u*.24-w,-u*.32,u*.06);pg(g,c,u*.1,-u*.05,u*.52,-u*.24-w,u*.32,u*.06)}
+ el(g,0,u*.06,u*.25,u*.27,c);el(g,0,-u*.27,u*.17,u*.16,c);
+ g.fillStyle='#fff';g.beginPath();g.arc(-u*.06,-u*.3,u*.05,0,7);g.arc(u*.07,-u*.3,u*.05,0,7);g.fill();
+ g.fillStyle='#111';g.beginPath();g.arc(-u*.05,-u*.3,u*.025,0,7);g.arc(u*.08,-u*.3,u*.025,0,7);g.fill()}
+/* 2.13 : écusson de palier (chiffre romain), grisé s'il est fermé */
+function palIcon(g,p,lock){g.lineWidth=2;g.strokeStyle=OUT;g.lineJoin='round';pg(g,lock?'#5a6478':'#d9b45e',20,4,34,9,32,26,20,36,8,26,6,9);
+ g.fillStyle=lock?'#c9d3e0':'#3a2410';g.font='700 13px Fredoka,sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(['I','II','III'][p-1],20,20)}
 /* tours en relief, une silhouette par type ; elles grandissent à chaque niveau */
 function lin(g,x0,x1,...c){const gr=g.createLinearGradient(x0,0,x1,0);c.forEach((v,i)=>gr.addColorStop(i/(c.length-1),v));return gr}
 function barrel(g,s,a,len,w,col,lw){const dx=Math.cos(a)*s*len,dy=Math.sin(a)*s*len*.55-s*.07;g.lineCap='round';g.beginPath();g.moveTo(0,-s*.07);g.lineTo(dx,dy);
@@ -587,7 +595,7 @@ function drawMini(b,g,m){g.fillStyle=b.dead?'#333':'#426c3e';g.fillRect(0,0,C*m,
 const $=id=>document.getElementById(id),main=$('main'),stage=$('stage'),bar=$('bar'),MINI=4;
 if(typeof CanvasRenderingContext2D!='undefined'&&!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 /* G : partie locale (solo). B, P, time, tick, over, LV : vue courante, recopiée de G à chaque image. */
-let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',sel=0,view=0,mx,hudK='',tt=0,pick=null;
+let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',palv=1,hudPal=1,sel=0,view=0,mx,hudK='',tt=0,pick=null;
 const VB=()=>B[view],dpr=()=>Math.min(3,window.devicePixelRatio||1);
 const eff=b=>b.ai?Math.round(b.inc*DIFF[LV].b):b.inc;
 /* ---------- multijoueur ---------- */
@@ -638,7 +646,7 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   $('lobby').hidden=true;$('ov').hidden=true;if(this.spect)toast('Tu regardes la partie en spectateur')},
  /* applique un instantané : les positions sont lissées entre deux instantanés dans frame() */
  apply(s){this.snapAt=performance.now();time=s.time;tick=s.tick;
-  s.B.forEach((d,i)=>{const b=B[i];if(!b)return;b.gold=d.gold;b.inc=d.inc;b.lives=d.lives;b.dead=d.dead;
+  s.B.forEach((d,i)=>{const b=B[i];if(!b)return;b.gold=d.gold;b.inc=d.inc;b.lives=d.lives;b.dead=d.dead;b.tier=d.tier||1;
    const tk=JSON.stringify(d.t.map(t=>t.slice(0,5)));
    if(tk!==b.tk){b.tk=tk;b.g=Array.from({length:R},()=>Array(C).fill(0));for(const t of d.t)b.g[t[1]][t[0]]=1;b.d=b.dist()}
    b.t=d.t.map(t=>({x:t[0],y:t[1],k:t[2],lv:t[3],inv:t[4],a:t[5],sw:t[6]?.1:0,stun:t[7],b:t[8]||0,bt:t[9]||1}));
@@ -770,7 +778,7 @@ const towerIcon=(k,lv)=>icon(g=>{drawTower(g,k,28,27,30,.7,0,lv,0);drawTowerBadg
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 /* messages d'erreur renvoyés par Game.action */
 const ERR={poor:"Pas assez d'or",blocked:'Impossible ici : le chemin serait bloqué',max:'Niveau maximum atteint',busy:'Tour en chantier : attends la fin des travaux',over:'Partie terminée',bad:'Action impossible'};
-function showErr(e,a){if(!e)return;sfx('nope');if(e=='locked'){const T=CR[a.k];toast(T.n+' disponible à '+mmss(T.at)+' de jeu')}else toast(ERR[e]||ERR.bad)}
+function showErr(e,a){if(!e)return;sfx('nope');if(e=='locked'){const T=CR[a.k];toast(T?'Ouvre le palier '+T.t+' pour envoyer : '+T.n:'Ouvre d’abord le palier précédent')}else toast(ERR[e]||ERR.bad)}
 /* toutes les actions du joueur passent par ici : en solo vers G, en ligne vers le serveur */
 function doAction(a){if(over)return;if(NET.on){NET.act(a);return ''}const e=G.action(me,a);showErr(e,a);return e}
 /* ---------- fiche d'information (au-dessus des boutons) ---------- */
@@ -799,7 +807,7 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  const ic=towerIcon(k,lv);f.append(ic,txt);icone3D(ic,'tour',k,56,46)}
 function ficheEnvoi(){const f=$('fiche');f.textContent='';f.className='envoyer';f.dataset.mode='envoyer';
  const d=document.createElement('div');d.className='txt';const b=document.createElement('b');b.textContent='Envoyer des monstres';
- d.append(b,document.createElement('br'),'Chaque envoi attaque tous tes adversaires (4 monstres chacun) et augmente ton revenu pour toute la partie.');f.appendChild(d)}
+ d.append(b,document.createElement('br'),'Chaque envoi attaque tous tes adversaires (4 monstres chacun) et augmente ton revenu pour toute la partie. Ouvre les paliers 2 et 3 ('+PAL_C[1]+' et '+PAL_C[2].toLocaleString('fr-FR')+' or) pour des monstres plus forts.');f.appendChild(d)}
 function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P.t.includes(pick))pick=null;
  if(tab=='t'&&pick){const t=pick;remplirFiche('tour',t.k,t);
   if(t.b>0)add(icon(IC.up),'Améliorer','en chantier…',0,()=>showErr('busy'),1,'patiente');
@@ -807,7 +815,14 @@ function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P
   add(icon(IC.coin),'Vendre','+'+Math.floor(t.inv*.7)+' or',0,()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()});
   add(icon(IC.x),'Fermer','',0,()=>{pick=null;render()});return}
  if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(towerIcon(k,1),T.n,T.c+' or',T.c,()=>{sel=k;if(projet)projet.k=k;render()},sel==k,'⚔ '+dps(k,1)+' dégâts/s\n◎ portée '+fr(T.r));icone3D(bar.lastChild.querySelector('canvas'),'tour',k,56,46);apercu(bar.lastChild,k)})}
- else{ficheEnvoi();byCat(tab).forEach(k=>{const T=CR[k],lock=time<(T.at||0);add(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.n,T.c+' or · +'+T.i+' revenu',T.c,()=>playerSend(k),0,lock?'🔒 dès '+mmss(T.at):T.tag||'',T.at);bar.lastChild.dataset.tag=T.tag||'';icone3D(bar.lastChild.querySelector('canvas'),'monstre',k,40,40)})}}
+ else{ficheEnvoi();const pv=Math.min(palv,P.tier);
+  /* 2.13 : les paliers d'abord (choisir celui qu'on affiche, ou ouvrir le suivant), puis les monstres du palier affiché */
+  for(let p=1;p<=PAL_C.length;p++){
+   if(p<=P.tier)add(icon(g=>palIcon(g,p)),'Palier '+p,'ouvert',0,()=>{palv=p;render()},pv==p,p==pv?'affiché':'voir');
+   else if(p==P.tier+1)add(icon(g=>palIcon(g,p,1)),'Palier '+p,PAL_C[p-1]+' or',PAL_C[p-1],()=>{if(!NET.on&&P.gold<PAL_C[p-1]){showErr('poor');return}if(doAction({type:'tier'})===''){palv=p;sfx('up');render()}},0,'🔓 ouvrir');
+   else add(icon(g=>palIcon(g,p,1)),'Palier '+p,PAL_C[p-1]+' or',1e9,()=>showErr('locked',{}),0,'🔒 après le '+(p-1));
+   bar.lastChild.classList.add('palier')}
+  byCat(tab).filter(k=>CR[k].t==pv).forEach(k=>{const T=CR[k];add(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.n,T.c+' or · +'+T.i+' revenu',T.c,()=>playerSend(k),0,T.tag||'');icone3D(bar.lastChild.querySelector('canvas'),'monstre',k,40,40)})}}
 /* 2.2 : aperçu de la fiche sans changer la sélection. Appui long (400 ms) au doigt, survol à la souris. */
 let apT=0;
 function apercu(b,k){const voir=()=>{if(tab=='t'&&!pick){remplirFiche('construire',k);$('fiche').classList.add('apercu')}},
@@ -818,7 +833,7 @@ function apercu(b,k){const voir=()=>{if(tab=='t'&&!pick){remplirFiche('construir
  b.addEventListener('contextmenu',e=>e.preventDefault());
  b.onclick=e=>{if(b.lp){b.lp=0;return}clic(e)}}
 function setTab(t){tab=t;pick=null;projet=null;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==t));render()}
-function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(time<(T.at||0)){showErr('locked',a);return}if(!NET.on&&P.gold<T.c){showErr('poor',a);return}if(doAction(a)==='')sfx('send')}
+function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(T.t>P.tier){showErr('locked',a);return}if(!NET.on&&P.gold<T.c){showErr('poor',a);return}if(doAction(a)==='')sfx('send')}
 
 const factionBox=$('factions');
 function selectFaction(i){
@@ -912,6 +927,7 @@ function onLog(l){
 function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.dead).join('|')+'|'+Math.floor(time);
  if(k!=hudK){hudK=k;$('gold').textContent=Math.floor(P.gold);$('inc').textContent='+'+P.inc;$('clock').textContent=mmss(time);$('lives').lastChild.textContent=Math.max(0,P.lives);
   for(const b of B){b.ui.s.textContent=b.dead?'éliminé':Math.max(0,b.lives)+' vies\n+'+eff(b);b.ui.e.className='chip'+(b.i==view?' on':'')+(b.dead?' dead':'')}}
+ if(P.tier!==hudPal){hudPal=P.tier;if(tab!='t')render()}
  $('tfill').style.transform='scaleX('+(1-tick/10).toFixed(3)+')';
  for(const b of bar.children){b.classList.toggle('dis',+b.dataset.c>P.gold||time<+b.dataset.at);
   /* un monstre qui se débloque pendant que l'onglet est ouvert perd son cadenas */

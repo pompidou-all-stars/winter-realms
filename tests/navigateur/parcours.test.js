@@ -70,9 +70,14 @@ else for(const format of ['portrait','paysage'])test.describe(`Parcours mobile �
   await N.construire(p,3,5);await N.avancer(p,1500);await N.toucherCase(p,3,5);const e=await N.etat(p);assert.equal(e.panneauOuvert,true);assert.match(e.fiche,/niveau 1\/5/);assert.match(e.fiche,/Niveau 2 :/);
   await N.toucher(p,'#bar button:has-text("Vendre")');
  });
- test('Onglet « Spéciaux » (2.1) : les monstres verrouillés affichent leur heure de déblocage',async()=>{
-  await N.toucher(p,'#tabs button[data-t="s"]');assert.match(await p.textContent('#bar button:has-text("Tortue") em'),/🔒 dès 1:30/);
-  assert.match((await N.etat(p)).fiche,/augmente ton revenu/);await N.toucher(p,'#tabs button[data-t="t"]');
+ test('Onglet « Spéciaux » (2.13) : paliers de monstres ; le palier 2 s’ouvre contre son prix et montre ses monstres',async()=>{
+  await N.toucher(p,'#tabs button[data-t="s"]');assert.match((await N.etat(p)).fiche,/augmente ton revenu/);
+  assert.match(await p.textContent('#bar button:has-text("Tortue") em'),/blindée/);assert.match(await p.textContent('#bar button.palier:has-text("Palier 2")'),/300 or/);
+  await N.toucher(p,'#bar button.palier:has-text("Palier 2")');assert.equal(await p.evaluate(()=>P.tier),1,'pas assez d’or : palier fermé');
+  await p.evaluate(()=>{P.gold+=300});const or=await p.evaluate(()=>P.gold);await N.toucher(p,'#bar button.palier:has-text("Palier 2")');
+  assert.equal(await p.evaluate(()=>P.tier),2);assert.equal(await p.evaluate(()=>P.gold),or-300);
+  assert.equal(await p.locator('#bar button:has-text("Golem de boue")').count(),1,'monstres du palier 2 affichés');
+  await N.toucher(p,'#tabs button[data-t="t"]');
  });
  test('Deux doigts (2.1) : écarter les doigts zoome, sans poser de tour',async()=>{
   const avant=await N.etat(p),c=await N.centreCase(p,6,8);
