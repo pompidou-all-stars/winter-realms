@@ -53,7 +53,7 @@ const DOT_TYPES=[
 for(let fi=0;fi<5;fi++)for(const j of [4,5]){
  const t=TW[fi*10+j],effect=DOT_TYPES[fi];
  t.dot={...effect,dps:+(effect.dps*(j===5?1.35:1)).toFixed(2)};
- t.d=+(t.d*(j===5?.72:.88)).toFixed(2);
+ /* Les dégâts directs restent ceux des formules BASE_TW : les DoT sont équilibrés séparément. */
  t.tag+=' · '+({burn:'brûlure',shock:'électrocution',poison:'poison',spores:'spores',curse:'malédiction'}[effect.type]);
 }
 const ORDER=Array.from({length:10},(_,i)=>i);
