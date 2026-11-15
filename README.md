@@ -44,6 +44,8 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.12 (assets) — 2026-11-15
+- 3D assets: monster models for the upcoming tier system (3 tiers × 24 monsters, list in `art/monstres/PALIERS.md`). Not used by the game yet. No game change.
 ### 2.12 — 2026-11-15
 - Bigger board: in 3D the camera tilt adapts to the screen shape; in landscape, three columns (top bar and info on the left, board in the middle, tabs and buttons on the right). The "Vue d'ensemble" button now sits on the board.
 - "Elven frost" look inspired by strategy-game command bars: ornate screen frame with elven scrolls and frost, frosted night-glass panels with silver frames, framed cards with price medallions (all SVG and CSS).
