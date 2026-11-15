@@ -64,8 +64,8 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 
 ---
 
-## DoT des tours — branche de travail
-Les emplacements 5 et 6 (indices 4 et 5) de chaque faction appliquent un DoT propre : Alliance/brûlure (2,4 DPS × 4 s), Horde/électrocution (1,8 × 3 s), Sylvestres/poison (1,9 × 6 s), Nains/spores (1,6 × 5 s), Ombres/malédiction (2,1 × 4 s). La tour d'indice 5 a 35 % de DPS DoT supplémentaire. Les dégâts directs restent ceux des formules BASE_TW pour préserver les invariants de calcul des 50 tours ; le rendement additionnel des DoT doit être mesuré et équilibré par des paramètres dédiés. Les DoT de même type ne se cumulent pas : durée renouvelée, meilleur DPS conservé. Boss : 50 % des dégâts périodiques. Les dégâts périodiques sont appliqués dans Board.update. Valeurs provisoires, à vérifier en simulation. La refonte des noms et des modèles 3D des factions reste une étape distincte.
+## Factions et DoT — branche de travail
+Cinq factions : Humains (index 0, brûlure), Robots (1, électrocution), Créatures (2, poison), Végétaux (3, spores), Magiques (4, malédiction). Chaque faction dispose de dix tours nommées et d'une icône distincte. Les tours des emplacements 5 et 6 appliquent un DoT ; même type non cumulable, durée renouvelée, meilleur DPS conservé, dégâts périodiques divisés par deux sur les boss. Les dégâts directs restent issus de BASE_TW, sans altération des formules. Les bonus de faction historiques de FACTION_BALANCE restent à revoir pour correspondre pleinement aux nouvelles identités ; les modèles 3D spécifiques restent à réaliser.
 
 ## 1. Structure technique
 
@@ -780,3 +780,5 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-15 | 2.13 | **Paliers de monstres** (§6) : 3 paliers de 24 monstres (12 au sol, 3 volants, 8 magiques : hâte, invisible, se divise, accéléré, anti-magie, soin, armure, étourdissement ; 1 boss), soit 72 monstres au lieu de 17, avec les modèles 3D de la PR 26. Palier 1 ouvert dès le début, palier 2 à 300 or, palier 3 à 1 500 or (`PAL_C`, action `tier`) ; les déblocages par le temps disparaissent. Nouvelle capacité **accéléré** ; trois monstres qui se divisent (Petit limon, Petite boue, Tête d'hydre) ; un boss par palier (Roi gobelin, Cyclope, Azh'Khar). L'IA ouvre les paliers (2:30 et 7:00 au plus tôt) et envoie le plus fort monstre de chaque famille parmi ses paliers ouverts. Interface : écussons de palier dans l'onglet Envoyer, silhouette 2D de secours. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur ; l'instantané transmet le palier). Tests : `vagues` (paliers, accéléré), `combats` et `economie` adaptés, parcours mobile (palier 2). Chiffres d'équilibrage proposés, **à valider par le concepteur**. |
 
 | 2026-11-15 | Branche tours DoT : brûlure, électrocution, poison, spores et malédiction, sans cumul illimité ; équilibrage initial à valider. |
+
+| 2026-11-15 | PR #29 : remplace les cinq noms, descriptions, icônes et 50 noms de tours par Humains, Robots, Créatures, Végétaux et Magiques ; écran de sélection synchronisé. |
