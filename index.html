@@ -672,8 +672,8 @@ const VUE={z:1,ox:0,oy:0,w:0,h:0},ZMAX=3;let cadre='#c9a24a';
    et TOPM cases sont gardées libres au-dessus du plateau pour les tours hautes. En 2D, KY = 1 et TOPM = 0 (rien ne change). */
 const R3D={on:QS.get('rendu')!='2d',api:null,KY:1,TOPM:0,echec:false};
 /* 2.12 : en 3D, l'inclinaison de la caméra s'adapte au format de la zone de jeu pour que le plateau la remplisse
-   (KY visé : hauteur disponible / largeur disponible, borné entre 34° et 62° d'élévation) */
-function inclinerSelonFormat(w,h){if(!R3D.api||!R3D.api.incliner)return;const ky=Math.min(1,Math.max(.1,((h-6)/(w-6)*C-R3D.TOPM)/R));R3D.KY=R3D.api.incliner(Math.asin(ky)*180/Math.PI)}
+   (KY visé : hauteur disponible / largeur disponible, borné entre 34° et 66° d'élévation ; la marge du haut TOPM suit l'inclinaison) */
+function inclinerSelonFormat(w,h){if(!R3D.api||!R3D.api.incliner)return;for(let i=0;i<3;i++){const ky=Math.min(1,Math.max(.1,((h-6)/(w-6)*C-R3D.TOPM)/R));R3D.KY=R3D.api.incliner(Math.asin(ky)*180/Math.PI);R3D.TOPM=R3D.api.TOPM}}
 function fit(){const r=stage.getBoundingClientRect();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);inclinerSelonFormat(VUE.w,VUE.h);cell=Math.max(16,Math.floor(Math.min((r.width-6)/C,(r.height-6)/(R*R3D.KY+R3D.TOPM))));mx=setup(main,VUE.w,VUE.h);if(R3D.api)R3D.api.taille(VUE.w,VUE.h,dpr());borner()}
 /* garde le plateau dans la zone visible : centré s'il est plus petit, sinon jamais plus de 8 px de vide au bord */
 function borner(){const s=cell*VUE.z,W=C*s,H=(R*R3D.KY+R3D.TOPM)*s,m=8,hm=R3D.TOPM*s;

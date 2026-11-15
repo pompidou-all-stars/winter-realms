@@ -14,8 +14,8 @@ import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
 /* élévation de la caméra : 42° par défaut ; depuis la 2.12, index.html l'adapte au format de l'écran (incliner)
    pour que le plateau occupe toute la place (plus redressée en portrait, plus rasante en paysage) */
-export let E = 42 * Math.PI / 180, KY = Math.sin(E), KH = Math.cos(E);
-export const TOPM = 1.2, E_MIN = 34, E_MAX = 62;
+export let E = 42 * Math.PI / 180, KY = Math.sin(E), KH = Math.cos(E), TOPM = 1.6 * KH; /* TOPM : place gardée au-dessus du plateau pour les tours hautes (1,2 case à 42°) */
+export const E_MIN = 34, E_MAX = 66;
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
@@ -45,7 +45,7 @@ export function creer(J) {
   function placerCamera() { cam.position.set(0, 60 * Math.sin(E), 60 * Math.cos(E)); cam.up.set(0, 1, 0); cam.lookAt(0, 0, 0) }
   placerCamera();
   /* change l'élévation (en degrés, bornée) et renvoie le nouveau tassement vertical KY */
-  function incliner(deg) { deg = Math.min(E_MAX, Math.max(E_MIN, deg)); E = deg * Math.PI / 180; KY = Math.sin(E); KH = Math.cos(E); placerCamera(); return KY }
+  function incliner(deg) { deg = Math.min(E_MAX, Math.max(E_MIN, deg)); E = deg * Math.PI / 180; KY = Math.sin(E); KH = Math.cos(E); TOPM = 1.6 * KH; placerCamera(); return KY }
 
   /* lumières : ciel et sol (ambiance), soleil chaud avec ombres, contre-jour */
   scene.add(new THREE.HemisphereLight('#e4efff', '#6a7890', 1.15));
@@ -455,5 +455,5 @@ export function creer(J) {
   /* compteurs pour les tests : objets 3D présents et appels de dessin de la dernière image */
   const etat = () => ({tours: tours.size, monstres: monstres.size, projectiles: projs.size, effets: effets.size, fantome: !!(fantome && fantome.r.parent),
     portee: portee.visible, dessins: renderer.info.render.calls, triangles: renderer.info.render.triangles});
-  return {canvas, dessiner, taille, versEcran, precharger, hauteurMonstre: HAUT, get KY() { return KY }, TOPM, incliner, vignette, renderer, etat};
+  return {canvas, dessiner, taille, versEcran, precharger, hauteurMonstre: HAUT, get KY() { return KY }, get TOPM() { return TOPM }, incliner, vignette, renderer, etat};
 }
