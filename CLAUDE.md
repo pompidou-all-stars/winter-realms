@@ -782,3 +782,5 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-15 | Branche tours DoT : brûlure, électrocution, poison, spores et malédiction, sans cumul illimité ; équilibrage initial à valider. |
 
 | 2026-11-15 | PR #29 : remplace les cinq noms, descriptions, icônes et 50 noms de tours par Humains, Robots, Créatures, Végétaux et Magiques ; écran de sélection synchronisé. |
+
+| 2026-11-15 | Correctif PR #29 : l'écran de sélection utilisait encore « Peuples sylvestres » et « Clans nains » ; remplacés par « Créatures » et « Végétaux ». Les ressources 3D historiques restent à refondre. |
