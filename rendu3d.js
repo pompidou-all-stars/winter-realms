@@ -18,12 +18,13 @@ export let E = 42 * Math.PI / 180, KY = Math.sin(E), KH = Math.cos(E), TOPM = 1.
 export const E_MIN = 34, E_MAX = 66;
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
-const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
+/* Les anciennes ressources GLB ne représentent plus les factions. Tours générées en 3D directement. */
+const FAC = ['humains', 'robots', 'creatures', 'vegetaux', 'magiques'];
 /* couleurs du terrain : mêmes valeurs que art/communs/factions.py (SOL, BIOME) */
 /* thème hiver (2.9) : terrain enneigé. Damier de neige légèrement teinté par la couleur de la faction (TEINTE),
    bord en roche givrée, décor d'hiver (sapins enneigés, rochers, cristaux de glace). */
 const NEIGE = ['#eef3f9', '#e2eaf3'];
-const TEINTE = ['#5a9a45', '#a8652f', '#356d4b', '#8a7a5a', '#7a5a9a'];
+const TEINTE = ['#d8b45c', '#78b9cf', '#a56fce', '#69bd83', '#a879c9'];
 const BIOME = [{bord: '#5b6b80', terre: '#8a9bb0', glace: '#bfe6ff'}, {bord: '#5f5a58', terre: '#958a86', glace: '#cfe9ff'},
   {bord: '#4f6670', terre: '#8aa3a8', glace: '#c8f2e6'}, {bord: '#625d58', terre: '#9a948c', glace: '#ffe2b8'},
   {bord: '#4e4660', terre: '#8e86a3', glace: '#d9c4ff'}];
@@ -84,7 +85,7 @@ export function creer(J) {
   function precharger(factions) {
     const l = [charger('assets/3d/decor/portail.glb'), charger('assets/3d/decor/chateau.glb')];
     for (let k = 0; k < CR.length; k++) l.push(charger(urlMonstre(k)));
-    for (const f of factions) for (let j = 0; j < 10; j++) l.push(charger(urlTour(f * 10 + j)));
+    /* Tours procédurales : aucun chargement d'anciens modèles de faction. */
     return Promise.all(l);
   }
 
@@ -204,11 +205,56 @@ export function creer(J) {
   const tours = new Map();
   const pipGeo = new THREE.SphereGeometry(.035, 8, 6);
   /* formes de repli quand un modèle manque (règle d'art/LISEZMOI.md : le jeu fonctionne sans le fichier 3D) */
+  /* Silhouettes 3D propres à chaque faction et à chaque rôle, sans dépendance GLB.
+     Les tours de même faction partagent un langage visuel mais pas une silhouette identique. */
   function repliTour(k) {
-    const g = new THREE.Group(), m = mat(TW[k].col);
-    const socle = new THREE.Mesh(new THREE.CylinderGeometry(.38, .4, .1, 12), mat('#8a8f99')); socle.position.y = .05;
-    const fut = new THREE.Mesh(new THREE.CylinderGeometry(.18, .24, .6, 10), m); fut.position.y = .4;
-    for (const o of [socle, fut]) { o.castShadow = o.receiveShadow = true; g.add(o) }
+    const g = new THREE.Group(), f = Math.floor(k / 10), role = k % 10;
+    const accent = mat(TW[k].col), sombre = mat(['#695a48','#354758','#49305a','#42633c','#45305f'][f]);
+    const clair = mat(['#e9d6a2','#a6e8fa','#d4a3f0','#a5e783','#e4b6ff'][f]);
+    const piece = (geo, material, x, y, z, sx=1, sy=1, sz=1) => {
+      const o = new THREE.Mesh(geo, material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);
+      o.castShadow=o.receiveShadow=true;g.add(o);return o;
+    };
+    const cyl = (r1,r2,h,n=10)=>new THREE.CylinderGeometry(r1,r2,h,n);
+    piece(cyl(.38,.4,.12),sombre,0,.06,0);
+    if(f===0){ // Humains : combattant en armure, casque et arme
+      piece(G.boite,accent,0,.4,0,.35,.48,.25);
+      piece(G.sphere,clair,0,.79,0,.16,.17,.16);
+      piece(G.boite,sombre,0,.88,.02,.35,.09,.24);
+      piece(G.boite,clair,.25,.46,0,.06,.65,.06);
+      if(role===4||role===5)piece(G.sphere,mat('#ff793b'),.25,.86,0,.13,.17,.13);
+      else piece(G.boite,sombre,-.24,.43,0,.12,.38,.25);
+    }else if(f===1){ // Robots : châssis, jambes articulées et antenne
+      piece(G.boite,sombre,0,.43,0,.48,.42,.34);
+      piece(G.boite,accent,0,.48,.19,.34,.18,.045);
+      for(const x of [-.23,.23]){piece(G.boite,sombre,x,.16,0,.11,.26,.12);piece(G.sphere,clair,x,.55,.2,.075,.075,.06)}
+      piece(G.boite,clair,0,.82,0,.045,.32,.045);
+      piece(G.sphere,accent,0,1.01,0,.12,.12,.12);
+      if(role===4||role===5)for(const x of [-.19,.19])piece(G.sphere,clair,x,.82,0,.1,.12,.1);
+    }else if(f===2){ // Créatures : corps organique, yeux, cornes
+      piece(G.sphere,accent,0,.42,0,.36,.33,.3);
+      piece(G.sphere,sombre,0,.72,-.06,.27,.24,.25);
+      for(const x of [-.15,.15]){piece(G.sphere,clair,x,.77,.16,.075,.09,.06);
+        piece(new THREE.ConeGeometry(.09,.33,7),sombre,x,.99,-.1)}
+      for(const x of [-.26,.26])piece(new THREE.ConeGeometry(.1,.28,6),accent,x,.22,.15);
+      if(role===4||role===5)piece(G.sphere,mat('#a3f15d'),0,.48,.29,.15,.13,.09);
+    }else if(f===3){ // Végétaux : tronc, branches et couronne feuillue
+      piece(cyl(.13,.23,.65),sombre,0,.42,0);
+      for(const x of [-.26,.26]){const b=piece(G.boite,sombre,x,.63,0,.11,.38,.12);b.rotation.z=x>0?-.55:.55}
+      piece(G.ico,accent,0,.91,0,.4,.34,.37);
+      for(const x of [-.25,.25])piece(G.sphere,clair,x,.77,.12,.15,.16,.14);
+      if(role===4||role===5)piece(G.sphere,mat('#b8e88a'),0,1.1,.12,.16,.11,.16);
+    }else{ // Magiques : spectre flottant et runes
+      piece(new THREE.ConeGeometry(.32,.75,8),sombre,0,.52,0);
+      piece(G.sphere,accent,0,.89,0,.24,.24,.24);
+      for(const x of [-.11,.11])piece(G.sphere,clair,x,.93,.2,.055,.065,.04);
+      const orb=piece(G.sphere,clair,0,1.22,0,.16,.16,.16);orb.name='Orbe';
+      for(const x of [-.31,.31])piece(G.ico,accent,x,.65,0,.11,.18,.11);
+    }
+    // Variation de rôle visible : cristal, canon, lame ou halo
+    if(role===2||role===8){const o=piece(G.ico,clair,0,1.28,0,.13,.22,.13);o.name='Cristal'}
+    if(role===3){piece(G.boite,sombre,0,.67,.31,.24,.19,.46)}
+    if(role===7){piece(G.ico,accent,0,1.2,0,.24,.24,.24)}
     return g;
   }
   function repliMonstre(k) {
@@ -230,8 +276,7 @@ export function creer(J) {
     return g;
   }
   function creerTour(t, fantome) {
-    const g = modele(urlTour(t.k)); if (g === undefined) return null;
-    const o = g ? g.scene.clone(true) : repliTour(t.k);
+    const o = repliTour(t.k);
     if (fantome) o.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = .55; m.material.depthWrite = false; m.castShadow = false } });
     const r = new THREE.Group(); r.add(o);
     const anim = {};
