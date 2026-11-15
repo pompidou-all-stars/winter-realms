@@ -121,6 +121,16 @@
    "empreinte_source": "ff4045ef8f2fc05c7eb118b057fc4c19a6c78df1d80d56f61af0b0fd7e081c82",
    "blender": "5.3"
   },
+  "monstres/gnoll": {
+   "id": "monstres/gnoll",
+   "categorie": "monstre",
+   "titre": "Gnoll",
+   "fichier": "assets/3d/monstres/gnoll.glb",
+   "triangles": 1898,
+   "octets": 58404,
+   "empreinte_source": "57661f54c130420c7f2a242a5b1c2f3d92b5c56c5fc9d307e0006f592b2874a0",
+   "blender": "5.3"
+  },
   "monstres/gob": {
    "id": "monstres/gob",
    "categorie": "monstre",
@@ -129,6 +139,16 @@
    "triangles": 1668,
    "octets": 56192,
    "empreinte_source": "3ce145af7e9af41c800b366960c689e9d5369837d10d574750248de270e474a6",
+   "blender": "5.3"
+  },
+  "monstres/gobking": {
+   "id": "monstres/gobking",
+   "categorie": "monstre",
+   "titre": "Roi gobelin",
+   "fichier": "assets/3d/monstres/gobking.glb",
+   "triangles": 2528,
+   "octets": 70244,
+   "empreinte_source": "81eb2a8f60ffe4fba6bcb57790a5bd75f27b8fd6a840ca6c1b691b18c121d0ce",
    "blender": "5.3"
   },
   "monstres/golem": {
@@ -149,6 +169,16 @@
    "triangles": 690,
    "octets": 26396,
    "empreinte_source": "4ca68eb86fdbde84ed5f83c2a92d28af2e4845e2577da3f5c78705c73781c45c",
+   "blender": "5.3"
+  },
+  "monstres/harpy": {
+   "id": "monstres/harpy",
+   "categorie": "monstre",
+   "titre": "Harpie",
+   "fichier": "assets/3d/monstres/harpy.glb",
+   "triangles": 642,
+   "octets": 22812,
+   "empreinte_source": "fa607b59475a9513a9c2e2c91c95161b0d11237284b278ddf62083ffda9fbbdf",
    "blender": "5.3"
   },
   "monstres/healer": {
@@ -181,6 +211,16 @@
    "empreinte_source": "8be52ad1ebf39fcc752381bd2dd980f7601c0c31bb3951332dc3b27c1b4f6904",
    "blender": "5.3"
   },
+  "monstres/kobold": {
+   "id": "monstres/kobold",
+   "categorie": "monstre",
+   "titre": "Kobold",
+   "fichier": "assets/3d/monstres/kobold.glb",
+   "triangles": 1548,
+   "octets": 57812,
+   "empreinte_source": "679d340e6fc76e1049d87fdd461f177867943ef250cd9c3dd18bda6f9e82f43e",
+   "blender": "5.3"
+  },
   "monstres/mammoth": {
    "id": "monstres/mammoth",
    "categorie": "monstre",
@@ -191,6 +231,16 @@
    "empreinte_source": "47b7488f40a9acd54a875758e8d9b4e0acb7fbb786a57bdfdaa4db26d9c3079c",
    "blender": "5.3"
   },
+  "monstres/myco": {
+   "id": "monstres/myco",
+   "categorie": "monstre",
+   "titre": "Myconide",
+   "fichier": "assets/3d/monstres/myco.glb",
+   "triangles": 896,
+   "octets": 29736,
+   "empreinte_source": "098a175cb68e34732db50ee12592451dc1a167dd627046278831c1013e8605af",
+   "blender": "5.3"
+  },
   "monstres/orc": {
    "id": "monstres/orc",
    "categorie": "monstre",
@@ -199,6 +249,26 @@
    "triangles": 2192,
    "octets": 63888,
    "empreinte_source": "c1c21d5a2b7ddb811f2baa012189c541ba0dc62385be21f80511f706cc149736",
+   "blender": "5.3"
+  },
+  "monstres/raider": {
+   "id": "monstres/raider",
+   "categorie": "monstre",
+   "titre": "Maraudeur",
+   "fichier": "assets/3d/monstres/raider.glb",
+   "triangles": 2034,
+   "octets": 57500,
+   "empreinte_source": "d4c208c6a7b1f41cc934dedf88f65096d4f9455e73d6001d6dedc0e6b6aa1252",
+   "blender": "5.3"
+  },
+  "monstres/rat": {
+   "id": "monstres/rat",
+   "categorie": "monstre",
+   "titre": "Rat des neiges",
+   "fichier": "assets/3d/monstres/rat.glb",
+   "triangles": 1020,
+   "octets": 35220,
+   "empreinte_source": "5aba3295e434cdbd34dfcf1ca3832f5022c99e7d258d4e626caf26f71fc8367c",
    "blender": "5.3"
   },
   "monstres/sapper": {
@@ -259,6 +329,16 @@
    "triangles": 1526,
    "octets": 43356,
    "empreinte_source": "0fc2e3608892de488a2915dcbb6feece0d9052c8913b2b3d9a708cb6e5014773",
+   "blender": "5.3"
+  },
+  "monstres/wasp": {
+   "id": "monstres/wasp",
+   "categorie": "monstre",
+   "titre": "Guêpe des glaces",
+   "fichier": "assets/3d/monstres/wasp.glb",
+   "triangles": 794,
+   "octets": 25320,
+   "empreinte_source": "3d36755efedc1ac7509c3b4495f102a8be4401989a21dc130dc1c0eed2a4c66c",
    "blender": "5.3"
   },
   "monstres/wolf": {
