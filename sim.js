@@ -48,16 +48,16 @@ const ORDER=Array.from({length:10},(_,i)=>i);
 const CR=[
  /* ---- palier 1 ---- */
  {n:'Sapeur gobelin',cat:'n',t:1,c:10,hp:12,s:1.6,z:.75,g:'gob',col:'#8fce5a'},
- {n:'Rat des neiges',cat:'n',t:1,c:15,hp:15,s:2.2,z:.7,g:'rat',col:'#d9dfe4'},
- {n:'Warg',cat:'n',t:1,c:20,hp:22,s:2.4,z:.78,g:'wolf',col:'#9aa3ad'},
- {n:'Kobold',cat:'n',t:1,c:25,hp:30,s:1.6,z:.78,g:'kobold',col:'#d9733a'},
- {n:'Squelette du givre',cat:'n',t:1,c:35,hp:42,s:1.5,z:.85,g:'skel',col:'#e6e2d2'},
- {n:'Sanglier de guerre',cat:'n',t:1,c:45,hp:52,s:2,z:.9,g:'boar',col:'#7a4a2e'},
- {n:'Gnoll',cat:'n',t:1,c:55,hp:68,s:1.6,z:.9,g:'gnoll',col:'#c9a25a'},
- {n:'Brute orc',cat:'n',t:1,c:65,hp:82,s:1.4,z:.95,g:'orc',col:'#5f9c45'},
- {n:'Maraudeur',cat:'n',t:1,c:75,hp:95,s:1.5,z:.9,g:'raider',col:'#4f5a3a'},
- {n:'Myconide',cat:'n',t:1,c:85,hp:115,s:1.1,z:.95,g:'myco',col:'#c8322a'},
- {n:'Yéti',cat:'n',t:1,c:100,hp:135,s:1.3,z:1.15,g:'yeti',col:'#e2eaf0'},
+ {n:'Rat des neiges',cat:'n',t:1,c:20,hp:20,s:2.2,z:.7,g:'rat',col:'#d9dfe4'},
+ {n:'Warg',cat:'n',t:1,c:30,hp:33,s:2.4,z:.78,g:'wolf',col:'#9aa3ad'},
+ {n:'Kobold',cat:'n',t:1,c:40,hp:48,s:1.6,z:.78,g:'kobold',col:'#d9733a'},
+ {n:'Squelette du givre',cat:'n',t:1,c:50,hp:60,s:1.5,z:.85,g:'skel',col:'#e6e2d2'},
+ {n:'Sanglier de guerre',cat:'n',t:1,c:60,hp:69,s:2,z:.9,g:'boar',col:'#7a4a2e'},
+ {n:'Gnoll',cat:'n',t:1,c:70,hp:87,s:1.6,z:.9,g:'gnoll',col:'#c9a25a'},
+ {n:'Brute orc',cat:'n',t:1,c:80,hp:101,s:1.4,z:.95,g:'orc',col:'#5f9c45'},
+ {n:'Maraudeur',cat:'n',t:1,c:90,hp:114,s:1.5,z:.9,g:'raider',col:'#4f5a3a'},
+ {n:'Myconide',cat:'n',t:1,c:100,hp:135,s:1.1,z:.95,g:'myco',col:'#c8322a'},
+ {n:'Yéti',cat:'n',t:1,c:110,hp:149,s:1.3,z:1.15,g:'yeti',col:'#e2eaf0'},
  {n:'Troll des glaces',cat:'n',t:1,c:120,hp:160,s:1.5,z:1.1,g:'troll',col:'#57aeb0'},
  {n:'Chauve-souris',cat:'f',t:1,c:30,hp:16,s:2,z:.75,g:'bat',fly:1,col:'#7d5ba6'},
  {n:'Guêpe des glaces',cat:'f',t:1,c:50,hp:26,s:2.3,z:.7,g:'wasp',fly:1,col:'#f5c534'},
@@ -125,7 +125,10 @@ const CR=[
  {n:'Petit limon',cat:'x',t:1,c:20,hp:35,s:1.6,z:.6,g:'slime',col:'#b5e04a'},
  {n:'Petite boue',cat:'x',t:2,c:60,hp:110,s:1.4,z:.8,g:'mudgolem',col:'#6b4a2a'},
  {n:'Tête d’hydre',cat:'x',t:3,c:200,hp:380,s:1.3,z:.95,g:'hydra',col:'#2f7a6a'}];
-for(const T of CR){T.i=T.cat=='n'?Math.round(T.c/10*(1+.1*Math.log10(T.c/10))):Math.round(T.c*.065);if(T.split)T.kid=CR.findIndex(U=>U.n==T.split)}
+/* 2.14 : tous les coûts sont des dizaines, et le revenu des monstres au sol est arrondi à l'inférieur : il ne dépasse jamais la courbe
+   (10 or → 1, 100 → 11, 1000 → 120), donc aucun monstre bon marché ne rapporte proportionnellement plus qu'un plus cher (fin de la faille du Rat : 15 or pour +2). */
+const revenu=T=>T.cat=='n'?Math.floor(T.c/10*(1+.1*Math.log10(T.c/10))+1e-9):Math.round(T.c*.065);
+for(const T of CR){T.i=revenu(T);if(T.split)T.kid=CR.findIndex(U=>U.n==T.split)}
 /* paliers (2.13) : prix d'ouverture des paliers 1, 2 et 3 ; accéléré : vitesse × (1 + ACC × secondes de vie), au plus × ACC_MAX */
 const PAL_C=[0,300,1500],ACC=.1,ACC_MAX=2;
 const byCat=c=>CR.map((T,k)=>k).filter(k=>CR[k].cat==c).sort((a,b)=>CR[a].c-CR[b].c),NORM=byCat('n'),FLY=byCat('f'),idx=f=>CR.findIndex(T=>T[f]),

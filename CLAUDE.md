@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.13)
+# Winter Realms — Tower Wars (Édition 2.14)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -298,7 +298,8 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 - Un envoi coûte le prix du monstre et fait apparaître un **groupe de 4** (`GROUP`) chez **chaque adversaire encore en jeu**, espacés d'environ 0,4 s.
 - **Les monstres se renforcent avec le temps** : `PV = PV_base × (1 + temps/200) × 0,55` (`HPK`). L'armure suit le même multiplicateur `(1 + temps/200)`. À 10 minutes, les monstres ont donc 4 fois plus de PV.
 - **Revenu gagné par envoi** :
-  - monstres au sol : `arrondi(coût/10 × (1 + 0,1 × log10(coût/10)))`, une courbe croissante ;
+  - monstres au sol : `arrondi à l'inférieur(coût/10 × (1 + 0,1 × log10(coût/10)))`, une courbe croissante qui passe par **10 or → +1, 100 → +11, 1000 → +120**. Depuis la 2.14, l'arrondi se fait à l'inférieur : aucun monstre ne rapporte plus que la courbe, donc un monstre bon marché n'est jamais proportionnellement plus rentable qu'un plus cher ;
+  - **tous les coûts sont des dizaines** (depuis la 2.14) ;
   - autres monstres : `arrondi(coût × 0,065)`.
 - **Paliers** (depuis la 2.13, à la place des déblocages par le temps) : les monstres sont rangés en **3 paliers de 24** (12 au sol, 3 volants, 8 magiques, 1 boss). Le palier 1 est ouvert dès le début ; chaque joueur ouvre ensuite le palier 2 pour **300 or** puis le palier 3 pour **1 500 or** (`PAL_C`, action `tier`), une fois pour toute la partie. Un monstre d'un palier fermé est refusé (`locked`). Les 8 capacités magiques de chaque palier : hâte, invisible, se divise, accéléré, anti-magie, soin, armure, étourdissement. Les monstres au sol restent les plus rentables pour le revenu (courbe ci-dessus, contre 6,5 % du coût pour les autres).
 
@@ -308,16 +309,16 @@ Vitesse en cases par seconde. Dans chaque palier, les monstres sont rangés par 
 | Monstre | Catégorie | Coût | +revenu | PV de base | Vitesse | Palier | Capacité |
 |---|---|---|---|---|---|---|---|
 | Sapeur gobelin | Sol | 10 | +1 | 12 | 1,6 | 1 | — |
-| Rat des neiges | Sol | 15 | +2 | 15 | 2,2 | 1 | — |
-| Warg | Sol | 20 | +2 | 22 | 2,4 | 1 | — |
-| Kobold | Sol | 25 | +3 | 30 | 1,6 | 1 | — |
-| Squelette du givre | Sol | 35 | +4 | 42 | 1,5 | 1 | — |
-| Sanglier de guerre | Sol | 45 | +5 | 52 | 2 | 1 | — |
-| Gnoll | Sol | 55 | +6 | 68 | 1,6 | 1 | — |
-| Brute orc | Sol | 65 | +7 | 82 | 1,4 | 1 | — |
-| Maraudeur | Sol | 75 | +8 | 95 | 1,5 | 1 | — |
-| Myconide | Sol | 85 | +9 | 115 | 1,1 | 1 | — |
-| Yéti | Sol | 100 | +11 | 135 | 1,3 | 1 | — |
+| Rat des neiges | Sol | 20 | +2 | 20 | 2,2 | 1 | — |
+| Warg | Sol | 30 | +3 | 33 | 2,4 | 1 | — |
+| Kobold | Sol | 40 | +4 | 48 | 1,6 | 1 | — |
+| Squelette du givre | Sol | 50 | +5 | 60 | 1,5 | 1 | — |
+| Sanglier de guerre | Sol | 60 | +6 | 69 | 2 | 1 | — |
+| Gnoll | Sol | 70 | +7 | 87 | 1,6 | 1 | — |
+| Brute orc | Sol | 80 | +8 | 101 | 1,4 | 1 | — |
+| Maraudeur | Sol | 90 | +9 | 114 | 1,5 | 1 | — |
+| Myconide | Sol | 100 | +11 | 135 | 1,1 | 1 | — |
+| Yéti | Sol | 110 | +12 | 149 | 1,3 | 1 | — |
 | Troll des glaces | Sol | 120 | +13 | 160 | 1,5 | 1 | — |
 | Chauve-souris | Volant | 30 | +2 | 16 | 2 | 1 | Vol |
 | Guêpe des glaces | Volant | 50 | +3 | 26 | 2,3 | 1 | Vol |
@@ -331,18 +332,18 @@ Vitesse en cases par seconde. Dans chaque palier, les monstres sont rangés par 
 | Briseur de runes | Magique | 170 | +11 | 120 | 1,4 | 1 | **Anti-magie** : insensible au Givre et au Mage |
 | Saboteur gobelin | Magique | 190 | +12 | 110 | 1,5 | 1 | **Étourdit** la tour la plus proche |
 | Roi gobelin | Boss | 450 | +29 | 900 | 1 | 1 | **Boss** : armure 2 et étourdissement |
-| Homme-lézard | Sol | 150 | +17 | 200 | 1,6 | 2 | — |
+| Homme-lézard | Sol | 150 | +16 | 200 | 1,6 | 2 | — |
 | Chevalier noir | Sol | 180 | +20 | 250 | 1,2 | 2 | — |
-| Gargouille | Sol | 210 | +24 | 285 | 1,3 | 2 | — |
+| Gargouille | Sol | 210 | +23 | 285 | 1,3 | 2 | — |
 | Loup-garou | Sol | 240 | +27 | 310 | 1,9 | 2 | — |
-| Ours de guerre | Sol | 270 | +31 | 370 | 1,5 | 2 | — |
+| Ours de guerre | Sol | 270 | +30 | 370 | 1,5 | 2 | — |
 | Golem runique | Sol | 300 | +34 | 420 | 1 | 2 | — |
 | Ogre | Sol | 330 | +38 | 460 | 1,1 | 2 | — |
-| Minotaure | Sol | 370 | +43 | 500 | 1,4 | 2 | — |
-| Automate blindé | Sol | 410 | +48 | 580 | 1 | 2 | — |
+| Minotaure | Sol | 370 | +42 | 500 | 1,4 | 2 | — |
+| Automate blindé | Sol | 410 | +47 | 580 | 1 | 2 | — |
 | Wendigo | Sol | 450 | +52 | 610 | 1,6 | 2 | — |
 | Rhinocéros de guerre | Sol | 500 | +58 | 720 | 1,5 | 2 | — |
-| Mammouth de guerre | Sol | 600 | +71 | 900 | 0,9 | 2 | — |
+| Mammouth de guerre | Sol | 600 | +70 | 900 | 0,9 | 2 | — |
 | Griffon corrompu | Volant | 150 | +10 | 95 | 1,9 | 2 | Vol |
 | Vouivre | Volant | 260 | +17 | 180 | 1,8 | 2 | Vol |
 | Manticore | Volant | 380 | +25 | 290 | 1,6 | 2 | Vol |
@@ -355,17 +356,17 @@ Vitesse en cases par seconde. Dans chaque palier, les monstres sont rangés par 
 | Inquisiteur | Magique | 450 | +29 | 380 | 1,3 | 2 | **Anti-magie** : insensible au Givre et au Mage |
 | Ingénieur nain renégat | Magique | 480 | +31 | 360 | 1,4 | 2 | **Étourdit** la tour la plus proche |
 | Cyclope des cendres | Boss | 1400 | +91 | 2800 | 1 | 2 | **Boss** : armure 6 et étourdissement |
-| Roi-liche | Sol | 900 | +108 | 1200 | 1,2 | 3 | — |
+| Roi-liche | Sol | 900 | +107 | 1200 | 1,2 | 3 | — |
 | Seigneur de guerre orc | Sol | 1000 | +120 | 1350 | 1,3 | 3 | — |
 | Élémentaire de feu | Sol | 1100 | +132 | 1400 | 1,5 | 3 | — |
 | Démon des abysses | Sol | 1250 | +151 | 1700 | 1,4 | 3 | — |
 | Golem de lave | Sol | 1400 | +170 | 2000 | 0,9 | 3 | — |
-| Ver des neiges | Sol | 1550 | +189 | 2100 | 1,2 | 3 | — |
-| Chimère | Sol | 1700 | +208 | 2250 | 1,5 | 3 | — |
+| Ver des neiges | Sol | 1550 | +188 | 2100 | 1,2 | 3 | — |
+| Chimère | Sol | 1700 | +207 | 2250 | 1,5 | 3 | — |
 | Géant du givre | Sol | 1900 | +233 | 2700 | 1 | 3 | — |
-| Sylvain corrompu | Sol | 2100 | +259 | 3000 | 0,9 | 3 | — |
+| Sylvain corrompu | Sol | 2100 | +258 | 3000 | 0,9 | 3 | — |
 | Mastodonte de fer | Sol | 2400 | +297 | 3500 | 0,8 | 3 | — |
-| Béhémoth | Sol | 2700 | +336 | 3900 | 1,1 | 3 | — |
+| Béhémoth | Sol | 2700 | +335 | 3900 | 1,1 | 3 | — |
 | Colosse de pierre | Sol | 3000 | +374 | 4500 | 0,85 | 3 | — |
 | Dragon ancien | Volant | 900 | +59 | 800 | 1,3 | 3 | Vol |
 | Phénix de givre | Volant | 1200 | +78 | 1000 | 1,6 | 3 | Vol |
@@ -775,3 +776,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-15 | 2.12 | **Interface : terrain plus grand et habillage « givre elfique »**. Le terrain occupe toute la place : en 3D, l'inclinaison de la caméra s'adapte au format de l'écran (34° à 66°) ; en paysage, trois colonnes (bandeau et fiche à gauche, terrain au centre, onglets et boutons à droite). Bouton « Vue d'ensemble » posé sur le plateau. Habillage inspiré des barres de commande des jeux de stratégie : cadre d'écran à volutes elfiques et voile de givre, panneaux en verre de nuit à texture de givre et cadres argentés, cartes serties avec prix en médaillon (tout en SVG et CSS). En 3D, les icônes des tours et des monstres sont des rendus des modèles 3D. Interface uniquement : `sim.js` non modifié (pas de redéploiement du serveur). Test de mise en page paysage adapté. |
 | 2026-11-15 | 2.12 | Assets 3D : **modèles des monstres des paliers** (PR B : 3 paliers × 24 monstres, liste dans `art/monstres/PALIERS.md`), un script par modèle dans `art/monstres/` (§15.1). Ils ne sont pas encore utilisés par le jeu. **Aucun changement de jeu** (`sim.js` et `index.html` inchangés). |
 | 2026-11-15 | 2.13 | **Paliers de monstres** (§6) : 3 paliers de 24 monstres (12 au sol, 3 volants, 8 magiques : hâte, invisible, se divise, accéléré, anti-magie, soin, armure, étourdissement ; 1 boss), soit 72 monstres au lieu de 17, avec les modèles 3D de la PR 26. Palier 1 ouvert dès le début, palier 2 à 300 or, palier 3 à 1 500 or (`PAL_C`, action `tier`) ; les déblocages par le temps disparaissent. Nouvelle capacité **accéléré** ; trois monstres qui se divisent (Petit limon, Petite boue, Tête d'hydre) ; un boss par palier (Roi gobelin, Cyclope, Azh'Khar). L'IA ouvre les paliers (2:30 et 7:00 au plus tôt) et envoie le plus fort monstre de chaque famille parmi ses paliers ouverts. Interface : écussons de palier dans l'onglet Envoyer, silhouette 2D de secours. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur ; l'instantané transmet le palier). Tests : `vagues` (paliers, accéléré), `combats` et `economie` adaptés, parcours mobile (palier 2). Chiffres d'équilibrage proposés, **à valider par le concepteur**. |
+| 2026-11-15 | 2.14 | **Coûts en dizaines et revenus sur la courbe** (§2, §6) : le Rat des neiges coûtait 15 or pour +2 de revenu (13 %, mieux que tous les autres monstres) ; il coûte maintenant 20 or pour +2. Les monstres au sol du palier 1 passent sur une échelle de 10 en 10 (10 à 120 or), PV ajustés au même rapport. Le revenu des monstres au sol est arrondi à l'inférieur sur la courbe 10 → 1, 100 → 11, 1000 → 120 : aucun monstre ne la dépasse. Volants et spéciaux : coûts déjà en dizaines, revenu inchangé (6,5 % du coût). `sim.js` modifié (redéploiement automatique du serveur). Test `tables` : coûts en dizaines et revenus sous la courbe. Chiffres **à valider par le concepteur**. |

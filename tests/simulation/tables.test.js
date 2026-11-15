@@ -28,5 +28,8 @@ test('Chaque tour est bien calculée à partir des tables de base (formules reca
 });
 
 test('Revenu gagné par envoi : formule du code (sol : courbe log ; autres : 6,5 % du coût)',()=>{
- for(const T of S.CR){const attendu=T.cat=='n'?Math.round(T.c/10*(1+.1*Math.log10(T.c/10))):Math.round(T.c*.065);assert.equal(T.i,attendu,T.n)}
+ for(const T of S.CR){const attendu=T.cat=='n'?Math.floor(T.c/10*(1+.1*Math.log10(T.c/10))+1e-9):Math.round(T.c*.065);assert.equal(T.i,attendu,T.n)}
+ /* 2.14 : coûts en dizaines, et aucun monstre au sol ne dépasse la courbe 10 → 1, 100 → 11, 1000 → 120 */
+ for(const T of S.CR){assert.equal(T.c%10,0,T.n+' : coût en dizaines');if(T.cat=='n')assert.ok(T.i<=T.c/10*(1+.1*Math.log10(T.c/10))+1e-9,T.n+' : sous la courbe')}
+ for(const[c,i]of[[10,1],[100,11],[1000,120]]){const T=S.CR.find(U=>U.cat=='n'&&U.c==c);if(T)assert.equal(T.i,i,T.n)}
 });
