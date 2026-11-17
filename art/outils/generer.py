@@ -1,6 +1,6 @@
 """Winter Realms — génération des assets 3D à partir des scripts de art/.
 
-Chaque asset est un script Python de art/ (hors art/outils/ et art/communs/) qui définit :
+Chaque asset est un script Python de art/ (hors art/outils/, art/communs/ et art/sons/, qui décrit les sons) qui définit :
     INFOS = {'categorie': 'tour' | 'monstre' | 'decor' | 'exemple', 'titre': '…'}
     def construire(ctx): …   # crée ses objets dans une scène vide
 
@@ -39,7 +39,7 @@ def scripts_assets():
     ids = []
     for dossier, sous, fichiers in os.walk(ART):
         rel = os.path.relpath(dossier, ART).replace('\\', '/')
-        if rel.split('/')[0] in ('outils', 'communs', '__pycache__') or rel.endswith('__pycache__'):
+        if rel.split('/')[0] in ('outils', 'communs', 'sons', '__pycache__') or rel.endswith('__pycache__'):
             continue
         for f in fichiers:
             if f.endswith('.py') and not f.startswith('_'):

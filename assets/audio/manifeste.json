@@ -1,0 +1,73 @@
+{
+ "_lisezmoi": "Généré par art/outils/manifeste-audio.js : ne pas éditer à la main.",
+ "fichiers": 32,
+ "octets": 1259920,
+ "sons": {
+  "boom": [
+   "interface/boom-1.mp3",
+   "interface/boom-2.mp3"
+  ],
+  "chantier-alliance": [
+   "construction/chantier-alliance-1.mp3"
+  ],
+  "tap": [
+   "interface/tap-1.mp3"
+  ],
+  "tir-arrow-alliance": [
+   "tours/tir-arrow-alliance-1.mp3",
+   "tours/tir-arrow-alliance-2.mp3",
+   "tours/tir-arrow-alliance-3.mp3"
+  ],
+  "tir-arrow-horde": [
+   "tours/tir-arrow-horde-1.mp3",
+   "tours/tir-arrow-horde-2.mp3",
+   "tours/tir-arrow-horde-3.mp3"
+  ],
+  "tir-arrow-legion": [
+   "tours/tir-arrow-legion-1.mp3",
+   "tours/tir-arrow-legion-2.mp3",
+   "tours/tir-arrow-legion-3.mp3"
+  ],
+  "tir-arrow-nains": [
+   "tours/tir-arrow-nains-1.mp3",
+   "tours/tir-arrow-nains-2.mp3",
+   "tours/tir-arrow-nains-3.mp3"
+  ],
+  "tir-arrow-sylvestres": [
+   "tours/tir-arrow-sylvestres-1.mp3",
+   "tours/tir-arrow-sylvestres-2.mp3",
+   "tours/tir-arrow-sylvestres-3.mp3"
+  ],
+  "tir-mage-alliance": [
+   "tours/tir-mage-alliance-1.mp3"
+  ],
+  "tir-slash-alliance": [
+   "tours/tir-slash-alliance-1.mp3",
+   "tours/tir-slash-alliance-2.mp3",
+   "tours/tir-slash-alliance-3.mp3"
+  ],
+  "tir-slash-horde": [
+   "tours/tir-slash-horde-1.mp3",
+   "tours/tir-slash-horde-2.mp3",
+   "tours/tir-slash-horde-3.mp3"
+  ],
+  "tir-slash-sylvestres": [
+   "tours/tir-slash-sylvestres-1.mp3"
+  ],
+  "voix-alliance-sel": [
+   "voix/alliance/voix-alliance-sel-1.mp3"
+  ],
+  "voix-horde-sel": [
+   "voix/horde/voix-horde-sel-1.mp3"
+  ],
+  "voix-legion-sel": [
+   "voix/legion/voix-legion-sel-1.mp3"
+  ],
+  "voix-nains-sel": [
+   "voix/nains/voix-nains-sel-1.mp3"
+  ],
+  "voix-sylvestres-sel": [
+   "voix/sylvestres/voix-sylvestres-sel-1.mp3"
+  ]
+ }
+}
