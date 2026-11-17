@@ -1,21 +1,22 @@
-/* Winter Realms — rendu 3D (prototype, activé par ?rendu=3d). Chargé à la demande par index.html.
+/* Winter Realms — rendu 3D (par défaut depuis la 2.8). Chargé à la demande par index.html.
    Lit l'état d'un terrain (Board de sim.js) comme draw() en 2D, et le dessine avec three.js.
 
-   Projection : caméra ORTHOGRAPHIQUE inclinée (élévation E). Une case (x, y) du jeu est en (x, 0, y) dans le monde
-   (X vers la droite, Z vers le bas de l'écran, Y vers le haut). À l'écran, un point du sol (gx, gz) à la hauteur h est en
-     sx = ox + gx·s,   sy = oy + (gz·KY − h·KH)·s     avec s = taille d'une case en pixels, KY = sin E, KH = cos E.
-   C'est la même formule que la 2D avec un tassement vertical KY : zoom, déplacement à deux doigts et toucher d'une case
-   gardent la logique d'index.html (VUE.z, VUE.ox, VUE.oy).
+   Caméra « vue tactique » (2.15) : PERSPECTIVE, à hauteur fixe (élévation ELEV), qui regarde un point du sol (V.fx, V.fz).
+   Une case (x, y) du jeu est en (x, 0, y) dans le monde (X vers la droite, Z vers le château, Y vers le haut).
+   - le joueur la déplace en glissant le doigt (glisser : le sol reste sous le doigt), avec un peu d'élan au lâcher (lancer) ;
+   - elle pivote autour du point regardé par huitièmes de tour (pivoter), en douceur ;
+   - à la largeur du point regardé, on voit COLONNES cases ; le point regardé est au centre de la zone libre entre le bandeau
+     du haut et le dock du bas (cadre).
+   index.html passe par projeter (monde → pixels), echelle (pixels par case) et sol (pixels → case) pour la surcouche 2D,
+   le toucher d'une case et les tests.
 
    Modèles : assets/3d/ (fabriqués par les scripts Blender de art/, voir CLAUDE.md §15). */
 import * as THREE from 'three';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
-/* élévation de la caméra : 42° par défaut ; depuis la 2.12, index.html l'adapte au format de l'écran (incliner)
-   pour que le plateau occupe toute la place (plus redressée en portrait, plus rasante en paysage) */
-export let E = 42 * Math.PI / 180, KY = Math.sin(E), KH = Math.cos(E), TOPM = 1.6 * KH; /* TOPM : place gardée au-dessus du plateau pour les tours hautes (1,2 case à 42°) */
-export const E_MIN = 34, E_MAX = 66;
+/* caméra tactique (2.15) : champ vertical, élévation, nombre de cases visibles en largeur au point regardé */
+export const FOV = 48, ELEV = 40 * Math.PI / 180, COLONNES = 10.5;
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
@@ -40,12 +41,59 @@ export function creer(J) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#1a2433');
-  const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, .1, 200);
-  function placerCamera() { cam.position.set(0, 60 * Math.sin(E), 60 * Math.cos(E)); cam.up.set(0, 1, 0); cam.lookAt(0, 0, 0) }
+  /* nuit d'hiver : le champ de neige autour du plateau se fond dans le bleu nuit au loin */
+  scene.background = new THREE.Color('#16243a'); scene.fog = new THREE.Fog('#16243a', 32, 85);
+  const champ = new THREE.Mesh(new THREE.PlaneGeometry(400, 400).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({color: '#aebfd3', roughness: 1}));
+  champ.position.set(C / 2, -.72, R / 2); scene.add(champ);
+
+  /* ---------- caméra tactique (2.15) ---------- */
+  const cam = new THREE.PerspectiveCamera(FOV, 1, .5, 400);
+  /* fx, fz : point regardé ; az : angle actuel (azC : visé, par huitièmes de tour) ; vx, vz : élan ; w, h : taille du canevas ;
+     haut, bas : bandes couvertes par le bandeau et le dock (le point regardé est au centre de ce qui reste) */
+  const V = {fx: C / 2, fz: R / 2 + 1.5, az: 0, azC: 0, vx: 0, vz: 0, w: 1, h: 1, haut: 0, bas: 0};
+  const borner = () => { V.fx = Math.min(C, Math.max(0, V.fx)); V.fz = Math.min(R, Math.max(0, V.fz)) };
+  function placerCamera() {
+    const asp = V.w / V.h, D = COLONNES / (2 * Math.tan(FOV * Math.PI / 360) * asp), ch = D * Math.cos(ELEV);
+    cam.aspect = asp; cam.setViewOffset(V.w, V.h, 0, V.h / 2 - (V.haut + (V.h - V.haut - V.bas) / 2), V.w, V.h);
+    cam.position.set(V.fx + ch * Math.sin(V.az), D * Math.sin(ELEV), V.fz + ch * Math.cos(V.az)); cam.up.set(0, 1, 0); cam.lookAt(V.fx, 0, V.fz);
+    cam.updateProjectionMatrix(); cam.updateMatrixWorld();
+  }
   placerCamera();
-  /* change l'élévation (en degrés, bornée) et renvoie le nouveau tassement vertical KY */
-  function incliner(deg) { deg = Math.min(E_MAX, Math.max(E_MIN, deg)); E = deg * Math.PI / 180; KY = Math.sin(E); KH = Math.cos(E); TOPM = 1.6 * KH; placerCamera(); return KY }
+  /* taille du canevas et bandes couvertes par l'interface */
+  function cadre(o) { Object.assign(V, o); placerCamera() }
+  /* point du monde → pixels du canevas (z > 1 : derrière la caméra) */
+  const vp = new THREE.Vector3(), droite = new THREE.Vector3();
+  function projeter(x, y, z) { vp.set(x, y, z).project(cam); return {x: (vp.x + 1) / 2 * V.w, y: (1 - vp.y) / 2 * V.h, z: vp.z} }
+  /* taille à l'écran (pixels) d'une case posée au point (x, z) du sol, à la hauteur y */
+  function echelle(x, z, y = 0) { droite.setFromMatrixColumn(cam.matrixWorld, 0); const a = projeter(x, y, z), b = projeter(x + droite.x, y + droite.y, z + droite.z); return Math.hypot(b.x - a.x, b.y - a.y) }
+  /* pixels du canevas → point du sol {x, z} (null au-dessus de l'horizon ; avec loin, un point lointain dans cette direction) */
+  const rayon = new THREE.Raycaster(), ndc = new THREE.Vector2();
+  function sol(px, py, loin) {
+    ndc.set(px / V.w * 2 - 1, 1 - py / V.h * 2); rayon.setFromCamera(ndc, cam); const o = rayon.ray.origin, d = rayon.ray.direction;
+    if (d.y > -.02) { if (!loin) return null; const n = Math.hypot(d.x, d.z) || 1; return {x: o.x + d.x / n * 90, z: o.z + d.z / n * 90} }
+    const t = -o.y / d.y; return {x: o.x + d.x * t, z: o.z + d.z * t};
+  }
+  /* le doigt passe de (x0, y0) à (x1, y1) : la caméra suit pour garder le même point du sol sous le doigt. Renvoie le déplacement. */
+  function glisser(x0, y0, x1, y1) {
+    const a = sol(x0, y0), b = sol(x1, y1), ax = V.fx, az = V.fz; let dx, dz;
+    if (a && b && Math.hypot(a.x - V.fx, a.z - V.fz) < 40) { dx = a.x - b.x; dz = a.z - b.z }
+    else { const k = echelle(V.fx, V.fz) || 30, k2 = k * Math.sin(ELEV), c = Math.cos(V.az), s = Math.sin(V.az), du = (x1 - x0) / k, dv = (y1 - y0) / k2;
+      dx = -du * c - dv * s; dz = du * s - dv * c }
+    const n = Math.hypot(dx, dz); if (n > 1.5) { dx *= 1.5 / n; dz *= 1.5 / n }
+    V.fx += dx; V.fz += dz; borner(); placerCamera(); return [V.fx - ax, V.fz - az];
+  }
+  /* un huitième de tour à gauche (-1) ou à droite (+1), animé dans dessiner */
+  function pivoter(sens) { V.azC += sens * Math.PI / 4 }
+  /* élan au lâcher (cases par seconde), amorti dans dessiner */
+  function lancer(vx, vz) { const n = Math.hypot(vx, vz), m = n > 14 ? 14 / n : 1; V.vx = vx * m; V.vz = vz * m }
+  function viser(x, z) { V.fx = x; V.fz = z; V.vx = V.vz = 0; borner(); placerCamera() }
+  /* coins de la zone libre, au sol (pour le cadre de la vignette) */
+  const empreinte = () => [[0, V.haut], [V.w, V.haut], [V.w, V.h - V.bas], [0, V.h - V.bas]].map(([x, y]) => sol(x, y, true));
+  function bougerCamera(dt) {
+    V.az = Math.abs(V.azC - V.az) > 1e-3 ? V.az + (V.azC - V.az) * Math.min(1, dt * 8) : V.azC;
+    if (Math.hypot(V.vx, V.vz) > .05) { V.fx += V.vx * dt; V.fz += V.vz * dt; borner(); const f = Math.exp(-dt * 4); V.vx *= f; V.vz *= f } else V.vx = V.vz = 0;
+    placerCamera();
+  }
 
   /* lumières : ciel et sol (ambiance), soleil chaud avec ombres, contre-jour */
   scene.add(new THREE.HemisphereLight('#e4efff', '#6a7890', 1.15));
@@ -386,7 +434,7 @@ export function creer(J) {
   function vider() {
     for (const m of [tours, monstres, projs, effets]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
   }
-  function dessiner(b, temps, VUE, cell, etat) {
+  function dessiner(b, temps, etat) {
     const dt = dernier ? Math.min(.1, Math.max(0, temps - dernier)) : 0; dernier = temps;
     if (b !== terrain) { vider(); terrain = b; cheminD = null }
     if (b.classId !== plateauFaction) construirePlateau(b.classId);
@@ -417,15 +465,13 @@ export function creer(J) {
       if (fantome) fantome.r.position.set(etat.projet.x + .5, 0, etat.projet.y + .5);
     }
 
-    /* caméra : mêmes zoom et décalage que la 2D (voir l'en-tête) */
-    const s = cell * VUE.z;
-    cam.left = -VUE.ox / s; cam.right = (VUE.w - VUE.ox) / s; cam.top = VUE.oy / s; cam.bottom = -(VUE.h - VUE.oy) / s;
-    cam.updateProjectionMatrix();
+    /* caméra : rotation et élan (voir l'en-tête) */
+    bougerCamera(dt);
     renderer.render(scene, cam);
   }
   function taille(w, h, dpr) { renderer.setPixelRatio(Math.min(2, dpr)); renderer.setSize(w, h, true) }
   /* point du monde (gx, gz au sol, hauteur h) → pixels du canevas */
-  function versEcran(gx, gz, h, VUE, cell) { const s = cell * VUE.z; return {x: VUE.ox + gx * s, y: VUE.oy + (gz * KY - h * KH) * s} }
+  function versEcran(gx, gz, h) { return projeter(gx, h, gz) }
 
   /* 2.12 : vignettes des boutons (tours et monstres) rendues à partir des modèles 3D, vue de trois quarts,
      avec un petit moteur de rendu à part (fond transparent). Renvoie l'image en data URL, ou null si le modèle manque. */
@@ -454,6 +500,8 @@ export function creer(J) {
 
   /* compteurs pour les tests : objets 3D présents et appels de dessin de la dernière image */
   const etat = () => ({tours: tours.size, monstres: monstres.size, projectiles: projs.size, effets: effets.size, fantome: !!(fantome && fantome.r.parent),
-    portee: portee.visible, dessins: renderer.info.render.calls, triangles: renderer.info.render.triangles});
-  return {canvas, dessiner, taille, versEcran, precharger, hauteurMonstre: HAUT, get KY() { return KY }, get TOPM() { return TOPM }, incliner, vignette, renderer, etat};
+    portee: portee.visible, dessins: renderer.info.render.calls, triangles: renderer.info.render.triangles,
+    vue: {fx: V.fx, fz: V.fz, az: Math.round(V.azC / (Math.PI / 4)), perspective: cam.isPerspectiveCamera}});
+  return {canvas, dessiner, taille, versEcran, precharger, hauteurMonstre: HAUT, vignette, renderer, etat,
+    cadre, projeter, echelle, sol, glisser, pivoter, lancer, viser, empreinte};
 }

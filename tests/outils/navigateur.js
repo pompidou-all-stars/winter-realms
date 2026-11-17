@@ -67,12 +67,16 @@ async function deuxDoigts(page,{de,vers,etapes=8}){const cdp=await page.context(
  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();await page.clock.runFor(50)}
 async function toucher(page,selecteur){await page.locator(selecteur).first().tap();await page.clock.runFor(50)}
 async function avancer(page,ms){await page.clock.runFor(ms)}
-async function etat(page){return page.evaluate(()=>({or:P.gold,revenu:P.inc,vies:P.lives,tours:P.t.map(t=>({x:t.x,y:t.y,k:t.k,lv:t.lv})),temps:time,horloge:document.getElementById('clock').textContent,
- vue:view,fin:over,faction:chosenClass,panneauOuvert:!!document.querySelector('#bar .info')||document.getElementById('fiche')?.dataset.mode=='tour',fiche:document.getElementById('fiche')?.innerText||'',zoom:typeof VUE=='object'?VUE.z:1,projet:typeof projet!='undefined'&&projet?{...projet}:null,toast:document.getElementById('toast').hidden?'':document.getElementById('toast').textContent,boutons:[...document.querySelectorAll('#bar button')].map(b=>b.textContent)}))}
+/* 2.15 : la fiche n'est visible que lorsqu'on a choisi quelque chose ; les boutons Améliorer et Vendre sont dans la fiche */
+async function etat(page){return page.evaluate(()=>{const f=document.getElementById('fiche');return {or:P.gold,revenu:P.inc,vies:P.lives,tours:P.t.map(t=>({x:t.x,y:t.y,k:t.k,lv:t.lv})),temps:time,horloge:document.getElementById('clock').textContent,
+ vue:view,fin:over,faction:chosenClass,panneauOuvert:f?.dataset.mode=='tour',fiche:f&&!f.hidden?f.innerText:'',choix:typeof sel!='undefined'?sel:null,monstre:typeof mon!='undefined'?mon:null,
+ projet:typeof projet!='undefined'&&projet?{...projet}:null,toast:document.getElementById('toast').hidden?'':document.getElementById('toast').textContent,boutons:[...document.querySelectorAll('#fiche .actions button')].map(b=>b.textContent)}})}
+/* 2.15 : toucher la carte d'une tour ou d'un monstre par son nom (les cartes n'affichent que l'icône et le prix ; le nom est dans aria-label) */
+async function toucherCarte(page,nom){await toucher(page,`#bar button[aria-label^="${nom},"]`)}
 
 /* 2.7 : attend que le rendu 3D soit prêt (module chargé et modèles préchargés). Le chargement passe par le réseau local,
    qui ne dépend pas de l'horloge figée : on attend en temps réel, puis on avance l'horloge d'une image. */
 async function attendre3D(page,ms=30000){const fin=Date.now()+ms;
  while(Date.now()<fin){const e=await page.evaluate(()=>({ok:!!(window.R3D_ETAT&&R3D_ETAT().charge),echec:window.R3D_ETAT&&R3D_ETAT().echec}));
   if(e.ok){await page.clock.runFor(50);return true}if(e.echec)return false;await page.waitForTimeout(100)}return false}
-module.exports={disponible,lancer,ouvrir,attendre3D,toucherCase,construire,glisser,centreCase,deuxDoigts,toucher,avancer,etat,FORMATS};
+module.exports={disponible,lancer,ouvrir,attendre3D,toucherCase,construire,glisser,centreCase,deuxDoigts,toucher,toucherCarte,avancer,etat,FORMATS};
