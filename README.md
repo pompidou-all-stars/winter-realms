@@ -44,6 +44,9 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.14 — 2026-11-15
+- Balance: every monster cost is a multiple of 10, and ground-monster income is rounded down onto the curve 10 gold → +1, 100 → +11, 1000 → +120, so no cheap monster pays better than the curve. The Snow rat now costs 20 gold for +2 (was 15 for +2). Tier-1 ground monsters now go from 10 to 120 gold in steps of 10.
+
 ### 2.13 — 2026-11-15
 - Monster tiers: 3 tiers of 24 monsters (12 ground, 3 flying, 8 magic, 1 boss), 72 monsters instead of 17. Tier 1 is open from the start; tier 2 costs 300 gold and tier 3 costs 1,500 gold. Time unlocks are gone.
 - New "accelerated" ability (speeds up the longer it lives); three splitting monsters; one boss per tier.
