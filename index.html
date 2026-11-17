@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.14</title>
+<title>Winter Realms — Tower Wars · Édition 2.15</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -14,97 +14,113 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0;background:radial-gradient(ellipse at 50% 30%,#14223a,var(--bg) 70%);color:var(--ink);font-family:'Fredoka',system-ui,sans-serif;font-weight:500;touch-action:manipulation;user-select:none;-webkit-user-select:none;overflow:hidden}
 button{font:inherit;color:inherit;cursor:pointer}
-#app{height:100vh;height:100dvh;display:grid;grid-template:"hud" auto "stage" 1fr "ctl" auto / 1fr;gap:4px;
- padding:calc(4px + env(safe-area-inset-top,0px)) calc(4px + env(safe-area-inset-right,0px)) calc(4px + env(safe-area-inset-bottom,0px)) calc(4px + env(safe-area-inset-left,0px))}
-/* bandeau du haut : une seule ligne, comme la barre de ressources d'un jeu */
-#hud{grid-area:hud;position:relative;background:var(--cadre);border:1px solid var(--liseré);border-radius:9px;box-shadow:var(--relief);padding:3px 4px 6px;overflow:hidden}
-#row1{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--dim);white-space:nowrap;min-width:0}
-#row1 b{color:var(--ink);font-weight:700}
-.res{display:inline-flex;align-items:center;gap:3px;height:28px;padding:0 7px;border-radius:7px;background:#0007;box-shadow:inset 0 1px 3px #000a,0 1px 0 #ffffff14}
-.res small{font-size:10px;color:var(--dim)}
-#row1 .big{font-size:18px;color:var(--gold);display:inline-block;text-shadow:0 1px 0 #6b420b}
-#row1 .coin{display:inline-block;width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#f2c14e 45%,#a86e12);border:1px solid #6b420b;box-shadow:0 1px 0 #0008}
-#clock{color:var(--ice);font-weight:700}
-#lives{color:#ff8f7e}#lives b{color:var(--ink)}
-#factionBadge{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:11px;font-weight:700;color:var(--gold)}
-#row1 .sp{flex:0 0 0}
+/* ===== 2.15 : interface « vue tactique » (maquette validée par le concepteur) =====
+   Le terrain occupe tout l'écran ; le bandeau (en haut) et le dock (en bas : fiche, onglets, paliers, cartes) flottent par-dessus.
+   Portrait seulement : un téléphone tenu en paysage affiche « Tourne ton téléphone » ; sur ordinateur, le jeu tient dans une colonne. */
+#app{position:fixed;top:0;bottom:0;left:0;right:0;margin:0 auto;width:100%;overflow:hidden;background:#06101c}
+@media (orientation:landscape){#app{width:min(100%,calc(100dvh*.62))}}
+#stage{position:absolute;inset:0;overflow:hidden;--dock:150px}
+#main{position:absolute;left:0;top:0;touch-action:none}
+/* bandeau du haut : menu, or, revenu (anneau des 10 secondes), vies, horloge, plein écran */
+#hud{position:absolute;z-index:5;left:calc(8px + env(safe-area-inset-left,0px));right:calc(8px + env(safe-area-inset-right,0px));top:calc(8px + env(safe-area-inset-top,0px));display:flex;gap:6px;align-items:center;pointer-events:none}
+.pastille{display:flex;align-items:center;gap:5px;height:30px;padding:0 9px;border-radius:15px;background:#0b1626d9;border:1px solid #9be7ff33;box-shadow:inset 0 1px 0 #ffffff1a,0 2px 6px #0007;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+#gold,#inc{color:#ffe597}
 #gold.pop{animation:pop .35s}
 @keyframes pop{40%{transform:scale(1.35)}}
-.ib{flex:0 0 auto;width:30px;height:28px;border:1px solid #8fb6d966;border-radius:7px;background:linear-gradient(180deg,#34507a,#1d3152);box-shadow:inset 0 1px 0 #ffffff30,0 2px 0 #0009;display:grid;place-items:center;padding:0}
-.ib:active{transform:translateY(1px)}
-.ib svg{width:17px;height:17px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.ib.off{opacity:.45}
-/* 2.3 puis 2.11 : le bouton des terrains des joueurs est revenu dans le bandeau ; le panneau des vignettes flotte sur le terrain */
-#cartesBtn{width:auto;min-width:34px;display:flex;align-items:center;gap:4px;padding:0 6px;border:2px solid var(--c,#c9a24a);font-size:11px;font-weight:700;color:var(--ink)}
-#cartesTxt{max-width:62px;overflow:hidden;text-overflow:ellipsis}
-#cartesTxt:empty{display:none}
-#cartesBtn.on{background:linear-gradient(180deg,#f2c14e,#b8862b)}#cartesBtn.on svg{stroke:#3a2205}
-#chips{position:absolute;left:6px;top:6px;z-index:3;display:grid;grid-template-columns:repeat(2,auto);gap:6px;padding:6px;border-radius:10px;background:#0a1322f0;border:1px solid var(--liseré);box-shadow:0 10px 28px #000b}
-#chips[hidden]{display:none}
-.chip{display:flex;align-items:center;gap:6px;min-width:0;padding:4px 8px 4px 4px;border:2px solid transparent;border-radius:8px;background:var(--panel2);font-size:11px;line-height:1.2;text-align:left;white-space:pre-line;color:var(--dim)}
-.chip canvas{flex:0 0 auto;border-radius:3px}
-.chip b{display:block;font-size:13px;font-weight:700;color:var(--c)}
-.chip.on{border-color:var(--c);background:#0006}
-.chip.dead{opacity:.35}
-#tbar{position:absolute;left:4px;right:4px;bottom:2px;height:3px;border-radius:2px;background:#0008;overflow:hidden}
-#tfill{display:block;height:100%;background:linear-gradient(90deg,#c98b22,#ffe597);transform-origin:left;transform:scaleX(0)}
-#stage{grid-area:stage;position:relative;min-height:0;min-width:0;overflow:hidden}
-#main{position:absolute;left:0;top:0;touch-action:none}
-#zoomReset{position:absolute;right:10px;bottom:52px;width:auto;padding:0 10px;gap:5px;display:flex;align-items:center;font-size:12px;font-weight:700;background:#0a1322d8;color:var(--ink);border:1px solid var(--liseré);border-radius:8px;height:30px}
-#zoomReset svg{width:16px;height:16px;fill:none;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#banner,#toast{position:absolute;left:50%;transform:translateX(-50%);padding:5px 12px;border-radius:8px;font-size:13px;white-space:nowrap;pointer-events:none}
-#banner{bottom:48px;color:#fff;font-weight:700;pointer-events:auto;box-shadow:0 4px 14px #0008;border:1px solid #fff6;text-shadow:0 1px 2px #0008}
-#toast{bottom:10px;background:#0a1322e8;border:1px solid var(--liseré)}
+.coin{display:inline-block;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#f2c14e 50%,#a86e12);box-shadow:0 0 0 1px #6b4a0a}
+.anneau{width:18px;height:18px}
+#lives{color:#ffb4a2}#lives b{color:#ffb4a2}
+#clock{color:var(--dim);font-weight:500}
+#hud .vide{flex:1}
+.rondbtn{pointer-events:auto;flex:0 0 30px;width:30px;height:30px;border-radius:15px;display:grid;place-items:center;padding:0;color:#ffe597;background:#0b1626d9;border:1px solid #f2c14e88;box-shadow:inset 0 1px 0 #ffffff1a,0 2px 6px #0007}
+.rondbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+/* adversaires : un bouton, et le panneau des 4 vignettes (vies, revenu) */
+#cartesBtn{position:absolute;z-index:5;right:calc(8px + env(safe-area-inset-right,0px));top:calc(46px + env(safe-area-inset-top,0px));height:32px;display:flex;align-items:center;gap:6px;padding:0 11px 0 8px;border-radius:16px;background:#0b1626e6;border:1.5px solid var(--c,#f2c14e99);color:var(--c,var(--ink));font-size:12.5px;font-weight:700;box-shadow:0 2px 8px #0008}
+#cartesBtn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#advPoints{display:flex;gap:3px}
+#advPoints i{width:6px;height:6px;border-radius:50%}
+#chips{position:absolute;z-index:9;left:calc(8px + env(safe-area-inset-left,0px));right:calc(8px + env(safe-area-inset-right,0px));top:calc(84px + env(safe-area-inset-top,0px));display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px;border-radius:14px;background:linear-gradient(180deg,#1d3150,#14223a);border:1px solid #f2c14e88;box-shadow:0 8px 24px #000c}
+.chip{display:flex;gap:8px;align-items:center;min-width:0;padding:5px;border-radius:10px;background:#0d1729;border:1px solid #8fb6d944;font-size:12px;line-height:1.3;text-align:left;white-space:pre-line;color:var(--dim)}
+.chip canvas{flex:0 0 auto;border-radius:5px}
+.chip b{display:block;font-size:14px;font-weight:700;color:var(--c)}
+.chip.on{border-color:var(--c);box-shadow:0 0 0 1px var(--c)}
+.chip.dead{opacity:.4}
+/* flèches de rotation de la vue (3D seulement) */
+.fleche{position:absolute;z-index:5;bottom:calc(var(--dock) + 10px);width:42px;height:42px;border-radius:50%;display:grid;place-items:center;padding:0;background:radial-gradient(circle at 50% 35%,#2b4470,#101d33);border:1.5px solid var(--gold);box-shadow:0 3px 8px #0009,inset 0 1px 0 #ffffff33}
+.fleche svg{width:22px;height:22px;fill:none;stroke:#ffe597;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.fleche:active{transform:scale(.92)}
+#rotG{left:calc(10px + env(safe-area-inset-left,0px))}
+#rotD{right:calc(10px + env(safe-area-inset-right,0px))}
+body.r2d .fleche{display:none}
+/* bannière (terrain d'un autre joueur), astuce et message */
+#banner,#toast,#astuce{position:absolute;left:50%;transform:translateX(-50%);z-index:6;text-align:center}
+#banner{bottom:calc(var(--dock) + 60px);height:30px;padding:0 13px;border-radius:15px;white-space:nowrap;color:#fff;font-size:12.5px;font-weight:700;border:1px solid #fff6;box-shadow:0 2px 8px #0008;text-shadow:0 1px 2px #0008}
+#toast{z-index:7;bottom:calc(var(--dock) + 62px);width:max-content;max-width:calc(100% - 32px);padding:7px 13px;border-radius:12px;font-size:13.5px;font-weight:700;background:#0b1626f2;border:1px solid var(--gold);color:#ffe597;box-shadow:0 4px 12px #000a;pointer-events:none}
+#banner:not([hidden])~#toast{bottom:calc(var(--dock) + 100px)}
+#toast.refus{border-color:var(--red);color:#ffc2b0}
+#astuce{top:calc(88px + env(safe-area-inset-top,0px));max-width:78%;padding:6px 11px;border-radius:12px;font-size:12.5px;line-height:1.3;background:#0b1626e6;border:1px solid #9be7ff55;color:var(--ice);pointer-events:none}
 [hidden]{display:none!important}
-#ctl{grid-area:ctl;display:flex;flex-direction:column;gap:4px;min-width:0}
-/* onglets façon jeu : boutons en relief, or pour construire, rouge pour attaquer */
-#tabs{display:flex;gap:6px;align-items:stretch}
-#tabs button{font-weight:700;font-size:13px;padding:5px 2px;border:0;border-radius:7px;background:transparent;text-shadow:0 1px 0 #0008}
-#tabs .tw{flex:0 0 29%;background:var(--cadre);border:1px solid var(--liseré);box-shadow:var(--relief)}
-#tabs .tw:before{content:'⚒ '}
-#tabs .tw.on{background:var(--or-fond);color:#3a2205;border-color:#7a4e10;box-shadow:var(--or-relief);text-shadow:0 1px 0 #fff6}
-#tabs .mon{flex:1;display:flex;align-items:center;gap:3px;min-width:0;padding:3px;border-radius:8px;background:linear-gradient(180deg,#3a1d1a,#24110f);border:1px solid #c8574088;box-shadow:var(--relief)}
-#tabs .mon span{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#ffb4a2;padding:0 3px 0 4px}
-#tabs .mon button{flex:1}
-#tabs .mon button.on{background:linear-gradient(180deg,#f07a52,#c2401f 55%,#8a2410);color:#fff;box-shadow:inset 0 1px 0 #fff6,0 2px 0 #4a1307}
-#bar.mon button{background:linear-gradient(180deg,#3e2522,#261513)}
-/* fiche d'information : parchemin de nuit à liseré d'or */
-#fiche{display:flex;align-items:center;gap:8px;min-width:0;height:72px;overflow:hidden;padding:4px 9px;background:var(--cadre);border:1px solid var(--liseré);border-radius:8px;box-shadow:var(--relief);font-size:12px;line-height:1.3;color:var(--dim)}
-#fiche canvas{flex:0 0 auto}
-#fiche .txt{flex:1;min-width:0}
+/* dock du bas : fiche (seulement quand on a choisi quelque chose), onglets, paliers, cartes */
+#ctl{position:absolute;z-index:5;left:0;right:0;bottom:0;display:flex;flex-direction:column;gap:6px;padding:16px calc(8px + env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) calc(8px + env(safe-area-inset-left,0px));background:linear-gradient(180deg,#06101c00,#06101cd9 22%,#06101c)}
+#fiche{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:8px 10px 9px;border-radius:14px;background:linear-gradient(180deg,#1d3150,#14223a);border:1px solid #f2c14e88;box-shadow:inset 0 1px 0 #ffffff22,0 4px 14px #000a;font-size:12px;line-height:1.35;color:var(--dim)}
+#fiche.envoyer{border-color:#e4572e99;background:linear-gradient(180deg,#3a1d1a,#22100e)}
+#fiche .txt{min-width:0}
 #fiche .tt{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
-#fiche .tt b{font-size:14px;font-weight:700;color:var(--gold);text-shadow:0 1px 0 #000}
-#fiche .tt span{font-size:11px;color:var(--dim)}
+#fiche .tt b{font-size:15px;font-weight:700;color:var(--ink)}
+#fiche .tt span{font-size:11.5px;color:var(--ice)}
 #fiche .st{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:1px}
 #fiche .st i{font-style:normal;color:var(--ink);font-weight:700}
-#fiche .ex{margin-top:1px;font-size:11px;line-height:1.3;color:var(--ice);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
-#fiche .next{color:#a8e07a}#fiche .chantier{color:#ffc95e;font-weight:700}
-#fiche.apercu{box-shadow:inset 0 0 0 2px #f2c14e99,var(--relief)}
-#fiche.envoyer{background:linear-gradient(180deg,#3a1d1a,#24110f);border-color:#c8574088;color:#ffcfc4}
-/* cartes de tours et de monstres : emplacements sertis, comme une barre de sorts */
-#bar{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+#fiche .ex{grid-column:1/-1;font-size:11.5px}
+#fiche .ex:empty{display:none}
+#fiche .next{color:#a8e07a}
+#fiche .chantier{color:#ffc95e;font-weight:700}
+#fiche .aide{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ice)}
+#fiche .aide i{font-style:normal;display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#9be7ff22;border:1px solid #9be7ff55;font-size:11px}
+#fiche .actions{grid-column:1/-1;display:flex;gap:6px}
+#fiche .actions button{flex:1;height:34px;border-radius:9px;border:1px solid #f2c14e99;background:linear-gradient(180deg,#3a5078,#1f3152);color:var(--ink);font-size:13px;font-weight:700}
+#fiche .actions button.vendre{border-color:#9be7ff55;background:#14223a}
+#fiche .actions button:disabled{opacity:.55}
+#fiche .fermer{align-self:start;background:none;border:0;color:var(--dim);font-size:20px;line-height:1;padding:0 2px}
+#tabs{display:flex;gap:4px;align-items:center}
+#tabs button{flex:1;min-width:0;height:32px;padding:0 2px;border-radius:9px;border:1px solid #8fb6d944;background:#101d33;color:var(--dim);font-size:13px;font-weight:700}
+#tabs .sep{flex:0 0 1px;height:20px;background:#9be7ff33}
+#tabs button.on{color:#3a2205;background:var(--or-fond);border-color:#ffe597}
+#tabs button.mon.on{color:#fff;background:linear-gradient(180deg,#f07a52,#c2401f 55%,#8a2410);border-color:#ffb4a2}
+#paliers{display:flex;gap:4px}
+#paliers button{flex:1;min-width:0;height:26px;padding:0 2px;border-radius:7px;border:1px solid #8fb6d944;background:#0d1729;color:var(--dim);font-size:11.5px;font-weight:700;white-space:nowrap}
+#paliers button.on{border-color:var(--gold);color:#ffe597;background:#1f3152}
+#paliers button.achat{border-color:#f2c14e88;color:#ffe597}
+#paliers button.ferme{color:#7f8da3;border-style:dashed}
+/* cartes : l'icône et le prix seulement (le reste est dans la fiche) */
+#bar{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 1px 1px;min-height:70px}
 #bar::-webkit-scrollbar{display:none}
-#bar button{-webkit-touch-callout:none;position:relative;flex:0 0 auto;min-width:62px;padding:2px 5px 3px;border:1px solid #8fb6d944;border-radius:8px;background:linear-gradient(180deg,#203251,#131f35);box-shadow:inset 0 1px 0 #ffffff1c,0 2px 0 #0009;display:flex;flex-direction:column;align-items:center;line-height:1.15;white-space:nowrap}
-#bar button b{font-size:12px;font-weight:700;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-#bar button small{font-size:11px;font-weight:700;color:var(--gold)}
-#bar button small:before{content:'';display:inline-block;width:8px;height:8px;margin-right:3px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff3b0,#f2c14e 50%,#a86e12);vertical-align:0}
-#bar button em{display:block;min-height:11px;white-space:pre-line;font-style:normal;font-size:10px;line-height:1.2;font-weight:700;color:var(--ice)}
-#bar button.sel{border:1px solid var(--gold);background:linear-gradient(180deg,#3a5078,#1f3152);box-shadow:inset 0 0 0 1px #f2c14e88,0 0 10px #f2c14e55,0 2px 0 #0009}
-#bar button.dis{opacity:.45}
-#bar button.dis small{color:#ff8a7a}
+#bar button{-webkit-touch-callout:none;position:relative;flex:0 0 64px;height:66px;padding:3px 0 0;border-radius:11px;border:1px solid #8fb6d944;background:radial-gradient(ellipse at 50% 30%,#2b4470,#121f36 75%);display:flex;flex-direction:column;align-items:center;gap:1px;color:#ffe597;font-size:11.5px;font-weight:700;font-variant-numeric:tabular-nums}
+#bar.mon button{background:radial-gradient(ellipse at 50% 30%,#5a2a24,#1e0f0d 75%)}
+#bar button canvas{filter:drop-shadow(0 2px 2px #000a)}
+#bar.mon button canvas{margin-top:3px}
+#bar button small{font-size:11px;font-weight:700;padding:0 6px;border-radius:9px;background:#060c18cc;border:1px solid #c9a24a66}
+#bar button.dis{color:#ff8c7a}
+#bar button.dis canvas{opacity:.55}
+#bar button.sel{border:1.5px solid var(--gold);box-shadow:0 0 0 1px #f2c14e66,0 0 12px #f2c14e66}
+#bar.mon button.sel:after{content:'ENVOYER';position:absolute;left:0;right:0;top:2px;margin:auto;width:max-content;padding:1px 6px;border-radius:6px;background:linear-gradient(180deg,#f07a52,#c2401f);color:#fff;font-size:9.5px;letter-spacing:.06em;animation:pouls 1s ease-in-out infinite}
+#bar button.tape{animation:tape .2s ease-out}
 #bar button:active{transform:scale(.95)}
-@media (orientation:landscape) and (min-width:560px){
- /* 2.12 : trois colonnes, le terrain au centre : à gauche le bandeau et la fiche, à droite les onglets et les boutons */
- #app{grid-template:"hud stage tabs" auto "fiche stage bar" minmax(0,1fr) / minmax(180px,236px) minmax(0,1fr) minmax(196px,268px)}
- #ctl{display:contents}
- #tabs{grid-area:tabs;flex-wrap:wrap}
- #tabs .tw{flex:1 1 100%}
- #row1{flex-wrap:wrap;row-gap:4px}
- #fiche{grid-area:fiche;height:auto;min-height:0;flex-direction:column;align-items:flex-start;justify-content:flex-start;overflow-y:auto;overscroll-behavior:contain}
- #fiche .ex{-webkit-line-clamp:unset;display:block}
- #bar{grid-area:bar;flex-wrap:wrap;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;align-content:flex-start;min-height:0}
- #bar button{flex:1 1 40%}
-}
+@keyframes pouls{50%{transform:scale(1.08)}}
+@keyframes tape{0%{transform:scale(.84);filter:brightness(1.7)}100%{transform:scale(1);filter:none}}
+/* menu */
+#menu{position:absolute;inset:0;z-index:15;display:grid;place-items:center;padding:16px;background:#050b17b8}
+#menu .menu{width:min(280px,100%);display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:16px;background:linear-gradient(180deg,#1d3150,#14223a);border:1px solid #f2c14e88;box-shadow:0 12px 32px #000c}
+#menu .titre-menu{font-size:20px;font-weight:700;color:#ffe597;text-align:center;letter-spacing:.06em}
+#menu button{height:42px;border-radius:10px;border:1px solid #8fb6d944;background:#101d33;color:var(--ink);font-size:15px;font-weight:700}
+#menu button.principal{background:var(--or-fond);color:#3a2205;border-color:#ffe597}
+#menu button.danger{border-color:#e4572e88;color:#ffc2b0}
+#menu ul{margin:0;padding:8px 10px 8px 24px;font-size:12.5px;line-height:1.4;font-weight:500;color:var(--dim);background:#0d1729;border-radius:10px;display:flex;flex-direction:column;gap:4px}
+/* portrait seulement : sur un téléphone en paysage, on demande de le tourner */
+#tourner{display:none;position:fixed;inset:0;z-index:3000;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;background:var(--bg);color:var(--ink);font-size:17px;font-weight:700;text-align:center}
+#tourner svg{width:56px;height:56px;fill:none;stroke:#ffe597;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+@media (orientation:landscape) and (pointer:coarse) and (max-height:540px){#tourner{display:flex}}
+.rondbtn:focus-visible,.fleche:focus-visible,#cartesBtn:focus-visible,#banner:focus-visible,.chip:focus-visible,#bar button:focus-visible,#tabs button:focus-visible,#paliers button:focus-visible,#menu button:focus-visible,#fiche button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){#bar.mon button.sel:after,#bar button.tape,#gold.pop{animation:none}}
 
 /* ===== Écran d'accueil (2.11) : menu de jeu vidéo, nuit d'hiver, montagnes et neige ===== */
 #ov{position:fixed;z-index:1000;inset:0;background:linear-gradient(180deg,#060b18 0%,#0e1c36 40%,#1b3358 75%,#2b4a72 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(22px + env(safe-area-inset-bottom,0px));text-align:center;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
@@ -184,59 +200,43 @@ button{font:inherit;color:inherit;cursor:pointer}
 #ov button.ghost{background:transparent;border:0;box-shadow:none;color:var(--dim);font-size:14px;text-decoration:underline;text-shadow:none}
 #vue3d{margin:4px 0 0;font-size:14px}#vue3d a{color:var(--gold)}
 body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:none!important}
-
-/* ===== 2.12 : direction artistique « givre elfique » =====
-   Inspirée des barres de commande des jeux de stratégie : cadre d'écran ornementé, bandeau de ressources serti,
-   onglets en relief, boutons de commande carrés et sertis avec le prix en médaillon. Ornements en filigrane argenté
-   (volutes, feuilles en amande, gemmes de glace), texture de givre ; tout est dessiné en code (SVG et CSS). */
-:root{--orne-argent:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M30 3H34M30 61H34M3 30V34M61 30V34' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M30 8H34M30 56H34M8 30V34M56 30V34' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cg%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3C/svg%3E");--orne-or:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M30 3H34M30 61H34M3 30V34M61 30V34' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M30 8H34M30 56H34M8 30V34M56 30V34' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cg%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3C/svg%3E");--orne-rouge:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M30 3H34M30 61H34M3 30V34M61 30V34' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M30 8H34M30 56H34M8 30V34M56 30V34' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cg%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3C/svg%3E");--orne-ecran:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cdefs%3E%3Cg id='c'%3E%3Cpath d='M4 70 C4 30 30 4 70 4' fill='none' stroke='%23d9ecff' stroke-width='2.4'/%3E%3Cpath d='M11 70 C11 36 36 11 70 11' fill='none' stroke='%238fb6d9' stroke-width='1'/%3E%3Cpath d='M4 70 C10 50 24 44 34 50 C42 55 36 64 29 62' fill='none' stroke='%23d9ecff' stroke-width='1.5'/%3E%3Cpath d='M70 4 C50 10 44 24 50 34 C55 42 64 36 62 29' fill='none' stroke='%23d9ecff' stroke-width='1.5'/%3E%3Cpath d='M16 16 C24 6 40 6 46 10 C40 19 26 25 16 16z' fill='%239fc3e6' opacity='.55'/%3E%3Cpath d='M16 16 C6 24 6 40 10 46 C19 40 25 26 16 16z' fill='%239fc3e6' opacity='.55'/%3E%3Cg stroke='%23eaf6ff' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M20 20 L30 30M25 25l4-1M25 25l-1 4'/%3E%3C/g%3E%3Ccircle cx='18' cy='18' r='4.2' fill='%239be7ff' stroke='%23eaf6ff' stroke-width='1.2'/%3E%3C/g%3E%3C/defs%3E%3Cpath d='M70 4H50M70 116H50M4 50V70M116 50V70' stroke='%23d9ecff' stroke-width='2.4'/%3E%3Cuse href='%23c'/%3E%3Cuse href='%23c' transform='translate(120 0) scale(-1 1)'/%3E%3Cuse href='%23c' transform='translate(0 120) scale(1 -1)'/%3E%3Cuse href='%23c' transform='translate(120 120) scale(-1 -1)'/%3E%3C/svg%3E");--givre:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6 .18' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .85  0 0 0 0 .93  0 0 0 0 1  0 0 0 .7 -.38'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23f)'/%3E%3C/svg%3E")}
-/* cadre de tout l'écran : coins à volutes, lignes argentées et voile de givre sur les bords */
-#app{position:relative;padding:calc(9px + env(safe-area-inset-top,0px)) calc(9px + env(safe-area-inset-right,0px)) calc(9px + env(safe-area-inset-bottom,0px)) calc(9px + env(safe-area-inset-left,0px))}
-#app:before{content:'';position:absolute;inset:max(1px,env(safe-area-inset-top,0px)) max(1px,env(safe-area-inset-right,0px)) max(1px,env(safe-area-inset-bottom,0px)) max(1px,env(safe-area-inset-left,0px));border:30px solid transparent;border-image:var(--orne-ecran) 60 / 30px / 0 round;pointer-events:none;z-index:20;opacity:.85}
-#app:after{content:'';position:absolute;inset:0;pointer-events:none;z-index:19;box-shadow:inset 0 0 22px #bfe3ff40,inset 0 0 3px #d9ecff80;background:var(--givre);-webkit-mask:linear-gradient(#000,transparent 9%,transparent 91%,#000),linear-gradient(90deg,#000,transparent 7%,transparent 93%,#000);mask:linear-gradient(#000,transparent 9%,transparent 91%,#000),linear-gradient(90deg,#000,transparent 7%,transparent 93%,#000);opacity:.55}
-/* panneaux sertis : fond verre de nuit + givre, cadre argenté à volutes */
-#hud,#fiche,#tabs .tw,#tabs .mon,#chips{position:relative;background-image:var(--givre),linear-gradient(180deg,#1d3150f2,#0f1a2ef2);background-size:180px,auto;border:1px solid #8fb6d955}
-#hud:after,#fiche:after,#tabs .tw:after,#tabs .mon:after,#bar button:after{content:'';position:absolute;inset:-3px;border:12px solid transparent;border-image:var(--orne-argent) 32 / 12px / 0 stretch;pointer-events:none}
-#hud{border-radius:6px;padding:4px 6px 7px}
-#fiche{border-radius:6px}
-#tabs .tw.on{background-image:var(--givre),var(--or-fond);background-size:180px,auto}
-#tabs .tw.on:after{border-image-source:var(--orne-or)}
-#tabs .mon{background-image:var(--givre),linear-gradient(180deg,#3a1d1af2,#22100ef2)}
-#tabs .mon:after{border-image-source:var(--orne-rouge)}
-#fiche.envoyer{background-image:var(--givre),linear-gradient(180deg,#3a1d1af2,#22100ef2)}#fiche.envoyer:after{border-image-source:var(--orne-rouge)}
-/* ressources : pierres de lune serties */
-.res{background:linear-gradient(180deg,#07101e,#0d1a2e);border:1px solid #8fb6d944;box-shadow:inset 0 2px 4px #000c,0 1px 0 #ffffff1a}
-.ib{background:radial-gradient(circle at 50% 30%,#4a6e9e,#1a2c4c 70%);border:1px solid #d9ecff88;box-shadow:inset 0 1px 0 #ffffff40,0 0 0 1px #0a1322,0 2px 4px #000a}
-/* boutons de commande : emplacements carrés sertis (barre de sorts), icône sur fond de glace, prix en médaillon */
-#bar{gap:6px;padding:3px 2px 4px}
-#bar button{border-radius:5px;border:1px solid #8fb6d955;padding:3px 5px 4px;background-image:var(--givre),radial-gradient(ellipse at 50% 28%,#2d4a74,#0f1a2e 72%);background-size:180px,auto}
-#bar button:after{inset:-2px;border-width:10px;border-image-width:10px}
-#bar button canvas{filter:drop-shadow(0 3px 3px #000a)}
-#bar button.sel{background-image:var(--givre),radial-gradient(ellipse at 50% 28%,#5b7fae,#1a2c4c 72%);border-color:#ffe597;box-shadow:0 0 12px #f2c14e66,inset 0 0 10px #f2c14e33}
-#bar button.sel:after{border-image-source:var(--orne-or)}
-#bar.mon button{background-image:var(--givre),radial-gradient(ellipse at 50% 28%,#5a2a24,#1e0f0d 72%)}
-#bar.mon button:after{border-image-source:var(--orne-rouge)}
-#bar button small:empty{display:none}
-#bar button small{display:inline-block;margin-top:1px;padding:0 6px 0 4px;border-radius:9px;background:#060c18cc;border:1px solid #c9a24a88}
-/* le plateau 3D se fond dans le décor */
-#stage{border-radius:6px}
-#zoomReset{border-radius:99px;background:radial-gradient(circle at 50% 30%,#3a5a88ee,#132240ee 75%);border:1px solid #d9ecffaa;box-shadow:0 0 0 2px #0a1322,0 4px 12px #000b;z-index:4}
-#chips{border-radius:6px}
 </style></head><body>
 <div id="app">
- <div id="hud">
-  <div id="row1"><button class="ib" id="cartesBtn" type="button" aria-expanded="false" aria-label="Voir les terrains des autres joueurs"><svg viewBox="0 0 24 24"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg><span id="cartesTxt"></span></button><span class="res"><span class="coin"></span><b class="big" id="gold">0</b></span><span class="res"><b id="inc">+0</b><small>/10 s</small></span><span class="res" id="clock">0:00</span><span class="res" id="lives">❤ <b>40</b></span><span id="factionBadge"></span><span class="sp"></span>
-   <button class="ib" id="snd" aria-label="Couper ou remettre le son"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M17 9a4 4 0 0 1 0 6"/></svg></button>
-   <button class="ib" id="fs" aria-label="Plein écran"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button></div>
-  <div id="tbar"><i id="tfill"></i></div>
- </div>
- <div id="stage"><canvas id="main"></canvas><div id="chips" hidden></div><div id="banner" hidden></div><div id="toast" hidden></div><button id="zoomReset" type="button" hidden aria-label="Revenir à la vue d'ensemble"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>Vue d'ensemble</button></div>
- <div id="ctl">
-  <div id="tabs"><button data-t="t" class="tw on">Construire</button><div class="mon"><span>Envoyer</span><button data-t="n">Sol</button><button data-t="f">Volants</button><button data-t="s">Spéciaux</button></div></div>
-  <div id="fiche"></div>
-  <div id="bar"></div>
+ <div id="stage"><canvas id="main"></canvas>
+  <div id="hud">
+   <button class="rondbtn" id="menuBtn" type="button" aria-label="Ouvrir le menu" aria-haspopup="dialog"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+   <span class="pastille"><span class="coin"></span><b id="gold">0</b></span>
+   <span class="pastille" title="Revenu toutes les 10 s"><svg class="anneau" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="#9be7ff33" stroke-width="3"/><circle id="arc" cx="10" cy="10" r="8" fill="none" stroke="#f2c14e" stroke-width="3" stroke-dasharray="50.3" stroke-dashoffset="50.3" transform="rotate(-90 10 10)"/></svg><b id="inc">+0</b></span>
+   <span class="pastille" id="lives">♥ <b>40</b></span>
+   <span class="vide"></span>
+   <span class="pastille" id="clock">0:00</span>
+   <button class="rondbtn" id="fs" type="button" aria-label="Passer en plein écran"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+  </div>
+  <button id="cartesBtn" type="button" aria-expanded="false" aria-controls="chips"><svg viewBox="0 0 24 24"><path d="M4 4l10 10M4 4h4M4 4v4M20 4L10 14M20 4h-4M20 4v4M7 15l2 2M5 19l3-3M17 15l-2 2M19 19l-3-3"/></svg><span id="cartesTxt">Adversaires</span><span id="advPoints"></span></button>
+  <div id="chips" hidden></div>
+  <button class="fleche" id="rotG" type="button" aria-label="Pivoter la vue vers la gauche"><svg viewBox="0 0 24 24"><path d="M4 4v5h5"/><path d="M4.6 9A8 8 0 1 1 6 16.5"/></svg></button>
+  <button class="fleche" id="rotD" type="button" aria-label="Pivoter la vue vers la droite"><svg viewBox="0 0 24 24"><path d="M20 4v5h-5"/><path d="M19.4 9A8 8 0 1 0 18 16.5"/></svg></button>
+  <button id="banner" type="button" hidden></button>
+  <div id="astuce" hidden></div>
+  <div id="toast" hidden></div>
+  <div id="ctl">
+   <div id="fiche" hidden></div>
+   <div id="tabs"><button data-t="t" class="tw on" type="button">🏰 Tours</button><span class="sep"></span><button data-t="n" class="mon" type="button">Sol</button><button data-t="f" class="mon" type="button">Volants</button><button data-t="s" class="mon" type="button">Spéciaux</button></div>
+   <div id="paliers" hidden></div>
+   <div id="bar"></div>
+  </div>
+  <div id="menu" hidden role="dialog" aria-modal="true" aria-labelledby="menuTitre"><div class="menu">
+   <div class="titre-menu" id="menuTitre">Menu</div>
+   <button class="principal" id="mReprendre" type="button">Reprendre</button>
+   <button id="snd" type="button">Son : activé</button>
+   <button id="mVibre" type="button">Vibrations : activées</button>
+   <button id="mGestes" type="button" aria-expanded="false" aria-controls="mListe">Rappel des gestes</button>
+   <ul id="mListe" hidden><li>Une carte de tour, puis deux touchers sur une case : construit.</li><li>Une carte de monstre, puis chaque toucher sur la carte : envoie un groupe.</li><li>Toucher une tour posée : l'améliorer ou la vendre.</li><li>Glisser le doigt : déplace la carte.</li><li>Flèches en bas : font pivoter la vue.</li></ul>
+   <button class="danger" id="mQuitter" type="button">Quitter la partie</button>
+  </div></div>
  </div>
 </div>
+<div id="tourner" role="alert"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="15" y="6" width="18" height="32" rx="3"/><path d="M8 30a16 16 0 0 0 10 12M8 30l-1 5M8 30l5 1"/></svg>Tourne ton téléphone :<br>Winter Realms se joue en portrait.</div>
 <div id="ov"><canvas id="ovSnow" aria-hidden="true"></canvas>
  <svg class="monts" viewBox="0 0 400 140" preserveAspectRatio="none" aria-hidden="true">
   <path d="M0 140V78l38-30 26 18 44-46 30 26 22-14 48 40 40-52 46 44 28-18 40 30 38-26v90z" fill="#3a5a85" opacity=".55"/>
@@ -585,17 +585,19 @@ function draw(b,g,s,t){
  for(const c of fl)cre(c);
  for(const f of b.fx)drawFx(g,f,s);
  if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,C*s,R*s);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',C*s/2,R*s/2)}}
-/* sur la vignette du terrain affiché, un cadre montre la partie visible quand on a zoomé */
-function cadreMini(g){const s=cell*VUE.z,m=MINI,sy=s*R3D.KY;g.strokeStyle='#fff';g.lineWidth=1;g.strokeRect(Math.max(0,-VUE.ox/s*m)+.5,Math.max(0,-VUE.oy/sy*m)+.5,Math.min(C,VUE.w/s)*m-1,Math.min(R,VUE.h/sy)*m-1)}
+/* sur la vignette du terrain affiché, en 3D, un cadre montre la partie visible (la vue tactique ne montre pas tout le terrain) */
+function cadreMini(g){const m=MINI,pts=R3D.api.empreinte();g.save();g.beginPath();g.rect(0,0,C*m,R*m);g.clip();g.strokeStyle='#fff';g.lineWidth=1.5;g.beginPath();
+ pts.forEach((p,i)=>i?g.lineTo(p.x*m,p.z*m):g.moveTo(p.x*m,p.z*m));g.closePath();g.stroke();g.fillStyle='#ffffff22';g.fill();g.restore()}
 function drawMini(b,g,m){g.fillStyle=b.dead?'#333':'#426c3e';g.fillRect(0,0,C*m,R*m);
  for(const t of b.t){g.fillStyle=TW[t.k].col;g.fillRect(t.x*m+.5,t.y*m+.5,m-1,m-1)}
  for(const c of b.cr){g.fillStyle=CR[c.k].fly?'#fff':'#ffd23f';g.fillRect((c.x+.5)*m-1,(c.y+.5)*m-1,2,2)}}
 
 /* ---------- interface ---------- */
-const $=id=>document.getElementById(id),main=$('main'),stage=$('stage'),bar=$('bar'),MINI=4;
+const $=id=>document.getElementById(id),main=$('main'),stage=$('stage'),bar=$('bar'),MINI=4,SUB0=$('sub').textContent;
 if(typeof CanvasRenderingContext2D!='undefined'&&!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 /* G : partie locale (solo). B, P, time, tick, over, LV : vue courante, recopiée de G à chaque image. */
-let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',palv=1,hudPal=1,sel=0,view=0,mx,hudK='',tt=0,pick=null;
+/* 2.15 : sel = tour choisie pour construire (null : aucune), mon = monstre choisi pour envoyer (null : aucun), pick = tour posée ouverte */
+let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',palv=1,hudPal=1,sel=null,mon=null,view=0,mx,hudK='',tt=0,pick=null,vibre=true;
 const VB=()=>B[view],dpr=()=>Math.min(3,window.devicePixelRatio||1);
 const eff=b=>b.ai?Math.round(b.inc*DIFF[LV].b):b.inc;
 /* ---------- multijoueur ---------- */
@@ -642,8 +644,8 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   $('lnote').textContent='Difficulté des IA : '+DIFF[m.lv].n+'.'},
  start(m){this.playing=true;this.spect=m.you<0;LV=m.lv;
   const boards=m.seats.map((s,i)=>new Board(i,s.name,s.col,s.ai,s.classId));
-  useBoards(boards,this.spect?0:m.you);time=0;tick=10;over=false;started=true;
-  $('lobby').hidden=true;$('ov').hidden=true;if(this.spect)toast('Tu regardes la partie en spectateur')},
+  useBoards(boards,this.spect?0:m.you);time=0;tick=10;over=false;started=true;setTab('t');recentrer();
+  $('lobby').hidden=true;$('ov').hidden=true;if(this.spect)toast('Tu regardes la partie en spectateur');else astuce(true)},
  /* applique un instantané : les positions sont lissées entre deux instantanés dans frame() */
  apply(s){this.snapAt=performance.now();time=s.time;tick=s.tick;
   s.B.forEach((d,i)=>{const b=B[i];if(!b)return;b.gold=d.gold;b.inc=d.inc;b.lives=d.lives;b.dead=d.dead;b.tier=d.tier||1;
@@ -672,63 +674,72 @@ $('lquit').onclick=()=>NET.leave();
 $('lcopy').onclick=()=>{const v=$('llink').value;(navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(()=>toast('Lien copié')).catch(()=>{$('llink').select();toast('Copie le lien sélectionné')})};
 document.querySelectorAll('#ldiff button').forEach(b=>b.onclick=()=>NET.send({t:'diff',lv:+b.dataset.lv}));
 function setup(cv,w,h){const r=dpr();cv.width=Math.round(w*r);cv.height=Math.round(h*r);cv.style.width=w+'px';cv.style.height=h+'px';const g=cv.getContext('2d');g.setTransform(r,0,0,r,0,0);return g}
-/* ---------- vue du terrain : zoom (1× à 3×) et déplacement ----------
-   Le canevas couvre toute la zone de jeu ; le plateau y est dessiné avec un décalage (VUE.ox, VUE.oy) et une taille de case cell × VUE.z. */
-const VUE={z:1,ox:0,oy:0,w:0,h:0},ZMAX=3;let cadre='#c9a24a';
-/* 2.7 : rendu 3D, chargé à la demande (module rendu3d.js). Depuis la 2.8, c'est le rendu par défaut ; ?rendu=2d garde la 2D.
-   En 3D, la caméra est orthographique et inclinée : à l'écran, les rangées du terrain sont tassées d'un facteur KY,
-   et TOPM cases sont gardées libres au-dessus du plateau pour les tours hautes. En 2D, KY = 1 et TOPM = 0 (rien ne change). */
-const R3D={on:QS.get('rendu')!='2d',api:null,KY:1,TOPM:0,echec:false};
-/* 2.12 : en 3D, l'inclinaison de la caméra s'adapte au format de la zone de jeu pour que le plateau la remplisse
-   (KY visé : hauteur disponible / largeur disponible, borné entre 34° et 66° d'élévation ; la marge du haut TOPM suit l'inclinaison) */
-function inclinerSelonFormat(w,h){if(!R3D.api||!R3D.api.incliner)return;for(let i=0;i<3;i++){const ky=Math.min(1,Math.max(.1,((h-6)/(w-6)*C-R3D.TOPM)/R));R3D.KY=R3D.api.incliner(Math.asin(ky)*180/Math.PI);R3D.TOPM=R3D.api.TOPM}}
-function fit(){const r=stage.getBoundingClientRect();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);inclinerSelonFormat(VUE.w,VUE.h);cell=Math.max(16,Math.floor(Math.min((r.width-6)/C,(r.height-6)/(R*R3D.KY+R3D.TOPM))));mx=setup(main,VUE.w,VUE.h);if(R3D.api)R3D.api.taille(VUE.w,VUE.h,dpr());borner()}
-/* garde le plateau dans la zone visible : centré s'il est plus petit, sinon jamais plus de 8 px de vide au bord */
-function borner(){const s=cell*VUE.z,W=C*s,H=(R*R3D.KY+R3D.TOPM)*s,m=8,hm=R3D.TOPM*s;
- VUE.ox=W<=VUE.w?(VUE.w-W)/2:Math.min(m,Math.max(VUE.w-W-m,VUE.ox));VUE.oy=hm+(H<=VUE.h?(VUE.h-H)/2:Math.min(m,Math.max(VUE.h-H-m,VUE.oy-hm)));
- const zr=$('zoomReset');if(zr)zr.hidden=VUE.z<1.02}
-/* zoome autour d'un point de l'écran (px, py en pixels de la page) en gardant sous ce point la même case */
-function zoomer(nz,px,py){const r=main.getBoundingClientRect(),x=px-r.left,y=py-r.top,bx=(x-VUE.ox)/(cell*VUE.z),by=(y-VUE.oy)/(cell*VUE.z*R3D.KY);
- VUE.z=Math.min(ZMAX,Math.max(1,nz));VUE.ox=x-bx*cell*VUE.z;VUE.oy=y-by*cell*VUE.z*R3D.KY;borner()}
-function vueEnsemble(){VUE.z=1;borner()}
+/* ---------- vue du terrain (2.15) ----------
+   Le canevas couvre tout l'écran ; le bandeau (en haut) et le dock (en bas) flottent par-dessus.
+   - En 3D, caméra « vue tactique » de rendu3d.js : glisser le doigt déplace la carte, les flèches la font pivoter d'un huitième de tour.
+     Le passage écran ↔ case se fait par la caméra (projeter, sol).
+   - En 2D (?rendu=2d), le plateau entier tient entre le bandeau et le dock, sans zoom ni déplacement (décalage VUE.ox, VUE.oy). */
+const VUE={z:1,ox:0,oy:0,w:0,h:0};let cadre='#c9a24a';
+/* 2.7 : rendu 3D, chargé à la demande (module rendu3d.js). Depuis la 2.8, c'est le rendu par défaut ; ?rendu=2d garde la 2D. */
+const R3D={on:QS.get('rendu')!='2d',api:null,echec:false};
+if(!R3D.on)document.body.classList.add('r2d');
+/* bandes couvertes par l'interface : le bandeau en haut, et en bas le dock sans la fiche (onglets et cartes, toujours de la même hauteur) */
+function bandes(){const r=stage.getBoundingClientRect();return {haut:Math.round($('hud').getBoundingClientRect().bottom-r.top)+8,bas:Math.max(110,Math.round(r.bottom-bar.getBoundingClientRect().top)+46)}}
+function fit(){const r=stage.getBoundingClientRect(),{haut,bas}=bandes();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);mx=setup(main,VUE.w,VUE.h);
+ cell=Math.max(12,Math.floor(Math.min((VUE.w-12)/C,(VUE.h-haut-bas-12)/R)));VUE.ox=(VUE.w-C*cell)/2;VUE.oy=haut+Math.max(0,(VUE.h-haut-bas-R*cell)/2);
+ if(R3D.api){R3D.api.taille(VUE.w,VUE.h,dpr());R3D.api.cadre({w:VUE.w,h:VUE.h,haut,bas})}}
+/* remet la caméra sur le milieu du terrain (début de partie) */
+function recentrer(){if(R3D.api)R3D.api.viser(C/2,R/2+1.5)}
 /* centre d'une case du terrain, en coordonnées de la page (utilisé aussi par les tests) */
-function caseVersEcran(x,y){const r=main.getBoundingClientRect(),s=cell*VUE.z;return {x:r.left+VUE.ox+(x+.5)*s,y:r.top+VUE.oy+(y+.5)*s*R3D.KY}}
+function caseVersEcran(x,y){const r=main.getBoundingClientRect();if(R3D.api){const p=R3D.api.projeter(x+.5,0,y+.5);return {x:r.left+p.x,y:r.top+p.y}}
+ return {x:r.left+VUE.ox+(x+.5)*cell,y:r.top+VUE.oy+(y+.5)*cell}}
 /* case du terrain sous un point de la page */
-function caseSous(cx,cy){const r=main.getBoundingClientRect(),s=cell*VUE.z;return {x:Math.floor((cx-r.left-VUE.ox)/s),y:Math.floor((cy-r.top-VUE.oy)/(s*R3D.KY))}}
+function caseSous(cx,cy){const r=main.getBoundingClientRect();if(R3D.api){const p=R3D.api.sol(cx-r.left,cy-r.top);return p?{x:Math.floor(p.x),y:Math.floor(p.z)}:{x:-1,y:-1}}
+ return {x:Math.floor((cx-r.left-VUE.ox)/cell),y:Math.floor((cy-r.top-VUE.oy)/cell)}}
 function charger3D(){if(!R3D.on)return;
  import('./rendu3d.js').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R});stage.insertBefore(R3D.api.canvas,main);
-  R3D.KY=R3D.api.KY;R3D.TOPM=R3D.api.TOPM;fit();vueEnsemble();render();
+  fit();recentrer();render();
   R3D.pret=R3D.api.precharger([...new Set(B.map(b=>b.classId))]).then(()=>{R3D.charge=true})})
- .catch(e=>{console.warn(e);R3D.on=false;R3D.echec=true;toast('3D indisponible sur cet appareil : retour à la 2D')})}
+ .catch(e=>{console.warn(e);R3D.on=false;R3D.echec=true;document.body.classList.add('r2d');toast('3D indisponible sur cet appareil : retour à la 2D')})}
 /* état du rendu 3D, lu par les tests */
-window.R3D_ETAT=()=>({on:R3D.on,charge:!!R3D.charge,echec:R3D.echec,KY:R3D.KY,scene:R3D.api?R3D.api.etat():null});
-/* image en 3D, puis surcouche 2D (barres de vie, textes flottants, terrain éliminé) sur le canevas #main */
-function dessinerVue3D(t){const g=mx,b=VB(),s=cell*VUE.z,A=R3D.api,E=(x,z,h)=>A.versEcran(x,z,h,VUE,cell);g.clearRect(0,0,VUE.w,VUE.h);
- A.dessiner(b,t,VUE,cell,{pick:b===P&&b.t.includes(pick)?pick:null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
- for(const c of b.cr){const hp=c.hp/c.max;if(hp>=1)continue;const p=E(c.x+.5+(c.ox||0),c.y+.5+(c.oy||0),A.hauteurMonstre(c.k)),w=s*.6;
+window.R3D_ETAT=()=>({on:R3D.on,charge:!!R3D.charge,echec:R3D.echec,scene:R3D.api?R3D.api.etat():null});
+/* image en 3D, puis surcouche 2D (barres de vie, chantiers, textes flottants, terrain éliminé) sur le canevas #main ;
+   en perspective, la taille d'une case à l'écran (s) dépend de l'endroit : echelle la donne */
+function dessinerVue3D(t){const g=mx,b=VB(),A=R3D.api,E=(x,z,h)=>A.projeter(x,h,z);g.clearRect(0,0,VUE.w,VUE.h);
+ A.dessiner(b,t,{pick:b===P&&b.t.includes(pick)?pick:null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
+ for(const c of b.cr){const hp=c.hp/c.max;if(hp>=1)continue;const x=c.x+.5+(c.ox||0),z=c.y+.5+(c.oy||0),p=E(x,z,A.hauteurMonstre(c.k));if(p.z>1)continue;const s=A.echelle(x,z),w=s*.6;
   g.fillStyle='rgba(0,0,0,.6)';g.fillRect(p.x-w/2,p.y-s*.12,w,s*.09);g.fillStyle=c.sl>0?'#5dc8ff':hp>.4?'#7cdc6a':'#ff6b4a';g.fillRect(p.x-w/2,p.y-s*.12,w*Math.max(0,hp),s*.09)}
- for(const t of b.t)if(t.b>0){const p=1-t.b/(t.bt||1),q=E(t.x+.5,t.y+.88,0),w=s*.7,h=Math.max(3,s*.09);
-  g.fillStyle='rgba(20,16,10,.75)';g.fillRect(q.x-w/2-1,q.y-1,w+2,h+2);g.fillStyle='#ffc95e';g.fillRect(q.x-w/2,q.y,w*p,h)}
- for(const f of b.fx)if(f.type=='text'){const p=1-f.t/f.d,q=E(f.x,f.y+.4,.9+p*.6);g.save();g.globalAlpha=Math.max(0,1-p);
-  g.font='700 '+Math.round(s*.36)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='rgba(0,0,0,.6)';g.strokeText(f.txt,q.x,q.y);g.fillStyle=f.col;g.fillText(f.txt,q.x,q.y);g.restore()}
- if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,VUE.w,VUE.h);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';const q=E(C/2,R/2,0);g.fillText('Éliminé',q.x,q.y)}}
+ for(const t of b.t)if(t.b>0){const p=1-t.b/(t.bt||1),q=E(t.x+.5,t.y+.5,0);if(q.z>1)continue;const s=A.echelle(t.x+.5,t.y+.5),w=s*.7,h=Math.max(3,s*.09),y=q.y+s*.3;
+  g.fillStyle='rgba(20,16,10,.75)';g.fillRect(q.x-w/2-1,y-1,w+2,h+2);g.fillStyle='#ffc95e';g.fillRect(q.x-w/2,y,w*p,h)}
+ for(const f of b.fx)if(f.type=='text'){const p=1-f.t/f.d,q=E(f.x,f.y,.9+p*.6);if(q.z>1)continue;const s=A.echelle(f.x,f.y);g.save();g.globalAlpha=Math.max(0,1-p);
+  g.font='700 '+Math.round(Math.max(11,s*.36))+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='rgba(0,0,0,.6)';g.strokeText(f.txt,q.x,q.y);g.fillStyle=f.col;g.fillText(f.txt,q.x,q.y);g.restore()}
+ if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,VUE.w,VUE.h);g.font='700 32px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',VUE.w/2,VUE.h*.42)}}
 function dessinerVue(t){if(R3D.api){dessinerVue3D(t);return}const g=mx,s=cell*VUE.z,W=C*s,H=R*s,rr=Math.min(10*VUE.z,30);g.clearRect(0,0,VUE.w,VUE.h);g.save();g.translate(VUE.ox,VUE.oy);
  g.save();g.shadowColor='rgba(0,0,0,.56)';g.shadowBlur=32;g.shadowOffsetY=14;g.fillStyle=cadre;g.beginPath();g.roundRect(-3,-3,W+6,H+6,rr+3);g.fill();g.restore();
  g.beginPath();g.roundRect(0,0,W,H,rr);g.fillStyle='#141f33';g.fill();g.clip();draw(VB(),g,s,t);g.restore()}
-function toast(m){const t=$('toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true},1900)}
-function setView(v){view=v;projet=null;const b=B[v],bn=$('banner'),cb=$('cartesBtn');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · ↩ revenir au tien';cb.style.setProperty('--c',v==me?'#c9a24a':b.col);$('cartesTxt').textContent=v==me?'':b.name;cartes(false);bn.style.background=b.col;cadre=v!=me?b.col:'#c9a24a';hudK=''}
+function toast(m,refus){const t=$('toast');t.textContent=m;t.classList.toggle('refus',!!refus);t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>{t.hidden=true},1900)}
+/* astuce du début de partie (9 s, ou jusqu'au premier geste) */
+let astT=0;function astuce(on){const a=$('astuce');clearTimeout(astT);if(!on){a.hidden=true;return}
+ a.textContent=R3D.on?'Glisse le doigt pour déplacer la carte ; les flèches la font pivoter. Choisis une tour en bas, puis touche deux fois une case.':'Choisis une tour en bas, puis touche deux fois une case pour construire.';a.hidden=false;astT=setTimeout(()=>{a.hidden=true},9000)}
+function vibrer(ms){if(!vibre)return;try{navigator.vibrate&&navigator.vibrate(ms)}catch(_){}}
+/* terrain regardé : le bouton des adversaires prend la couleur et le nom du joueur regardé, la bannière ramène chez soi */
+function setView(v){view=v;projet=null;const b=B[v],bn=$('banner'),cb=$('cartesBtn');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · ↩ revenir au tien';bn.style.background=b.col;
+ if(v==me)cb.style.removeProperty('--c');else cb.style.setProperty('--c',b.col);$('cartesTxt').textContent=v==me?'Adversaires':b.name;$('advPoints').hidden=v!=me;
+ cartes(false);cadre=v!=me?b.col:'#c9a24a';hudK='';if(pick&&v!=me){pick=null;render()}else if(tab=='t'&&sel!=null)render()}
 const SOLO_COL=['#e4572e','#4aa3df','#b06ad0'];
 function soloSeats(f){return [{name:'Toi',col:FACTIONS[f].color,ai:0,classId:f}].concat([1,2,3].map(i=>({name:'IA '+i,col:SOLO_COL[i-1],ai:1,classId:(f+i)%5})))}
 /* installe une partie (locale ou reçue du serveur) : vignettes, joueur, vue */
-function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=P.classId*10;projet=null;
- const ch=$('chips');ch.textContent='';for(const b of B){const e=document.createElement('button'),cv=document.createElement('canvas'),tx=document.createElement('span'),n=document.createElement('b'),s=document.createElement('span');
-  e.className='chip';e.style.setProperty('--c',b.col);n.textContent=b.name;tx.append(n,s);e.append(cv,tx);e.onclick=()=>setView(b.i);ch.appendChild(e);b.ui={e,g:setup(cv,C*MINI,R*MINI),s}}
- $('factionBadge').textContent=FACTIONS[P.classId].icon+' '+FACTIONS[P.classId].name;hudK='';pick=null;setView(me);render()}
+function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=null;mon=null;projet=null;
+ const ch=$('chips'),pts=$('advPoints');ch.textContent='';pts.textContent='';for(const b of B){const e=document.createElement('button'),cv=document.createElement('canvas'),tx=document.createElement('span'),n=document.createElement('b'),s=document.createElement('span');
+  e.type='button';e.className='chip';e.style.setProperty('--c',b.col);e.setAttribute('aria-label','Voir le terrain de '+b.name);n.textContent=b.name;tx.append(n,s);e.append(cv,tx);e.onclick=()=>setView(b.i);ch.appendChild(e);b.ui={e,g:setup(cv,C*MINI,R*MINI),s};
+  if(b.i!==me){const i=document.createElement('i');i.style.background=b.col;pts.appendChild(i)}}
+ hudK='';pick=null;setView(me);render()}
 function newSolo(lv){G=new Game(soloSeats(chosenClass),lv);LV=lv;useBoards(G.B,0);syncSolo()}
 function syncSolo(){time=G.time;tick=G.tick;over=G.over}
 function icon(fn,w=40,h=40){const c=document.createElement('canvas'),g=setup(c,w,h);fn(g);return c}
-function add(ic,name,sub,cost,fn,on,tag,at){const b=document.createElement('button'),n=document.createElement('b'),s=document.createElement('small');n.textContent=name;s.textContent=sub;b.append(ic,n,s);
- const e=document.createElement('em');e.textContent=tag||'';b.append(e);b.dataset.c=cost;b.dataset.at=at||0;b.className=on?'sel':'';b.onclick=fn;bar.appendChild(b)}
+/* 2.15 : une carte de la barre = l'icône et le prix ; le nom sert d'étiquette (lecteurs d'écran, tests), le reste est dans la fiche */
+function carte(ic,prix,nom,cost,fn,on,k){const b=document.createElement('button'),s=document.createElement('small');s.textContent=prix;b.append(ic,s);b.type='button';
+ b.setAttribute('aria-label',nom+', '+prix);b.dataset.c=cost;b.dataset.k=k;b.className=on?'sel':'';b.onclick=fn;bar.appendChild(b);return b}
 const IC={coin(g){g.lineWidth=2;g.strokeStyle='#9a6b12';g.beginPath();g.arc(20,20,12,0,7);fs(g,'#f2c14e');g.beginPath();g.arc(20,20,6,0,7);g.stroke()},
  up(g){g.lineWidth=2;g.strokeStyle=OUT;g.lineJoin='round';pg(g,'#7cdc6a',20,7,32,21,25,21,25,33,15,33,15,21,8,21)},
  x(g){g.lineWidth=4;g.lineCap='round';g.strokeStyle='#b9c4ab';g.beginPath();g.moveTo(12,12);g.lineTo(28,28);g.moveTo(28,12);g.lineTo(12,28);g.stroke()}};
@@ -778,7 +789,7 @@ const towerIcon=(k,lv)=>icon(g=>{drawTower(g,k,28,27,30,.7,0,lv,0);drawTowerBadg
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 /* messages d'erreur renvoyés par Game.action */
 const ERR={poor:"Pas assez d'or",blocked:'Impossible ici : le chemin serait bloqué',max:'Niveau maximum atteint',busy:'Tour en chantier : attends la fin des travaux',over:'Partie terminée',bad:'Action impossible'};
-function showErr(e,a){if(!e)return;sfx('nope');if(e=='locked'){const T=CR[a.k];toast(T?'Ouvre le palier '+T.t+' pour envoyer : '+T.n:'Ouvre d’abord le palier précédent')}else toast(ERR[e]||ERR.bad)}
+function showErr(e,a){if(!e)return;sfx('nope');if(e=='locked'){const T=CR[a.k];toast(T?'Ouvre le palier '+T.t+' pour envoyer : '+T.n:'Ouvre d’abord le palier précédent',true)}else toast(ERR[e]||ERR.bad,true)}
 /* toutes les actions du joueur passent par ici : en solo vers G, en ligne vers le serveur */
 function doAction(a){if(over)return;if(NET.on){NET.act(a);return ''}const e=G.action(me,a);showErr(e,a);return e}
 /* ---------- fiche d'information (au-dessus des boutons) ---------- */
@@ -791,49 +802,56 @@ function bonusFaction(f){const B=FACTION_BALANCE[f],pc=x=>Math.round((x-1)*100)+
 /* effets propres à la tour, en clair */
 function effets(T,lv){const l=[];if(T.sp)l.push('explosion de zone');if(T.fsp)l.push('ralentit ×'+fr(.5-.05*(lv-1))+' pendant '+fr(T.sl)+' s');if(T.fl)l.push('souffle en cône');if(T.me)l.push('corps à corps');
  if(T.mg)l.push('révèle les Spectres invisibles');if(T.mag)l.push('magique : sans effet sur le Briseur de runes');return l}
-function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textContent='';f.className='';f.dataset.mode=mode;
- const txt=document.createElement('div');txt.className='txt';
- const tt=document.createElement('div');tt.className='tt';const n=document.createElement('b');n.textContent=T.n;const r=document.createElement('span');
- r.textContent=BASE_TW[T.skin].n+' · '+T.role+(t?' · niveau '+lv+'/5':'');tt.append(n,r);
- const st=document.createElement('div');st.className='st';
- const stat=(lbl,val)=>{const e=document.createElement('span'),i=document.createElement('i');i.textContent=val;e.append(lbl+' ',i);st.appendChild(e)};
- stat('⚔ Dégâts/s',dps(k,lv));stat('◎ Portée',fr(rng({k,lv})));stat('Cibles',T.gr?'sol uniquement':'sol et air');
- const ex=document.createElement('div');ex.className='ex';const part=(t,c)=>{if(ex.childNodes.length)ex.append(' · ');const e=document.createElement('span');if(c)e.className=c;e.textContent=t;ex.appendChild(e)};
+/* 2.15 : une seule fiche, et seulement quand on a choisi quelque chose : une tour à construire, une tour posée ou un monstre.
+   Elle rappelle le geste suivant ; celle d'une tour posée porte les boutons Améliorer et Vendre. Le × la referme (et annule le choix). */
+const elt=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e};
+function teteFiche(f,ic,nom,sous,stats){const txt=elt('div','txt'),tt=elt('div','tt'),st=elt('div','st');tt.append(elt('b','',nom),elt('span','',sous));
+ for(const [lbl,val] of stats){const e=elt('span');e.append(lbl+' ',elt('i','',val));st.appendChild(e)}txt.append(tt,st);
+ const x=elt('button','fermer','×');x.type='button';x.setAttribute('aria-label','Fermer la fiche');x.onclick=()=>{pick=null;sel=null;mon=null;projet=null;render()};f.append(ic,txt,x)}
+const aideFiche=(geste,txt)=>{const d=elt('div','aide');d.append(elt('i','',geste),txt);return d};
+function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textContent='';f.className='';f.dataset.mode=mode;f.hidden=false;
+ const ic=towerIcon(k,lv),stats=[['⚔ Dégâts/s',dps(k,lv)],['◎ Portée',fr(rng({k,lv}))],['Cibles',T.gr?'sol uniquement':'sol et air']];if(!t)stats.push(['Prix',T.c+' or']);
+ teteFiche(f,ic,T.n,BASE_TW[T.skin].n+' · '+T.role+(t?' · niveau '+lv+'/5':''),stats);icone3D(ic,'tour',k,56,46);
+ const ex=elt('div','ex'),part=(t,c)=>{if(ex.childNodes.length)ex.append(' · ');ex.appendChild(elt('span',c||'',t))};
  if(t&&t.b>0)part('🔨 '+(lv>1?'Amélioration':'Construction')+' en cours : '+Math.ceil(t.b)+' s','chantier');else if(!t)part('🔨 Construction : '+fr(btJ(T.c))+' s');
- if(t&&lv<5&&!(t.b>0))part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+' (pour '+upCost(t)+' or, '+fr(btJ(upCost(t)))+' s)','next');
+ if(t&&lv<5&&!(t.b>0))part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+' ('+fr(btJ(upCost(t)))+' s de travaux)','next');
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
  const bf=bonusFaction(T.faction);if(bf)part(bf);
- txt.append(tt,st,ex);
- const ic=towerIcon(k,lv);f.append(ic,txt);icone3D(ic,'tour',k,56,46)}
-function ficheEnvoi(){const f=$('fiche');f.textContent='';f.className='envoyer';f.dataset.mode='envoyer';
- const d=document.createElement('div');d.className='txt';const b=document.createElement('b');b.textContent='Envoyer des monstres';
- d.append(b,document.createElement('br'),'Chaque envoi attaque tous tes adversaires (4 monstres chacun) et augmente ton revenu pour toute la partie. Ouvre les paliers 2 et 3 ('+PAL_C[1]+' et '+PAL_C[2].toLocaleString('fr-FR')+' or) pour des monstres plus forts.');f.appendChild(d)}
+ f.appendChild(ex);
+ if(mode=='construire')f.appendChild(view==me?aideFiche('2×','Touche deux fois une case du terrain pour construire'):aideFiche('↩','Reviens sur ton terrain pour construire'));
+ if(mode=='tour'){const a=elt('div','actions'),up=elt('button'),ve=elt('button','vendre','Vendre · +'+Math.floor(t.inv*.7)+' or');up.type=ve.type='button';
+  if(t.b>0){up.textContent='Améliorer · en chantier…';up.onclick=()=>showErr('busy')}
+  else if(lv<5){up.textContent='Améliorer · '+upCost(t)+' or';up.onclick=()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()}}
+  else{up.textContent='Niveau maximum';up.disabled=true}
+  ve.onclick=()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()};a.append(up,ve);f.appendChild(a)}}
+/* fiche d'un monstre choisi : PV actuels (ils montent avec le temps de jeu), vitesse, revenu gagné, prix */
+function ficheMonstre(k){const f=$('fiche'),T=CR[k];f.textContent='';f.className='envoyer';f.dataset.mode='envoyer';f.hidden=false;
+ const ic=icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1));
+ teteFiche(f,ic,T.n,{n:'Sol',f:'Volant',s:'Spécial'}[T.cat]+(T.tag?' · '+T.tag:'')+' · palier '+T.t,[['PV',Math.round(T.hp*(1+time/200)*HPK)],['Vitesse',fr(T.s)],['Revenu','+'+T.i],['Prix',T.c+' or']]);icone3D(ic,'monstre',k,40,40);
+ f.appendChild(aideFiche('1×','Chaque toucher sur la carte envoie '+GROUP+' × '+T.n+' à chaque adversaire et augmente ton revenu'))}
+function cacherFiche(){const f=$('fiche');f.hidden=true;f.textContent='';f.dataset.mode=''}
 function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P.t.includes(pick))pick=null;
- if(tab=='t'&&pick){const t=pick;remplirFiche('tour',t.k,t);
-  if(t.b>0)add(icon(IC.up),'Améliorer','en chantier…',0,()=>showErr('busy'),1,'patiente');
-  else if(t.lv<5)add(icon(IC.up),'Améliorer',upCost(t)+' or',upCost(t),()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()},1,'niveau '+(t.lv+1)+' · '+fr(btJ(upCost(t)))+' s');
-  add(icon(IC.coin),'Vendre','+'+Math.floor(t.inv*.7)+' or',0,()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()});
-  add(icon(IC.x),'Fermer','',0,()=>{pick=null;render()});return}
- if(tab=='t'){remplirFiche('construire',sel);ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k];add(towerIcon(k,1),T.n,T.c+' or',T.c,()=>{sel=k;if(projet)projet.k=k;render()},sel==k,'⚔ '+dps(k,1)+' dégâts/s\n◎ portée '+fr(T.r));icone3D(bar.lastChild.querySelector('canvas'),'tour',k,56,46);apercu(bar.lastChild,k)})}
- else{ficheEnvoi();const pv=Math.min(palv,P.tier);
-  /* 2.13 : les paliers d'abord (choisir celui qu'on affiche, ou ouvrir le suivant), puis les monstres du palier affiché */
-  for(let p=1;p<=PAL_C.length;p++){
-   if(p<=P.tier)add(icon(g=>palIcon(g,p)),'Palier '+p,'ouvert',0,()=>{palv=p;render()},pv==p,p==pv?'affiché':'voir');
-   else if(p==P.tier+1)add(icon(g=>palIcon(g,p,1)),'Palier '+p,PAL_C[p-1]+' or',PAL_C[p-1],()=>{if(!NET.on&&P.gold<PAL_C[p-1]){showErr('poor');return}if(doAction({type:'tier'})===''){palv=p;sfx('up');render()}},0,'🔓 ouvrir');
-   else add(icon(g=>palIcon(g,p,1)),'Palier '+p,PAL_C[p-1]+' or',1e9,()=>showErr('locked',{}),0,'🔒 après le '+(p-1));
-   bar.lastChild.classList.add('palier')}
-  byCat(tab).filter(k=>CR[k].t==pv).forEach(k=>{const T=CR[k];add(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.n,T.c+' or · +'+T.i+' revenu',T.c,()=>playerSend(k),0,T.tag||'');icone3D(bar.lastChild.querySelector('canvas'),'monstre',k,40,40)})}}
-/* 2.2 : aperçu de la fiche sans changer la sélection. Appui long (400 ms) au doigt, survol à la souris. */
-let apT=0;
-function apercu(b,k){const voir=()=>{if(tab=='t'&&!pick){remplirFiche('construire',k);$('fiche').classList.add('apercu')}},
-  rendre=()=>{clearTimeout(apT);if($('fiche').classList.contains('apercu')&&tab=='t'&&!pick)remplirFiche('construire',sel)},clic=b.onclick;
- b.addEventListener('pointerdown',e=>{if(e.pointerType=='mouse')return;b.lp=0;clearTimeout(apT);apT=setTimeout(()=>{b.lp=1;voir();try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}},400)});
- b.addEventListener('pointerup',e=>{if(e.pointerType!='mouse')rendre()});b.addEventListener('pointercancel',rendre);
- b.addEventListener('pointerenter',e=>{if(e.pointerType=='mouse')voir()});b.addEventListener('pointerleave',e=>{if(e.pointerType=='mouse')rendre();else clearTimeout(apT)});
- b.addEventListener('contextmenu',e=>e.preventDefault());
- b.onclick=e=>{if(b.lp){b.lp=0;return}clic(e)}}
-function setTab(t){tab=t;pick=null;projet=null;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==t));render()}
-function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(T.t>P.tier){showErr('locked',a);return}if(!NET.on&&P.gold<T.c){showErr('poor',a);return}if(doAction(a)==='')sfx('send')}
+ if(pick)remplirFiche('tour',pick.k,pick);else if(tab=='t'&&sel!=null)remplirFiche('construire',sel);else if(tab!='t'&&mon!=null)ficheMonstre(mon);else cacherFiche();
+ const pal=$('paliers');pal.hidden=tab=='t';pal.textContent='';
+ if(tab=='t'){ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k],b=carte(towerIcon(k,1),T.c+' or',T.n,T.c,()=>{sel=k;pick=null;if(projet)projet.k=k;astuce(false);render()},sel===k,k);icone3D(b.querySelector('canvas'),'tour',k,56,46)});return}
+ /* 2.13 : paliers de monstres (celui qu'on affiche, ou ouvrir le suivant) ; 2.15 : sur une ligne au-dessus des cartes */
+ const pv=Math.min(palv,P.tier);
+ for(let p=1;p<=PAL_C.length;p++){const b=elt('button');b.type='button';
+  if(p<=P.tier){b.textContent='Palier '+p;b.className=pv==p?'on':'';b.onclick=()=>{palv=p;mon=null;render()}}
+  else if(p==P.tier+1){b.textContent='Palier '+p+' · '+PAL_C[p-1].toLocaleString('fr-FR')+' or';b.className='achat';b.onclick=()=>{if(!NET.on&&P.gold<PAL_C[p-1]){showErr('poor');return}if(doAction({type:'tier'})===''){palv=p;mon=null;sfx('up');render()}}}
+  else{b.textContent='Palier '+p+' · 🔒';b.className='ferme';b.onclick=()=>showErr('locked',{})}
+  pal.appendChild(b)}
+ byCat(tab).filter(k=>CR[k].t==pv).forEach(k=>{const T=CR[k],b=carte(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.c+' or',T.n,T.c,()=>toucherMonstre(k),mon===k,k);icone3D(b.querySelector('canvas'),'monstre',k,40,40)})}
+/* 2.15 : le premier toucher sur une carte de monstre la choisit (fiche, « ENVOYER ») ; chaque toucher suivant envoie un groupe.
+   Pas d'envoi automatique en rafale : marteler la carte fait partie du jeu. */
+function toucherMonstre(k){astuce(false);if(mon===k){playerSend(k);return}mon=k;pick=null;render()}
+function setTab(t){tab=t;pick=null;projet=null;mon=null;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==t));render()}
+/* chaque envoi réussi : rebond de la carte, petite vibration, et un compteur ×2, ×3… quand on enchaîne sur le même monstre */
+const rafale={k:-1,n:0,t:0};
+function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(T.t>P.tier){showErr('locked',a);return}if(!NET.on&&P.gold<T.c){showErr('poor',a);return}
+ if(doAction(a)!=='')return;sfx('send');vibrer(12);const now=performance.now();if(rafale.k===k&&now-rafale.t<1500)rafale.n++;else{rafale.k=k;rafale.n=1}rafale.t=now;
+ const c=bar.querySelector('button[data-k="'+k+'"]');if(c){c.classList.remove('tape');void c.offsetWidth;c.classList.add('tape')}
+ toast((rafale.n>1?'×'+rafale.n+' · ':'')+GROUP+' × '+T.n+' chez chaque adversaire · +'+T.i+' revenu')}
 
 const factionBox=$('factions');
 function selectFaction(i){
@@ -869,52 +887,62 @@ function annulerProjet(){projet=null}
 function confirmerConstruction(x,y){const k=projet.k;projet=null;
  if(NET.on){if(P.gold<TW[k].c){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr('poor');return}NET.act({type:'place',x,y,k},true);return}
  const e2=G.action(me,{type:'place',x,y,k});if(e2){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(e2)}}
-function act(e){if(over)return;const {x,y}=caseSous(e.clientX,e.clientY);
+/* toucher une case du terrain (au relâcher, sans avoir glissé) */
+function act(cx,cy){if(over)return;astuce(false);const {x,y}=caseSous(cx,cy);
  if(x<0||y<0||x>=C||y>=R)return;
+ if(view!=me){if(tab=='t'&&sel!=null)toast('Terrain de '+B[view].name+' : lecture seule. Reviens sur le tien pour construire.',true);return}
  const tw=P.t.find(t=>t.x==x&&t.y==y);
- if(tw){projet=null;if(tab!='t')setTab('t');pick=tw;render();sfx('tap');return}
+ if(tw){projet=null;pick=tw;render();sfx('tap');return}
  if(pick){pick=null;render();return}
- if(tab!='t'){toast('Passe sur « Construire » pour poser une tour');return}
+ if(tab!='t'){if(mon!=null){mon=null;render()}else toast('Passe sur l’onglet « Tours » pour construire');return}
+ if(sel==null){toast('Choisis d’abord une tour en bas de l’écran');return}
  if(projet&&projet.x==x&&projet.y==y){confirmerConstruction(x,y);return}
  const err=peutConstruire(x,y,sel);
  if(err){projet=null;P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(err);return}
  projet={x,y,k:sel};sfx('tap');toast('Touchez encore la case pour construire ('+TW[sel].c+' or, '+fr(btJ(TW[sel].c))+' s)')}
-/* Gestes sur le terrain :
-   - un doigt : un toucher (au relâcher) sur une case = aperçu, un 2e toucher sur la même case = construction ;
-     un doigt qui glisse vers une autre case n'est pas un toucher : il ne fait rien (plus de construction à la volée) ;
-   - deux doigts : pincer pour zoomer, déplacer pour se promener sur la carte (rien n'est construit) ;
-   - souris : même chose avec des clics, molette pour zoomer. */
-const DOIGTS=new Map();let geste=null,attente=null,gesteFini=false;
-const dist2=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y)||1,milieu=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
-const caseDe=e=>{const c=caseSous(e.clientX,e.clientY);return c.x+','+c.y};
-main.addEventListener('pointerdown',e=>{try{main.setPointerCapture(e.pointerId)}catch(_){}
- DOIGTS.set(e.pointerId,{x:e.clientX,y:e.clientY});
- if(DOIGTS.size==2){attente=null;const [a,b]=[...DOIGTS.values()];geste={d:dist2(a,b),m:milieu(a,b),z:VUE.z,ox:VUE.ox,oy:VUE.oy};return}
- if(DOIGTS.size>2||gesteFini)return;
- if(e.pointerType=='mouse'){if(view!=me){toast('Tu regardes le terrain de '+B[view].name);return}act(e)}
- else attente={clientX:e.clientX,clientY:e.clientY,id:e.pointerId}});
-main.addEventListener('pointermove',e=>{if(DOIGTS.has(e.pointerId))DOIGTS.set(e.pointerId,{x:e.clientX,y:e.clientY});
- if(geste){if(DOIGTS.size<2)return;const [a,b]=[...DOIGTS.values()],m=milieu(a,b),r=main.getBoundingClientRect(),s0=cell*geste.z;
-  const bx=(geste.m.x-r.left-geste.ox)/s0,by=(geste.m.y-r.top-geste.oy)/(s0*R3D.KY);
-  VUE.z=Math.min(ZMAX,Math.max(1,geste.z*dist2(a,b)/geste.d));VUE.ox=m.x-r.left-bx*cell*VUE.z;VUE.oy=m.y-r.top-by*cell*VUE.z*R3D.KY;borner();return}
- if(attente&&e.pointerId==attente.id&&caseDe(e)!=caseDe(attente))attente=null});
-for(const n of['pointerup','pointercancel'])main.addEventListener(n,e=>{const tap=attente&&e.pointerId==attente.id&&n=='pointerup'&&!geste;
- if(tap){if(view!=me)toast('Tu regardes le terrain de '+B[view].name);else act(attente)}
- if(attente&&e.pointerId==attente.id)attente=null;
- DOIGTS.delete(e.pointerId);if(geste){geste=null;gesteFini=DOIGTS.size>0}if(!DOIGTS.size)gesteFini=false});
-main.addEventListener('wheel',e=>{e.preventDefault();zoomer(VUE.z*Math.exp(-e.deltaY*.0015),e.clientX,e.clientY)},{passive:false});
-$('zoomReset').onclick=vueEnsemble;
-/* 2.3 : panneau flottant des terrains. Bouton = ouvrir/fermer ; toucher ailleurs le ferme sans poser de tour ; la bannière ramène à son terrain. */
-function cartes(o){const c=$('chips'),cb=$('cartesBtn');c.hidden=!o;cb.classList.toggle('on',o);cb.setAttribute('aria-expanded',o?'true':'false')}
+/* Gestes sur le terrain (2.15) :
+   - un toucher (relâché sans glisser) sur une case : aperçu, puis un 2e toucher sur la même case : construction ;
+   - glisser le doigt (ou la souris, bouton appuyé) : en 3D, déplace la carte comme une appli de cartes (le terrain suit le doigt),
+     avec un peu d'élan si on lâche vite ; un glissement ne construit jamais rien (en 2D, il ne fait rien) ;
+   - plus de pincement ni de molette : la vue tactique a une hauteur fixe, et les flèches la font pivoter. */
+const pan={id:null,x0:0,y0:0,x:0,y:0,actif:false,tm:0,vx:0,vz:0};
+main.addEventListener('pointerdown',e=>{if(pan.id!==null)return;try{main.setPointerCapture(e.pointerId)}catch(_){}
+ Object.assign(pan,{id:e.pointerId,x0:e.clientX,y0:e.clientY,x:e.clientX,y:e.clientY,actif:false,tm:e.timeStamp,vx:0,vz:0});if(R3D.api)R3D.api.lancer(0,0)});
+main.addEventListener('pointermove',e=>{if(e.pointerId!==pan.id)return;
+ if(!pan.actif){if(Math.hypot(e.clientX-pan.x0,e.clientY-pan.y0)<8)return;pan.actif=true;astuce(false)}
+ if(R3D.api){const r=main.getBoundingClientRect(),[dx,dz]=R3D.api.glisser(pan.x-r.left,pan.y-r.top,e.clientX-r.left,e.clientY-r.top),dt=Math.max(.008,(e.timeStamp-pan.tm)/1000);
+  pan.vx=pan.vx*.6+dx/dt*.4;pan.vz=pan.vz*.6+dz/dt*.4}
+ pan.x=e.clientX;pan.y=e.clientY;pan.tm=e.timeStamp});
+for(const n of['pointerup','pointercancel'])main.addEventListener(n,e=>{if(e.pointerId!==pan.id)return;pan.id=null;
+ if(pan.actif){if(n=='pointerup'&&R3D.api&&e.timeStamp-pan.tm<80)R3D.api.lancer(pan.vx,pan.vz);return}
+ if(n=='pointerup')act(pan.x0,pan.y0)});
+main.addEventListener('contextmenu',e=>e.preventDefault());
+/* rotation de la vue (3D) : un huitième de tour par toucher */
+$('rotG').onclick=()=>{if(R3D.api){R3D.api.pivoter(-1);vibrer(8);astuce(false)}};
+$('rotD').onclick=()=>{if(R3D.api){R3D.api.pivoter(1);vibrer(8);astuce(false)}};
+/* 2.3 puis 2.15 : panneau des terrains des joueurs, ouvert par le bouton des adversaires.
+   Toucher ailleurs le ferme sans poser de tour ; la bannière ramène à son terrain. */
+function cartes(o){const c=$('chips'),cb=$('cartesBtn');c.hidden=!o;cb.classList.toggle('on',o);cb.setAttribute('aria-expanded',o?'true':'false');if(o)astuce(false)}
 $('cartesBtn').onclick=()=>cartes($('chips').hidden);
 $('banner').onclick=()=>setView(me);
 stage.addEventListener('pointerdown',e=>{if(!$('chips').hidden&&!e.target.closest('#chips,#cartesBtn')){cartes(false);e.stopPropagation();e.preventDefault()}},true);
-$('snd').onclick=()=>{muted=!muted;$('snd').classList.toggle('off',muted);audio();if(!muted)sfx('income')};
-$('fs').onclick=()=>{const d=document,e=d.documentElement,no=()=>toast("Plein écran refusé ici : ouvre le jeu dans ton navigateur");
+/* menu : reprendre, son, vibrations, rappel des gestes, quitter (en deux touchers, pour éviter une erreur) */
+let quitter=0;
+function menu(o){$('menu').hidden=!o;quitter=0;$('mQuitter').textContent='Quitter la partie';if(o){cartes(false);astuce(false);$('mReprendre').focus()}}
+$('menuBtn').onclick=()=>menu(true);$('mReprendre').onclick=()=>menu(false);
+$('menu').addEventListener('click',e=>{if(e.target===e.currentTarget)menu(false)});
+$('snd').onclick=()=>{muted=!muted;$('snd').textContent='Son : '+(muted?'coupé':'activé');audio();if(!muted)sfx('income')};
+$('mVibre').onclick=()=>{vibre=!vibre;$('mVibre').textContent='Vibrations : '+(vibre?'activées':'coupées');vibrer(15)};
+$('mGestes').onclick=()=>{const l=$('mListe');l.hidden=!l.hidden;$('mGestes').setAttribute('aria-expanded',l.hidden?'false':'true')};
+$('mQuitter').onclick=()=>{if(!quitter){quitter=1;$('mQuitter').textContent='Confirmer : quitter la partie';return}menu(false);
+ if(NET.on){NET.leave();return}over=true;if(G)G.over=true;$('msg').textContent='Winter Realms';$('sub').textContent=SUB0;selectFaction(chosenClass);$('ov').classList.remove('fin');$('ov').hidden=false};
+document.addEventListener('keydown',e=>{if(e.key!='Escape')return;if(!$('menu').hidden)menu(false);else if(!$('chips').hidden)cartes(false)});
+/* plein écran, verrouillé en portrait quand le téléphone le permet */
+$('fs').onclick=()=>{const d=document,e=d.documentElement,no=()=>toast("Plein écran refusé ici : ouvre le jeu dans ton navigateur",true);
  try{if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return}
-  const rq=e.requestFullscreen||e.webkitRequestFullscreen;if(!rq){toast("Plein écran indisponible sur cet appareil");return}
-  const p=rq.call(e);if(p&&p.catch)p.catch(no)}catch(_){no()}};
-[0,1,2].forEach(l=>{$('go'+l).onclick=()=>{audio();started=true;newSolo(l);$('ov').hidden=true;$('ov').classList.remove('fin');vueEnsemble();toast('Astuce : deux doigts pour zoomer et se déplacer')}});
+  const rq=e.requestFullscreen||e.webkitRequestFullscreen;if(!rq){toast("Plein écran indisponible sur cet appareil",true);return}
+  Promise.resolve(rq.call(e)).then(()=>{try{const o=screen.orientation;if(o&&o.lock)o.lock('portrait').catch(()=>{})}catch(_){}}).catch(no)}catch(_){no()}};
+[0,1,2].forEach(l=>{$('go'+l).onclick=()=>{audio();started=true;newSolo(l);setTab('t');$('ov').hidden=true;$('ov').classList.remove('fin');recentrer();astuce(true)}});
 document.addEventListener('click',audio,true);
 
 /* ---------- sons et événements ---------- */
@@ -928,10 +956,9 @@ function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.d
  if(k!=hudK){hudK=k;$('gold').textContent=Math.floor(P.gold);$('inc').textContent='+'+P.inc;$('clock').textContent=mmss(time);$('lives').lastChild.textContent=Math.max(0,P.lives);
   for(const b of B){b.ui.s.textContent=b.dead?'éliminé':Math.max(0,b.lives)+' vies\n+'+eff(b);b.ui.e.className='chip'+(b.i==view?' on':'')+(b.dead?' dead':'')}}
  if(P.tier!==hudPal){hudPal=P.tier;if(tab!='t')render()}
- $('tfill').style.transform='scaleX('+(1-tick/10).toFixed(3)+')';
- for(const b of bar.children){b.classList.toggle('dis',+b.dataset.c>P.gold||time<+b.dataset.at);
-  /* un monstre qui se débloque pendant que l'onglet est ouvert perd son cadenas */
-  if(b.dataset.tag!==undefined&&time>=+b.dataset.at){const e=b.querySelector('em');if(e&&e.textContent.startsWith('🔒'))e.textContent=b.dataset.tag}}}
+ /* anneau du revenu : il se remplit pendant les 10 secondes qui précèdent le versement */
+ $('arc').setAttribute('stroke-dashoffset',(50.3*Math.max(0,tick)/10).toFixed(1));
+ for(const b of bar.children)b.classList.toggle('dis',+b.dataset.c>P.gold)}
 function end(winner){over=true;const win=winner===me;sfx(win?'win':'lose');
  $('msg').textContent=win?'Victoire !':winner>=0&&NET.on?B[winner].name+' gagne':'Défaite';
  $('sub').textContent='Partie de '+mmss(time)+'. Ton revenu final : +'+P.inc+' toutes les 10 s, en '+DIFF[LV].n+'. Adversaires éliminés : '+B.filter(b=>b!==P&&b.dead).length+' sur 3.';
@@ -952,11 +979,13 @@ function loop(now){neigeAccueil(now);const dt=Math.min(.05,Math.max(0,(now-last)
   if(NET.on)NET.frame(dt);
   else if(G&&!G.over){G.step(dt);syncSolo();const lg=G.log.splice(0);for(const l of lg)onLog(l)}
   playEvents();
-  if(pick&&tab=='t'){const c=pick.b>0?Math.ceil(pick.b):0;if(c!==pickB){pickB=c;render()}}
-  dessinerVue(now/1000);for(const b of B){drawMini(b,b.ui.g,MINI);if(b===VB()&&VUE.z>1.02)cadreMini(b.ui.g)}hud()}
+  if(pick){const c=pick.b>0?Math.ceil(pick.b):0;if(c!==pickB){pickB=c;render()}}
+  dessinerVue(now/1000);if(!$('chips').hidden)for(const b of B){drawMini(b,b.ui.g,MINI);if(b===VB()&&R3D.api)cadreMini(b.ui.g)}hud()}
  requestAnimationFrame(loop)}
 
 fit();if(typeof ResizeObserver!='undefined')new ResizeObserver(fit).observe(stage);else addEventListener('resize',fit);
+/* les flèches, la bannière et les messages se placent juste au-dessus du dock, dont la hauteur change avec la fiche */
+{const dock=()=>stage.style.setProperty('--dock',$('ctl').offsetHeight+'px');dock();if(typeof ResizeObserver!='undefined')new ResizeObserver(dock).observe($('ctl'))}
 G=new Game(soloSeats(chosenClass),0);G.over=true;LV=0;useBoards(G.B,0);started=true;over=true;requestAnimationFrame(loop);
 /* lien vers l'autre rendu (2D ↔ 3D) sur l'écran d'accueil, puis chargement du rendu 3D (par défaut depuis la 2.8) */
 {const a=$('mode3d');if(a){const q=new URLSearchParams(location.search);if(R3D.on)q.set('rendu','2d');else q.delete('rendu');a.href=location.pathname+(q.toString()?'?'+q:'');a.textContent=R3D.on?'Jouer en vue 2D (classique)':'Revenir à la vue 3D'}}

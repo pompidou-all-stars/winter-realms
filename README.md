@@ -44,6 +44,13 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.15 — 2026-11-17
+- New "tactical view" interface, from the mockup approved by the designer: the board fills the screen, with the top bar and the bottom dock floating over it. In 3D, a perspective camera at a fixed height: drag a finger to move the map (like a maps app, with momentum), two arrows rotate the view by 45°. No more pinch zoom or "Vue d'ensemble".
+- Portrait only: a phone held in landscape shows "Tourne ton téléphone".
+- Top bar: menu (sound, vibrations, gestures reminder, quit), gold, income with a 10-second ring, lives, clock, fullscreen. "Adversaires" button opens the four board thumbnails; you can send monsters while watching an opponent's board.
+- One info card, shown only when something is selected (tower to build, placed tower with Upgrade and Sell, monster). Cards show only the icon and price. Building: pick a card, then tap a square twice. Sending: the first tap selects the monster, each following tap sends a group (no auto-repeat, on purpose), with a bounce, a vibration and a ×2, ×3 counter.
+- Interface only: `sim.js` is unchanged (no server redeploy).
+
 ### 2.14 — 2026-11-15
 - Balance: every monster cost is a multiple of 10, and ground-monster income is rounded down onto the curve 10 gold → +1, 100 → +11, 1000 → +120, so no cheap monster pays better than the curve. The Snow rat now costs 20 gold for +2 (was 15 for +2). Tier-1 ground monsters now go from 10 to 120 gold in steps of 10.
 
