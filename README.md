@@ -44,6 +44,10 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.16 — 2026-11-17
+- Background music: three themes composed by the designer with Suno (`assets/musique/`). A random one starts at launch, then they play one after another in a loop for the whole game. A « Musique » toggle in the menu turns it off without muting the sound effects.
+- Interface only: `sim.js` is unchanged (no server redeploy).
+
 ### 2.15 — 2026-11-17
 - New "tactical view" interface, from the mockup approved by the designer: the board fills the screen, with the top bar and the bottom dock floating over it. In 3D, a perspective camera at a fixed height: drag a finger to move the map (like a maps app, with momentum), two arrows rotate the view by 45°. No more pinch zoom or "Vue d'ensemble".
 - Portrait only: a phone held in landscape shows "Tourne ton téléphone".
