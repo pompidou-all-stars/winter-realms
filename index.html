@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.15</title>
+<title>Winter Realms — Tower Wars · Édition 2.16</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -228,6 +228,7 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
   <div id="menu" hidden role="dialog" aria-modal="true" aria-labelledby="menuTitre"><div class="menu">
    <div class="titre-menu" id="menuTitre">Menu</div>
    <button class="principal" id="mReprendre" type="button">Reprendre</button>
+   <button id="mMusique" type="button">Musique : activée</button>
    <button id="snd" type="button">Son : activé</button>
    <button id="mVibre" type="button">Vibrations : activées</button>
    <button id="mGestes" type="button" aria-expanded="false" aria-controls="mListe">Rappel des gestes</button>
@@ -304,6 +305,22 @@ const SFX={
  win(){[523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.09,0,i*.13))},
  lose(){[392,330,262,196].forEach((f,i)=>tone(f,.3,'sawtooth',.06,0,i*.16))}};
 function sfx(n){if(!AC||muted)return;const now=performance.now();if(now-(lastS[n]||0)<(n=='flame'?170:70))return;lastS[n]=now;try{SFX[n]()}catch(e){}}
+/* ---------- musique de fond (2.16) : 3 thèmes composés par le concepteur avec Suno (assets/musique/) ----------
+   Le premier thème est tiré au hasard, puis ils s'enchaînent les uns après les autres, en boucle, de l'accueil à la fin de la partie.
+   Elle démarre au premier toucher (les navigateurs bloquent le son avant) ; elle passe par Web Audio quand c'est possible,
+   pour que son volume se règle aussi sur iPhone. Pause quand la page est cachée. Le menu la coupe (« Musique »), sans toucher aux bruitages. */
+const MUSIQUE={pistes:['assets/musique/winter-realm.mp3','assets/musique/winter-realm-1.mp3','assets/musique/winter-realm-2.mp3'],vol:.4,on:true,i:-1,el:null,err:0,
+ demarrer(){if(this.el||!this.on)return;audio();const a=new Audio();a.preload='auto';this.el=a;
+  try{if(AC){const s=AC.createMediaElementSource(a),g=AC.createGain();g.gain.value=this.vol;s.connect(g);g.connect(AC.destination)}else a.volume=this.vol}catch(_){a.volume=this.vol}
+  a.addEventListener('ended',()=>this.suivante());a.addEventListener('playing',()=>{this.err=0});
+  /* un fichier illisible : on passe au suivant, sans boucler si aucun ne se lit */
+  a.addEventListener('error',()=>{if(++this.err<this.pistes.length)this.suivante()});
+  this.i=Math.floor(Math.random()*this.pistes.length);this.jouer()},
+ jouer(){const a=this.el;a.src=this.pistes[this.i];if(this.on&&!document.hidden)a.play().catch(()=>{})},
+ suivante(){if(!this.el)return;this.i=(this.i+1)%this.pistes.length;this.jouer()},
+ basculer(){this.on=!this.on;if(!this.el){this.demarrer();return}if(this.on)this.el.play().catch(()=>{});else this.el.pause()}};
+for(const n of['pointerdown','keydown'])document.addEventListener(n,()=>MUSIQUE.demarrer(),{capture:true,passive:true});
+document.addEventListener('visibilitychange',()=>{const a=MUSIQUE.el;if(!a||!MUSIQUE.on)return;if(document.hidden)a.pause();else a.play().catch(()=>{})});
 
 /* ---------- dessin ---------- */
 function fs(g,f){g.fillStyle=f;g.fill();g.stroke()}
@@ -932,6 +949,7 @@ function menu(o){$('menu').hidden=!o;quitter=0;$('mQuitter').textContent='Quitte
 $('menuBtn').onclick=()=>menu(true);$('mReprendre').onclick=()=>menu(false);
 $('menu').addEventListener('click',e=>{if(e.target===e.currentTarget)menu(false)});
 $('snd').onclick=()=>{muted=!muted;$('snd').textContent='Son : '+(muted?'coupé':'activé');audio();if(!muted)sfx('income')};
+$('mMusique').onclick=()=>{MUSIQUE.basculer();$('mMusique').textContent='Musique : '+(MUSIQUE.on?'activée':'coupée')};
 $('mVibre').onclick=()=>{vibre=!vibre;$('mVibre').textContent='Vibrations : '+(vibre?'activées':'coupées');vibrer(15)};
 $('mGestes').onclick=()=>{const l=$('mListe');l.hidden=!l.hidden;$('mGestes').setAttribute('aria-expanded',l.hidden?'false':'true')};
 $('mQuitter').onclick=()=>{if(!quitter){quitter=1;$('mQuitter').textContent='Confirmer : quitter la partie';return}menu(false);

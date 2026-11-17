@@ -33,6 +33,11 @@ test.describe('Parcours mobile — portrait',()=>{
   await N.avancer(p,2100);const e=await N.etat(p);assert.equal(e.horloge,'0:02');assert.deepEqual([e.or,e.revenu,e.vies,e.faction],[100,10,40,2]);
   assert.equal(await p.isVisible('#astuce'),true);assert.equal(e.fiche,'','sans choix, pas de fiche (2.15)');
  });
+ test('Musique (2.16) : un des 3 thèmes démarre dès le premier toucher, puis ils s’enchaînent en boucle',async()=>{
+  const m=()=>p.evaluate(()=>({src:MUSIQUE.el?MUSIQUE.el.src:'',i:MUSIQUE.i,n:MUSIQUE.pistes.length}));
+  const a=await m();assert.match(a.src,/assets\/musique\/winter-realm(-1|-2)?\.mp3$/,'thème en cours : '+a.src);assert.equal(a.n,3);
+  for(let k=1;k<=3;k++){await p.evaluate(()=>MUSIQUE.el.dispatchEvent(new Event('ended')));const b=await m();assert.equal(b.i,(a.i+k)%3,'thème suivant ('+k+')')}
+ });
  test('Interface (2.15) : bandeau en haut, dock en bas, terrain sur tout l\'écran ; pas de flèches de rotation en 2D',async()=>{
   const s=await p.locator('#stage').boundingBox(),h=await p.locator('#hud').boundingBox(),c=await p.locator('#ctl').boundingBox(),v=p.viewportSize();
   assert.ok(s.width>=v.width-1&&s.height>=v.height-1,'le terrain couvre l\'écran');assert.ok(h.y<60,'bandeau en haut');assert.ok(c.y+c.height>=v.height-1,'dock en bas');
@@ -106,6 +111,7 @@ test.describe('Parcours mobile — portrait',()=>{
  test('Menu (2.15) : son, rappel des gestes, reprendre ; quitter demande une confirmation',async()=>{
   await N.toucher(p,'#menuBtn');assert.equal(await p.isVisible('#menu'),true);
   await N.toucher(p,'#snd');assert.equal(await p.textContent('#snd'),'Son : coupé');await N.toucher(p,'#snd');
+  await N.toucher(p,'#mMusique');assert.equal(await p.textContent('#mMusique'),'Musique : coupée');assert.equal(await p.evaluate(()=>MUSIQUE.el.paused),true,'musique en pause');await N.toucher(p,'#mMusique');assert.equal(await p.evaluate(()=>MUSIQUE.on),true);
   await N.toucher(p,'#mGestes');assert.equal(await p.isVisible('#mListe'),true);
   await N.toucher(p,'#mReprendre');assert.equal(await p.isVisible('#menu'),false);
   await N.toucher(p,'#menuBtn');await N.toucher(p,'#mQuitter');assert.equal(await val(()=>document.getElementById('ov').hidden),true,'un seul toucher ne quitte pas');
