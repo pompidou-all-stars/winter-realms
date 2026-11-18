@@ -47,6 +47,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ### 2.24 — 2026-11-18
 - On a computer, **Shift + click** on a tile builds the selected tower in a single click (no preview step). The tower stays selected, so you can chain builds. Touch screens keep the two-tap build.
 - Interface only (`sim.js` untouched, no server redeploy).
+- Organisation: every version now gets a very short title (2 to 4 words, e.g. “exploration fin de partie” for 2.23), reused in the commit, the PR, the CLAUDE.md log and this changelog. No game change.
 
 ### 2.23 — 2026-11-18
 - End of game (solo): a window shows Victory/Defeat with stats for the 4 players (rank, towers, maze length, waves sent, monsters killed, final income), an income curve over the game and a personal summary.

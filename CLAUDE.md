@@ -16,6 +16,10 @@ Concrètement :
 3. Si la version change, mettre à jour le numéro dans le `<title>` de `index.html` **et** dans le titre de ce fichier.
 4. Un changement qui contredit ce document sans le mettre à jour est considéré comme incomplet.
 5. **Les tests doivent passer** (`node tests/tout.js`) avant chaque commit, et chaque évolution est présentée avec ses **trois bilans** (technique, gameplay, visuel). Voir §12.
+6. **Chaque version a un titre très court** qui résume ce qu'elle fait, en **2 à 4 mots**, en minuscules, sans verbe ni ponctuation. Exemples : 2.23 « exploration fin de partie », 2.24 « Maj + clic », 2.20 « givre selon le niveau ». Ce titre est repris tel quel :
+   - dans le commit et la PR : `Version X.Y : <titre>` ;
+   - au début de la ligne du **Journal des modifications** : `**<titre>** : …` ;
+   - dans le titre de la section du `README.md` : `### X.Y — <titre> — <date>`.
 
 Claude : quand tu modifies le jeu, applique cette règle sans qu'on te le demande.
 
@@ -25,7 +29,7 @@ On commite **souvent, par petites étapes**, pour que tout le monde suive l'avan
 
 1. **Un commit par amélioration** (une nouvelle tour, un monstre, une retouche d'équilibrage, un correctif, une évolution visuelle…). On ne mélange pas plusieurs sujets dans un même commit.
 2. Chaque commit contient **à la fois** le changement dans `index.html` **et** la mise à jour de `CLAUDE.md`.
-3. **Nouvelle version reçue** (fichier HTML partagé par un membre du groupe) : créer une branche, y copier le fichier dans `index.html`, lire le diff (`git diff`), mettre à jour `CLAUDE.md`, puis faire un commit nommé `Version X.Y : <résumé>`.
+3. **Nouvelle version reçue** (fichier HTML partagé par un membre du groupe) : créer une branche, y copier le fichier dans `index.html`, lire le diff (`git diff`), mettre à jour `CLAUDE.md`, puis faire un commit nommé `Version X.Y : <titre>` (titre court de la version, voir la règle de maintenance n°6).
 4. **Messages de commit** en français, au présent, courts et précis : `Ajoute la tour …`, `Corrige …`, `Rééquilibre …`, `Version 1.6 : plateau diorama`.
 5. Faire `git push` juste après chaque commit **sur sa branche**, pour que les autres voient l'avancement.
 6. Ne jamais laisser une modification qui marche sans la commiter à la fin d'une séance de travail.
@@ -823,3 +827,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-18 | 2.22 | **La 3D devient la seule vue proposée** (§1, §9, §15.2) : le lien « Jouer en vue 2D (classique) » de l'accueil est retiré. Le rendu 2D reste dans le code comme **secours** quand WebGL manque et pour les **tests** (`?rendu=2d` fonctionne toujours). Test `parcours-3d` adapté (plus de lien sur l'accueil). Interface uniquement : `sim.js` non modifié. |
 | 2026-11-18 | 2.23 | **Fin de partie : statistiques et exploration des labyrinthes** (§9) : en solo, une fenêtre donne Victoire ou Défaite, un tableau des 4 joueurs (classement, tours, longueur du chemin, vagues envoyées, monstres tués, revenu), la courbe du revenu et un résumé du joueur ; « Regarder la carte » fige la partie et permet de se balader sur les 4 labyrinthes (toucher une tour ouvre sa fiche), « Quitter » ramène à l'écran de fin. Compteurs `Board.st` dans `sim.js`, sans effet sur le jeu (redéploiement automatique du serveur). Test `fin-de-partie` complété. |
 | 2026-11-18 | 2.24 | **Maj + clic pour construire en un clic** (§9), sur ordinateur : la tour choisie est posée directement, sans l'aperçu du 1er toucher ; elle reste choisie pour enchaîner. Le toucher en deux temps reste la règle sur écran tactile. Interface uniquement : `sim.js` non modifié. |
+| 2026-11-18 | 2.24 | Organisation : **titre court pour chaque version** (règle de maintenance n°6) : 2 à 4 mots qui résument la version (par exemple « exploration fin de partie » pour la 2.23), repris dans le commit, la PR, le journal et le `README.md`. **Aucun changement de jeu.** |
