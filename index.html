@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.20</title>
+<title>Winter Realms — Tower Wars · Édition 2.21</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -260,7 +260,6 @@ body.r2d .fleche{display:none}
 #ldiff button{font-size:14px!important;padding:6px 10px!important;background:linear-gradient(180deg,#34507a,#1d3152)!important;color:var(--ink)!important;border-color:#8fb6d966!important;text-shadow:none!important;box-shadow:inset 0 1px 0 #ffffff30,0 2px 0 #0009!important}
 #ldiff button.on{background:var(--or-fond)!important;color:#3a2205!important}
 #ov button.ghost{background:transparent;border:0;box-shadow:none;color:var(--dim);font-size:14px;text-decoration:underline;text-shadow:none}
-#vue3d{margin:4px 0 0;font-size:14px}#vue3d a{color:var(--gold)}
 body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:none!important}
 </style></head><body>
 <div id="app">
@@ -327,7 +326,7 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
  <button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">⚒️</span><span><strong>Clans nains</strong><small>Artillerie · perforation des armures</small></span></button>
  <button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">☠️</span><span><strong>Légion des ombres</strong><small>Malédictions · amplification des dégâts</small></span></button>
  </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><h2 id="difficultyLabel" hidden>Lance la bataille</h2><div id="lv"><button id="go0" disabled>Normal<small>IA à revenu égal</small></button><button id="go1" disabled>Difficile<small>IA : +25 % de revenu</small></button><button id="go2" disabled>Brutal<small>IA : +50 % de revenu</small></button></div>
- <p id="hint">Carte de 13 × 17 cases. En Difficile et en Brutal, tes chantiers prennent aussi plus de temps.</p><p id="vue3d"><a id="mode3d" href="?rendu=2d">Jouer en vue 2D (classique)</a></p>
+ <p id="hint">Carte de 13 × 17 cases. En Difficile et en Brutal, tes chantiers prennent aussi plus de temps.</p>
  <div id="online"><h2>Jouer entre amis</h2><input id="pname" maxlength="16" placeholder="Ton pseudo" autocomplete="nickname">
   <div class="orow"><button id="mkRoom" type="button">Créer un salon</button><input id="rcode" maxlength="4" placeholder="CODE" autocapitalize="characters"><button id="joinRoom" type="button">Rejoindre</button></div></div>
  <div id="lobby" hidden><h2>Salon <b id="lcode"></b></h2><p id="lhelp">Partage ce lien à tes amis :</p><div class="orow"><input id="llink" readonly><button id="lcopy" type="button">Copier</button></div>
@@ -1131,8 +1130,7 @@ fit();if(typeof ResizeObserver!='undefined')new ResizeObserver(fit).observe(stag
 /* les flèches, la bannière et les messages se placent juste au-dessus du dock, dont la hauteur change avec la fiche */
 {const dock=()=>stage.style.setProperty('--dock',$('ctl').offsetHeight+'px');dock();if(typeof ResizeObserver!='undefined')new ResizeObserver(dock).observe($('ctl'))}
 G=new Game(soloSeats(chosenClass),0);G.over=true;LV=0;useBoards(G.B,0);started=true;over=true;requestAnimationFrame(loop);
-/* lien vers l'autre rendu (2D ↔ 3D) sur l'écran d'accueil, puis chargement du rendu 3D (par défaut depuis la 2.8) */
-{const a=$('mode3d');if(a){const q=new URLSearchParams(location.search);if(R3D.on)q.set('rendu','2d');else q.delete('rendu');a.href=location.pathname+(q.toString()?'?'+q:'');a.textContent=R3D.on?'Jouer en vue 2D (classique)':'Revenir à la vue 3D'}}
+/* chargement du rendu 3D (par défaut depuis la 2.8, seule vue proposée depuis la 2.21 ; ?rendu=2d reste pour le secours et les tests) */
 charger3D();
 /* lien d'invitation ?salon=CODE : on rejoint directement si le pseudo est déjà connu */
 if(QS.get('salon')){$('rcode').value=QS.get('salon').toUpperCase().slice(0,4);if(store.get('wr-name'))NET.join($('rcode').value);else{$('pname').focus();$('sub').textContent='Tu es invité·e dans le salon '+$('rcode').value+' : choisis un pseudo puis touche « Rejoindre ».'}}
