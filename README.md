@@ -44,6 +44,9 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.19 — 2026-11-18
+- Darker, more warlike sound effects: monster death cries and boss arrivals move from cartoon to dark fantasy; tower shots, explosions and sabotage are punchier. 45 prompts rewritten, 124 files regenerated locally. Voices, music and interface sounds are unchanged.
+
 ### 2.18 — 2026-11-18
 - Frost skin on the tactical-view interface: the 2.12 frosted textures and silver scrollwork frames are back, laid out like a strategy-game console (a frosted resource bar across the top, a frosted console at the bottom, both edged with a silver frieze set with ice gems). Square framed cards (silver, gold when selected, red for monsters) with the price in a medallion; framed tabs, info card, opponents panel and menu; round metal buttons ringed with gold.
 - Interface only: `sim.js` is unchanged (no server redeploy).

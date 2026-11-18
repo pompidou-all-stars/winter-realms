@@ -77,7 +77,9 @@ def main():
             t = time.time()
             g = torch.Generator("cuda").manual_seed(graine(s["id"], n))
             # le modèle produit mal les sons très courts : on génère au moins 2 s puis on coupe le silence
-            out = pipe(s["p"], negative_prompt=NEGATIF, num_inference_steps=o.pas,
+            # « neg » (facultatif) ajoute des mots à éviter pour ce son seulement
+            neg = NEGATIF + (", " + s["neg"] if s.get("neg") else "")
+            out = pipe(s["p"], negative_prompt=neg, num_inference_steps=o.pas,
                        audio_end_in_s=max(2.0, s["dur"]), num_waveforms_per_prompt=1, generator=g).audios[0]
             a = out.float().cpu().numpy()
             if not s.get("loop"): a = a[:, : int(sr * max(s["dur"], 0.4) * 1.5)]
