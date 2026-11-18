@@ -44,10 +44,17 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.21 — 2026-11-18
+### 2.23 — 2026-11-18
 - End of game (solo): a window shows Victory/Defeat with stats for the 4 players (rank, towers, maze length, waves sent, monsters killed, final income), an income curve over the game and a personal summary.
 - “Regarder la carte” lets you walk around the frozen mazes (drag, rotate, switch board, tap a tower to see it); “Quitter” goes back to the replay screen. Tap a player in the table to look at their maze.
 - `sim.js`: stat counters per board (`Board.st`), no effect on gameplay (server redeploys automatically).
+
+### 2.22 — 2026-11-18
+- The 3D view is now the only view offered: the "Jouer en vue 2D (classique)" link is gone from the home screen. The 2D renderer stays as a fallback when WebGL is missing and for the tests (`?rendu=2d` still works).
+- Interface only (`sim.js` untouched, no server redeploy).
+
+### 2.21 — 2026-11-18
+- The monster tier row now sits above the tabs, so the tabs and cards stay in place when switching between towers and monsters. Interface only: `sim.js` is unchanged.
 
 ### 2.20 — 2026-11-18
 - Frost towers and Sylvan roots now scale with the tower level. Frost: −20 % speed at level 1 up to −50 % at level 5 (was −50 % to −70 %), lasting 1.5 s to 2.7 s, with a blast radius growing from 1.2 to 2 tiles. Roots: −10 % at level 1 up to −30 % at level 5, lasting 0.72 s to 1.3 s.

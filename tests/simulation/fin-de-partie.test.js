@@ -24,7 +24,7 @@ test('Comportement constaté : plusieurs fuites simultanées font passer les vie
  for(let i=0;i<3;i++){const c=apparaitre(S,b,0);Object.assign(c,{x:6,y:16,tx:6,ty:16})}
  b.update(.05);assert.equal(b.lives,-2);G.step(.05);assert.equal(b.dead,1);
 });
-test('Statistiques de fin de partie (2.21) : tours posées, envois, monstres tués, revenu à chaque versement, moment de l\'élimination',()=>{const G=partie(S,{ia:[0,1,1,1]}),P=G.B[0];
+test('Statistiques de fin de partie (2.23) : tours posées, envois, monstres tués, revenu à chaque versement, moment de l\'élimination',()=>{const G=partie(S,{ia:[0,1,1,1]}),P=G.B[0];
  assert.equal(G.action(0,{type:'place',x:1,y:1,k:0}),'');assert.equal(G.action(0,{type:'send',k:0}),'');
  assert.equal(P.st.pose,1);assert.equal(P.st.env,1);assert.equal(P.st.envOr,S.CR[0].c);
  const c=apparaitre(S,P,0);c.hp=0;P.update(.05);assert.equal(P.st.tue,1);
