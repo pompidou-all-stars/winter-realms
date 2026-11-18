@@ -46,6 +46,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ### 2.18 — 2026-11-18
 - Ground monsters now move diagonally and at any angle: they take the shortest straight-line route (e.g. corner to corner along the diagonal) instead of only horizontal and vertical steps, without cutting through tower corners. They keep a small clearance from towers.
+- Monsters no longer pile up: nearby monsters push each other sideways only, never slowing anyone down, so they spread out without creating traffic jams.
 - The dotted path shows this new route, in 2D and 3D. A tower can no longer be placed right next to a ground monster; a tower placed in front of one makes it change its route.
 - `sim.js` changed (automatic server redeploy). The AI still plans its mazes with 4-direction lengths.
 

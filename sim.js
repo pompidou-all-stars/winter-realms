@@ -156,7 +156,7 @@ const GRID_MIN=12;
 /* ---------- chemin au sol en diagonale (depuis la 2.18) ----------
    Distances à la sortie sur 8 directions (diagonale = √2), sans couper le coin d'une tour : une diagonale exige que les deux cases voisines soient libres.
    Le monstre suit ensuite cette chaîne de cases en ligne droite, aussi loin qu'il voit (vue) : il peut donc prendre n'importe quel angle. */
-const DIR8=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]],S2=Math.SQRT2,MR=.3,VUE_MAX=16;
+const DIR8=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]],S2=Math.SQRT2,MR=.3,VUE_MAX=16,ESP=.75,ESP_V=1.5;
 const cel=(v,n)=>Math.max(0,Math.min(n-1,Math.floor(v+.5)));
 /* pas possible de (x, y) dans la direction (dx, dy) */
 function libre8(g,x,y,dx,dy){const a=x+dx,b=y+dy;return a>=0&&b>=0&&a<C&&b<R&&!g[b][a]&&(!(dx&&dy)||(!g[y][a]&&!g[b][x]))}
@@ -223,6 +223,17 @@ class Board{
   if(rad){const cg=this.cgOk&&this.cr.length>GRID_MIN?this.cg.near(p.tx-.5,p.ty-.5,rad+.5).map(n=>this.cr[n]):this.cr;for(const c of cg){if(c===tg||c.hid||(T.gr&&CR[c.k].fly)||Math.hypot(c.x+.5-p.tx,c.y+.5-flyH(c.k)-p.ty)>=rad)continue;this.hit(c,p.d*.6,T,p.sf)}
    this.fx.push({type:'boom',x:p.tx,y:p.ty,r:rad,t:.3,d:.3,col:T.sl?'#8fdcff':'#ffb347'});if(T.sp)this.ev.push('boom')}
   else this.fx.push({type:'ring',x:p.tx,y:p.ty,r:T.skin==3?.45:.26,t:.2,d:.2,col:T.skin==0?'#ffffff':'#e39bff'})}
+ /* espacement (depuis la 2.18) : deux monstres à moins de ESP case (au sol entre eux, volants entre eux) se poussent SUR LE CÔTÉ seulement,
+    perpendiculairement à leur marche, au plus ESP_V case/s. Personne n'est freiné ni repoussé en arrière : ils s'étalent sans jamais faire bouchon.
+    Un monstre qui en suit un autre dans la même file part d'un côté choisi selon son numéro. Au sol, le pas de côté garde MR case des tours. */
+ ecarter(dt){const L=this.cr,n=L.length;if(n<2||!(dt>0))return;const G=n>GRID_MIN&&(this.sg||(this.sg=new Grid())).fill(L),mv=[];
+  for(let i=0;i<n;i++){const c=L[i],F=!!CR[c.k].fly,hx=(F?EX[0]:c.tx)-c.x,hy=(F?EX[1]:c.ty)-c.y,h=Math.hypot(hx,hy);if(h<.05)continue;
+   const px=-hy/h,py=hx/h;let s=0;
+   for(const j of G?G.near(c.x,c.y,ESP):L.keys()){const o=L[j];if(o===c||!!CR[o.k].fly!==F)continue;const dx=c.x-o.x,dy=c.y-o.y,d=Math.hypot(dx,dy);if(d>=ESP)continue;
+    const w=(ESP-d)/ESP,lat=d>1e-3?(dx*px+dy*py)/d:0;s+=(lat+(Math.abs(lat)<.5?(c.id>o.id?.5:-.5):0))*w}
+   if(Math.abs(s)>1e-3)mv.push([c,F,px,py,Math.max(-1,Math.min(1,s))*ESP_V*dt])}
+  for(const[c,F,px,py,m]of mv){const nx=Math.max(0,Math.min(C-1,c.x+px*m)),ny=Math.max(0,Math.min(R-1,c.y+py*m));
+   if(F||(vue(this.g,c.x,c.y,nx,ny)&&vue(this.g,nx,ny,c.tx,c.ty))){c.x=nx;c.y=ny}}}
  update(dt){
   this.hurt=Math.max(0,this.hurt-dt);
   for(const s of this.q){s.t-=dt;if(s.t<=0){const hp=CR[s.k].hp*s.m*HPK;this.hpIn+=hp;if(CR[s.k].fly)this.flyIn+=hp;if(CR[s.k].inv)this.specSeen=1;this.cr.push({id:++UID,k:s.k,x:SP[0],y:SP[1],tx:SP[0],ty:SP[1],hp,max:hp,sl:0,sf:.5,f:1,ph:Math.random()*6,ox:(Math.random()-.5)*.3,oy:(Math.random()-.5)*.22,arm:(CR[s.k].arm||0)*s.m,cs:2})}}
@@ -244,6 +255,7 @@ class Board{
     if(dd<1e-4){if(c.tx==EX[0]&&c.ty==EX[1]){c.leak=1;break}
      const ox=c.tx,oy=c.ty;this.viser(c);if(c.tx==ox&&c.ty==oy)break;continue}
     const m=Math.min(sp,dd);c.x+=dx/dd*m;c.y+=dy/dd*m;sp-=m}}
+  this.ecarter(dt);
   this.pen*=Math.pow(.955,dt);const tot=this.d[SP[1]][SP[0]]||1;
   for(const c of this.cr){const pr=CR[c.k].fly?1-Math.hypot(EX[0]-c.x,EX[1]-c.y)/12:1-(this.d[c.ty][c.tx]+Math.hypot(c.tx-c.x,c.ty-c.y))/tot;if(pr>this.pen)this.pen=pr}
   /* tours et explosions : seuls les monstres des cases à portée sont examinés (grille remplie une fois par pas, les monstres ne bougent plus ensuite) */
