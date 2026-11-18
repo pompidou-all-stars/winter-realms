@@ -1,5 +1,5 @@
 {
-  "_lisezmoi": "Source de la bibliothèque sonore : chaque entrée garde la consigne envoyée à ElevenLabs (modèle eleven_text_to_sound_v2 pour les bruitages, eleven_v4 pour les voix). Les fichiers produits sont assets/audio/<dossier>/<id>-<n>.mp3. Ne pas retoucher les fichiers à la main : régénérer depuis la consigne.",
+  "_lisezmoi": "Source de la bibliothèque sonore : chaque bruitage garde sa consigne (p), sa durée (dur), son nombre de variantes (n) et, au besoin, des mots à éviter (neg) ; il est généré en local par art/sons/bruitages.py (Stable Audio Open). Les répliques sont générées par art/sons/voix.py (Chatterbox). Fichiers produits : assets/audio/<dossier>/<id>-<n>.mp3. Ne pas retoucher les fichiers à la main : régénérer depuis la consigne.",
   "factions": [
     "alliance",
     "horde",
@@ -39,181 +39,211 @@
       "id": "tir-arrow-alliance",
       "dur": 0.8,
       "n": 3,
-      "p": "Steel crossbow bolt shot, crisp mechanical snap and fast whoosh, close-mic, dry, fantasy game sound effect, no music"
+      "p": "Heavy steel crossbow firing, hard mechanical snap and powerful bolt whoosh, tight close-mic, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-arrow-horde",
       "dur": 0.8,
       "n": 3,
-      "p": "Crude bone bow shot, heavy wooden twang and rough whoosh, close-mic, dry, fantasy game sound effect, no music"
+      "p": "Brutal war bow loosing a heavy arrow, thick sinew string thrum and deep rough whoosh, close-mic, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-arrow-sylvestres",
       "dur": 0.8,
       "n": 3,
-      "p": "Light elven bow shot, delicate string pluck and airy leafy whoosh, close-mic, dry, fantasy game sound effect, no music"
+      "p": "Elven longbow arrow release, taut string snap and sharp fast whistle cutting the air, close-mic, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-arrow-nains",
       "dur": 0.8,
       "n": 3,
-      "p": "Small dwarven mechanical ballista shot, metal gear clack and spring thwack, close-mic, dry, fantasy game sound effect, no music"
+      "p": "Dwarven steel ballista firing, heavy iron lever slam and thick bolt thwack, close-mic, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-arrow-legion",
       "dur": 0.8,
       "n": 3,
-      "p": "Cursed dark arrow shot, bowstring twang with a hissing ghostly whisper trail, close-mic, fantasy game sound effect, no music"
+      "p": "Black arrow loosed from a cursed bow, hard string crack and a dark hissing whoosh, close-mic, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-slash-alliance",
       "dur": 0.7,
       "n": 3,
-      "p": "Knight longsword slash, clean steel swish and armored clank, close-mic, dry, fantasy game sound effect, no music"
+      "p": "Knight longsword strike on armor, sharp steel swing and ringing metal impact clang, close-mic, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-slash-horde",
       "dur": 0.7,
       "n": 3,
-      "p": "Brutal battle axe chop, heavy swing whoosh and a clean meaty thud, no distortion, moderate level, dry, fantasy game sound effect, no music"
+      "p": "Massive orc war axe chop, heavy swing and brutal bone-crunching flesh impact, close-mic, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-slash-sylvestres",
       "dur": 0.7,
       "n": 3,
-      "p": "Wooden staff strike with whipping vines, swift swish and leaf rustle, close-mic, fantasy game sound effect, no music"
+      "p": "Heavy ironwood staff blow, fast swing and hard wooden crack on armor, close-mic, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-slash-nains",
       "dur": 0.7,
       "n": 3,
-      "p": "Heavy war hammer strike on metal, mechanical piston clank, close-mic, dry, fantasy game sound effect, no music"
+      "p": "Dwarven war hammer smashing steel, heavy swing and crushing metal anvil impact, close-mic, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-slash-legion",
       "dur": 0.7,
       "n": 3,
-      "p": "Spectral scythe slash, cold ghostly swish with eerie metallic ring, close-mic, fantasy game sound effect, no music"
+      "p": "Dark reaper scythe slash, cold steel swing and wet cutting impact, close-mic, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-frost-alliance",
       "dur": 1,
       "n": 3,
-      "p": "Ice crystal spell burst with a bright holy chime and freezing crackle, fantasy game sound effect, no music"
+      "p": "Frost spell impact, sharp ice shards shattering and freezing crackle, cold blast, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-frost-horde",
       "dur": 1,
       "n": 3,
-      "p": "Frost totem shamanic ice blast, hollow wooden thump and ice crackle, fantasy game sound effect, no music"
+      "p": "Shamanic ice blast, deep thump followed by cracking ice and freezing wind, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-frost-sylvestres",
       "dur": 1,
       "n": 3,
-      "p": "Dewdrop frost magic, soft crystalline tinkle and gentle freezing shimmer, fantasy game sound effect, no music"
+      "p": "Freezing nature magic, ice spreading fast with sharp crystalline cracks and cold gust, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-frost-nains",
       "dur": 1,
       "n": 3,
-      "p": "Cryo machine blast, pressurized steam hiss and ice crackle, metallic, fantasy game sound effect, no music"
+      "p": "Cryo cannon blast, high pressure steam burst and ice cracking on metal, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-frost-legion",
       "dur": 1,
       "n": 3,
-      "p": "Cursed frost spell, dark icy crackle with a ghostly whoosh, fantasy game sound effect, no music"
+      "p": "Cursed frost spell, deep dark icy crack and an ominous cold wind rush, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-canon-alliance",
       "dur": 1,
       "n": 3,
-      "p": "Royal bronze cannon shot, sharp powerful boom with short echo, fantasy game sound effect, no music"
+      "p": "Bronze siege cannon firing, deep powerful boom with sharp crack and short battlefield echo, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-canon-horde",
       "dur": 1,
       "n": 3,
-      "p": "Crude clan cannon blast, rough heavy boom with rattling wood, fantasy game sound effect, no music"
+      "p": "Crude iron cannon blast, heavy brutal boom with rattling chains and wood, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-canon-sylvestres",
       "dur": 1,
       "n": 3,
-      "p": "Explosive seed pod launched from a giant flower, deep organic pop and whoosh, fantasy game sound effect, no music"
+      "p": "Siege catapult launch, heavy wooden arm slam and deep whoosh of a flung boulder, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-canon-nains",
       "dur": 1,
       "n": 3,
-      "p": "Runic mortar shot, deep metallic thump and gear rattle, fantasy game sound effect, no music"
+      "p": "Dwarven mortar firing, deep thunderous thump and heavy iron recoil clank, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-canon-legion",
       "dur": 1,
       "n": 3,
-      "p": "Infernal mortar shot, deep dark boom with a demonic rumble, fantasy game sound effect, no music"
+      "p": "Infernal siege mortar firing, deep dark boom with a rumbling hellish tail, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-mage-alliance",
       "dur": 1.2,
       "n": 3,
-      "p": "Holy light magic bolt cast, bright shimmering chime swell then sharp whoosh release, sparkling, fantasy spell game sound effect, no music"
+      "p": "Arcane light bolt cast, fast energy charge then powerful blast release with crackle, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-mage-horde",
       "dur": 1.2,
       "n": 3,
-      "p": "Shaman fire spell cast, roaring flame burst and tribal bone rattle, fantasy spell game sound effect, no music"
+      "p": "Shaman fireball cast, fierce roaring fire burst and explosive whoosh, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-mage-sylvestres",
       "dur": 1.2,
       "n": 3,
-      "p": "Druid nature magic cast, sparkling chimes and rustling leaves whoosh, fantasy spell game sound effect, no music"
+      "p": "Druid magic bolt, deep earthy energy surge and sharp release with crackling sparks, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-mage-nains",
       "dur": 1.2,
       "n": 3,
-      "p": "Arcane cannon energy shot, electric hum charge and crackling zap, fantasy game sound effect, no music"
+      "p": "Runic energy cannon shot, heavy electric charge and violent lightning crack, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-mage-legion",
       "dur": 1.2,
       "n": 3,
-      "p": "Void magic bolt, deep distorted whoosh with a sinister whisper, dark fantasy spell sound effect, no music"
+      "p": "Shadow magic bolt, deep sinister energy surge and dark violent blast, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-flame-alliance",
       "dur": 1,
       "n": 2,
-      "p": "Short burst of griffin flame breath, roaring fire whoosh, fantasy game sound effect, no music"
+      "p": "Short burst of fire breath, fierce roaring flame jet, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-flame-horde",
       "dur": 1,
       "n": 2,
-      "p": "Short war furnace fire blast, harsh roaring flames and crackle, fantasy game sound effect, no music"
+      "p": "Short war furnace fire blast, harsh roaring flames and heavy crackle, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-flame-sylvestres",
       "dur": 1,
       "n": 2,
-      "p": "Short burst of burning heartwood fire, crackling wood flames whoosh, fantasy game sound effect, no music"
+      "p": "Short burst of burning wood fire, violent crackling flames whoosh, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-flame-nains",
       "dur": 1,
       "n": 2,
-      "p": "Short forge flamethrower burst, pressurized gas roar and crackle, fantasy game sound effect, no music"
+      "p": "Short flamethrower burst, pressurized fuel roar and hard ignition, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "tir-flame-legion",
       "dur": 1,
       "n": 2,
-      "p": "Short lava eruption burst, bubbling magma roar with a dark rumble, fantasy game sound effect, no music"
+      "p": "Short hellfire eruption, deep roaring flames and bubbling magma rumble, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "chantier-alliance",
@@ -309,85 +339,99 @@
       "id": "boom",
       "dur": 1.3,
       "n": 3,
-      "p": "Cannonball explosion on frozen ground, punchy deep boom, ice shards and debris scatter, short tail, game sound effect, no music"
+      "p": "Cannonball explosion on frozen ground, heavy deep boom, debris and ice shards scattering, short tail, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "mort-gobelin",
       "dur": 1,
       "n": 3,
-      "p": "Small goblin creature death squeal, short and comedic, creature vocalization, no words, no music"
+      "p": "Goblin warrior death cry, short raspy pained shriek cut off, gruesome, creature vocalization, no words, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "mort-bete",
       "dur": 1,
       "n": 3,
-      "p": "Wolf beast death yelp and whimper, short, creature vocalization, no music"
+      "p": "Dire wolf death, vicious snarl turning into a pained dying howl, creature vocalization, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "mort-orc",
       "dur": 1,
       "n": 3,
-      "p": "Orc warrior death groan, deep guttural and short, creature vocalization, no words, no music"
+      "p": "Orc warrior death, deep guttural agonized groan and a heavy body falling, creature vocalization, no words, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "mort-geant",
       "dur": 1.3,
       "n": 3,
-      "p": "Huge giant creature death roar fading out, deep and heavy, creature vocalization, no words, no music"
+      "p": "Troll death, huge deep agonized bellow fading, heavy body crashing to the ground, creature vocalization, no words, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "mort-pierre",
       "dur": 1.2,
       "n": 3,
-      "p": "Stone golem crumbling apart, rocks cracking and tumbling to the ground, game sound effect, no music"
+      "p": "Stone golem shattering, heavy rock cracking, crumbling and crashing down, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "mort-volant",
       "dur": 1,
       "n": 3,
-      "p": "Flying creature death screech with fluttering wings falling, short, game sound effect, no music"
+      "p": "Giant bat creature death, harsh dark screech and leathery wings collapsing, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "mort-dragon",
       "dur": 1.5,
       "n": 2,
-      "p": "Dragon death roar, huge and fading into a low growl, creature vocalization, no music"
+      "p": "Dragon death, enormous deep agonized roar fading into a dying rumble, creature vocalization, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "mort-magique",
       "dur": 1,
       "n": 3,
-      "p": "Ghostly spirit dissipating with an ethereal sigh and soft magical shimmer, game sound effect, no music"
+      "p": "Dark spirit death, distorted ghostly wail fading into a cold dark whoosh, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "mort-gelee",
       "dur": 0.8,
       "n": 3,
-      "p": "Slime creature bursting, wet squelchy splat, game sound effect, no music"
+      "p": "Monstrous slime death, thick wet visceral burst and splatter, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "mort-heros",
       "dur": 1.8,
       "n": 2,
-      "p": "Mighty warlord final death roar and heavy armor clattering to the ground, no words, no music"
+      "p": "Warlord death, deep agonized battle roar and heavy plate armor crashing to the ground, no words, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "arrivee-heros",
       "dur": 2,
       "n": 2,
-      "p": "Menacing warlord battle roar with heavy armor clank, boss arrival, no words, no music"
+      "p": "Warlord arrival, deep menacing war cry and war horn blast, heavy armor, no words, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "arrivee-dragon",
       "dur": 2,
       "n": 2,
-      "p": "Dragon roar in the distance with large wing flaps, boss arrival, no music"
+      "p": "Dragon arrival, terrifying deep roar and huge wing beats overhead, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "arrivee-cyc",
       "dur": 2,
       "n": 2,
-      "p": "Giant cyclops angry roar with heavy ground-shaking footstep, boss arrival, no words, no music"
+      "p": "Cyclops arrival, monstrous deep roar and earth-shaking heavy footsteps, dark fantasy, menacing, cinematic, realistic, no music",
+      "neg": "cartoon, comedic, cute, childish, squeaky, funny, toy, whimsical, chipmunk, high-pitched"
     },
     {
       "id": "warn",
@@ -399,7 +443,8 @@
       "id": "zap",
       "dur": 0.8,
       "n": 2,
-      "p": "Electric sabotage zap, short crackling spark and metal clank, game sound effect, no music"
+      "p": "Sabotage strike, violent electric crackle and heavy metal clank, gritty, punchy, cinematic dark fantasy battle sound effect, realistic, no music",
+      "neg": "cartoon, comedic, cute, toy, whimsical, video game bleep, chiptune, high-pitched squeak"
     },
     {
       "id": "leak",
