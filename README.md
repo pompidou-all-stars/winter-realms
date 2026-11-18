@@ -64,6 +64,10 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.26 — terrain immersif — 2026-11-18
+- More immersive 3D terrain: a less distorted camera (34° field of view instead of 48°), 20% closer, and you can no longer pan far away from the board. The board is now part of a continuous winter landscape, told apart only by its grid: relief around it (the board itself stays flat), patches of grass and melted snow, snow grain, a forest of tall snowy pines, rocks, a gradient sky, distant mountains and haze.
+- 3D renderer only: `sim.js` is unchanged (no server redeploy).
+
 ### 2.25 — 2026-11-18
 - Organisation: **roadmap** at the top of this README (improvement ideas with a status) and an “Idée d'amélioration” issue form to propose new ones. No need to run the simulation tests when a change cannot affect gameplay (docs, project rules). No game change.
 - Ground monsters now move diagonally and at any angle: they take the shortest straight-line route (e.g. corner to corner along the diagonal) instead of only horizontal and vertical steps, without cutting through tower corners. They keep a small clearance from towers.
