@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.17</title>
+<title>Winter Realms — Tower Wars · Édition 2.18</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -121,6 +121,63 @@ body.r2d .fleche{display:none}
 @media (orientation:landscape) and (pointer:coarse) and (max-height:540px){#tourner{display:flex}}
 .rondbtn:focus-visible,.fleche:focus-visible,#cartesBtn:focus-visible,#banner:focus-visible,.chip:focus-visible,#bar button:focus-visible,#tabs button:focus-visible,#paliers button:focus-visible,#menu button:focus-visible,#fiche button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){#bar.mon button.sel:after,#bar button.tape,#gold.pop{animation:none}}
+/* ===== 2.18 : habillage « givre » sur l'interface vue tactique =====
+   Retour des textures gelées et des cadres à volutes de la 2.12, disposés comme la console d'un jeu de stratégie :
+   une barre de ressources en haut et une console en bas, en verre de nuit givré, bordées d'une frise d'argent à gemme de glace ;
+   cartes carrées serties (argent, or quand elle est choisie, rouge pour les monstres), prix en médaillon, boutons en métal bleuté.
+   Univers propre au jeu (givre elfique), tout en SVG et CSS dans le code. */
+:root{--orne-argent:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M30 3H34M30 61H34M3 30V34M61 30V34' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M30 8H34M30 56H34M8 30V34M56 30V34' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cg%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23d9ecff' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%238fb6d9' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23d9ecff' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23d9ecff' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%238fb6d9' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%239be7ff' stroke='%23d9ecff' stroke-width='.8'/%3E%3C/g%3E%3C/svg%3E");--orne-or:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M30 3H34M30 61H34M3 30V34M61 30V34' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M30 8H34M30 56H34M8 30V34M56 30V34' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cg%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffe597' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c9a24a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffe597' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffe597' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c9a24a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23fff3b0' stroke='%23ffe597' stroke-width='.8'/%3E%3C/g%3E%3C/svg%3E");--orne-rouge:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64' viewBox='0 0 64 64'%3E%3Cpath d='M30 3H34M30 61H34M3 30V34M61 30V34' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M30 8H34M30 56H34M8 30V34M56 30V34' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cg%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 0) scale(-1 1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(0 64) scale(1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3Cg transform='translate(64 64) scale(-1 -1)'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cpath d='M3 30 C3 13 13 3 30 3' stroke='%23ffc2b0' stroke-width='2.2'/%3E%3Cpath d='M8 30 C8 17 17 8 30 8' stroke='%23c8574a' stroke-width='.9' opacity='.8'/%3E%3Cpath d='M3 30 C6 22 12 19 17 22 C21 25 18 30 14 29' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3Cpath d='M30 3 C22 6 19 12 22 17 C25 21 30 18 29 14' stroke='%23ffc2b0' stroke-width='1.3'/%3E%3C/g%3E%3Cpath d='M9 9 C13 4 20 4 22 6 C20 10 13 13 9 9z' fill='%23c8574a' opacity='.75'/%3E%3Ccircle cx='11' cy='11' r='2.6' fill='%23ffd9c9' stroke='%23ffc2b0' stroke-width='.8'/%3E%3C/g%3E%3C/svg%3E");--givre:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6 .18' numOctaves='2' seed='7'/%3E%3CfeColorMatrix values='0 0 0 0 .85  0 0 0 0 .93  0 0 0 0 1  0 0 0 .7 -.38'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23f)'/%3E%3C/svg%3E")}
+:root{--frise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='16' viewBox='0 0 96 16'%3E%3Cpath d='M0 7H96' stroke='%23d9ecff' stroke-width='1.6'/%3E%3Cpath d='M0 11H96' stroke='%238fb6d9' stroke-width='.8' opacity='.7'/%3E%3Cpath d='M34 7C39 1 44 1 48 4C52 1 57 1 62 7' fill='none' stroke='%23d9ecff' stroke-width='1.2'/%3E%3Cpath d='M48 1.5L52.5 7.5L48 13.5L43.5 7.5Z' fill='%239be7ff' stroke='%23eaf6ff' stroke-width='.8'/%3E%3Cpath d='M8 7C12 3.5 17 3.5 20 7M76 7C79 3.5 84 3.5 88 7' fill='none' stroke='%238fb6d9' stroke-width='1'/%3E%3C/svg%3E");
+ --verre-nuit:linear-gradient(180deg,#1d3150f2,#0f1a2ef2)}
+/* le terrain : un léger voile de froid sur les bords */
+#stage::after{content:'';position:absolute;inset:0;pointer-events:none;z-index:2;box-shadow:inset 0 0 46px #bfe3ff24,inset 0 0 4px #d9ecff40}
+/* barre de ressources : bande de verre givré sur toute la largeur, frise d'argent dessous */
+#hud{left:0;right:0;top:0;padding:calc(6px + env(safe-area-inset-top,0px)) calc(8px + env(safe-area-inset-right,0px)) 9px calc(8px + env(safe-area-inset-left,0px));
+ background-image:var(--givre),linear-gradient(180deg,#0b1526f7,#172a45f2);background-size:180px,auto;box-shadow:0 6px 16px #000a}
+#hud:after{content:'';position:absolute;left:0;right:0;bottom:-8px;height:16px;background:var(--frise) repeat-x center/96px 16px;pointer-events:none}
+/* ressources : pierres de lune serties dans la barre */
+.pastille{border-radius:7px;background:linear-gradient(180deg,#07101e,#0d1a2e);border:1px solid #8fb6d955;box-shadow:inset 0 2px 4px #000c,0 1px 0 #ffffff1a;backdrop-filter:none}
+/* boutons ronds en métal bleuté */
+.rondbtn,.fleche{background:radial-gradient(circle at 50% 30%,#4a6e9e,#1a2c4c 70%);border:1px solid #d9ecffaa;box-shadow:inset 0 1px 0 #ffffff40,0 0 0 2px #0a1322,0 0 0 3px #c9a24a88,0 3px 8px #000a}
+/* boutons et panneaux sertis : verre de nuit givré, cadre d'argent à volutes (or pour le choix, rouge pour les monstres) */
+#cartesBtn,#chips,#fiche,#tabs button,#paliers button,#menu .menu,#menu button{background-image:var(--givre),var(--verre-nuit);background-size:180px,auto;border:1px solid #8fb6d955}
+#fiche,#tabs button,#paliers button,#menu .menu,#menu button{position:relative}
+#cartesBtn:after,#chips:after,#fiche:after,#tabs button:after,#menu .menu:after,#bar button:before{content:'';position:absolute;inset:-3px;border:12px solid transparent;border-image:var(--orne-argent) 32 / 12px / 0 stretch;pointer-events:none}
+#cartesBtn{top:calc(54px + env(safe-area-inset-top,0px));border-radius:5px;border-color:var(--c,#8fb6d955);color:var(--c,var(--ink))}
+#cartesBtn:after{border-width:10px;border-image-width:10px}
+#chips{top:calc(96px + env(safe-area-inset-top,0px));border-radius:6px}
+#astuce{top:calc(100px + env(safe-area-inset-top,0px))}
+.chip{border-radius:5px;background:linear-gradient(180deg,#07101e,#0d1a2e);box-shadow:inset 0 2px 4px #000a}
+/* console du bas : onglets, paliers et cartes sur une dalle de verre givré, frise d'argent dessus ; la fiche flotte au-dessus */
+#ctl{padding:0;gap:10px;background:none}
+#fiche{margin:0 calc(8px + env(safe-area-inset-right,0px)) 0 calc(8px + env(safe-area-inset-left,0px));border-radius:6px}
+#fiche.envoyer{background-image:var(--givre),linear-gradient(180deg,#3a1d1af2,#22100ef2)}
+#fiche.envoyer:after{border-image-source:var(--orne-rouge)}
+#console{position:relative;display:flex;flex-direction:column;gap:7px;padding:12px calc(8px + env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) calc(8px + env(safe-area-inset-left,0px));
+ background-image:var(--givre),linear-gradient(180deg,#172a45f5,#0a1322fa);background-size:180px,auto;box-shadow:0 -6px 18px #000a}
+#console:before{content:'';position:absolute;left:0;right:0;top:-8px;height:16px;background:var(--frise) repeat-x center/96px 16px;pointer-events:none}
+#tabs button{border-radius:5px;color:var(--ink);text-shadow:0 1px 0 #000a;box-shadow:inset 0 1px 0 #ffffff1f,0 2px 0 #000a}
+#tabs button:after{border-width:10px;border-image-width:10px}
+#tabs button.on{background-image:var(--givre),var(--or-fond);color:#3a2205;text-shadow:0 1px 0 #fff6}
+#tabs button.on:after{border-image-source:var(--orne-or)}
+#tabs button.mon.on{background-image:var(--givre),linear-gradient(180deg,#f07a52,#c2401f 55%,#8a2410);color:#fff;text-shadow:0 1px 0 #0008}
+#tabs button.mon.on:after{border-image-source:var(--orne-rouge)}
+#paliers button{border-radius:4px}
+#paliers button.on{background-image:var(--givre),linear-gradient(180deg,#3a5078,#1f3152);border-color:var(--gold)}
+/* cartes : emplacements carrés sertis, icône sur fond de glace, prix en médaillon posé sur le cadre */
+#bar{gap:8px;padding:4px 3px 3px;min-height:72px}
+#bar button{flex:0 0 62px;height:64px;padding:2px 0 0;border-radius:5px;border:1px solid #8fb6d955;background-image:var(--givre),radial-gradient(ellipse at 50% 28%,#2d4a74,#0f1a2e 72%);background-size:180px,auto}
+#bar button:before{inset:-2px;border-width:10px;border-image-width:10px}
+#bar.mon button{background-image:var(--givre),radial-gradient(ellipse at 50% 28%,#5a2a24,#1e0f0d 72%)}
+#bar.mon button:before{border-image-source:var(--orne-rouge)}
+#bar button.sel{background-image:var(--givre),radial-gradient(ellipse at 50% 28%,#5b7fae,#1a2c4c 72%);border-color:#ffe597;box-shadow:0 0 12px #f2c14e66,inset 0 0 10px #f2c14e33}
+#bar button.sel:before{border-image-source:var(--orne-or)}
+#bar button small{position:absolute;left:50%;bottom:-3px;transform:translateX(-50%);z-index:1;white-space:nowrap;padding:0 6px;border-radius:9px;background:#060c18f0;border:1px solid #c9a24a99;box-shadow:0 1px 3px #000a}
+/* menu */
+#menu .menu{border-radius:6px}
+#menu button{border-radius:5px;box-shadow:inset 0 1px 0 #ffffff1f,0 2px 0 #000a}
+#menu button.principal{background-image:var(--givre),var(--or-fond);color:#3a2205}
+#menu button.danger{background-image:var(--givre),linear-gradient(180deg,#3a1d1af2,#22100ef2)}
 
 /* ===== Écran d'accueil (2.11) : menu de jeu vidéo, nuit d'hiver, montagnes et neige ===== */
 #ov{position:fixed;z-index:1000;inset:0;background:linear-gradient(180deg,#060b18 0%,#0e1c36 40%,#1b3358 75%,#2b4a72 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(22px + env(safe-area-inset-bottom,0px));text-align:center;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
@@ -221,9 +278,11 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
   <div id="toast" hidden></div>
   <div id="ctl">
    <div id="fiche" hidden></div>
+   <div id="console">
    <div id="tabs"><button data-t="t" class="tw on" type="button">🏰 Tours</button><span class="sep"></span><button data-t="n" class="mon" type="button">Sol</button><button data-t="f" class="mon" type="button">Volants</button><button data-t="s" class="mon" type="button">Spéciaux</button></div>
    <div id="paliers" hidden></div>
    <div id="bar"></div>
+   </div>
   </div>
   <div id="menu" hidden role="dialog" aria-modal="true" aria-labelledby="menuTitre"><div class="menu">
    <div class="titre-menu" id="menuTitre">Menu</div>
@@ -718,8 +777,10 @@ const VUE={z:1,ox:0,oy:0,w:0,h:0};let cadre='#c9a24a';
 /* 2.7 : rendu 3D, chargé à la demande (module rendu3d.js). Depuis la 2.8, c'est le rendu par défaut ; ?rendu=2d garde la 2D. */
 const R3D={on:QS.get('rendu')!='2d',api:null,echec:false};
 if(!R3D.on)document.body.classList.add('r2d');
-/* bandes couvertes par l'interface : le bandeau en haut, et en bas le dock sans la fiche (onglets et cartes, toujours de la même hauteur) */
-function bandes(){const r=stage.getBoundingClientRect();return {haut:Math.round($('hud').getBoundingClientRect().bottom-r.top)+8,bas:Math.max(110,Math.round(r.bottom-bar.getBoundingClientRect().top)+46)}}
+/* bandes couvertes par l'interface : la barre du haut, et en bas la console sans la fiche ni la ligne des paliers
+   (onglets et cartes : toujours la même hauteur, quel que soit l'onglet ouvert) ; +8 pour les frises */
+function bandes(){const r=stage.getBoundingClientRect(),pa=$('paliers'),ph=pa.hidden?0:pa.offsetHeight+7;
+ return {haut:Math.round($('hud').getBoundingClientRect().bottom-r.top)+8,bas:Math.max(110,Math.round(r.bottom-$('console').getBoundingClientRect().top)-ph+8)}}
 function fit(){const r=stage.getBoundingClientRect(),{haut,bas}=bandes();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);mx=setup(main,VUE.w,VUE.h);
  cell=Math.max(12,Math.floor(Math.min((VUE.w-12)/C,(VUE.h-haut-bas-12)/R)));VUE.ox=(VUE.w-C*cell)/2;VUE.oy=haut+Math.max(0,(VUE.h-haut-bas-R*cell)/2);
  if(R3D.api){R3D.api.taille(VUE.w,VUE.h,dpr());R3D.api.cadre({w:VUE.w,h:VUE.h,haut,bas})}}
