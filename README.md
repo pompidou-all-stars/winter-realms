@@ -44,12 +44,17 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.23 — 2026-11-18
+### 2.24 — 2026-11-18
 - Ground monsters now move diagonally and at any angle: they take the shortest straight-line route (e.g. corner to corner along the diagonal) instead of only horizontal and vertical steps, without cutting through tower corners. They keep a small clearance from towers.
 - Monsters no longer pile up: nearby monsters push each other sideways only, never slowing anyone down, so they spread out without creating traffic jams.
 - The AI plans its mazes with the same rules (8 directions, no corner cutting), so its walls are judged by the path monsters really take; diagonal walls (towers touching by a corner) now count.
 - The dotted path shows this new route, in 2D and 3D. A tower can no longer be placed right next to a ground monster; a tower placed in front of one makes it change its route.
 - `sim.js` changed (automatic server redeploy).
+
+### 2.23 — 2026-11-18
+- End of game (solo): a window shows Victory/Defeat with stats for the 4 players (rank, towers, maze length, waves sent, monsters killed, final income), an income curve over the game and a personal summary.
+- “Regarder la carte” lets you walk around the frozen mazes (drag, rotate, switch board, tap a tower to see it); “Quitter” goes back to the replay screen. Tap a player in the table to look at their maze.
+- `sim.js`: stat counters per board (`Board.st`), no effect on gameplay (server redeploys automatically).
 
 ### 2.22 — 2026-11-18
 - The 3D view is now the only view offered: the "Jouer en vue 2D (classique)" link is gone from the home screen. The 2D renderer stays as a fallback when WebGL is missing and for the tests (`?rendu=2d` still works).
