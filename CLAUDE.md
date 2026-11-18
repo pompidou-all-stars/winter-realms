@@ -21,6 +21,8 @@ Concrètement :
    - au début de la ligne du **Journal des modifications** : `**<titre>** : …` ;
    - dans le titre de la section du `README.md` : `### X.Y — <titre> — <date>`.
 
+7. **Feuille de route** (en tête du `README.md`) : si l'évolution réalise ou commence une idée de la feuille de route, mettre à jour son statut (🛠️ en cours, ✅ fait). Les nouvelles idées arrivent par le formulaire « Idée d'amélioration » (`.github/ISSUE_TEMPLATE/idee.yml`, étiquette `idée`) ou par une ligne ajoutée au tableau.
+
 Claude : quand tu modifies le jeu, applique cette règle sans qu'on te le demande.
 
 ## ⚠️ Règle de commits réguliers (obligatoire)
@@ -837,3 +839,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-18 | 2.25 | **Monstres espacés** (§3, `Board.ecarter`) : les monstres proches (moins de 0,75 case) se poussent sur le côté seulement, au plus 1,5 case/s, sans jamais être freinés : ils ne se superposent plus (chevauchements de 3 % à 0 % des paires dans un essai à 40 monstres) et le temps de trajet est inchangé, donc pas de bouchon. Les volants s'écartent aussi entre eux. `sim.js` modifié (redéploiement automatique du serveur). Deux tests ajoutés à `deplacements`. |
 | 2026-11-18 | 2.25 | **IA adaptée aux déplacements en diagonale** (§8) : la longueur du chemin de ses plans (`plen`, `mzPath`) suit les règles des monstres (8 directions sans couper les coins, coûts 5 et 7, algorithme de Dial) et la recherche locale peut ajouter des segments en diagonale. Mesuré sur 30 graines avec le vrai chemin : à 40 tours, 56,1 → 57,0 cases en Normal et 59,0 → 61,1 en Brutal ; plan complet 89 → 95 cases en Brutal. Génération ≈ 60 à 75 ms (au lieu de 30 à 40), par tranches de 5 ms au plus ; garde-fou du test `labyrinthe` porté de 100 à 150 ms au total (10 ms par tranche inchangé). `sim.js` modifié (redéploiement automatique du serveur). |
 | 2026-11-18 | 2.25 | Organisation : **titre court pour chaque version** (règle de maintenance n°6) : 2 à 4 mots qui résument la version (par exemple « exploration fin de partie » pour la 2.23), repris dans le commit, la PR, le journal et le `README.md`. **Aucun changement de jeu.** |
+| 2026-11-18 | 2.25 | **feuille de route** : tableau des idées d'améliorations en tête du `README.md` (IA, difficulté, tours, factions, quêtes bonus, pouvoirs du palier 3, correctif du défilement sur PC), avec un statut par idée, et formulaire GitHub « Idée d'amélioration » (`.github/ISSUE_TEMPLATE/idee.yml`) pour en proposer. Règle de maintenance n°7. **Aucun changement de jeu.** |
