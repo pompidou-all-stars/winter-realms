@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.16</title>
+<title>Winter Realms — Tower Wars · Édition 2.17</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -988,10 +988,18 @@ function playEvents(){for(const b of B){for(const e of b.ev){if(e[0]=='!'){if(b=
    - mort d'un monstre : le nuage « puff » porte la couleur du monstre, qui donne sa famille sonore ;
    - arrivée d'un boss : le nombre de héros, dragons ou cyclopes du terrain augmente ;
    - fin d'un chantier du joueur : t.b passe à 0 (construction terminée, ou amélioration si niveau > 1). */
-const FAM_SON={gob:'gobelin',sapper:'gobelin',wolf:'bete',turtle:'bete',orc:'orc',chaman:'orc',breaker:'orc',troll:'geant',cyc:'geant',golem:'pierre',
- bat:'volant',griffon:'volant',dragon:'dragon',healer:'magique',spectre:'magique',slime:'gelee',hero:'heros'};
+/* les 72 clés de monstres (CR[…].g, paliers depuis la 2.13) rangées dans les 10 familles de cris de mort */
+const FAM_SON={gob:'gobelin',sapper:'gobelin',gobking:'gobelin',kobold:'gobelin',imp:'gobelin',engineer:'gobelin',rat:'gobelin',
+ wolf:'bete',boar:'bete',bear:'bete',werewolf:'bete',rhino:'bete',mammoth:'bete',turtle:'bete',beetle:'bete',lizard:'bete',centaur:'bete',nightmare:'bete',manticore:'bete',chimera:'bete',
+ orc:'orc',raider:'orc',gnoll:'orc',chaman:'orc',breaker:'orc',drummer:'orc',warlord:'orc',knight:'orc',assassin:'orc',inquisitor:'orc',herald:'orc',
+ troll:'geant',yeti:'geant',ogre:'geant',minotaur:'geant',cyc:'geant',giant:'geant',wendigo:'geant',behemoth:'geant',demon:'geant',treant:'geant',
+ golem:'pierre',automaton:'pierre',mudgolem:'pierre',lavagolem:'pierre',juggernaut:'pierre',colossus:'pierre',gargoyle:'pierre',thunder:'pierre',dragonturtle:'pierre',
+ bat:'volant',wasp:'volant',harpy:'volant',griffon:'volant',roc:'volant',phoenix:'volant',
+ dragon:'dragon',wyvern:'dragon',wyrm:'dragon',hydra:'dragon',
+ healer:'magique',spectre:'magique',skel:'magique',lich:'magique',druid:'magique',bloodpriest:'magique',reaper:'magique',fireel:'magique',manaeater:'magique',myco:'magique',
+ slime:'gelee',hero:'heros'};
 const COL_SON={};for(const T of CR)if(!COL_SON[T.col])COL_SON[T.col]=FAM_SON[T.g];
-const BOSS_SON={hero:'arrivee-heros',dragon:'arrivee-dragon',cyc:'arrivee-cyc'},vusFx=new WeakSet();let obsVue=-1,obsBoss={},obsChantier={};
+const BOSS_SON={hero:'arrivee-heros',dragon:'arrivee-dragon',hydra:'arrivee-dragon',wyrm:'arrivee-dragon',cyc:'arrivee-cyc',giant:'arrivee-cyc',behemoth:'arrivee-cyc',colossus:'arrivee-cyc'},vusFx=new WeakSet();let obsVue=-1,obsBoss={},obsChantier={};
 function ecouterSons(){if(!AC||muted||!window.SON)return;const b=VB();
  if(obsVue!==view){obsVue=view;obsBoss={};for(const f of b.fx)vusFx.add(f)}
  for(const f of b.fx)if(f.type=='puff'&&!vusFx.has(f)){vusFx.add(f);const fam=COL_SON[f.col];if(fam)son('mort-'+fam,{ecart:90})}

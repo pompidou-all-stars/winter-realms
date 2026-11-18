@@ -44,6 +44,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.17 — 2026-11-18
+- Sound library: about 230 MP3 files generated locally for free (Stable Audio Open for sound effects, Chatterbox for voices, both usable commercially): tower shots per faction, construction, deaths of all 72 monsters, boss arrivals, interface, winter and battle ambiences, and 55 comic voice lines (11 per faction) in the designer's recorded voices.
+- New `audio.js` engine (preloading, variants, priorities, one voice at a time); the synthesized sounds remain as a fallback, and `?son=synth` brings them back.
+- Generation scripts in `art/sons/`, quality check `art/outils/controle-sons.js`, listening page `ecoute-sons.html`. `sim.js` is unchanged (no server redeploy).
+
 ### 2.16 — 2026-11-17
 - Background music: three themes composed by the designer with Suno (`assets/musique/`). A random one starts at launch, then they play one after another in a loop for the whole game. A « Musique » toggle in the menu turns it off without muting the sound effects.
 - Interface only: `sim.js` is unchanged (no server redeploy).
