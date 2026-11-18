@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.24</title>
+<title>Winter Realms — Tower Wars · Édition 2.25</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -965,7 +965,7 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
  const bf=bonusFaction(T.faction);if(bf)part(bf);
  f.appendChild(ex);
- if(mode=='construire')f.appendChild(view==me?aideFiche('2×','Touche deux fois une case du terrain pour construire'):aideFiche('↩','Reviens sur ton terrain pour construire'));
+ if(mode=='construire')f.appendChild(view==me?aideFiche('2×','Touche deux fois une case du terrain pour construire'+(matchMedia('(pointer:fine)').matches?' (Maj + clic : en un seul clic)':'')):aideFiche('↩','Reviens sur ton terrain pour construire'));
  if(mode=='tour'&&explore){f.appendChild(aideFiche('🏁','Partie terminée · '+t.inv+' or investis dans cette tour'));return}
  if(mode=='tour'){const a=elt('div','actions'),up=elt('button'),ve=elt('button','vendre','Vendre · +'+Math.floor(t.inv*.7)+' or');up.type=ve.type='button';
   if(t.b>0){up.textContent='Améliorer · en chantier…';up.onclick=()=>showErr('busy')}
@@ -1040,7 +1040,7 @@ function confirmerConstruction(x,y){const k=projet.k;projet=null;
  if(NET.on){if(P.gold<TW[k].c){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr('poor');return}NET.act({type:'place',x,y,k},true);return}
  const e2=G.action(me,{type:'place',x,y,k});if(e2){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(e2)}}
 /* toucher une case du terrain (au relâcher, sans avoir glissé) */
-function act(cx,cy){if(explore){const {x,y}=caseSous(cx,cy),tw=VB().t.find(t=>t.x==x&&t.y==y);astuce(false);if(tw){pick=tw;sfx('tap')}else pick=null;render();return}
+function act(cx,cy,direct){if(explore){const {x,y}=caseSous(cx,cy),tw=VB().t.find(t=>t.x==x&&t.y==y);astuce(false);if(tw){pick=tw;sfx('tap')}else pick=null;render();return}
  if(over)return;astuce(false);const {x,y}=caseSous(cx,cy);
  if(x<0||y<0||x>=C||y>=R)return;
  if(view!=me){if(tab=='t'&&sel!=null)toast('Terrain de '+B[view].name+' : lecture seule. Reviens sur le tien pour construire.',true);return}
@@ -1052,6 +1052,8 @@ function act(cx,cy){if(explore){const {x,y}=caseSous(cx,cy),tw=VB().t.find(t=>t.
  if(projet&&projet.x==x&&projet.y==y){confirmerConstruction(x,y);return}
  const err=peutConstruire(x,y,sel);
  if(err){projet=null;P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(err);return}
+ /* Maj + clic (ordinateur, 2.24) : construit tout de suite, sans aperçu ; la tour reste choisie pour enchaîner */
+ if(direct){projet={x,y,k:sel};confirmerConstruction(x,y);return}
  projet={x,y,k:sel};sfx('tap');toast('Touchez encore la case pour construire ('+TW[sel].c+' or, '+fr(btJ(TW[sel].c))+' s)')}
 /* Gestes sur le terrain (2.15) :
    - un toucher (relâché sans glisser) sur une case : aperçu, puis un 2e toucher sur la même case : construction ;
@@ -1068,7 +1070,7 @@ main.addEventListener('pointermove',e=>{if(e.pointerId!==pan.id)return;
  pan.x=e.clientX;pan.y=e.clientY;pan.tm=e.timeStamp});
 for(const n of['pointerup','pointercancel'])main.addEventListener(n,e=>{if(e.pointerId!==pan.id)return;pan.id=null;
  if(pan.actif){if(n=='pointerup'&&R3D.api&&e.timeStamp-pan.tm<80)R3D.api.lancer(pan.vx,pan.vz);return}
- if(n=='pointerup')act(pan.x0,pan.y0)});
+ if(n=='pointerup')act(pan.x0,pan.y0,e.shiftKey&&e.pointerType=='mouse')});
 main.addEventListener('contextmenu',e=>e.preventDefault());
 /* rotation de la vue (3D) : un huitième de tour par toucher */
 $('rotG').onclick=()=>{if(R3D.api){R3D.api.pivoter(-1);vibrer(8);astuce(false)}};
@@ -1146,7 +1148,7 @@ function end(winner){over=true;const win=winner===me;finSons();sfx(win?'win':'lo
  pick=null;sel=null;mon=null;projet=null;cartes(false);menu(false);astuce(false);render();remplirFin(win,winner);finFenetre(true)}
 /* 2.23 : fin de partie en solo. Une fenêtre donne les statistiques des 4 joueurs et propose « Regarder la carte »
    (la partie reste figée : on se balade sur les labyrinthes, on change de terrain, on touche une tour pour la voir) ou « Quitter ». */
-/* longueur réelle du chemin (en ligne droite et en diagonale depuis la 2.24), arrondie à la case */
+/* longueur réelle du chemin (en ligne droite et en diagonale depuis la 2.25), arrondie à la case */
 const longueur=b=>{if(b.d[SP[1]][SP[0]]>=INF)return 0;const P=chemin(b);let L=0;for(let i=1;i<P.length;i++)L+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);return Math.round(L)};
 /* classement : le gagnant, puis les terrains encore debout (par vies), puis les éliminés du dernier au premier */
 const classement=()=>B.slice().sort((a,b)=>(b.dead?b.st.mort:1e9+b.lives)-(a.dead?a.st.mort:1e9+a.lives));

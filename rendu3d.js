@@ -227,7 +227,7 @@ export function creer(J) {
   /* ---------- chemin en pointillés animés ---------- */
   const NTIR = 240;
   const tirets = new THREE.InstancedMesh(G.tiret, transp('#3d5f8a', .5), NTIR); tirets.frustumCulled = false; scene.add(tirets);
-  /* points de passage en ligne droite (diagonales comprises, depuis la 2.24) et distance cumulée à chacun */
+  /* points de passage en ligne droite (diagonales comprises, depuis la 2.25) et distance cumulée à chacun */
   let cheminD = null, chemin = [], cumul = [0], longueur = 0;
   function calculerChemin(b) {
     if (b.d === cheminD) return; cheminD = b.d;

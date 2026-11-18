@@ -158,7 +158,7 @@ class Grid{constructor(){this.b=Array.from({length:C*R},()=>[]);this.u=[];this.o
  near(x,y,r){const o=this.o,x0=gcl(Math.floor(x-r),C),x1=gcl(Math.floor(x+r),C),y0=gcl(Math.floor(y-r),R),y1=gcl(Math.floor(y+r),R);o.length=0;
   for(let b=y0;b<=y1;b++)for(let a=x0;a<=x1;a++){const L=this.b[b*C+a];for(let k=0;k<L.length;k++)o.push(L[k])}if(o.length>1)o.sort((p,q)=>p-q);return o}}
 const GRID_MIN=12;
-/* ---------- chemin au sol en diagonale (depuis la 2.24) ----------
+/* ---------- chemin au sol en diagonale (depuis la 2.25) ----------
    Distances à la sortie sur 8 directions (diagonale = √2), sans couper le coin d'une tour : une diagonale exige que les deux cases voisines soient libres.
    Le monstre suit ensuite cette chaîne de cases en ligne droite, aussi loin qu'il voit (vue) : il peut donc prendre n'importe quel angle. */
 const DIR8=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]],S2=Math.SQRT2,MR=.3,VUE_MAX=16,ESP=.75,ESP_V=1.5;
@@ -232,7 +232,7 @@ class Board{
   if(rad){const cg=this.cgOk&&this.cr.length>GRID_MIN?this.cg.near(p.tx-.5,p.ty-.5,rad+.5).map(n=>this.cr[n]):this.cr;for(const c of cg){if(c===tg||c.hid||(T.gr&&CR[c.k].fly)||Math.hypot(c.x+.5-p.tx,c.y+.5-flyH(c.k)-p.ty)>=rad)continue;this.hit(c,p.d*.6,T,p.lv)}
    this.fx.push({type:'boom',x:p.tx,y:p.ty,r:rad,t:.3,d:.3,col:T.sl?'#8fdcff':'#ffb347'});if(T.sp)this.ev.push('boom')}
   else this.fx.push({type:'ring',x:p.tx,y:p.ty,r:T.skin==3?.45:.26,t:.2,d:.2,col:T.skin==0?'#ffffff':'#e39bff'})}
- /* espacement (depuis la 2.24) : deux monstres à moins de ESP case (au sol entre eux, volants entre eux) se poussent SUR LE CÔTÉ seulement,
+ /* espacement (depuis la 2.25) : deux monstres à moins de ESP case (au sol entre eux, volants entre eux) se poussent SUR LE CÔTÉ seulement,
     perpendiculairement à leur marche, au plus ESP_V case/s. Personne n'est freiné ni repoussé en arrière : ils s'étalent sans jamais faire bouchon.
     Un monstre qui en suit un autre dans la même file part d'un côté choisi selon son numéro. Au sol, le pas de côté garde MR case des tours. */
  ecarter(dt){const L=this.cr,n=L.length;if(n<2||!(dt>0))return;const G=n>GRID_MIN&&(this.sg||(this.sg=new Grid())).fill(L),mv=[];
@@ -299,7 +299,7 @@ function pathCells(b){return chaine(b,SP[0],SP[1],200)}
 
 /* --- labyrinthe de l'IA (2.5, affiné en 2.6) : chaque terrain IA reçoit un plan cible au début de la partie ---
    grille plate (case i = y*C+x, 1 = mur), parcours en largeur rapide, hasard propre (graine tirée une fois) pour que le découpage dans le temps ne change rien. */
-/* depuis la 2.24, mêmes règles que les monstres : 8 directions, sans couper le coin d'un mur. Coûts entiers : 5 en ligne droite, 7 en diagonale (≈ 5 × √2),
+/* depuis la 2.25, mêmes règles que les monstres : 8 directions, sans couper le coin d'un mur. Coûts entiers : 5 en ligne droite, 7 en diagonale (≈ 5 × √2),
    d'où un parcours par files de priorité circulaires (8 files, Dial) presque aussi rapide que le parcours en largeur d'avant. NB : par case, nombre de voisins puis (voisin, coût, coin 1, coin 2). */
 const N=C*R,SPI=SP[1]*C+SP[0],EXI=EX[1]*C+EX[0],NB=new Int16Array(N*33),DB=new Int16Array(N),BH=new Int16Array(8),EN=new Int16Array(N*8+8),ENX=new Int16Array(N*8+8);
 for(let i=0;i<N;i++){const x=i%C,y=i/C|0;let k=0;for(const[dx,dy]of DIR8){const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R)continue;const o=i*33+1+k++*4;

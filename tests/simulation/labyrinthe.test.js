@@ -28,7 +28,7 @@ test('Givre : 2 à 6 emplacements, répartis tout le long du chemin final',()=>{
 });
 /* La découpe est vérifiée de façon certaine (nombre de tranches), la durée seulement comme garde-fou :
    les machines de GitHub sont plus ou moins chargées, d'où la meilleure de 3 mesures et une marge (révision de la 2.11). */
-test('La génération est découpée en plusieurs tranches courtes (moins de 10 ms par tranche, moins de 150 ms au total ; 150 depuis la 2.24, chemin en 8 directions)',()=>{
+test('La génération est découpée en plusieurs tranches courtes (moins de 10 ms par tranche, moins de 150 ms au total ; 150 depuis la 2.25, chemin en 8 directions)',()=>{
  let meilleurMax=Infinity,meilleurTot=Infinity,tranches=0;
  for(let essai=0;essai<3;essai++){
   const S=charger('actuel',{graine:4});const G=partie(S,{ia:[0,1,1,1],difficulte:2});const b=G.B[1];let tot=0,max=0,M=null,n=0;
