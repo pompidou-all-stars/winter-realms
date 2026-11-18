@@ -44,6 +44,10 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.23 — 2026-11-18
+- More immersive 3D terrain: a less distorted camera (34° field of view instead of 48°), 20% closer, and you can no longer pan far away from the board. The board is now part of a continuous winter landscape, told apart only by its grid: relief around it (the board itself stays flat), patches of grass and melted snow, snow grain, a forest of tall snowy pines, rocks, a gradient sky, distant mountains and haze.
+- 3D renderer only: `sim.js` is unchanged (no server redeploy).
+
 ### 2.22 — 2026-11-18
 - The 3D view is now the only view offered: the "Jouer en vue 2D (classique)" link is gone from the home screen. The 2D renderer stays as a fallback when WebGL is missing and for the tests (`?rendu=2d` still works).
 - Interface only (`sim.js` untouched, no server redeploy).
