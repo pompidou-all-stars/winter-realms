@@ -44,11 +44,23 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.24 — 2026-11-18
+### 2.26 — équilibrage des tours — 2026-11-18
 - Frost towers deal 2 base damage instead of 4 (half as strong); their slow is unchanged, since it is what makes them strong.
 - Archers deal 6 base damage instead of 8 (−25 %): cheap to upgrade, they had become the best value tower everywhere; their price is unchanged so mazes stay cheap. Mages deal 55 instead of 45 (+22 %): they were the weakest value tower.
 - Tooling: tower test bench (`node tests/outils/banc-tours.js`) measuring each tower's damage per gold invested, levels 1 to 5, against 7 typical waves, with before/after comparison. No gameplay change.
 - Area towers rebalanced, measured with the tower test bench. Flame towers now hit at most 8 monsters per burst (those closest to the exit) instead of everything in their cone: against a crowd of 40 monsters, a level-5 flame tower was worth about 5 times a normal tower per gold. Cannons deal 12 base damage instead of 20 (−40 %): their blast still hits everything around (that is the point of the tower), but their overall value is back in line with the other towers. `sim.js` changed (automatic server redeploy).
+
+### 2.25 — 2026-11-18
+- Ground monsters now move diagonally and at any angle: they take the shortest straight-line route (e.g. corner to corner along the diagonal) instead of only horizontal and vertical steps, without cutting through tower corners. They keep a small clearance from towers.
+- Monsters no longer pile up: nearby monsters push each other sideways only, never slowing anyone down, so they spread out without creating traffic jams.
+- The AI plans its mazes with the same rules (8 directions, no corner cutting), so its walls are judged by the path monsters really take; diagonal walls (towers touching by a corner) now count.
+- The dotted path shows this new route, in 2D and 3D. A tower can no longer be placed right next to a ground monster; a tower placed in front of one makes it change its route.
+- `sim.js` changed (automatic server redeploy).
+- Organisation: every version now gets a very short title (2 to 4 words, e.g. “exploration fin de partie” for 2.23), reused in the commit, the PR, the CLAUDE.md log and this changelog. No game change.
+
+### 2.24 — 2026-11-18
+- On a computer, **Shift + click** on a tile builds the selected tower in a single click (no preview step). The tower stays selected, so you can chain builds. Touch screens keep the two-tap build.
+- Interface only (`sim.js` untouched, no server redeploy).
 
 ### 2.23 — 2026-11-18
 - End of game (solo): a window shows Victory/Defeat with stats for the 4 players (rank, towers, maze length, waves sent, monsters killed, final income), an income curve over the game and a personal summary.

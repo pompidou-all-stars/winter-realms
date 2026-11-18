@@ -227,22 +227,21 @@ export function creer(J) {
   /* ---------- chemin en pointillés animés ---------- */
   const NTIR = 240;
   const tirets = new THREE.InstancedMesh(G.tiret, transp('#3d5f8a', .5), NTIR); tirets.frustumCulled = false; scene.add(tirets);
-  let cheminD = null, chemin = [], longueur = 0;
+  /* points de passage en ligne droite (diagonales comprises, depuis la 2.25) et distance cumulée à chacun */
+  let cheminD = null, chemin = [], cumul = [0], longueur = 0;
   function calculerChemin(b) {
-    if (b.d === cheminD) return; cheminD = b.d; chemin = []; longueur = 0;
-    let x = SP[0], y = SP[1]; chemin.push([x + .5, y + .5]);
-    for (let n = 0; n < 200 && b.d[y][x] > 0 && b.d[y][x] < INF; n++) {
-      for (const [dx, dy] of DIRS) { const a = x + dx, c = y + dy; if (a >= 0 && c >= 0 && a < C && c < R && b.d[c][a] == b.d[y][x] - 1) { x = a; y = c; break } }
-      chemin.push([x + .5, y + .5]);
-    }
-    longueur = chemin.length - 1;
+    if (b.d === cheminD) return; cheminD = b.d;
+    chemin = J.chemin(b).map(([x, y]) => [x + .5, y + .5]); cumul = [0];
+    for (let i = 1; i < chemin.length; i++) cumul.push(cumul[i - 1] + Math.hypot(chemin[i][0] - chemin[i - 1][0], chemin[i][1] - chemin[i - 1][1]));
+    longueur = cumul[cumul.length - 1];
   }
   function dessinerChemin(t) {
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), un = new THREE.Vector3(1, 1, 1), e = new THREE.Euler();
-    let n = 0; const pas = .46, dec = (t * .9) % pas;
+    let n = 0, i = 0; const pas = .46, dec = (t * .9) % pas;
     for (let d = dec; d < longueur && n < NTIR; d += pas) {
-      const i = Math.floor(d), f = d - i, a = chemin[i], b = chemin[i + 1];
-      m4.compose(v.set(a[0] + (b[0] - a[0]) * f, .015, a[1] + (b[1] - a[1]) * f), q.setFromEuler(e.set(0, b[0] !== a[0] ? 0 : Math.PI / 2, 0)), un);
+      while (cumul[i + 1] < d) i++;
+      const a = chemin[i], b = chemin[i + 1], f = (d - cumul[i]) / ((cumul[i + 1] - cumul[i]) || 1);
+      m4.compose(v.set(a[0] + (b[0] - a[0]) * f, .015, a[1] + (b[1] - a[1]) * f), q.setFromEuler(e.set(0, -Math.atan2(b[1] - a[1], b[0] - a[0]), 0)), un);
       tirets.setMatrixAt(n++, m4);
     }
     tirets.count = n; tirets.instanceMatrix.needsUpdate = true;

@@ -18,8 +18,32 @@ test('Un volant va en ligne droite vers la sortie (Chauve-souris, vitesse 2 : 8 
 test('Un monstre au sol contourne les tours, sans jamais entrer sur une case occupée',()=>{const b=terrain();b.gold=1e6;
  for(let x=0;x<12;x++)b.place(x,4,0);for(let x=1;x<13;x++)b.place(x,9,0);
  const c=apparaitre(S,b,0);c.hp=c.max=1e9;let t=0;
- while(b.cr.length&&t<60){b.update(.05);t+=.05;assert.equal(b.g[c.ty][c.tx],0,`case (${c.tx},${c.ty}) occupée`)}
+ while(b.cr.length&&t<60){b.update(.05);t+=.05;assert.equal(b.g[c.ty][c.tx],0,`case (${c.tx},${c.ty}) occupée`);assert.equal(b.g[Math.round(c.y)][Math.round(c.x)],0,`monstre sur une tour en (${c.x},${c.y})`)}
  assert.equal(b.lives,39);assert.ok(t>10,'le détour doit prendre plus de 10 s');
+});
+test('Diagonale : sur un terrain ouvert, un monstre parti du coin haut gauche file en ligne droite vers la sortie',()=>{const b=terrain();
+ const c=apparaitre(S,b,0);c.hp=c.max=1e9;Object.assign(c,{x:0,y:0,tx:0,ty:0});
+ for(let i=0;i<40;i++){b.update(.05);proche(c.x/6,c.y/16,'sur la droite (0,0) → (6,16)',.03)}
+});
+test('Diagonale : le monstre coupe le virage en biais au lieu de longer les murs à angle droit',()=>{const b=terrain();b.gold=1e6;
+ for(let x=1;x<13;x++)b.place(x,3,0);const c=apparaitre(S,b,0);c.hp=c.max=1e9;let t=0,obl=0;
+ while(b.cr.length&&t<30){const x=c.x,y=c.y;b.update(.05);t+=.05;if(Math.abs(c.x-x)>1e-6&&Math.abs(c.y-y)>1e-6)obl++}
+ assert.equal(b.lives,39);assert.ok(obl>100,`déplacement en biais la plupart du temps (${obl} pas)`);
+ /* en 4 directions : 6 + 16 = 22 cases, soit 13,75 s à 1,6 case/s ; en ligne droite : environ 6,3 + 1,7 + 13,4 ≈ 21,4 cases */
+ assert.ok(t<13.6,`trajet en ${t.toFixed(2)} s`);
+});
+test('Espacement : 3 envois rapprochés (12 monstres) s\'écartent sur le côté, sans retard ni bouchon',()=>{const b=terrain();
+ for(let i=0;i<3;i++)b.send(0,1);const vie=()=>{for(const c of b.cr)c.hp=c.max=1e9};
+ for(let i=0;i<40;i++){b.update(.05);vie()}const L=b.cr;let dmin=9;for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++)dmin=Math.min(dmin,Math.hypot(L[i].x-L[j].x,L[i].y-L[j].y));
+ assert.equal(L.length,12);assert.ok(dmin>.35,`distance minimale ${dmin.toFixed(2)}`);
+ /* le dernier apparaît au plus tard à 1,39 s ; un Sapeur seul met 10 s */
+ for(let i=0;i<190;i++){b.update(.05);vie()}assert.equal(b.cr.length,0,'tous sortis à temps');assert.equal(b.lives,28);
+});
+test('Espacement dans un couloir d\'une case : on ne sort jamais du couloir et personne ne reste coincé',()=>{const b=terrain();b.gold=1e7;
+ for(let x=0;x<12;x++)b.place(x,4,0);for(let x=1;x<13;x++)b.place(x,8,0);for(const t of b.t)t.b=0;
+ for(let i=0;i<20;i++)b.q.push({k:i%3,m:1,t:i*.1});let t=0;
+ while((b.q.length||b.cr.length)&&t<60){b.update(.05);t+=.05;for(const c of b.cr){c.hp=c.max=1e9;assert.equal(b.g[Math.round(c.y)][Math.round(c.x)],0,'monstre sur une tour')}}
+ assert.equal(b.lives,20);assert.ok(t<25,`tous sortis en ${t.toFixed(1)} s`);
 });
 test('Vitesse ralentie : déplacement = vitesse × facteur × temps',()=>{const b=terrain();const c=apparaitre(S,b,0);
  c.gt=10;c.gp=.5;b.update(.5);proche(c.y,1.6*.5*.5,'position');
