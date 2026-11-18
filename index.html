@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.16</title>
+<title>Winter Realms — Tower Wars · Édition 2.17</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -272,11 +272,13 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
   <button id="lquit" type="button" class="ghost">Quitter le salon</button></div>
 </div>
 <script src="sim.js"></script>
+<script src="audio.js"></script>
 <script>
-/* ---------- sons (Web Audio, aucun fichier) ---------- */
+/* ---------- sons : fichiers ElevenLabs (audio.js), sons synthétisés en secours ---------- */
 let AC=null,master=null,nbuf=null,muted=false,lastS={};
 function audio(){try{if(!AC){const K=window.AudioContext||window.webkitAudioContext;if(!K)return;AC=new K();master=AC.createGain();master.gain.value=.8;master.connect(AC.destination);
-  const n=AC.sampleRate;nbuf=AC.createBuffer(1,n,n);const d=nbuf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1}
+  const n=AC.sampleRate;nbuf=AC.createBuffer(1,n,n);const d=nbuf.getChannelData(0);for(let i=0;i<n;i++)d[i]=Math.random()*2-1;
+  if(window.SON)SON.init(AC,master)}
  if(AC.state=='suspended')AC.resume()}catch(e){AC=null}}
 function tone(f,d,type,v,f2,dl){const t=AC.currentTime+(dl||0),o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(f2)o.frequency.exponentialRampToValueAtTime(f2,t+d);
  g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g);g.connect(master);o.start(t);o.stop(t+d+.02)}
@@ -304,7 +306,23 @@ const SFX={
  out(){[659,523,392].forEach((f,i)=>tone(f,.18,'square',.05,0,i*.1))},
  win(){[523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.09,0,i*.13))},
  lose(){[392,330,262,196].forEach((f,i)=>tone(f,.3,'sawtooth',.06,0,i*.16))}};
-function sfx(n){if(!AC||muted)return;const now=performance.now();if(now-(lastS[n]||0)<(n=='flame'?170:70))return;lastS[n]=now;try{SFX[n]()}catch(e){}}
+/* nom du son (événement du jeu) → identifiant du fichier ; b = terrain qui le produit (sa faction choisit la variante) */
+const FAC_SON=['alliance','horde','sylvestres','nains','legion'],facSon=b=>FAC_SON[(b||P).classId]||'alliance';
+const PRIO_SON={win:5,lose:5,out:4,leak:4,warn:3,send:3,income:3,build:2,up:2,sell:2,nope:2,tap:2,boom:2,zap:2};
+function idSon(n,b){if(/^(arrow|canon|frost|mage|slash|flame)$/.test(n))return 'tir-'+n+'-'+facSon(b);
+ if(n=='build')return 'chantier-'+facSon(b);if(n=='up')return 'up-'+facSon(b);return n}
+function sfx(n,b){if(!AC||muted)return;const now=performance.now();if(now-(lastS[n]||0)<(n=='flame'?170:70))return;lastS[n]=now;
+ if(window.SON&&SON.joue(idSon(n,b),{prio:PRIO_SON[n]||1,ecart:n=='flame'?300:0}))return;
+ try{SFX[n]()}catch(e){}}
+/* sons sans équivalent synthétisé (mort d'un monstre précis, construction finie, voix) : fichier seulement */
+function son(id,o){if(AC&&!muted&&window.SON)SON.joue(id,o)}
+function voix(ctx,ecart){if(AC&&!muted&&window.SON&&!NET.spect)SON.voix(facSon(P),ctx,ecart)}
+/* début de partie : préchargement de la faction du joueur et des sons communs, ambiances */
+function debutSons(){if(!window.SON)return;audio();const f=facSon(P),aut=[...new Set(B.map(b=>facSon(b)))];
+ SON.precharge(['*-'+f,'voix-'+f+'-*','boom','mort-*','arrivee-*','warn','zap','leak','income','send','sell','nope','tap','ouvre','ferme','out','win','lose']);
+ setTimeout(()=>SON.precharge(aut.map(x=>'*-'+x)),4000);
+ if(!muted){SON.ambiance('amb-hiver',.35);SON.ambiance('amb-bataille',.14)}}
+function finSons(){if(window.SON){SON.ambiance('amb-hiver',0);SON.ambiance('amb-bataille',0)}}
 /* ---------- musique de fond (2.16) : 3 thèmes composés par le concepteur avec Suno (assets/musique/) ----------
    Le premier thème est tiré au hasard, puis ils s'enchaînent les uns après les autres, en boucle, de l'accueil à la fin de la partie.
    Elle démarre au premier toucher (les navigateurs bloquent le son avant) ; elle passe par Web Audio quand c'est possible,
@@ -661,7 +679,7 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   $('lnote').textContent='Difficulté des IA : '+DIFF[m.lv].n+'.'},
  start(m){this.playing=true;this.spect=m.you<0;LV=m.lv;
   const boards=m.seats.map((s,i)=>new Board(i,s.name,s.col,s.ai,s.classId));
-  useBoards(boards,this.spect?0:m.you);time=0;tick=10;over=false;started=true;setTab('t');recentrer();
+  useBoards(boards,this.spect?0:m.you);time=0;tick=10;over=false;started=true;setTab('t');recentrer();debutSons();
   $('lobby').hidden=true;$('ov').hidden=true;if(this.spect)toast('Tu regardes la partie en spectateur');else astuce(true)},
  /* applique un instantané : les positions sont lissées entre deux instantanés dans frame() */
  apply(s){this.snapAt=performance.now();time=s.time;tick=s.tick;
@@ -751,7 +769,7 @@ function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=null;mon=null;proje
   e.type='button';e.className='chip';e.style.setProperty('--c',b.col);e.setAttribute('aria-label','Voir le terrain de '+b.name);n.textContent=b.name;tx.append(n,s);e.append(cv,tx);e.onclick=()=>setView(b.i);ch.appendChild(e);b.ui={e,g:setup(cv,C*MINI,R*MINI),s};
   if(b.i!==me){const i=document.createElement('i');i.style.background=b.col;pts.appendChild(i)}}
  hudK='';pick=null;setView(me);render()}
-function newSolo(lv){G=new Game(soloSeats(chosenClass),lv);LV=lv;useBoards(G.B,0);syncSolo()}
+function newSolo(lv){G=new Game(soloSeats(chosenClass),lv);LV=lv;useBoards(G.B,0);syncSolo();debutSons()}
 function syncSolo(){time=G.time;tick=G.tick;over=G.over}
 function icon(fn,w=40,h=40){const c=document.createElement('canvas'),g=setup(c,w,h);fn(g);return c}
 /* 2.15 : une carte de la barre = l'icône et le prix ; le nom sert d'étiquette (lecteurs d'écran, tests), le reste est dans la fiche */
@@ -806,7 +824,7 @@ const towerIcon=(k,lv)=>icon(g=>{drawTower(g,k,28,27,30,.7,0,lv,0);drawTowerBadg
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 /* messages d'erreur renvoyés par Game.action */
 const ERR={poor:"Pas assez d'or",blocked:'Impossible ici : le chemin serait bloqué',max:'Niveau maximum atteint',busy:'Tour en chantier : attends la fin des travaux',over:'Partie terminée',bad:'Action impossible'};
-function showErr(e,a){if(!e)return;sfx('nope');if(e=='locked'){const T=CR[a.k];toast(T?'Ouvre le palier '+T.t+' pour envoyer : '+T.n:'Ouvre d’abord le palier précédent',true)}else toast(ERR[e]||ERR.bad,true)}
+function showErr(e,a){if(!e)return;sfx('nope');if(e!='locked')voix('impossible',5000);if(e=='locked'){const T=CR[a.k];toast(T?'Ouvre le palier '+T.t+' pour envoyer : '+T.n:'Ouvre d’abord le palier précédent',true)}else toast(ERR[e]||ERR.bad,true)}
 /* toutes les actions du joueur passent par ici : en solo vers G, en ligne vers le serveur */
 function doAction(a){if(over)return;if(NET.on){NET.act(a);return ''}const e=G.action(me,a);showErr(e,a);return e}
 /* ---------- fiche d'information (au-dessus des boutons) ---------- */
@@ -909,7 +927,7 @@ function act(cx,cy){if(over)return;astuce(false);const {x,y}=caseSous(cx,cy);
  if(x<0||y<0||x>=C||y>=R)return;
  if(view!=me){if(tab=='t'&&sel!=null)toast('Terrain de '+B[view].name+' : lecture seule. Reviens sur le tien pour construire.',true);return}
  const tw=P.t.find(t=>t.x==x&&t.y==y);
- if(tw){projet=null;pick=tw;render();sfx('tap');return}
+ if(tw){projet=null;pick=tw;render();sfx('tap');voixSelection();return}
  if(pick){pick=null;render();return}
  if(tab!='t'){if(mon!=null){mon=null;render()}else toast('Passe sur l’onglet « Tours » pour construire');return}
  if(sel==null){toast('Choisis d’abord une tour en bas de l’écran');return}
@@ -948,7 +966,7 @@ let quitter=0;
 function menu(o){$('menu').hidden=!o;quitter=0;$('mQuitter').textContent='Quitter la partie';if(o){cartes(false);astuce(false);$('mReprendre').focus()}}
 $('menuBtn').onclick=()=>menu(true);$('mReprendre').onclick=()=>menu(false);
 $('menu').addEventListener('click',e=>{if(e.target===e.currentTarget)menu(false)});
-$('snd').onclick=()=>{muted=!muted;$('snd').textContent='Son : '+(muted?'coupé':'activé');audio();if(!muted)sfx('income')};
+$('snd').onclick=()=>{muted=!muted;$('snd').textContent='Son : '+(muted?'coupé':'activé');audio();if(muted)finSons();else{sfx('income');if(started&&!over&&window.SON){SON.ambiance('amb-hiver',.35);SON.ambiance('amb-bataille',.14)}}};
 $('mMusique').onclick=()=>{MUSIQUE.basculer();$('mMusique').textContent='Musique : '+(MUSIQUE.on?'activée':'coupée')};
 $('mVibre').onclick=()=>{vibre=!vibre;$('mVibre').textContent='Vibrations : '+(vibre?'activées':'coupées');vibrer(15)};
 $('mGestes').onclick=()=>{const l=$('mListe');l.hidden=!l.hidden;$('mGestes').setAttribute('aria-expanded',l.hidden?'false':'true')};
@@ -965,7 +983,32 @@ document.addEventListener('click',audio,true);
 
 /* ---------- sons et événements ---------- */
 /* les terrains notent leurs sons dans b.ev ; '!' = toujours audible pour son propriétaire */
-function playEvents(){for(const b of B){for(const e of b.ev){if(e[0]=='!'){if(b===P||b===VB())sfx(e.slice(1))}else if(b===VB())sfx(e)}b.ev.length=0}}
+function playEvents(){for(const b of B){for(const e of b.ev){if(e[0]=='!'){if(b===P||b===VB())sfx(e.slice(1),b)}else if(b===VB())sfx(e,b)}b.ev.length=0}}
+/* couche d'observation pour les sons qui n'ont pas d'événement dans sim.js (rien n'est ajouté à la simulation).
+   - mort d'un monstre : le nuage « puff » porte la couleur du monstre, qui donne sa famille sonore ;
+   - arrivée d'un boss : le nombre de héros, dragons ou cyclopes du terrain augmente ;
+   - fin d'un chantier du joueur : t.b passe à 0 (construction terminée, ou amélioration si niveau > 1). */
+/* les 72 clés de monstres (CR[…].g, paliers depuis la 2.13) rangées dans les 10 familles de cris de mort */
+const FAM_SON={gob:'gobelin',sapper:'gobelin',gobking:'gobelin',kobold:'gobelin',imp:'gobelin',engineer:'gobelin',rat:'gobelin',
+ wolf:'bete',boar:'bete',bear:'bete',werewolf:'bete',rhino:'bete',mammoth:'bete',turtle:'bete',beetle:'bete',lizard:'bete',centaur:'bete',nightmare:'bete',manticore:'bete',chimera:'bete',
+ orc:'orc',raider:'orc',gnoll:'orc',chaman:'orc',breaker:'orc',drummer:'orc',warlord:'orc',knight:'orc',assassin:'orc',inquisitor:'orc',herald:'orc',
+ troll:'geant',yeti:'geant',ogre:'geant',minotaur:'geant',cyc:'geant',giant:'geant',wendigo:'geant',behemoth:'geant',demon:'geant',treant:'geant',
+ golem:'pierre',automaton:'pierre',mudgolem:'pierre',lavagolem:'pierre',juggernaut:'pierre',colossus:'pierre',gargoyle:'pierre',thunder:'pierre',dragonturtle:'pierre',
+ bat:'volant',wasp:'volant',harpy:'volant',griffon:'volant',roc:'volant',phoenix:'volant',
+ dragon:'dragon',wyvern:'dragon',wyrm:'dragon',hydra:'dragon',
+ healer:'magique',spectre:'magique',skel:'magique',lich:'magique',druid:'magique',bloodpriest:'magique',reaper:'magique',fireel:'magique',manaeater:'magique',myco:'magique',
+ slime:'gelee',hero:'heros'};
+const COL_SON={};for(const T of CR)if(!COL_SON[T.col])COL_SON[T.col]=FAM_SON[T.g];
+const BOSS_SON={hero:'arrivee-heros',dragon:'arrivee-dragon',hydra:'arrivee-dragon',wyrm:'arrivee-dragon',cyc:'arrivee-cyc',giant:'arrivee-cyc',behemoth:'arrivee-cyc',colossus:'arrivee-cyc'},vusFx=new WeakSet();let obsVue=-1,obsBoss={},obsChantier={};
+function ecouterSons(){if(!AC||muted||!window.SON)return;const b=VB();
+ if(obsVue!==view){obsVue=view;obsBoss={};for(const f of b.fx)vusFx.add(f)}
+ for(const f of b.fx)if(f.type=='puff'&&!vusFx.has(f)){vusFx.add(f);const fam=COL_SON[f.col];if(fam)son('mort-'+fam,{ecart:90})}
+ const nb={};for(const c of b.cr){const g=CR[c.k].g;if(BOSS_SON[g])nb[g]=(nb[g]||0)+1}
+ for(const g in BOSS_SON)if((nb[g]||0)>(obsBoss[g]||0))son(BOSS_SON[g],{prio:4,ecart:4000});obsBoss=nb;
+ const vu={};for(const t of P.t){const k=t.x+','+t.y;vu[k]=t.b;if(obsChantier[k]>0&&!(t.b>0)){son('fini-'+facSon(P),{prio:3,ecart:400});voix(t.lv>1?'ameliore':'construit',7000)}}
+ obsChantier=vu}
+/* toucher une tour : réplique de sélection ; au 4e toucher rapproché, la tour s'agace */
+let selVoix=[];function voixSelection(){const now=performance.now();selVoix=selVoix.filter(t=>now-t<5000);selVoix.push(now);voix(selVoix.length>=4?'agace':'sel',600)}
 function onLog(l){
  if(l.type=='income'){sfx('income');const e=$('gold');e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')}
  else if(l.type=='out'){if(l.i!==me){toast(B[l.i].name+' est éliminé·e');sfx('out')}else if(NET.on){over=true;toast('Tu es éliminé·e : tu peux regarder la fin de la partie');sfx('lose')}}
@@ -977,7 +1020,7 @@ function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.d
  /* anneau du revenu : il se remplit pendant les 10 secondes qui précèdent le versement */
  $('arc').setAttribute('stroke-dashoffset',(50.3*Math.max(0,tick)/10).toFixed(1));
  for(const b of bar.children)b.classList.toggle('dis',+b.dataset.c>P.gold)}
-function end(winner){over=true;const win=winner===me;sfx(win?'win':'lose');
+function end(winner){over=true;const win=winner===me;finSons();sfx(win?'win':'lose');
  $('msg').textContent=win?'Victoire !':winner>=0&&NET.on?B[winner].name+' gagne':'Défaite';
  $('sub').textContent='Partie de '+mmss(time)+'. Ton revenu final : +'+P.inc+' toutes les 10 s, en '+DIFF[LV].n+'. Adversaires éliminés : '+B.filter(b=>b!==P&&b.dead).length+' sur 3.';
  $('hint').textContent=NET.on?'Retour au salon dans quelques secondes…':'Rejouer en :';$('ov').classList.add('fin');$('ov').hidden=false;if(NET.on)NET.ended()}
@@ -996,7 +1039,7 @@ function loop(now){neigeAccueil(now);const dt=Math.min(.05,Math.max(0,(now-last)
  if(started){
   if(NET.on)NET.frame(dt);
   else if(G&&!G.over){G.step(dt);syncSolo();const lg=G.log.splice(0);for(const l of lg)onLog(l)}
-  playEvents();
+  playEvents();ecouterSons();
   if(pick){const c=pick.b>0?Math.ceil(pick.b):0;if(c!==pickB){pickB=c;render()}}
   dessinerVue(now/1000);if(!$('chips').hidden)for(const b of B){drawMini(b,b.ui.g,MINI);if(b===VB()&&R3D.api)cadreMini(b.ui.g)}hud()}
  requestAnimationFrame(loop)}

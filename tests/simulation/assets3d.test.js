@@ -7,7 +7,7 @@ const ART=path.join(RACINE,'art'),MANIF=path.join(RACINE,'assets','3d','manifest
 const lire=f=>fs.readFileSync(f,'utf8').replace(/\r\n/g,'\n');
 
 function scripts(){const ids=[];(function parcourir(d,rel){for(const n of fs.readdirSync(d).sort()){const p=path.join(d,n),r=rel?rel+'/'+n:n;
- if(fs.statSync(p).isDirectory()){if(!rel&&['outils','communs','__pycache__'].includes(n))continue;parcourir(p,r)}
+ if(fs.statSync(p).isDirectory()){if(!rel&&['outils','communs','sons','__pycache__'].includes(n))continue;parcourir(p,r)}
  else if(n.endsWith('.py')&&!n.startsWith('_'))ids.push(r.slice(0,-3))}})(ART,'');return ids.sort()}
 /* même calcul que empreinte() dans art/outils/generer.py */
 function empreinte(id){const h=crypto.createHash('sha256');h.update('script:'+lire(path.join(ART,id+'.py')),'utf8');

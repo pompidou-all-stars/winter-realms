@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Winter Realms — écoute des sons</title>
+<style>
+:root{--fond:#0c1424;--carte:#16223a;--txt:#e6eefb;--dim:#9fb0cc;--or:#e8c15a;--rouge:#ff7b6e;--vert:#7fd18b}
+body{margin:0;background:var(--fond);color:var(--txt);font:14px/1.4 system-ui,sans-serif;padding:16px}
+h1{font-size:20px;color:var(--or);margin:0 0 4px}p{color:var(--dim);margin:0 0 12px}
+input{width:100%;max-width:420px;padding:8px;border-radius:6px;border:1px solid #2c3d5e;background:#0f1a2e;color:var(--txt);margin-bottom:12px}
+h2{font-size:15px;color:var(--or);margin:18px 0 6px;border-bottom:1px solid #2c3d5e;padding-bottom:4px}
+.son{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--carte);border-radius:8px;padding:6px 8px;margin:4px 0}
+.son b{min-width:190px;font-weight:600}
+button{background:#22345a;color:var(--txt);border:1px solid #3b5384;border-radius:6px;padding:4px 9px;cursor:pointer;font:inherit;font-size:12px}
+button:hover{background:#2d4473}.m{font:11px ui-monospace,monospace;color:var(--dim)}.alerte{color:var(--rouge)}.bon{color:var(--vert)}
+</style></head><body>
+<h1>Bibliothèque sonore</h1>
+<p>Chaque bouton joue une variante. Les mesures (durée, crête, niveau moyen, silences, saturation) servent au contrôle qualité : une ligne rouge signale un fichier à vérifier.</p>
+<input id="filtre" placeholder="Filtrer (ex. nains, mort-, voix-horde)">
+<div id="liste">Chargement…</div>
+<script>
+const AC=new (window.AudioContext||window.webkitAudioContext)(),cache={},RES={};
+const db=v=>v>0?(20*Math.log10(v)).toFixed(1):'-∞';
+async function decode(f){if(cache[f])return cache[f];const b=await (await fetch('assets/audio/'+f)).arrayBuffer();return cache[f]=await AC.decodeAudioData(b)}
+/* mesures d'un fichier : durée, crête, RMS, silence au début et à la fin (sous -45 dB), part d'échantillons saturés */
+function mesure(buf){const d=buf.getChannelData(0),n=d.length,s=Math.pow(10,-45/20);let pk=0,sq=0,clip=0,a=-1,z=-1;
+ for(let i=0;i<n;i++){const v=Math.abs(d[i]);if(v>pk)pk=v;sq+=v*v;if(v>.99)clip++;if(v>s){if(a<0)a=i;z=i}}
+ const sr=buf.sampleRate;return {dur:+(n/sr).toFixed(2),crete:+db(pk),rms:+db(Math.sqrt(sq/n)),debut:a<0?n/sr:+(a/sr).toFixed(2),fin:z<0?n/sr:+((n-1-z)/sr).toFixed(2),sature:+(clip/n*100).toFixed(2)}}
+/* le jeu remonte lui-même les sons faibles (crête ramenée à -3 dB, gain ×8 au plus = +18 dB) : seul un son sous -21 dB est à refaire */
+function verdict(m,id){const p=[];if(m.crete<-21)p.push('trop faible');if(m.sature>.5)p.push('saturé');if(m.debut>.25&&!id.startsWith('amb-'))p.push('silence au début');if(m.rms<-40)p.push('presque muet');return p}
+async function joue(f){const b=await decode(f);const s=AC.createBufferSource();s.buffer=b;s.connect(AC.destination);s.start()}
+async function mesurer(ids){const out={};for(const id of ids)for(const f of MAN.sons[id]){try{const m=mesure(await decode(f));m.problemes=verdict(m,id);out[f]=m}catch(e){out[f]={erreur:String(e)}}}return out}
+let MAN=null;
+fetch('assets/audio/manifeste.json').then(r=>r.json()).then(m=>{MAN=m;dessine()}).catch(()=>{document.getElementById('liste').textContent='manifeste.json introuvable'});
+function groupe(id){return id.startsWith('tir-')?'Tirs des tours':/^(chantier|fini|up)-/.test(id)?'Construction et amélioration':/^(mort|arrivee)-/.test(id)?'Monstres':id.startsWith('voix-')?'Voix':id.startsWith('amb-')?'Ambiances':'Interface et partie'}
+function dessine(){const q=document.getElementById('filtre').value.trim().toLowerCase(),L=document.getElementById('liste');L.innerHTML='';let g0='';
+ for(const id of Object.keys(MAN.sons).filter(i=>i.includes(q)).sort((a,b)=>groupe(a).localeCompare(groupe(b))||a.localeCompare(b))){
+  const g=groupe(id);if(g!=g0){g0=g;const h=document.createElement('h2');h.textContent=g;L.appendChild(h)}
+  const d=document.createElement('div');d.className='son';d.innerHTML='<b>'+id+'</b>';
+  MAN.sons[id].forEach((f,i)=>{const bt=document.createElement('button');bt.textContent='▶ '+(i+1);bt.onclick=()=>joue(f);d.appendChild(bt)});
+  const m=document.createElement('span');m.className='m';m.textContent='…';d.appendChild(m);L.appendChild(d);
+  mesurer([id]).then(r=>{Object.assign(RES,r);const v=Object.values(r);const pb=v.flatMap(x=>x.problemes||[x.erreur]).filter(Boolean);
+   m.textContent=v.map(x=>x.erreur?'erreur':x.dur+' s, crête '+x.crete+' dB').join(' · ')+(pb.length?' — '+[...new Set(pb)].join(', '):'');m.className='m '+(pb.length?'alerte':'bon')})}}
+document.getElementById('filtre').oninput=()=>MAN&&dessine();
+window.mesurerFichier=async f=>{const m=mesure(await decode(f));m.problemes=verdict(m,f.split('/').pop());return m};
+</script></body></html>

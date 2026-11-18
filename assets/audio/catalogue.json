@@ -1,0 +1,602 @@
+{
+  "_lisezmoi": "Source de la bibliothèque sonore : chaque entrée garde la consigne envoyée à ElevenLabs (modèle eleven_text_to_sound_v2 pour les bruitages, eleven_v4 pour les voix). Les fichiers produits sont assets/audio/<dossier>/<id>-<n>.mp3. Ne pas retoucher les fichiers à la main : régénérer depuis la consigne.",
+  "factions": [
+    "alliance",
+    "horde",
+    "sylvestres",
+    "nains",
+    "legion"
+  ],
+  "voix": {
+    "alliance": {
+      "voice_id": "FmOMKTYDTzzmpxukR0kC",
+      "nom": "Emilio - Deep French Voice",
+      "ton": "[proud, commanding]"
+    },
+    "horde": {
+      "voice_id": "30MA7zYVNHAmlXqFhk8P",
+      "nom": "Julien - Deep Warm & Entertaining",
+      "ton": "[gruff, growling]"
+    },
+    "sylvestres": {
+      "voice_id": "FZo4J4ksP3rihj4k77bi",
+      "nom": "Sabrina",
+      "ton": "[softly, mysterious]"
+    },
+    "nains": {
+      "voice_id": "30ndZrqtoeQllE13MnID",
+      "nom": "Gronk - Le Lutin Cavernicole",
+      "ton": "[gruff, amused]"
+    },
+    "legion": {
+      "voice_id": "CbCVr0nso2tHXdUrOh4e",
+      "nom": "Henry, français ténébreux",
+      "ton": "[whispering, menacing]"
+    }
+  },
+  "sons": [
+    {
+      "id": "tir-arrow-alliance",
+      "dur": 0.8,
+      "n": 3,
+      "p": "Steel crossbow bolt shot, crisp mechanical snap and fast whoosh, close-mic, dry, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-arrow-horde",
+      "dur": 0.8,
+      "n": 3,
+      "p": "Crude bone bow shot, heavy wooden twang and rough whoosh, close-mic, dry, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-arrow-sylvestres",
+      "dur": 0.8,
+      "n": 3,
+      "p": "Light elven bow shot, delicate string pluck and airy leafy whoosh, close-mic, dry, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-arrow-nains",
+      "dur": 0.8,
+      "n": 3,
+      "p": "Small dwarven mechanical ballista shot, metal gear clack and spring thwack, close-mic, dry, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-arrow-legion",
+      "dur": 0.8,
+      "n": 3,
+      "p": "Cursed dark arrow shot, bowstring twang with a hissing ghostly whisper trail, close-mic, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-slash-alliance",
+      "dur": 0.7,
+      "n": 3,
+      "p": "Knight longsword slash, clean steel swish and armored clank, close-mic, dry, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-slash-horde",
+      "dur": 0.7,
+      "n": 3,
+      "p": "Brutal battle axe chop, heavy swing whoosh and a clean meaty thud, no distortion, moderate level, dry, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-slash-sylvestres",
+      "dur": 0.7,
+      "n": 3,
+      "p": "Wooden staff strike with whipping vines, swift swish and leaf rustle, close-mic, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-slash-nains",
+      "dur": 0.7,
+      "n": 3,
+      "p": "Heavy war hammer strike on metal, mechanical piston clank, close-mic, dry, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-slash-legion",
+      "dur": 0.7,
+      "n": 3,
+      "p": "Spectral scythe slash, cold ghostly swish with eerie metallic ring, close-mic, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-frost-alliance",
+      "dur": 1,
+      "n": 3,
+      "p": "Ice crystal spell burst with a bright holy chime and freezing crackle, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-frost-horde",
+      "dur": 1,
+      "n": 3,
+      "p": "Frost totem shamanic ice blast, hollow wooden thump and ice crackle, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-frost-sylvestres",
+      "dur": 1,
+      "n": 3,
+      "p": "Dewdrop frost magic, soft crystalline tinkle and gentle freezing shimmer, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-frost-nains",
+      "dur": 1,
+      "n": 3,
+      "p": "Cryo machine blast, pressurized steam hiss and ice crackle, metallic, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-frost-legion",
+      "dur": 1,
+      "n": 3,
+      "p": "Cursed frost spell, dark icy crackle with a ghostly whoosh, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-canon-alliance",
+      "dur": 1,
+      "n": 3,
+      "p": "Royal bronze cannon shot, sharp powerful boom with short echo, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-canon-horde",
+      "dur": 1,
+      "n": 3,
+      "p": "Crude clan cannon blast, rough heavy boom with rattling wood, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-canon-sylvestres",
+      "dur": 1,
+      "n": 3,
+      "p": "Explosive seed pod launched from a giant flower, deep organic pop and whoosh, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-canon-nains",
+      "dur": 1,
+      "n": 3,
+      "p": "Runic mortar shot, deep metallic thump and gear rattle, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-canon-legion",
+      "dur": 1,
+      "n": 3,
+      "p": "Infernal mortar shot, deep dark boom with a demonic rumble, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-mage-alliance",
+      "dur": 1.2,
+      "n": 3,
+      "p": "Holy light magic bolt cast, bright shimmering chime swell then sharp whoosh release, sparkling, fantasy spell game sound effect, no music"
+    },
+    {
+      "id": "tir-mage-horde",
+      "dur": 1.2,
+      "n": 3,
+      "p": "Shaman fire spell cast, roaring flame burst and tribal bone rattle, fantasy spell game sound effect, no music"
+    },
+    {
+      "id": "tir-mage-sylvestres",
+      "dur": 1.2,
+      "n": 3,
+      "p": "Druid nature magic cast, sparkling chimes and rustling leaves whoosh, fantasy spell game sound effect, no music"
+    },
+    {
+      "id": "tir-mage-nains",
+      "dur": 1.2,
+      "n": 3,
+      "p": "Arcane cannon energy shot, electric hum charge and crackling zap, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-mage-legion",
+      "dur": 1.2,
+      "n": 3,
+      "p": "Void magic bolt, deep distorted whoosh with a sinister whisper, dark fantasy spell sound effect, no music"
+    },
+    {
+      "id": "tir-flame-alliance",
+      "dur": 1,
+      "n": 2,
+      "p": "Short burst of griffin flame breath, roaring fire whoosh, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-flame-horde",
+      "dur": 1,
+      "n": 2,
+      "p": "Short war furnace fire blast, harsh roaring flames and crackle, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-flame-sylvestres",
+      "dur": 1,
+      "n": 2,
+      "p": "Short burst of burning heartwood fire, crackling wood flames whoosh, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-flame-nains",
+      "dur": 1,
+      "n": 2,
+      "p": "Short forge flamethrower burst, pressurized gas roar and crackle, fantasy game sound effect, no music"
+    },
+    {
+      "id": "tir-flame-legion",
+      "dur": 1,
+      "n": 2,
+      "p": "Short lava eruption burst, bubbling magma roar with a dark rumble, fantasy game sound effect, no music"
+    },
+    {
+      "id": "chantier-alliance",
+      "dur": 1.8,
+      "n": 2,
+      "p": "Stone masonry construction, chisel taps and hammer on steel, a stone block placed with a solid thunk, fantasy strategy game sound, no music"
+    },
+    {
+      "id": "chantier-horde",
+      "dur": 1.8,
+      "n": 2,
+      "p": "Heavy wooden logs dropped and lashed with rope, rough hammer pounding, fantasy strategy game sound, no voices, no music"
+    },
+    {
+      "id": "chantier-sylvestres",
+      "dur": 1.8,
+      "n": 2,
+      "p": "Tree roots and branches growing and creaking, leaves rustling, soft magical shimmer, fantasy strategy game sound, no music"
+    },
+    {
+      "id": "chantier-nains",
+      "dur": 1.8,
+      "n": 2,
+      "p": "Forge hammer striking an anvil, gears ratchet, metal plates bolted, fantasy strategy game sound, no music"
+    },
+    {
+      "id": "chantier-legion",
+      "dur": 1.8,
+      "n": 2,
+      "p": "Dark stones grinding into place, chains rattling, eerie magical hum, fantasy strategy game sound, no music"
+    },
+    {
+      "id": "fini-alliance",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Short brass horn call and a bright bell chime, construction complete signal, fantasy game sound effect"
+    },
+    {
+      "id": "fini-horde",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Two heavy tribal war drum hits, construction complete signal, fantasy game sound effect"
+    },
+    {
+      "id": "fini-sylvestres",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Airy magical chime with a soft wooden flute note and birdsong, construction complete signal, fantasy game sound effect"
+    },
+    {
+      "id": "fini-nains",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Short steam whistle toot and a final anvil ring, construction complete signal, fantasy game sound effect"
+    },
+    {
+      "id": "fini-legion",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Deep ominous gong with a ghostly whisper, construction complete signal, dark fantasy game sound effect"
+    },
+    {
+      "id": "up-alliance",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Holy power-up, rising bright shimmer and a ringing steel note, fantasy game upgrade sound, no music"
+    },
+    {
+      "id": "up-horde",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Rising fire roar ending with a heavy drum hit, fantasy game upgrade sound, no music"
+    },
+    {
+      "id": "up-sylvestres",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Rising magical sparkle and creaking growing wood, fantasy game upgrade sound, no music"
+    },
+    {
+      "id": "up-nains",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Mechanical upgrade, gears whirring up and a heavy metallic clunk, fantasy game upgrade sound, no music"
+    },
+    {
+      "id": "up-legion",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Dark energy rising, distorted swell and a sinister whisper, fantasy game upgrade sound, no music"
+    },
+    {
+      "id": "boom",
+      "dur": 1.3,
+      "n": 3,
+      "p": "Cannonball explosion on frozen ground, punchy deep boom, ice shards and debris scatter, short tail, game sound effect, no music"
+    },
+    {
+      "id": "mort-gobelin",
+      "dur": 1,
+      "n": 3,
+      "p": "Small goblin creature death squeal, short and comedic, creature vocalization, no words, no music"
+    },
+    {
+      "id": "mort-bete",
+      "dur": 1,
+      "n": 3,
+      "p": "Wolf beast death yelp and whimper, short, creature vocalization, no music"
+    },
+    {
+      "id": "mort-orc",
+      "dur": 1,
+      "n": 3,
+      "p": "Orc warrior death groan, deep guttural and short, creature vocalization, no words, no music"
+    },
+    {
+      "id": "mort-geant",
+      "dur": 1.3,
+      "n": 3,
+      "p": "Huge giant creature death roar fading out, deep and heavy, creature vocalization, no words, no music"
+    },
+    {
+      "id": "mort-pierre",
+      "dur": 1.2,
+      "n": 3,
+      "p": "Stone golem crumbling apart, rocks cracking and tumbling to the ground, game sound effect, no music"
+    },
+    {
+      "id": "mort-volant",
+      "dur": 1,
+      "n": 3,
+      "p": "Flying creature death screech with fluttering wings falling, short, game sound effect, no music"
+    },
+    {
+      "id": "mort-dragon",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Dragon death roar, huge and fading into a low growl, creature vocalization, no music"
+    },
+    {
+      "id": "mort-magique",
+      "dur": 1,
+      "n": 3,
+      "p": "Ghostly spirit dissipating with an ethereal sigh and soft magical shimmer, game sound effect, no music"
+    },
+    {
+      "id": "mort-gelee",
+      "dur": 0.8,
+      "n": 3,
+      "p": "Slime creature bursting, wet squelchy splat, game sound effect, no music"
+    },
+    {
+      "id": "mort-heros",
+      "dur": 1.8,
+      "n": 2,
+      "p": "Mighty warlord final death roar and heavy armor clattering to the ground, no words, no music"
+    },
+    {
+      "id": "arrivee-heros",
+      "dur": 2,
+      "n": 2,
+      "p": "Menacing warlord battle roar with heavy armor clank, boss arrival, no words, no music"
+    },
+    {
+      "id": "arrivee-dragon",
+      "dur": 2,
+      "n": 2,
+      "p": "Dragon roar in the distance with large wing flaps, boss arrival, no music"
+    },
+    {
+      "id": "arrivee-cyc",
+      "dur": 2,
+      "n": 2,
+      "p": "Giant cyclops angry roar with heavy ground-shaking footstep, boss arrival, no words, no music"
+    },
+    {
+      "id": "warn",
+      "dur": 2,
+      "n": 2,
+      "p": "Distant war horn signalling an incoming enemy attack, cold mountain air, no music"
+    },
+    {
+      "id": "zap",
+      "dur": 0.8,
+      "n": 2,
+      "p": "Electric sabotage zap, short crackling spark and metal clank, game sound effect, no music"
+    },
+    {
+      "id": "leak",
+      "dur": 1.2,
+      "n": 2,
+      "p": "Castle gate struck, heavy wooden thud and a short alarm bell ring, game sound effect, no music"
+    },
+    {
+      "id": "income",
+      "dur": 0.8,
+      "n": 2,
+      "p": "Small pile of gold coins clinking, bright and satisfying, game reward sound, no music"
+    },
+    {
+      "id": "send",
+      "dur": 1.5,
+      "n": 2,
+      "p": "Monster horde unleashed, short war horn blast and stampede rumble, game sound effect, no music"
+    },
+    {
+      "id": "sell",
+      "dur": 1.2,
+      "n": 1,
+      "p": "Tower dismantled, wooden creak and stones tumbling, then coins clinking, game sound effect, no music"
+    },
+    {
+      "id": "nope",
+      "dur": 0.5,
+      "n": 1,
+      "p": "Soft error sound, dull wooden knock with low muted buzz, fantasy user interface, no music"
+    },
+    {
+      "id": "tap",
+      "dur": 0.5,
+      "n": 2,
+      "p": "Soft fantasy UI button click, small metal and wood tick with faint crystal shimmer, clean, very short, no music"
+    },
+    {
+      "id": "ouvre",
+      "dur": 0.6,
+      "n": 1,
+      "p": "Fantasy UI panel opening, soft parchment unroll whoosh with a faint chime, no music"
+    },
+    {
+      "id": "ferme",
+      "dur": 0.5,
+      "n": 1,
+      "p": "Fantasy UI panel closing, soft parchment roll and gentle wooden tap, no music"
+    },
+    {
+      "id": "out",
+      "dur": 2,
+      "n": 1,
+      "p": "Dramatic low gong and crumbling stone fortress, a kingdom has fallen, game sound effect"
+    },
+    {
+      "id": "win",
+      "dur": 4,
+      "n": 2,
+      "p": "Short victorious fanfare of brass horns and timpani, heroic fantasy, game victory stinger"
+    },
+    {
+      "id": "lose",
+      "dur": 4,
+      "n": 2,
+      "p": "Short somber defeat horn and slow low drum, fading, dark fantasy, game defeat stinger"
+    },
+    {
+      "id": "amb-hiver",
+      "dur": 20,
+      "n": 1,
+      "loop": true,
+      "p": "Cold winter wind blowing over snowy mountains, soft gusts and faint distant howl, calm, no music"
+    },
+    {
+      "id": "amb-bataille",
+      "dur": 20,
+      "n": 1,
+      "loop": true,
+      "p": "Distant medieval battlefield ambience, faint clashing swords and war drums far away under the wind, no voices, no music"
+    }
+  ],
+  "repliques": {
+    "alliance": {
+      "sel": [
+        "Hum hum ! Pour le roi !",
+        "Mes moustaches sont prêtes, commandant !",
+        "Oui, oui, à vos ordres !"
+      ],
+      "agace": [
+        "Commandant, je cire mon armure, là !",
+        "Encore ?! Même un chevalier fait la sieste !"
+      ],
+      "construit": [
+        "Tour bâtie, et droite comme ma lance !",
+        "Voilà ! Pour la gloire et pour le roi !"
+      ],
+      "ameliore": [
+        "Ho ho ! Plus brillant que jamais !",
+        "Une nouvelle couche de dorure !"
+      ],
+      "impossible": [
+        "Sacrebleu, impossible !",
+        "Même avec ma plus belle épée, non !"
+      ]
+    },
+    "horde": {
+      "sel": [
+        "Grrr… On cogne qui ?",
+        "Quoi ? Moi prêt !",
+        "Bwahaha ! Bagarre ?"
+      ],
+      "agace": [
+        "Toi arrêter toucher, ou moi mordre !",
+        "Grrr ! Moi travailler, pas papoter !"
+      ],
+      "construit": [
+        "Tour debout ! Grrr, ça va saigner !",
+        "Fini ! Maintenant, on tape !"
+      ],
+      "ameliore": [
+        "Plus gros ! Plus fort ! Bwaha !",
+        "Ça, c'est de la tour qui cogne !"
+      ],
+      "impossible": [
+        "Pas possible, chef ! Grrr…",
+        "Moi pas comprendre !"
+      ]
+    },
+    "sylvestres": {
+      "sel": [
+        "Mmmh… la forêt t'écoute…",
+        "Oui ? Je parlais à un champignon.",
+        "Le vent… le vent est avec nous."
+      ],
+      "agace": [
+        "Patience… même les chênes poussent lentement.",
+        "Arrête de secouer les branches, voyons !"
+      ],
+      "construit": [
+        "Les racines ont pris… joli.",
+        "Une sentinelle pousse… chut, elle dort encore."
+      ],
+      "ameliore": [
+        "La sève monte… oh, ça chatouille !",
+        "Plus grand, plus feuillu !"
+      ],
+      "impossible": [
+        "Non, non… la forêt boude.",
+        "Même une fougère ne pousserait pas là."
+      ]
+    },
+    "nains": {
+      "sel": [
+        "Ouais, chef ? Hmpf.",
+        "Encore du boulot ? Ha !",
+        "La forge est chaude, la bière aussi !"
+      ],
+      "agace": [
+        "Tu vas me laisser finir ma bière, oui ?!",
+        "Encore un clic et je te martèle !"
+      ],
+      "construit": [
+        "Travail fini ! Du solide, du nain !",
+        "Et voilà ! Ça tiendra mille ans !"
+      ],
+      "ameliore": [
+        "Plus de rivets, plus de boum !",
+        "Ha ! Ça, c'est de l'ingénierie !"
+      ],
+      "impossible": [
+        "Pas question, chef ! Hmpf.",
+        "Même mon marteau dit non !"
+      ]
+    },
+    "legion": {
+      "sel": [
+        "Hé hé hé… que désires-tu ?",
+        "Les ombres t'écoutent…",
+        "Mouahaha… nous attendons."
+      ],
+      "agace": [
+        "Ne tente pas les ténèbres… sérieusement.",
+        "Encore toi ? Ton âme sera la prochaine… hé hé."
+      ],
+      "construit": [
+        "Les ténèbres s'élèvent… mouahaha !",
+        "Notre tour se dresse… sinistrement."
+      ],
+      "ameliore": [
+        "Plus de pouvoir… toujours plus !",
+        "La corruption grandit… délicieux."
+      ],
+      "impossible": [
+        "Impossible… même pour la mort.",
+        "Les ombres refusent… quel dommage."
+      ]
+    }
+  }
+}

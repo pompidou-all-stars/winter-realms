@@ -9,3 +9,9 @@ rapports/
 *.blend1
 __pycache__/
 apercus/
+# sons refusés par le contrôle qualité (art/outils/generer-sons.js)
+.sons-refuses/
+
+# enregistrements de référence des voix (voix de personnes réelles : hors du dépôt public sauf accord)
+art/sons/voix/*
+!art/sons/voix/LISEZMOI.md
