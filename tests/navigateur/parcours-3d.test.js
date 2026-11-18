@@ -67,7 +67,7 @@ else test.describe('Parcours mobile en 3D — portrait',()=>{
  test('Aucune erreur JavaScript pendant tout le parcours',()=>assert.deepEqual(o.erreurs,[]));
 });
 
-/* 2.8 : la 3D est le rendu par défaut ; ?rendu=2d garde la 2D classique (2.21 : plus de lien sur l'accueil, la 2D sert de secours et aux tests) */
+/* 2.8 : la 3D est le rendu par défaut ; ?rendu=2d garde la 2D classique (2.22 : plus de lien sur l'accueil, la 2D sert de secours et aux tests) */
 if(N.disponible())test('Adresse par défaut : la 3D ; avec ?rendu=2d : la 2D',async()=>{
  const srv=await demarrer(RACINE),nav=await N.lancer({webgl:true});
  try{let o=await N.ouvrir(nav,srv.url);assert.equal(await N.attendre3D(o.page),true,'3D chargée sans paramètre');
