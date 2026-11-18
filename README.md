@@ -1,5 +1,25 @@
 # Winter Realms — Tower Wars
 
+## 🗺️ Feuille de route — idées d'améliorations
+
+Une idée ? **[➕ Proposer une idée](https://github.com/pompidou-all-stars/winter-realms/issues/new?template=idee.yml)** (formulaire GitHub, marche aussi sur téléphone), ou ajoute une ligne ici dans une PR. Toutes les idées : [onglet Issues, étiquette « idée »](https://github.com/pompidou-all-stars/winter-realms/issues?q=label%3Aid%C3%A9e).
+
+Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
+
+| Statut | Domaine | Idée |
+|---|---|---|
+| 💡 | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. |
+| 💡 | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. |
+| 💡 | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
+| 💡 | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
+| 💡 | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
+| 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
+| 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
+| 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
+| 💡 | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. |
+| 🧭 | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. |
+| 🧭 | ✨ Palier 3 | **Pouvoirs magiques payants** : renforcements sur son propre terrain, ou malédictions à lancer sur le terrain d'un adversaire. |
+
 A browser tower-wars game: the game itself is `index.html` (interface, drawing, sounds) plus `sim.js` (the simulation, also used by the multiplayer server). No build step, no dependencies.
 
 ## Play
@@ -45,6 +65,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.25 — 2026-11-18
+- Organisation: **roadmap** at the top of this README (improvement ideas with a status) and an “Idée d'amélioration” issue form to propose new ones. No need to run the simulation tests when a change cannot affect gameplay (docs, project rules). No game change.
 - Ground monsters now move diagonally and at any angle: they take the shortest straight-line route (e.g. corner to corner along the diagonal) instead of only horizontal and vertical steps, without cutting through tower corners. They keep a small clearance from towers.
 - Monsters no longer pile up: nearby monsters push each other sideways only, never slowing anyone down, so they spread out without creating traffic jams.
 - The AI plans its mazes with the same rules (8 directions, no corner cutting), so its walls are judged by the path monsters really take; diagonal walls (towers touching by a corner) now count.
