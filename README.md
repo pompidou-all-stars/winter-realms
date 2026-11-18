@@ -45,6 +45,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.20 — 2026-11-18
+- Tooling: tower test bench (`node tests/outils/banc-tours.js`) measuring each tower's damage per gold invested, levels 1 to 5, against 7 typical waves, with before/after comparison. No gameplay change.
 - Frost towers and Sylvan roots now scale with the tower level. Frost: −20 % speed at level 1 up to −50 % at level 5 (was −50 % to −70 %), lasting 1.5 s to 2.7 s, with a blast radius growing from 1.2 to 2 tiles. Roots: −10 % at level 1 up to −30 % at level 5, lasting 0.72 s to 1.3 s.
 - Cold and roots now add up (frost −50 % + roots −30 % = −80 %); two effects of the same kind do not stack (the strongest and longest wins).
 - The tower card shows the slow, duration and zone, and what the next level brings. `sim.js` changed (automatic server redeploy).
