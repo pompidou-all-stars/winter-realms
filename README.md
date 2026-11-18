@@ -50,6 +50,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 - The AI plans its mazes with the same rules (8 directions, no corner cutting), so its walls are judged by the path monsters really take; diagonal walls (towers touching by a corner) now count.
 - The dotted path shows this new route, in 2D and 3D. A tower can no longer be placed right next to a ground monster; a tower placed in front of one makes it change its route.
 - `sim.js` changed (automatic server redeploy).
+- Organisation: every version now gets a very short title (2 to 4 words, e.g. “exploration fin de partie” for 2.23), reused in the commit, the PR, the CLAUDE.md log and this changelog. No game change.
 
 ### 2.24 — 2026-11-18
 - On a computer, **Shift + click** on a tile builds the selected tower in a single click (no preview step). The tower stays selected, so you can chain builds. Touch screens keep the two-tap build.

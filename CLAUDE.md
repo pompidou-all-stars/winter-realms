@@ -16,6 +16,10 @@ Concrètement :
 3. Si la version change, mettre à jour le numéro dans le `<title>` de `index.html` **et** dans le titre de ce fichier.
 4. Un changement qui contredit ce document sans le mettre à jour est considéré comme incomplet.
 5. **Les tests doivent passer** (`node tests/tout.js`) avant chaque commit, et chaque évolution est présentée avec ses **trois bilans** (technique, gameplay, visuel). Voir §12.
+6. **Chaque version a un titre très court** qui résume ce qu'elle fait, en **2 à 4 mots**, en minuscules, sans verbe ni ponctuation. Exemples : 2.23 « exploration fin de partie », 2.24 « Maj + clic », 2.20 « givre selon le niveau ». Ce titre est repris tel quel :
+   - dans le commit et la PR : `Version X.Y : <titre>` ;
+   - au début de la ligne du **Journal des modifications** : `**<titre>** : …` ;
+   - dans le titre de la section du `README.md` : `### X.Y — <titre> — <date>`.
 
 Claude : quand tu modifies le jeu, applique cette règle sans qu'on te le demande.
 
@@ -25,7 +29,7 @@ On commite **souvent, par petites étapes**, pour que tout le monde suive l'avan
 
 1. **Un commit par amélioration** (une nouvelle tour, un monstre, une retouche d'équilibrage, un correctif, une évolution visuelle…). On ne mélange pas plusieurs sujets dans un même commit.
 2. Chaque commit contient **à la fois** le changement dans `index.html` **et** la mise à jour de `CLAUDE.md`.
-3. **Nouvelle version reçue** (fichier HTML partagé par un membre du groupe) : créer une branche, y copier le fichier dans `index.html`, lire le diff (`git diff`), mettre à jour `CLAUDE.md`, puis faire un commit nommé `Version X.Y : <résumé>`.
+3. **Nouvelle version reçue** (fichier HTML partagé par un membre du groupe) : créer une branche, y copier le fichier dans `index.html`, lire le diff (`git diff`), mettre à jour `CLAUDE.md`, puis faire un commit nommé `Version X.Y : <titre>` (titre court de la version, voir la règle de maintenance n°6).
 4. **Messages de commit** en français, au présent, courts et précis : `Ajoute la tour …`, `Corrige …`, `Rééquilibre …`, `Version 1.6 : plateau diorama`.
 5. Faire `git push` juste après chaque commit **sur sa branche**, pour que les autres voient l'avancement.
 6. Ne jamais laisser une modification qui marche sans la commiter à la fin d'une séance de travail.
@@ -832,3 +836,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-18 | 2.25 | **Monstres au sol en diagonale** (§3) : distances sur 8 directions (diagonale √2, sans couper le coin d'une tour), puis déplacement en ligne droite vers la case la plus lointaine visible du chemin, à 0,3 case des tours, cible revue toutes les 0,25 s : les monstres prennent le chemin le plus court à n'importe quel angle (du coin haut gauche au coin bas droit, la diagonale). Chemin en pointillés (2D et 3D) tracé avec les mêmes règles (`chemin`). Pose refusée à moins de 0,9 case d'un monstre au sol (plus de case « visée » protégée) ; une pose devant un monstre lui fait changer de cible. L'IA garde ses labyrinthes calculés en 4 directions. **`sim.js` modifié** (redéploiement automatique du serveur). Tests `construction` et `deplacements` adaptés, deux tests de diagonale ajoutés. La colonne « Chemin » des statistiques de fin de partie (2.23) donne la longueur réelle de ce chemin, arrondie à la case. |
 | 2026-11-18 | 2.25 | **Monstres espacés** (§3, `Board.ecarter`) : les monstres proches (moins de 0,75 case) se poussent sur le côté seulement, au plus 1,5 case/s, sans jamais être freinés : ils ne se superposent plus (chevauchements de 3 % à 0 % des paires dans un essai à 40 monstres) et le temps de trajet est inchangé, donc pas de bouchon. Les volants s'écartent aussi entre eux. `sim.js` modifié (redéploiement automatique du serveur). Deux tests ajoutés à `deplacements`. |
 | 2026-11-18 | 2.25 | **IA adaptée aux déplacements en diagonale** (§8) : la longueur du chemin de ses plans (`plen`, `mzPath`) suit les règles des monstres (8 directions sans couper les coins, coûts 5 et 7, algorithme de Dial) et la recherche locale peut ajouter des segments en diagonale. Mesuré sur 30 graines avec le vrai chemin : à 40 tours, 56,1 → 57,0 cases en Normal et 59,0 → 61,1 en Brutal ; plan complet 89 → 95 cases en Brutal. Génération ≈ 60 à 75 ms (au lieu de 30 à 40), par tranches de 5 ms au plus ; garde-fou du test `labyrinthe` porté de 100 à 150 ms au total (10 ms par tranche inchangé). `sim.js` modifié (redéploiement automatique du serveur). |
+| 2026-11-18 | 2.25 | Organisation : **titre court pour chaque version** (règle de maintenance n°6) : 2 à 4 mots qui résument la version (par exemple « exploration fin de partie » pour la 2.23), repris dans le commit, la PR, le journal et le `README.md`. **Aucun changement de jeu.** |
