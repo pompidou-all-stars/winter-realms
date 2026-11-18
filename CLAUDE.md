@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.20)
+# Winter Realms — Tower Wars (Édition 2.21)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -146,11 +146,11 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 | Archétype | Coût | Portée | Dégâts | Recharge | Particularités |
 |---|---|---|---|---|---|
 | Archer | 20 | 2,8 | 8 | 0,5 s | Tir simple, touche le sol et les airs |
-| Canon | 50 | 2,5 | 20 | 1,2 s | Explosion de rayon 1,1 (60 % des dégâts autour), **sol uniquement** |
+| Canon | 50 | 2,5 | 12 | 1,2 s | Explosion de rayon 1,1 (60 % des dégâts autour, sans limite de cibles), **sol uniquement**. Dégâts 20 → 12 en 2.21 |
 | Givre | 40 | 2,5 | 4 | 0,9 s | Explosion de rayon 1,2 à 2 selon le niveau, **ralentit** (voir plus bas), **magique** |
 | Mage | 90 | 3,2 | 45 | 1,4 s | **Magique**, **détecte les invisibles** dans sa portée |
 | Garde | 30 | 1,5 | 20 | 0,55 s | Corps à corps (frappe directe), **sol uniquement** |
-| Flammes | 70 | 2,0 | 3 | 0,12 s | Cône d'environ ±29°, plus tout ce qui est à moins de 0,6 case ; touche les airs |
+| Flammes | 70 | 2,0 | 3 | 0,12 s | Cône d'environ ±29°, plus tout ce qui est à moins de 0,6 case ; **4 monstres au plus par jet** (`mx`, les plus proches de la sortie, depuis la 2.21) ; touche les airs |
 
 - Les tours « magiques » (Givre, Mage) **n'ont aucun effet sur le Briseur de runes**.
 - **Ciblage** : chaque tour vise, dans sa portée, le monstre visible **le plus proche de la sortie**.
@@ -236,7 +236,7 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 | 0 | Tour des archers | Archer | 20 | 7,8 | 0,515 | 15 | 3,08 |
 | 1 | Bastion du chevalier | Garde | 35 | 21 | 0,567 | 37 | 1,65 |
 | 2 | Obélisque de givre | Givre | 40 | 3,7 | 0,927 | 4 | 2,75 |
-| 3 | Bombarde royale | Canon | 60 | 21,7 | 1,236 | 18 | 2,75 |
+| 3 | Bombarde royale | Canon | 60 | 13 | 1,236 | 11 | 2,75 |
 | 4 | Brasier du griffon | Flammes | 85 | 3,4 | 0,124 | 27 | 2,2 |
 | 5 | Sanctuaire solaire | Mage | 85 | 40,2 | 1,442 | 28 | 3,52 |
 | 6 | Tour des sentinelles | Archer | 25 | 8,3 | 0,443 | 19 | 3,45 |
@@ -250,7 +250,7 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 | 0 | Tour des chasseurs | Archer | 20 | 7,7 | 0,52 | 15 | 2,6 |
 | 1 | Totem du berserker | Garde | 35 | 20,7 | 0,572 | 36 | 1,4 |
 | 2 | Totem de glace | Givre | 40 | 3,7 | 0,936 | 4 | 2,33 |
-| 3 | Canon des clans | Canon | 55 | 21,5 | 1,248 | 17 | 2,33 |
+| 3 | Canon des clans | Canon | 55 | 12,9 | 1,248 | 10 | 2,33 |
 | 4 | Fourneau de guerre | Flammes | 85 | 3,4 | 0,125 | 27 | 1,86 |
 | 5 | Chaman des flammes | Mage | 85 | 39,7 | 1,456 | 27 | 2,98 |
 | 6 | Tour des éclaireurs | Archer | 25 | 8,2 | 0,447 | 18 | 2,92 |
@@ -264,7 +264,7 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 | 0 | Arbre sentinelle | Archer | 20 | 7,7 | 0,51 | 15 | 2,8 |
 | 1 | Gardien des racines | Garde | 30 | 20,7 | 0,561 | 37 | 1,5 |
 | 2 | Pierre de rosée | Givre | 40 | 3,7 | 0,918 | 4 | 2,5 |
-| 3 | Fleur explosive | Canon | 55 | 21,5 | 1,224 | 18 | 2,5 |
+| 3 | Fleur explosive | Canon | 55 | 12,9 | 1,224 | 11 | 2,5 |
 | 4 | Cœur ardent | Flammes | 85 | 3,4 | 0,122 | 28 | 2 |
 | 5 | Cercle druidique | Mage | 85 | 39,7 | 1,428 | 28 | 3,2 |
 | 6 | Nid des faucons | Archer | 25 | 8,2 | 0,439 | 19 | 3,14 |
@@ -278,7 +278,7 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 | 0 | Tourelle de guet | Archer | 20 | 8,6 | 0,54 | 16 | 2,86 |
 | 1 | Automate garde | Garde | 35 | 23,3 | 0,594 | 39 | 1,53 |
 | 2 | Cryo-forge | Givre | 40 | 4,1 | 0,972 | 4 | 2,55 |
-| 3 | Mortier runique | Canon | 60 | 24,2 | 1,296 | 19 | 2,55 |
+| 3 | Mortier runique | Canon | 60 | 14,5 | 1,296 | 11 | 2,55 |
 | 4 | Forge incandescente | Flammes | 90 | 3,8 | 0,13 | 29 | 2,04 |
 | 5 | Canon arcanique | Mage | 90 | 44,7 | 1,512 | 30 | 3,26 |
 | 6 | Baliste naine | Archer | 25 | 9,3 | 0,464 | 20 | 3,2 |
@@ -292,7 +292,7 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 | 0 | Tour des damnés | Archer | 20 | 8,1 | 0,505 | 16 | 2,77 |
 | 1 | Chevalier funeste | Garde | 35 | 21,8 | 0,556 | 39 | 1,48 |
 | 2 | Obélisque maudit | Givre | 40 | 3,9 | 0,909 | 4 | 2,48 |
-| 3 | Mortier infernal | Canon | 55 | 22,6 | 1,212 | 19 | 2,48 |
+| 3 | Mortier infernal | Canon | 55 | 13,6 | 1,212 | 11 | 2,48 |
 | 4 | Puits de lave | Flammes | 85 | 3,6 | 0,121 | 30 | 1,98 |
 | 5 | Nexus du néant | Mage | 85 | 41,8 | 1,414 | 30 | 3,17 |
 | 6 | Œil démoniaque | Archer | 25 | 8,7 | 0,434 | 20 | 3,1 |
@@ -813,3 +813,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-18 | 2.19 | **Icônes plus lisibles** (§9) : pastilles de rôle et de cibles des tours rondes et cerclées de la couleur du rôle (le carré doré, qui diluait la couleur, est retiré) ; aile redessinée en vraie aile à plumes. Onglets d'envoi en icônes : patte (sol), aile (volants), étoile (spéciaux). Le **gain de revenu** revient sur les cartes de monstres (pastille verte « +N »). Interface uniquement : `sim.js` non modifié. |
 | 2026-11-18 | 2.20 | **Givre et racines selon le niveau** (§4.1, §5) : le Givre ralentit de −20 % (niveau 1) à −50 % (niveau 5) au lieu de −50 % à −70 %, pendant 1,5 s à 2,7 s, avec une explosion de rayon 1,2 à 2 cases ; les racines sylvestres de −10 % pendant 0,72 s à −30 % pendant 1,3 s (avant : −18 % à tous les niveaux). **Le froid et les racines s'additionnent** (jusqu'à −80 %) ; deux effets de la même famille ne se cumulent pas. Tables `GIVRE_LV` et `RACINES_LV`. Fiche : ralentissement, durée et zone au niveau actuel et au suivant. `sim.js` modifié (redéploiement automatique du serveur). Tests `deplacements` et `combats` adaptés. Valeurs demandées par le concepteur ; durées et rayons **à valider**. |
 | 2026-11-18 | 2.20 | Outillage : **banc d'essai des tours** (`tests/outils/banc-tours.js`, §12) : rendement par or investi de chaque tour et de chaque niveau dans 7 vagues types, avec comparaison avant → après. Premier constat : face à une foule (vague d'IA), une Flammes niveau 5 inflige 187 % des PV de 40 Ogres de la 8e minute, contre 19 % pour un Mage niveau 5 au même prix. **Aucun changement de jeu.** |
+| 2026-11-18 | 2.21 | **Rééquilibrage des tours de zone** (§4.1, §5.1), mesuré avec le banc d'essai : la **Flammes** ne touche plus que **4 monstres au plus par jet** (`mx`, les plus proches de la sortie) au lieu de tout son cône ; face à une foule de 40 monstres, son rendement par or passe de 459 à 87 (indice du banc, niveau 5), sans changement contre un groupe de 4 ni contre les volants. Le **Canon** voit ses dégâts de base passer de **20 à 12** (−40 %) : il garde son explosion sans limite de cibles (c'est son principe) et reste la meilleure tour contre les foules, mais son rendement global au niveau 5 passe de 222 à environ 138, au niveau du Mage, du Garde et de la Flammes. La fiche de la Flammes indique « 4 cibles au plus ». `sim.js` modifié (redéploiement automatique du serveur). Nouveau test `combats` (4 cibles au plus). Chiffres **à valider par le concepteur**. |

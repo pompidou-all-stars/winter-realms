@@ -2,11 +2,12 @@
 const C=13,R=17,SP=[6,0],EX=[6,16],DIRS=[[1,0],[-1,0],[0,1],[0,-1]],INF=1e9,OUT='#2b1d12';
 const BASE_TW=[
  {n:'Archer',c:20,r:2.8,d:8,cd:.5,ps:10,col:'#6aa84f',s:'arrow'},
- {n:'Canon',c:50,r:2.5,d:20,cd:1.2,ps:6.5,sp:1.1,gr:1,col:'#b0703a',s:'canon',tag:'sol'},
+ {n:'Canon',c:50,r:2.5,d:12,cd:1.2,ps:6.5,sp:1.1,gr:1,col:'#b0703a',s:'canon',tag:'sol'},
  {n:'Givre',c:40,r:2.5,d:4,cd:.9,ps:8,sl:1.5,fsp:1.2,mag:1,col:'#3d85c6',s:'frost',tag:'magie · zone'},
  {n:'Mage',c:90,r:3.2,d:45,cd:1.4,ps:7.5,mg:1,mag:1,col:'#8e44ad',s:'mage',tag:'magie · détecte'},
  {n:'Garde',c:30,r:1.5,d:20,cd:.55,me:1,gr:1,col:'#c0392b',s:'slash',tag:'sol'},
- {n:'Flammes',c:70,r:2,d:3,cd:.12,fl:1,col:'#e67e22',s:'flame'}];
+ {n:'Flammes',c:70,r:2,d:3,cd:.12,fl:1,mx:4,col:'#e67e22',s:'flame'}];
+/* mx (Flammes, 2.21) : nombre maximal de monstres touchés par jet de flammes (les plus proches de la sortie) ; avant, tout le cône était touché, ce qui rendait la tour imbattable face aux grosses vagues */
 /* ralentissements selon le niveau de la tour (2.18), du niveau 1 au niveau 5. p : part de vitesse retirée, d : durée (s), r : rayon de la zone du Givre (cases).
    Le froid (Givre) et les racines (Sylvestres) s'additionnent ; deux effets de la même famille ne s'additionnent pas (le plus fort et le plus long l'emportent). */
 const GIVRE_LV={p:[.2,.275,.35,.425,.5],d:[1.5,1.8,2.1,2.4,2.7],r:[1.2,1.4,1.6,1.8,2]},RACINES_LV={p:[.1,.15,.2,.25,.3],d:[.72,.85,1,1.15,1.3]};
@@ -227,7 +228,8 @@ class Board{
     const rem=F?Math.hypot(EX[0]-c.x,EX[1]-c.y):this.d[c.ty][c.tx]+Math.hypot(c.tx-c.x,c.ty-c.y);if(rem<bd){bd=rem;tg=c}}
    if(!tg)continue;t.cd=T.cd;t.a=Math.atan2(tg.y-t.y,tg.x-t.x);
    if(T.me){this.hit(tg,dm,T,t.lv);t.sw=.2;this.fx.push({type:'slash',x:tg.x+.5,y:tg.y+.5,a:t.a,t:.18,d:.18})}
-   else if(T.fl){for(const c of voisins(t.x,t.y,r)){if(c.hid)continue;const dx=c.x-t.x,dy=c.y-t.y,dd=Math.hypot(dx,dy);if(dd>r)continue;const da=Math.atan2(dy,dx)-t.a;if(dd<.6||Math.abs(Math.atan2(Math.sin(da),Math.cos(da)))<.5)this.hit(c,dm,T,t.lv)}
+   else if(T.fl){const L=[];for(const c of voisins(t.x,t.y,r)){if(c.hid)continue;const dx=c.x-t.x,dy=c.y-t.y,dd=Math.hypot(dx,dy);if(dd>r)continue;const da=Math.atan2(dy,dx)-t.a;if(dd<.6||Math.abs(Math.atan2(Math.sin(da),Math.cos(da)))<.5)L.push(c)}
+    if(L.length>T.mx){const rem=c=>CR[c.k].fly?Math.hypot(EX[0]-c.x,EX[1]-c.y):this.d[c.ty][c.tx]+Math.hypot(c.tx-c.x,c.ty-c.y);L.sort((p,q)=>rem(p)-rem(q));L.length=T.mx}for(const c of L)this.hit(c,dm,T,t.lv)
     const h=topY(t);for(let i=0;i<2;i++){const a=t.a+(Math.random()-.5)*.5,v=r/.35*(.75+Math.random()*.35);this.fx.push({type:'flame',x:t.x+.5,y:t.y+.5-h,vx:Math.cos(a)*v,vy:Math.sin(a)*v+h/.35,t:.35,d:.35})}}
    else this.pr.push({id:++UID,x:t.x+.5,y:t.y+.5-topY(t),tg,k:t.k,d:dm,lv:t.lv,tx:tg.x+.5,ty:tg.y+.5,tot:Math.hypot(tg.x-t.x,tg.y-t.y)||.1,a:t.a});
    this.ev.push(T.s)}
