@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.23</title>
+<title>Winter Realms — Tower Wars · Édition 2.26</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -114,17 +114,17 @@ body.r2d .fleche{display:none}
 @keyframes tape{0%{transform:scale(.84);filter:brightness(1.7)}100%{transform:scale(1);filter:none}}
 /* menu */
 #menu{position:absolute;inset:0;z-index:15;display:grid;place-items:center;padding:16px;background:#050b17b8}
-#menu .menu{width:min(280px,100%);display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:16px;background:linear-gradient(180deg,#1d3150,#14223a);border:1px solid #f2c14e88;box-shadow:0 12px 32px #000c}
-#menu .titre-menu{font-size:20px;font-weight:700;color:#ffe597;text-align:center;letter-spacing:.06em}
-#menu button{height:42px;border-radius:10px;border:1px solid #8fb6d944;background:#101d33;color:var(--ink);font-size:15px;font-weight:700}
-#menu button.principal{background:var(--or-fond);color:#3a2205;border-color:#ffe597}
-#menu button.danger{border-color:#e4572e88;color:#ffc2b0}
+:is(#menu,#fin) .menu{width:min(280px,100%);display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:16px;background:linear-gradient(180deg,#1d3150,#14223a);border:1px solid #f2c14e88;box-shadow:0 12px 32px #000c}
+:is(#menu,#fin) .titre-menu{font-size:20px;font-weight:700;color:#ffe597;text-align:center;letter-spacing:.06em}
+:is(#menu,#fin) button{height:42px;border-radius:10px;border:1px solid #8fb6d944;background:#101d33;color:var(--ink);font-size:15px;font-weight:700}
+:is(#menu,#fin) button.principal{background:var(--or-fond);color:#3a2205;border-color:#ffe597}
+:is(#menu,#fin) button.danger{border-color:#e4572e88;color:#ffc2b0}
 #menu ul{margin:0;padding:8px 10px 8px 24px;font-size:12.5px;line-height:1.4;font-weight:500;color:var(--dim);background:#0d1729;border-radius:10px;display:flex;flex-direction:column;gap:4px}
 /* portrait seulement : sur un téléphone en paysage, on demande de le tourner */
 #tourner{display:none;position:fixed;inset:0;z-index:3000;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;background:var(--bg);color:var(--ink);font-size:17px;font-weight:700;text-align:center}
 #tourner svg{width:56px;height:56px;fill:none;stroke:#ffe597;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 @media (orientation:landscape) and (pointer:coarse) and (max-height:540px){#tourner{display:flex}}
-.rondbtn:focus-visible,.fleche:focus-visible,#cartesBtn:focus-visible,#banner:focus-visible,.chip:focus-visible,#bar button:focus-visible,#tabs button:focus-visible,#paliers button:focus-visible,#menu button:focus-visible,#fiche button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
+.rondbtn:focus-visible,.fleche:focus-visible,#cartesBtn:focus-visible,#banner:focus-visible,.chip:focus-visible,#bar button:focus-visible,#tabs button:focus-visible,#paliers button:focus-visible,:is(#menu,#fin) button:focus-visible,#fiche button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){#bar.mon button.sel:after,#bar button.tape,#gold.pop{animation:none}}
 /* ===== 2.18 : habillage « givre » sur l'interface vue tactique =====
    Retour des textures gelées et des cadres à volutes de la 2.12, disposés comme la console d'un jeu de stratégie :
@@ -145,9 +145,9 @@ body.r2d .fleche{display:none}
 /* boutons ronds en métal bleuté */
 .rondbtn,.fleche{background:radial-gradient(circle at 50% 30%,#4a6e9e,#1a2c4c 70%);border:1px solid #d9ecffaa;box-shadow:inset 0 1px 0 #ffffff40,0 0 0 2px #0a1322,0 0 0 3px #c9a24a88,0 3px 8px #000a}
 /* boutons et panneaux sertis : verre de nuit givré, cadre d'argent à volutes (or pour le choix, rouge pour les monstres) */
-#cartesBtn,#chips,#fiche,#tabs button,#paliers button,#menu .menu,#menu button{background-image:var(--givre),var(--verre-nuit);background-size:180px,auto;border:1px solid #8fb6d955}
-#fiche,#tabs button,#paliers button,#menu .menu,#menu button{position:relative}
-#cartesBtn:after,#chips:after,#fiche:after,#tabs button:after,#menu .menu:after,#bar button:before{content:'';position:absolute;inset:-3px;border:12px solid transparent;border-image:var(--orne-argent) 32 / 12px / 0 stretch;pointer-events:none}
+#cartesBtn,#chips,#fiche,#tabs button,#paliers button,:is(#menu,#fin) .menu,:is(#menu,#fin) button{background-image:var(--givre),var(--verre-nuit);background-size:180px,auto;border:1px solid #8fb6d955}
+#fiche,#tabs button,#paliers button,:is(#menu,#fin) .menu,:is(#menu,#fin) button{position:relative}
+#cartesBtn:after,#chips:after,#fiche:after,#tabs button:after,:is(#menu,#fin) .menu:after,#bar button:before{content:'';position:absolute;inset:-3px;border:12px solid transparent;border-image:var(--orne-argent) 32 / 12px / 0 stretch;pointer-events:none}
 #cartesBtn{top:calc(54px + env(safe-area-inset-top,0px));border-radius:5px;border-color:var(--c,#8fb6d955);color:var(--c,var(--ink))}
 #cartesBtn:after{border-width:10px;border-image-width:10px}
 #chips{top:calc(96px + env(safe-area-inset-top,0px));border-radius:6px}
@@ -179,10 +179,10 @@ body.r2d .fleche{display:none}
 #bar button.sel:before{border-image-source:var(--orne-or)}
 #bar button small{position:absolute;left:50%;bottom:-3px;transform:translateX(-50%);z-index:1;white-space:nowrap;padding:0 6px;border-radius:9px;background:#060c18f0;border:1px solid #c9a24a99;box-shadow:0 1px 3px #000a}
 /* menu */
-#menu .menu{border-radius:6px}
-#menu button{border-radius:5px;box-shadow:inset 0 1px 0 #ffffff1f,0 2px 0 #000a}
-#menu button.principal{background-image:var(--givre),var(--or-fond);color:#3a2205}
-#menu button.danger{background-image:var(--givre),linear-gradient(180deg,#3a1d1af2,#22100ef2)}
+:is(#menu,#fin) .menu{border-radius:6px}
+:is(#menu,#fin) button{border-radius:5px;box-shadow:inset 0 1px 0 #ffffff1f,0 2px 0 #000a}
+:is(#menu,#fin) button.principal{background-image:var(--givre),var(--or-fond);color:#3a2205}
+:is(#menu,#fin) button.danger{background-image:var(--givre),linear-gradient(180deg,#3a1d1af2,#22100ef2)}
 
 /* ===== Écran d'accueil (2.11) : menu de jeu vidéo, nuit d'hiver, montagnes et neige ===== */
 #ov{position:fixed;z-index:1000;inset:0;background:linear-gradient(180deg,#060b18 0%,#0e1c36 40%,#1b3358 75%,#2b4a72 100%);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:calc(16px + env(safe-area-inset-top,0px)) 16px calc(22px + env(safe-area-inset-bottom,0px));text-align:center;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y}
@@ -260,6 +260,30 @@ body.r2d .fleche{display:none}
 #ldiff button{font-size:14px!important;padding:6px 10px!important;background:linear-gradient(180deg,#34507a,#1d3152)!important;color:var(--ink)!important;border-color:#8fb6d966!important;text-shadow:none!important;box-shadow:inset 0 1px 0 #ffffff30,0 2px 0 #0009!important}
 #ldiff button.on{background:var(--or-fond)!important;color:#3a2205!important}
 #ov button.ghost{background:transparent;border:0;box-shadow:none;color:var(--dim);font-size:14px;text-decoration:underline;text-shadow:none}
+/* 2.23 : fin de partie (statistiques) et exploration des labyrinthes */
+#fin{position:absolute;inset:0;z-index:16;display:grid;place-items:center;padding:16px;background:#050b17c4;overflow-y:auto}
+#fin .menu{width:min(380px,100%);gap:7px}
+#fin #finTitre{font-size:26px;color:#ffe597;text-shadow:0 2px 0 #000}
+#fin.perdu #finTitre{color:#ffb3a0}
+#fin p{margin:0;text-align:center;font-size:13px;color:var(--dim);line-height:1.35}
+#finStats{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+#finStats th{font-size:10.5px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.03em;padding:0 3px 3px;text-align:right}
+#finStats td{padding:5px 3px;text-align:right;border-top:1px solid #8fb6d922;font-weight:700;color:var(--ink)}
+#finStats th:nth-child(-n+2),#finStats td:nth-child(-n+2){text-align:left}
+#finStats td.nom{white-space:nowrap;border-left:3px solid var(--c);padding-left:6px}
+#finStats td.rang{color:var(--dim);width:1.6em}
+#finStats tr.moi td{background:#f2c14e1c}
+#finStats tr[data-i]{cursor:pointer}
+#finStats tr.mort td:not(.rang){opacity:.62}
+.finCourbe{display:flex;flex-direction:column;gap:2px;font-size:11px;color:var(--dim);text-align:left}
+#finCourbe{width:100%;height:84px;border-radius:6px;background:#060d1acc}
+#fin .finAide{font-size:11px;margin-top:-3px}
+#fin #finMoi{color:var(--ink);font-size:12.5px}
+#finBtn{display:none;margin:0 auto;height:40px;padding:0 16px;border-radius:6px;border:1px solid #f2c14e99;background:var(--givre),var(--verre-nuit);background-size:180px,auto;color:#ffe597;font-size:14px;font-weight:700;box-shadow:0 3px 10px #000a}
+#finBtn u{text-decoration:none;color:var(--ink)}
+body.explore #console{display:none}
+body.explore #finBtn{display:block}
+#finBtn:focus-visible,#fin button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
 body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:none!important}
 </style></head><body>
 <div id="app">
@@ -288,7 +312,18 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
    <div id="tabs"><button data-t="t" class="tw on" type="button">🏰 Tours</button><span class="sep"></span><button data-t="n" class="mon" type="button">Sol</button><button data-t="f" class="mon" type="button">Volants</button><button data-t="s" class="mon" type="button">Spéciaux</button></div>
    <div id="bar"></div>
    </div>
+   <button id="finBtn" type="button">🏁 Partie terminée · <u>stats et quitter</u></button>
   </div>
+  <div id="fin" hidden role="dialog" aria-modal="true" aria-labelledby="finTitre"><div class="menu">
+   <div class="titre-menu" id="finTitre">Victoire !</div>
+   <p id="finSous"></p>
+   <table id="finStats"></table>
+   <p class="finAide">Touche un joueur pour regarder son labyrinthe.</p>
+   <div class="finCourbe"><span>Revenu au fil de la partie</span><canvas id="finCourbe"></canvas></div>
+   <p id="finMoi"></p>
+   <button class="principal" id="fRegarder" type="button">Regarder la carte</button>
+   <button class="danger" id="fQuitter" type="button">Quitter</button>
+  </div></div>
   <div id="menu" hidden role="dialog" aria-modal="true" aria-labelledby="menuTitre"><div class="menu">
    <div class="titre-menu" id="menuTitre">Menu</div>
    <button class="principal" id="mReprendre" type="button">Reprendre</button>
@@ -661,8 +696,7 @@ function draw(b,g,s,t){
  // Lumière d'ambiance douce au centre de l'arène.
  const ambience=g.createRadialGradient(C*s*.5,R*s*.43,s*.5,C*s*.5,R*s*.43,C*s*.8);ambience.addColorStop(0,'rgba(255,238,180,.07)');ambience.addColorStop(1,'rgba(0,0,0,.18)');g.fillStyle=ambience;g.fillRect(0,0,C*s,R*s);
  g.strokeStyle='rgba(255,255,255,.3)';g.lineWidth=s*.1;g.lineCap='round';g.lineJoin='round';g.setLineDash([s*.16,s*.3]);g.lineDashOffset=-t*s*.9;g.beginPath();
- let x=SP[0],y=SP[1];g.moveTo((x+.5)*s,(y+.5)*s);
- for(let n=0;n<200&&b.d[y][x]>0&&b.d[y][x]<INF;n++){for(const[dx,dy]of DIRS){const a=x+dx,c=y+dy;if(a>=0&&c>=0&&a<C&&c<R&&b.d[c][a]==b.d[y][x]-1){x=a;y=c;break}}g.lineTo((x+.5)*s,(y+.5)*s)}
+ chemin(b).forEach(([x,y],i)=>i?g.lineTo((x+.5)*s,(y+.5)*s):g.moveTo((x+.5)*s,(y+.5)*s));
  g.stroke();g.setLineDash([]);g.lineCap='butt';
  const px=(SP[0]+.5)*s,py=(SP[1]+.5)*s;g.beginPath();g.arc(px,py,s*.48,0,7);g.fillStyle='rgba(0,0,0,.28)';g.fill();g.beginPath();g.arc(px,py,s*.42,0,7);g.fillStyle='#2a1440';g.fill();
  for(let i=0;i<3;i++){g.beginPath();g.arc(px,py,s*(.36-i*.11),t*2+i*2,t*2+i*2+4.4);g.strokeStyle=['#5b2a86','#9b59d0','#e0b3ff'][i];g.lineWidth=s*.08;g.stroke()}
@@ -671,7 +705,7 @@ function draw(b,g,s,t){
  g.beginPath();g.arc(kx,ky+s*.38,s*.12,Math.PI,0);g.lineTo(kx+s*.12,ky+s*.38);g.lineTo(kx-s*.12,ky+s*.38);fs(g,'#5a3a1c');
  g.beginPath();g.moveTo(kx,ky-s*.28);g.lineTo(kx,ky-s*.48);g.stroke();pg(g,b.col,kx,ky-s*.48,kx+s*.2,ky-s*.42,kx,ky-s*.35);
  for(const c of b.cr){const rc=CR[c.k].aura?'255,228,94':CR[c.k].heal?'111,207,151':0;if(rc){g.beginPath();g.arc((c.x+.5)*s,(c.y+.5)*s,AURA_R*s,0,7);g.fillStyle='rgba('+rc+',.1)';g.fill();g.strokeStyle='rgba('+rc+','+(.35+Math.sin(t*5)*.15)+')';g.lineWidth=2;g.stroke()}}
- if(pick&&b===P&&b.t.includes(pick)){const cx=(pick.x+.5)*s,cy=(pick.y+.5)*s;g.beginPath();g.arc(cx,cy,rng(pick)*s,0,7);g.fillStyle='rgba(255,255,255,.1)';g.fill();g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=1.5;g.stroke();
+ if(pick&&b===VB()&&b.t.includes(pick)){const cx=(pick.x+.5)*s,cy=(pick.y+.5)*s;g.beginPath();g.arc(cx,cy,rng(pick)*s,0,7);g.fillStyle='rgba(255,255,255,.1)';g.fill();g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=1.5;g.stroke();
   g.strokeStyle='#ffd95e';g.lineWidth=3;g.strokeRect(pick.x*s+1.5,pick.y*s+1.5,s-3,s-3)}
  if(projet&&b===P){const T=TW[projet.k],cx=(projet.x+.5)*s,cy=(projet.y+.5)*s,ok=!peutConstruire(projet.x,projet.y,projet.k);
   g.beginPath();g.arc(cx,cy,T.r*s,0,7);g.fillStyle=ok?'rgba(255,255,255,.1)':'rgba(255,77,61,.12)';g.fill();g.strokeStyle='rgba(255,255,255,.7)';g.lineWidth=1.5;g.setLineDash([6,5]);g.stroke();g.setLineDash([]);
@@ -683,7 +717,7 @@ function draw(b,g,s,t){
  for(const p of b.pr)drawProj(g,p,s);
  for(const c of fl)cre(c);
  for(const f of b.fx)drawFx(g,f,s);
- if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,C*s,R*s);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',C*s/2,R*s/2)}}
+ if(b.dead&&explore){etiquetteElimine(g,C*s/2,s*.9)}else if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,C*s,R*s);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',C*s/2,R*s/2)}}
 /* sur la vignette du terrain affiché, en 3D, un cadre montre la partie visible (la vue tactique ne montre pas tout le terrain) */
 function cadreMini(g){const m=MINI,pts=R3D.api.empreinte();g.save();g.beginPath();g.rect(0,0,C*m,R*m);g.clip();g.strokeStyle='#fff';g.lineWidth=1.5;g.beginPath();
  pts.forEach((p,i)=>i?g.lineTo(p.x*m,p.z*m):g.moveTo(p.x*m,p.z*m));g.closePath();g.stroke();g.fillStyle='#ffffff22';g.fill();g.restore()}
@@ -696,7 +730,7 @@ const $=id=>document.getElementById(id),main=$('main'),stage=$('stage'),bar=$('b
 if(typeof CanvasRenderingContext2D!='undefined'&&!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 /* G : partie locale (solo). B, P, time, tick, over, LV : vue courante, recopiée de G à chaque image. */
 /* 2.15 : sel = tour choisie pour construire (null : aucune), mon = monstre choisi pour envoyer (null : aucun), pick = tour posée ouverte */
-let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',palv=1,hudPal=1,sel=null,mon=null,view=0,mx,hudK='',tt=0,pick=null,vibre=true;
+let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',palv=1,hudPal=1,sel=null,mon=null,view=0,mx,hudK='',tt=0,pick=null,vibre=true,explore=false;
 const VB=()=>B[view],dpr=()=>Math.min(3,window.devicePixelRatio||1);
 const eff=b=>b.ai?Math.round(b.inc*DIFF[LV].b):b.inc;
 /* ---------- multijoueur ---------- */
@@ -785,7 +819,7 @@ if(!R3D.on)document.body.classList.add('r2d');
 /* bandes couvertes par l'interface : la barre du haut, et en bas la console sans la fiche ni la ligne des paliers
    (onglets et cartes : toujours la même hauteur, quel que soit l'onglet ouvert) ; +8 pour les frises */
 function bandes(){const r=stage.getBoundingClientRect(),pa=$('paliers'),ph=pa.hidden?0:pa.offsetHeight+7;
- return {haut:Math.round($('hud').getBoundingClientRect().bottom-r.top)+8,bas:Math.max(110,Math.round(r.bottom-$('console').getBoundingClientRect().top)-ph+8)}}
+ return {haut:Math.round($('hud').getBoundingClientRect().bottom-r.top)+8,bas:Math.max(110,Math.round(r.bottom-$(explore?'ctl':'console').getBoundingClientRect().top)-ph+8)}}
 function fit(){const r=stage.getBoundingClientRect(),{haut,bas}=bandes();VUE.w=Math.round(r.width);VUE.h=Math.round(r.height);mx=setup(main,VUE.w,VUE.h);
  cell=Math.max(12,Math.floor(Math.min((VUE.w-12)/C,(VUE.h-haut-bas-12)/R)));VUE.ox=(VUE.w-C*cell)/2;VUE.oy=haut+Math.max(0,(VUE.h-haut-bas-R*cell)/2);
  if(R3D.api){R3D.api.taille(VUE.w,VUE.h,dpr());R3D.api.cadre({w:VUE.w,h:VUE.h,haut,bas})}}
@@ -798,7 +832,7 @@ function caseVersEcran(x,y){const r=main.getBoundingClientRect();if(R3D.api){con
 function caseSous(cx,cy){const r=main.getBoundingClientRect();if(R3D.api){const p=R3D.api.sol(cx-r.left,cy-r.top);return p?{x:Math.floor(p.x),y:Math.floor(p.z)}:{x:-1,y:-1}}
  return {x:Math.floor((cx-r.left-VUE.ox)/cell),y:Math.floor((cy-r.top-VUE.oy)/cell)}}
 function charger3D(){if(!R3D.on)return;
- import('./rendu3d.js').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R});stage.insertBefore(R3D.api.canvas,main);
+ import('./rendu3d.js').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R,chemin});stage.insertBefore(R3D.api.canvas,main);
   fit();recentrer();render();
   R3D.pret=R3D.api.precharger([...new Set(B.map(b=>b.classId))]).then(()=>{R3D.charge=true})})
  .catch(e=>{console.warn(e);R3D.on=false;R3D.echec=true;document.body.classList.add('r2d');toast('3D indisponible sur cet appareil : retour à la 2D')})}
@@ -807,14 +841,14 @@ window.R3D_ETAT=()=>({on:R3D.on,charge:!!R3D.charge,echec:R3D.echec,scene:R3D.ap
 /* image en 3D, puis surcouche 2D (barres de vie, chantiers, textes flottants, terrain éliminé) sur le canevas #main ;
    en perspective, la taille d'une case à l'écran (s) dépend de l'endroit : echelle la donne */
 function dessinerVue3D(t){const g=mx,b=VB(),A=R3D.api,E=(x,z,h)=>A.projeter(x,h,z);g.clearRect(0,0,VUE.w,VUE.h);
- A.dessiner(b,t,{pick:b===P&&b.t.includes(pick)?pick:null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
+ A.dessiner(b,t,{pick:b===VB()&&b.t.includes(pick)?pick:null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
  for(const c of b.cr){const hp=c.hp/c.max;if(hp>=1)continue;const x=c.x+.5+(c.ox||0),z=c.y+.5+(c.oy||0),p=E(x,z,A.hauteurMonstre(c.k));if(p.z>1)continue;const s=A.echelle(x,z),w=s*.6;
   g.fillStyle='rgba(0,0,0,.6)';g.fillRect(p.x-w/2,p.y-s*.12,w,s*.09);g.fillStyle=c.sl>0?'#5dc8ff':hp>.4?'#7cdc6a':'#ff6b4a';g.fillRect(p.x-w/2,p.y-s*.12,w*Math.max(0,hp),s*.09)}
  for(const t of b.t)if(t.b>0){const p=1-t.b/(t.bt||1),q=E(t.x+.5,t.y+.5,0);if(q.z>1)continue;const s=A.echelle(t.x+.5,t.y+.5),w=s*.7,h=Math.max(3,s*.09),y=q.y+s*.3;
   g.fillStyle='rgba(20,16,10,.75)';g.fillRect(q.x-w/2-1,y-1,w+2,h+2);g.fillStyle='#ffc95e';g.fillRect(q.x-w/2,y,w*p,h)}
  for(const f of b.fx)if(f.type=='text'){const p=1-f.t/f.d,q=E(f.x,f.y,.9+p*.6);if(q.z>1)continue;const s=A.echelle(f.x,f.y);g.save();g.globalAlpha=Math.max(0,1-p);
   g.font='700 '+Math.round(Math.max(11,s*.36))+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='rgba(0,0,0,.6)';g.strokeText(f.txt,q.x,q.y);g.fillStyle=f.col;g.fillText(f.txt,q.x,q.y);g.restore()}
- if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,VUE.w,VUE.h);g.font='700 32px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',VUE.w/2,VUE.h*.42)}}
+ if(b.dead&&explore)etiquetteElimine(g,VUE.w/2,bandes().haut+70);else if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,VUE.w,VUE.h);g.font='700 32px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',VUE.w/2,VUE.h*.42)}}
 function dessinerVue(t){if(R3D.api){dessinerVue3D(t);return}const g=mx,s=cell*VUE.z,W=C*s,H=R*s,rr=Math.min(10*VUE.z,30);g.clearRect(0,0,VUE.w,VUE.h);g.save();g.translate(VUE.ox,VUE.oy);
  g.save();g.shadowColor='rgba(0,0,0,.56)';g.shadowBlur=32;g.shadowOffsetY=14;g.fillStyle=cadre;g.beginPath();g.roundRect(-3,-3,W+6,H+6,rr+3);g.fill();g.restore();
  g.beginPath();g.roundRect(0,0,W,H,rr);g.fillStyle='#141f33';g.fill();g.clip();draw(VB(),g,s,t);g.restore()}
@@ -826,7 +860,7 @@ function vibrer(ms){if(!vibre)return;try{navigator.vibrate&&navigator.vibrate(ms
 /* terrain regardé : le bouton des adversaires prend la couleur et le nom du joueur regardé, la bannière ramène chez soi */
 function setView(v){view=v;projet=null;const b=B[v],bn=$('banner'),cb=$('cartesBtn');bn.hidden=v==me;bn.textContent='Terrain de '+b.name+' · ↩ revenir au tien';bn.style.background=b.col;
  if(v==me)cb.style.removeProperty('--c');else cb.style.setProperty('--c',b.col);$('cartesTxt').textContent=v==me?'Adversaires':b.name;$('advPoints').hidden=v!=me;
- cartes(false);cadre=v!=me?b.col:'#c9a24a';hudK='';if(pick&&v!=me){pick=null;render()}else if(tab=='t'&&sel!=null)render()}
+ cartes(false);cadre=v!=me?b.col:'#c9a24a';hudK='';if(pick&&(v!=me||explore)){pick=null;render()}else if(tab=='t'&&sel!=null)render()}
 const SOLO_COL=['#e4572e','#4aa3df','#b06ad0'];
 function soloSeats(f){return [{name:'Toi',col:FACTIONS[f].color,ai:0,classId:f}].concat([1,2,3].map(i=>({name:'IA '+i,col:SOLO_COL[i-1],ai:1,classId:(f+i)%5})))}
 /* installe une partie (locale ou reçue du serveur) : vignettes, joueur, vue */
@@ -927,11 +961,12 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  teteFiche(f,ic,T.n,BASE_TW[T.skin].n+' · '+T.role+(t?' · niveau '+lv+'/5':''),stats);icone3D(ic,'tour',k,56,46);
  const ex=elt('div','ex'),part=(t,c)=>{if(ex.childNodes.length)ex.append(' · ');ex.appendChild(elt('span',c||'',t))};
  if(t&&t.b>0)part('🔨 '+(lv>1?'Amélioration':'Construction')+' en cours : '+Math.ceil(t.b)+' s','chantier');else if(!t)part('🔨 Construction : '+fr(btJ(T.c))+' s');
- if(t&&lv<5&&!(t.b>0))part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+(ralentit(T,lv+1)?', ❄ −'+pr(ralentit(T,lv+1).p)+' · '+fd(ralentit(T,lv+1).d)+' s'+(T.fsp?' · zone '+fr(ralentit(T,lv+1).r):''):'')+' ('+fr(btJ(upCost(t)))+' s de travaux)','next');
+ if(t&&lv<5&&!(t.b>0)&&!explore)part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+(ralentit(T,lv+1)?', ❄ −'+pr(ralentit(T,lv+1).p)+' · '+fd(ralentit(T,lv+1).d)+' s'+(T.fsp?' · zone '+fr(ralentit(T,lv+1).r):''):'')+' ('+fr(btJ(upCost(t)))+' s de travaux)','next');
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
  const bf=bonusFaction(T.faction);if(bf)part(bf);
  f.appendChild(ex);
- if(mode=='construire')f.appendChild(view==me?aideFiche('2×','Touche deux fois une case du terrain pour construire'):aideFiche('↩','Reviens sur ton terrain pour construire'));
+ if(mode=='construire')f.appendChild(view==me?aideFiche('2×','Touche deux fois une case du terrain pour construire'+(matchMedia('(pointer:fine)').matches?' (Maj + clic : en un seul clic)':'')):aideFiche('↩','Reviens sur ton terrain pour construire'));
+ if(mode=='tour'&&explore){f.appendChild(aideFiche('🏁','Partie terminée · '+t.inv+' or investis dans cette tour'));return}
  if(mode=='tour'){const a=elt('div','actions'),up=elt('button'),ve=elt('button','vendre','Vendre · +'+Math.floor(t.inv*.7)+' or');up.type=ve.type='button';
   if(t.b>0){up.textContent='Améliorer · en chantier…';up.onclick=()=>showErr('busy')}
   else if(lv<5){up.textContent='Améliorer · '+upCost(t)+' or';up.onclick=()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()}}
@@ -943,7 +978,7 @@ function ficheMonstre(k){const f=$('fiche'),T=CR[k];f.textContent='';f.className
  teteFiche(f,ic,T.n,{n:'Sol',f:'Volant',s:'Spécial'}[T.cat]+(T.tag?' · '+T.tag:'')+' · palier '+T.t,[['PV',Math.round(T.hp*(1+time/200)*HPK)],['Vitesse',fr(T.s)],['Revenu','+'+T.i],['Prix',T.c+' or']]);icone3D(ic,'monstre',k,40,40);
  f.appendChild(aideFiche('1×','Chaque toucher sur la carte envoie '+GROUP+' × '+T.n+' à chaque adversaire et augmente ton revenu'))}
 function cacherFiche(){const f=$('fiche');f.hidden=true;f.textContent='';f.dataset.mode=''}
-function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P.t.includes(pick))pick=null;
+function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!VB().t.includes(pick))pick=null;
  if(pick)remplirFiche('tour',pick.k,pick);else if(tab=='t'&&sel!=null)remplirFiche('construire',sel);else if(tab!='t'&&mon!=null)ficheMonstre(mon);else cacherFiche();
  const pal=$('paliers');pal.hidden=tab=='t';pal.textContent='';
  if(tab=='t'){ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k],b=carte(towerIcon(k,1),T.c+' or',T.n,T.c,()=>{sel=k;pick=null;if(projet)projet.k=k;astuce(false);render()},sel===k,k);icone3D(b.querySelector('canvas'),'tour',k,56,46)});return}
@@ -999,14 +1034,14 @@ let projet=null;
 /* même contrôle que Board.place, sans rien modifier : '' si la pose est possible, sinon le code d'erreur */
 function peutConstruire(x,y,k){const T=TW[k];if(x<0||y<0||x>=C||y>=R||P.g[y][x]||(x==SP[0]&&y==SP[1])||(x==EX[0]&&y==EX[1]))return 'blocked';
  if(P.gold<T.c)return 'poor';
- if(P.cr.some(c=>!CR[c.k].fly&&((Math.abs(c.x-x)<.9&&Math.abs(c.y-y)<.9)||(c.tx==x&&c.ty==y))))return 'blocked';
- P.g[y][x]=1;const nd=P.dist();P.g[y][x]=0;return nd[SP[1]][SP[0]]>=INF||P.cr.some(c=>!CR[c.k].fly&&nd[c.ty][c.tx]>=INF)?'blocked':''}
+ P.g[y][x]=1;const nd=P.dist();P.g[y][x]=0;return nd[SP[1]][SP[0]]>=INF||genant(P,x,y,nd)?'blocked':''}
 function annulerProjet(){projet=null}
 function confirmerConstruction(x,y){const k=projet.k;projet=null;
  if(NET.on){if(P.gold<TW[k].c){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr('poor');return}NET.act({type:'place',x,y,k},true);return}
  const e2=G.action(me,{type:'place',x,y,k});if(e2){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(e2)}}
 /* toucher une case du terrain (au relâcher, sans avoir glissé) */
-function act(cx,cy){if(over)return;astuce(false);const {x,y}=caseSous(cx,cy);
+function act(cx,cy,direct){if(explore){const {x,y}=caseSous(cx,cy),tw=VB().t.find(t=>t.x==x&&t.y==y);astuce(false);if(tw){pick=tw;sfx('tap')}else pick=null;render();return}
+ if(over)return;astuce(false);const {x,y}=caseSous(cx,cy);
  if(x<0||y<0||x>=C||y>=R)return;
  if(view!=me){if(tab=='t'&&sel!=null)toast('Terrain de '+B[view].name+' : lecture seule. Reviens sur le tien pour construire.',true);return}
  const tw=P.t.find(t=>t.x==x&&t.y==y);
@@ -1017,6 +1052,8 @@ function act(cx,cy){if(over)return;astuce(false);const {x,y}=caseSous(cx,cy);
  if(projet&&projet.x==x&&projet.y==y){confirmerConstruction(x,y);return}
  const err=peutConstruire(x,y,sel);
  if(err){projet=null;P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(err);return}
+ /* Maj + clic (ordinateur, 2.24) : construit tout de suite, sans aperçu ; la tour reste choisie pour enchaîner */
+ if(direct){projet={x,y,k:sel};confirmerConstruction(x,y);return}
  projet={x,y,k:sel};sfx('tap');toast('Touchez encore la case pour construire ('+TW[sel].c+' or, '+fr(btJ(TW[sel].c))+' s)')}
 /* Gestes sur le terrain (2.15) :
    - un toucher (relâché sans glisser) sur une case : aperçu, puis un 2e toucher sur la même case : construction ;
@@ -1033,7 +1070,7 @@ main.addEventListener('pointermove',e=>{if(e.pointerId!==pan.id)return;
  pan.x=e.clientX;pan.y=e.clientY;pan.tm=e.timeStamp});
 for(const n of['pointerup','pointercancel'])main.addEventListener(n,e=>{if(e.pointerId!==pan.id)return;pan.id=null;
  if(pan.actif){if(n=='pointerup'&&R3D.api&&e.timeStamp-pan.tm<80)R3D.api.lancer(pan.vx,pan.vz);return}
- if(n=='pointerup')act(pan.x0,pan.y0)});
+ if(n=='pointerup')act(pan.x0,pan.y0,e.shiftKey&&e.pointerType=='mouse')});
 main.addEventListener('contextmenu',e=>e.preventDefault());
 /* rotation de la vue (3D) : un huitième de tour par toucher */
 $('rotG').onclick=()=>{if(R3D.api){R3D.api.pivoter(-1);vibrer(8);astuce(false)}};
@@ -1054,14 +1091,14 @@ $('mMusique').onclick=()=>{MUSIQUE.basculer();$('mMusique').textContent='Musique
 $('mVibre').onclick=()=>{vibre=!vibre;$('mVibre').textContent='Vibrations : '+(vibre?'activées':'coupées');vibrer(15)};
 $('mGestes').onclick=()=>{const l=$('mListe');l.hidden=!l.hidden;$('mGestes').setAttribute('aria-expanded',l.hidden?'false':'true')};
 $('mQuitter').onclick=()=>{if(!quitter){quitter=1;$('mQuitter').textContent='Confirmer : quitter la partie';return}menu(false);
- if(NET.on){NET.leave();return}over=true;if(G)G.over=true;$('msg').textContent='Winter Realms';$('sub').textContent=SUB0;selectFaction(chosenClass);$('ov').classList.remove('fin');$('ov').hidden=false};
-document.addEventListener('keydown',e=>{if(e.key!='Escape')return;if(!$('menu').hidden)menu(false);else if(!$('chips').hidden)cartes(false)});
+ if(NET.on){NET.leave();return}finExplore();over=true;if(G)G.over=true;$('msg').textContent='Winter Realms';$('sub').textContent=SUB0;selectFaction(chosenClass);$('ov').classList.remove('fin');$('ov').hidden=false};
+document.addEventListener('keydown',e=>{if(e.key!='Escape')return;if(!$('menu').hidden)menu(false);else if(!$('fin').hidden)explorer(view);else if(!$('chips').hidden)cartes(false)});
 /* plein écran, verrouillé en portrait quand le téléphone le permet */
 $('fs').onclick=()=>{const d=document,e=d.documentElement,no=()=>toast("Plein écran refusé ici : ouvre le jeu dans ton navigateur",true);
  try{if(d.fullscreenElement||d.webkitFullscreenElement){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return}
   const rq=e.requestFullscreen||e.webkitRequestFullscreen;if(!rq){toast("Plein écran indisponible sur cet appareil",true);return}
   Promise.resolve(rq.call(e)).then(()=>{try{const o=screen.orientation;if(o&&o.lock)o.lock('portrait').catch(()=>{})}catch(_){}}).catch(no)}catch(_){no()}};
-[0,1,2].forEach(l=>{$('go'+l).onclick=()=>{audio();started=true;newSolo(l);setTab('t');$('ov').hidden=true;$('ov').classList.remove('fin');recentrer();astuce(true)}});
+[0,1,2].forEach(l=>{$('go'+l).onclick=()=>{audio();finExplore();started=true;newSolo(l);setTab('t');$('ov').hidden=true;$('ov').classList.remove('fin');recentrer();astuce(true)}});
 document.addEventListener('click',audio,true);
 
 /* ---------- sons et événements ---------- */
@@ -1106,7 +1143,42 @@ function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.d
 function end(winner){over=true;const win=winner===me;finSons();sfx(win?'win':'lose');
  $('msg').textContent=win?'Victoire !':winner>=0&&NET.on?B[winner].name+' gagne':'Défaite';
  $('sub').textContent='Partie de '+mmss(time)+'. Ton revenu final : +'+P.inc+' toutes les 10 s, en '+DIFF[LV].n+'. Adversaires éliminés : '+B.filter(b=>b!==P&&b.dead).length+' sur 3.';
- $('hint').textContent=NET.on?'Retour au salon dans quelques secondes…':'Rejouer en :';$('ov').classList.add('fin');$('ov').hidden=false;if(NET.on)NET.ended()}
+ $('hint').textContent=NET.on?'Retour au salon dans quelques secondes…':'Rejouer en :';$('ov').classList.add('fin');
+ if(NET.on){$('ov').hidden=false;NET.ended();return}
+ pick=null;sel=null;mon=null;projet=null;cartes(false);menu(false);astuce(false);render();remplirFin(win,winner);finFenetre(true)}
+/* 2.23 : fin de partie en solo. Une fenêtre donne les statistiques des 4 joueurs et propose « Regarder la carte »
+   (la partie reste figée : on se balade sur les labyrinthes, on change de terrain, on touche une tour pour la voir) ou « Quitter ». */
+/* longueur réelle du chemin (en ligne droite et en diagonale depuis la 2.25), arrondie à la case */
+const longueur=b=>{if(b.d[SP[1]][SP[0]]>=INF)return 0;const P=chemin(b);let L=0;for(let i=1;i<P.length;i++)L+=Math.hypot(P[i][0]-P[i-1][0],P[i][1]-P[i-1][1]);return Math.round(L)};
+/* classement : le gagnant, puis les terrains encore debout (par vies), puis les éliminés du dernier au premier */
+const classement=()=>B.slice().sort((a,b)=>(b.dead?b.st.mort:1e9+b.lives)-(a.dead?a.st.mort:1e9+a.lives));
+function etiquetteElimine(g,x,y){g.save();g.font='700 15px Fredoka,system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';const w=g.measureText('Éliminé').width+22;
+ g.fillStyle='rgba(10,16,30,.78)';g.fillRect(x-w/2,y-13,w,26);g.fillStyle='#ffb3a0';g.fillText('Éliminé',x,y+1);g.restore()}
+function finFenetre(o){$('fin').hidden=!o;if(o)$('fRegarder').focus()}
+function remplirFin(win,winner){const st=b=>b.st||{pose:0,env:0,envOr:0,tue:0,rev:[],mort:-1};
+ $('finTitre').textContent=win?'Victoire !':'Défaite';$('fin').classList.toggle('perdu',!win);
+ $('finSous').textContent='Partie de '+mmss(time)+' en '+DIFF[LV].n+(!win&&winner>=0?' · '+B[winner].name+' l’emporte':'');
+ const tb=$('finStats');tb.textContent='';const h=elt('tr');
+ for(const [t,ti] of [['',''],['Joueur',''],['Tours','tours en place'],['Chemin','longueur du labyrinthe, en cases'],['Vagues','groupes de 4 monstres envoyés'],['Tués','monstres tués sur son terrain'],['Revenu','revenu final toutes les 10 s']]){const e=elt('th','',t);if(ti)e.title=ti;h.appendChild(e)}tb.appendChild(h);
+ classement().forEach((b,i)=>{const tr=elt('tr',(b===P?'moi ':'')+(b.dead?'mort':''));tr.dataset.i=b.i;tr.style.setProperty('--c',b.col);
+  const nom=elt('td','nom',FACTIONS[b.classId].icon+' '+b.name);
+  tr.append(elt('td','rang',(i+1)+(i?'e':'er')),nom,elt('td','',b.t.length),elt('td','',longueur(b)),elt('td','',st(b).env),elt('td','',st(b).tue),elt('td','','+'+eff(b)));
+  tr.setAttribute('aria-label','Regarder le labyrinthe de '+b.name);tr.onclick=()=>explorer(b.i);tb.appendChild(tr)});
+ const s=st(P),inv=P.t.reduce((a,t)=>a+t.inv,0),top=P.t.slice().sort((a,b)=>b.inv-a.inv)[0];
+ $('finMoi').textContent='Toi : '+s.pose+' tours posées, '+inv+' or dans tes tours, '+s.envOr+' or envoyé en monstres, '+Math.min(40,40-P.lives)+' vies perdues'+(top?' · ta tour phare : '+TW[top.k].n+' (niveau '+top.lv+')':'')+'.';
+ requestAnimationFrame(()=>courbeRevenu(st))}
+/* courbe du revenu de chaque joueur, un point par versement (toutes les 10 s) */
+function courbeRevenu(st){const cv=$('finCourbe'),w=cv.clientWidth||300,h=cv.clientHeight||84,g=setup(cv,w,h),L=B.map(b=>st(b).rev),n=Math.max(2,...L.map(l=>l.length)),mx=Math.max(10,...L.flat());
+ g.clearRect(0,0,w,h);g.strokeStyle='#8fb6d922';g.lineWidth=1;for(let i=1;i<4;i++){const y=Math.round(h*i/4)+.5;g.beginPath();g.moveTo(0,y);g.lineTo(w,y);g.stroke()}
+ g.fillStyle='#8fb6d9aa';g.font='600 10px Fredoka,system-ui,sans-serif';g.textAlign='right';g.fillText('+'+mx,w-4,11);g.textAlign='left';g.fillText('0:00',4,h-6);g.textAlign='right';g.fillText(mmss(time),w-4,h-6);
+ B.forEach(b=>{const l=st(b).rev;if(!l.length)return;g.strokeStyle=b.col;g.lineWidth=b===P?2.6:1.6;g.lineJoin='round';g.beginPath();
+  l.forEach((v,i)=>{const x=4+(w-8)*i/(n-1),y=h-4-(h-18)*v/mx;i?g.lineTo(x,y):g.moveTo(x,y)});g.stroke()})}
+function explorer(v){finFenetre(false);explore=true;document.body.classList.add('explore');pick=null;render();fit();setView(v);
+ toast('Glisse pour te balader · touche une tour pour la voir · « Adversaires » pour changer de terrain')}
+function finExplore(){explore=false;document.body.classList.remove('explore');$('fin').hidden=true;pick=null;fit()}
+$('finBtn').onclick=()=>{pick=null;render();cartes(false);finFenetre(true)};
+$('fRegarder').onclick=()=>explorer(view);
+$('fQuitter').onclick=()=>{finExplore();render();$('ov').hidden=false};
 let last=performance.now();
 let pickB=0;
 /* 2.11 : neige qui tombe sur l'écran d'accueil (positions calculées, sans hasard) */

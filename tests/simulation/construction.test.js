@@ -30,13 +30,16 @@ test('Refus d\'une tour qui couperait complètement le chemin',()=>{const {G,b}=
  for(let x=0;x<12;x++)assert.equal(G.action(0,{type:'place',x,y:5,k:0}),'',`case (${x},5)`);
  const or=b.gold;assert.equal(G.action(0,{type:'place',x:12,y:5,k:0}),'blocked');assert.equal(b.gold,or);assert.equal(b.g[5][12],0);
 });
-test('Le plus court chemin est recalculé après une pose et après une vente',()=>{const {G,b}=nouveau();
- assert.equal(chemin(b),16);G.action(0,{type:'place',x:6,y:8,k:0});assert.equal(chemin(b),18);
+test('Le plus court chemin est recalculé après une pose et après une vente (8 directions, diagonale √2)',()=>{const {G,b}=nouveau();
+ assert.equal(chemin(b),16);G.action(0,{type:'place',x:6,y:8,k:0});assert.ok(Math.abs(chemin(b)-(14+2*Math.SQRT2))<1e-9,'contournement par deux diagonales');
  G.action(0,{type:'sell',x:6,y:8});assert.equal(chemin(b),16);
 });
-test('Refus sur la case vers laquelle se dirige un monstre au sol',()=>{const {G,b}=nouveau();
- const c=apparaitre(S,b,0);avancerTerrain(b,.3);assert.deepEqual([c.tx,c.ty],[6,1]);
+test('Refus sur une case trop proche d\'un monstre au sol ; une pose devant lui le fait changer de cible',()=>{const {G,b}=nouveau();
+ const c=apparaitre(S,b,0);avancerTerrain(b,.3);
  assert.equal(G.action(0,{type:'place',x:6,y:1,k:0}),'blocked');
+ assert.equal(G.action(0,{type:'place',x:6,y:3,k:0}),'');assert.ok(!(c.tx==6&&c.ty>3),'la cible ne se trouve plus derrière la tour');
+ c.hp=c.max=1e9;for(let t=0;t<15&&b.cr.length;t+=.05){b.update(.05);assert.ok(Math.abs(c.x-6)>=.8||Math.abs(c.y-3)>=.8,'le monstre ne traverse pas la tour')}
+ assert.equal(b.lives,39);
 });
 test('Refus d\'une tour qui couperait le passage d\'un monstre déjà en route (même si l\'apparition reste reliée)',()=>{const {G,b}=nouveau();
  const c=apparaitre(S,b,0);Object.assign(c,{x:0,y:10,tx:0,ty:10});

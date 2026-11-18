@@ -1,5 +1,25 @@
 # Winter Realms — Tower Wars
 
+## 🗺️ Feuille de route — idées d'améliorations
+
+Une idée ? **[➕ Proposer une idée](https://github.com/pompidou-all-stars/winter-realms/issues/new?template=idee.yml)** (formulaire GitHub, marche aussi sur téléphone), ou ajoute une ligne ici dans une PR. Toutes les idées : [onglet Issues, étiquette « idée »](https://github.com/pompidou-all-stars/winter-realms/issues?q=label%3Aid%C3%A9e).
+
+Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
+
+| Statut | Domaine | Idée |
+|---|---|---|
+| 💡 | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. |
+| 💡 | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. |
+| 💡 | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
+| 💡 | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
+| 💡 | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
+| 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
+| 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
+| 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
+| 💡 | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. |
+| 🧭 | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. |
+| 🧭 | ✨ Palier 3 | **Pouvoirs magiques payants** : renforcements sur son propre terrain, ou malédictions à lancer sur le terrain d'un adversaire. |
+
 A browser tower-wars game: the game itself is `index.html` (interface, drawing, sounds) plus `sim.js` (the simulation, also used by the multiplayer server). No build step, no dependencies.
 
 ## Play
@@ -44,9 +64,27 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.23 — 2026-11-18
+### 2.26 — terrain immersif — 2026-11-18
 - More immersive 3D terrain: a less distorted camera (34° field of view instead of 48°), 20% closer, and you can no longer pan far away from the board. The board is now part of a continuous winter landscape, told apart only by its grid: relief around it (the board itself stays flat), patches of grass and melted snow, snow grain, a forest of tall snowy pines, rocks, a gradient sky, distant mountains and haze.
 - 3D renderer only: `sim.js` is unchanged (no server redeploy).
+
+### 2.25 — 2026-11-18
+- Organisation: **roadmap** at the top of this README (improvement ideas with a status) and an “Idée d'amélioration” issue form to propose new ones. No need to run the simulation tests when a change cannot affect gameplay (docs, project rules). No game change.
+- Ground monsters now move diagonally and at any angle: they take the shortest straight-line route (e.g. corner to corner along the diagonal) instead of only horizontal and vertical steps, without cutting through tower corners. They keep a small clearance from towers.
+- Monsters no longer pile up: nearby monsters push each other sideways only, never slowing anyone down, so they spread out without creating traffic jams.
+- The AI plans its mazes with the same rules (8 directions, no corner cutting), so its walls are judged by the path monsters really take; diagonal walls (towers touching by a corner) now count.
+- The dotted path shows this new route, in 2D and 3D. A tower can no longer be placed right next to a ground monster; a tower placed in front of one makes it change its route.
+- `sim.js` changed (automatic server redeploy).
+- Organisation: every version now gets a very short title (2 to 4 words, e.g. “exploration fin de partie” for 2.23), reused in the commit, the PR, the CLAUDE.md log and this changelog. No game change.
+
+### 2.24 — 2026-11-18
+- On a computer, **Shift + click** on a tile builds the selected tower in a single click (no preview step). The tower stays selected, so you can chain builds. Touch screens keep the two-tap build.
+- Interface only (`sim.js` untouched, no server redeploy).
+
+### 2.23 — 2026-11-18
+- End of game (solo): a window shows Victory/Defeat with stats for the 4 players (rank, towers, maze length, waves sent, monsters killed, final income), an income curve over the game and a personal summary.
+- “Regarder la carte” lets you walk around the frozen mazes (drag, rotate, switch board, tap a tower to see it); “Quitter” goes back to the replay screen. Tap a player in the table to look at their maze.
+- `sim.js`: stat counters per board (`Board.st`), no effect on gameplay (server redeploys automatically).
 
 ### 2.22 — 2026-11-18
 - The 3D view is now the only view offered: the "Jouer en vue 2D (classique)" link is gone from the home screen. The 2D renderer stays as a fallback when WebGL is missing and for the tests (`?rendu=2d` still works).

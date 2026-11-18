@@ -16,13 +16,13 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
 /* caméra tactique (2.15) : champ vertical, élévation, nombre de cases visibles en largeur au point regardé */
-/* 2.23 : champ plus étroit (moins de déformation), caméra un peu plus redressée, et 20 % plus près (8,4 cases au lieu de 10,5) */
+/* 2.26 : champ plus étroit (moins de déformation), caméra un peu plus redressée, et 20 % plus près (8,4 cases au lieu de 10,5) */
 export const FOV = 34, ELEV = 44 * Math.PI / 180, COLONNES = 8.4;
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
 /* couleurs du terrain : mêmes valeurs que art/communs/factions.py (SOL, BIOME) */
-/* thème hiver (2.9) : terrain enneigé (NEIGE ; TEINTE n'est plus utilisée depuis le paysage continu de la 2.23),
+/* thème hiver (2.9) : terrain enneigé (NEIGE ; TEINTE n'est plus utilisée depuis le paysage continu de la 2.26),
    bord en roche givrée, décor d'hiver (sapins enneigés, rochers, cristaux de glace). */
 const NEIGE = ['#eef3f9', '#e2eaf3'];
 const TEINTE = ['#5a9a45', '#a8652f', '#356d4b', '#8a7a5a', '#7a5a9a'];
@@ -42,7 +42,7 @@ export function creer(J) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
-  /* 2.23 : le terrain est entouré d'un paysage d'hiver (construirePlateau) qui se fond au loin dans la brume ;
+  /* 2.26 : le terrain est entouré d'un paysage d'hiver (construirePlateau) qui se fond au loin dans la brume ;
      ciel en dégradé (nuit en haut, bleu gris à l'horizon) et montagnes lointaines, hors de la brume */
   const HORIZON = '#4a6385';
   scene.background = new THREE.Color('#16243a'); scene.fog = new THREE.Fog(HORIZON, 34, 85);
@@ -70,7 +70,7 @@ export function creer(J) {
   /* fx, fz : point regardé ; az : angle actuel (azC : visé, par huitièmes de tour) ; vx, vz : élan ; w, h : taille du canevas ;
      haut, bas : bandes couvertes par le bandeau et le dock (le point regardé est au centre de ce qui reste) */
   const V = {fx: C / 2, fz: R / 2 + 1.5, az: 0, azC: 0, vx: 0, vz: 0, w: 1, h: 1, haut: 0, bas: 0};
-  /* 2.23 : le point regardé reste à au moins MARGE cases des bords du terrain : on ne voit jamais plus d'environ une case et demie
+  /* 2.26 : le point regardé reste à au moins MARGE cases des bords du terrain : on ne voit jamais plus d'environ une case et demie
      de paysage sur le côté (avant : jusqu'à la moitié de l'écran) */
   const MARGE = Math.min(C / 2, Math.max(1, COLONNES / 2 - 1.2));
   const borner = () => { V.fx = Math.min(C - MARGE, Math.max(MARGE, V.fx)); V.fz = Math.min(R - MARGE, Math.max(MARGE, V.fz)) };
@@ -121,9 +121,9 @@ export function creer(J) {
   /* lumières : ciel et sol (ambiance), soleil chaud avec ombres, contre-jour */
   scene.add(new THREE.HemisphereLight('#e4efff', '#6a7890', 1.15));
   const soleil = new THREE.DirectionalLight('#fff6ea', 2.2);
-  soleil.position.set(C / 2 - 6, 24, R / 2 + 6); /* 2.23 : plus haut, pour que l'ombre des sapins ne couvre pas le terrain */ soleil.target.position.set(C / 2, 0, R / 2);
+  soleil.position.set(C / 2 - 6, 24, R / 2 + 6); /* 2.26 : plus haut, pour que l'ombre des sapins ne couvre pas le terrain */ soleil.target.position.set(C / 2, 0, R / 2);
   soleil.castShadow = true;
-  /* les ombres couvrent le terrain et la forêt proche (2.23) */
+  /* les ombres couvrent le terrain et la forêt proche (2.26) */
   const sc = soleil.shadow.camera; sc.left = -19; sc.right = 19; sc.top = 20; sc.bottom = -20; sc.near = 1; sc.far = 60;
   soleil.shadow.mapSize.set(2048, 2048); soleil.shadow.bias = -.0006; soleil.shadow.normalBias = .02;
   scene.add(soleil, soleil.target);
@@ -176,7 +176,7 @@ export function creer(J) {
     etoile: mat('#ffe45e', {emissive: '#806000'})};
 
   /* ---------- terrain et paysage ----------
-     2.23 : plus de « diorama » posé dans le vide. Le terrain de jeu est une partie d'un grand paysage d'hiver continu, que seule
+     2.26 : plus de « diorama » posé dans le vide. Le terrain de jeu est une partie d'un grand paysage d'hiver continu, que seule
      sa grille distingue : sol enneigé avec du relief tout autour (le terrain de jeu reste plat, sans effet sur le jeu), plaques
      d'herbe et de neige fondue, grands sapins, rochers. Tout est calculé à partir des coordonnées (bruit déterministe) :
      même paysage à chaque partie, aucun scintillement. Le paysage est construit une seule fois ; seul le petit décor posé sur
@@ -298,7 +298,7 @@ export function creer(J) {
     // rochers gris givrés, coiffés de neige
     inst(G.ico, mat('#8c939e'), pos.caillou, (m, [x, y, s]) => m.compose(v.set(x, .02, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.09, .06, .08)));
     inst(G.ico, mat('#f4f8fc'), pos.caillou, (m, [x, y, s]) => m.compose(v.set(x, .055, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.07, .025, .06)));
-    // petits sapins : tronc, feuillage vert sombre, pointe de neige (plus grands depuis la 2.23)
+    // petits sapins : tronc, feuillage vert sombre, pointe de neige (plus grands depuis la 2.26)
     inst(G.boite, mat('#5a3d26'), pos.herbe, (m, [x, y]) => m.compose(v.set(x, .045, y), q.identity(), new THREE.Vector3(.035, .09, .035)));
     inst(G.cone, mat('#2f5a45'), pos.herbe, (m, [x, y, s]) => m.compose(v.set(x, .07, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.15, .32, .15)));
     inst(G.cone, mat('#f4f8fc'), pos.herbe, (m, [x, y, s]) => m.compose(v.set(x, .25, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.08, .16, .08)));
@@ -341,22 +341,21 @@ export function creer(J) {
   /* ---------- chemin en pointillés animés ---------- */
   const NTIR = 240;
   const tirets = new THREE.InstancedMesh(G.tiret, transp('#3d5f8a', .5), NTIR); tirets.frustumCulled = false; scene.add(tirets);
-  let cheminD = null, chemin = [], longueur = 0;
+  /* points de passage en ligne droite (diagonales comprises, depuis la 2.25) et distance cumulée à chacun */
+  let cheminD = null, chemin = [], cumul = [0], longueur = 0;
   function calculerChemin(b) {
-    if (b.d === cheminD) return; cheminD = b.d; chemin = []; longueur = 0;
-    let x = SP[0], y = SP[1]; chemin.push([x + .5, y + .5]);
-    for (let n = 0; n < 200 && b.d[y][x] > 0 && b.d[y][x] < INF; n++) {
-      for (const [dx, dy] of DIRS) { const a = x + dx, c = y + dy; if (a >= 0 && c >= 0 && a < C && c < R && b.d[c][a] == b.d[y][x] - 1) { x = a; y = c; break } }
-      chemin.push([x + .5, y + .5]);
-    }
-    longueur = chemin.length - 1;
+    if (b.d === cheminD) return; cheminD = b.d;
+    chemin = J.chemin(b).map(([x, y]) => [x + .5, y + .5]); cumul = [0];
+    for (let i = 1; i < chemin.length; i++) cumul.push(cumul[i - 1] + Math.hypot(chemin[i][0] - chemin[i - 1][0], chemin[i][1] - chemin[i - 1][1]));
+    longueur = cumul[cumul.length - 1];
   }
   function dessinerChemin(t) {
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), un = new THREE.Vector3(1, 1, 1), e = new THREE.Euler();
-    let n = 0; const pas = .46, dec = (t * .9) % pas;
+    let n = 0, i = 0; const pas = .46, dec = (t * .9) % pas;
     for (let d = dec; d < longueur && n < NTIR; d += pas) {
-      const i = Math.floor(d), f = d - i, a = chemin[i], b = chemin[i + 1];
-      m4.compose(v.set(a[0] + (b[0] - a[0]) * f, .015, a[1] + (b[1] - a[1]) * f), q.setFromEuler(e.set(0, b[0] !== a[0] ? 0 : Math.PI / 2, 0)), un);
+      while (cumul[i + 1] < d) i++;
+      const a = chemin[i], b = chemin[i + 1], f = (d - cumul[i]) / ((cumul[i + 1] - cumul[i]) || 1);
+      m4.compose(v.set(a[0] + (b[0] - a[0]) * f, .015, a[1] + (b[1] - a[1]) * f), q.setFromEuler(e.set(0, -Math.atan2(b[1] - a[1], b[0] - a[0]), 0)), un);
       tirets.setMatrixAt(n++, m4);
     }
     tirets.count = n; tirets.instanceMatrix.needsUpdate = true;
