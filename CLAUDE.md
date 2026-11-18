@@ -147,7 +147,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 |---|---|---|---|---|---|
 | Archer | 20 | 2,8 | 6 | 0,5 s | Tir simple, touche le sol et les airs. Dégâts 8 → 6 en 2.24 |
 | Canon | 50 | 2,5 | 12 | 1,2 s | Explosion de rayon 1,1 (60 % des dégâts autour, sans limite de cibles), **sol uniquement**. Dégâts 20 → 12 en 2.24 |
-| Givre | 40 | 2,5 | 4 | 0,9 s | Explosion de rayon 1,2 à 2 selon le niveau, **ralentit** (voir plus bas), **magique** |
+| Givre | 40 | 2,5 | 2 | 0,9 s | Explosion de rayon 1,2 à 2 selon le niveau, **ralentit** (voir plus bas), **magique**. Dégâts 4 → 2 en 2.24 |
 | Mage | 90 | 3,2 | 55 | 1,4 s | **Magique**, **détecte les invisibles** dans sa portée. Dégâts 45 → 55 en 2.24 |
 | Garde | 30 | 1,5 | 20 | 0,55 s | Corps à corps (frappe directe), **sol uniquement** |
 | Flammes | 70 | 2,0 | 3 | 0,12 s | Cône d'environ ±29°, plus tout ce qui est à moins de 0,6 case ; **8 monstres au plus par jet** (`mx`, les plus proches de la sortie, depuis la 2.24) ; touche les airs |
@@ -235,13 +235,13 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 |---|---|---|---|---|---|---|---|
 | 0 | Tour des archers | Archer | 20 | 5,8 | 0,515 | 11 | 3,08 |
 | 1 | Bastion du chevalier | Garde | 35 | 21 | 0,567 | 37 | 1,65 |
-| 2 | Obélisque de givre | Givre | 40 | 3,7 | 0,927 | 4 | 2,75 |
+| 2 | Obélisque de givre | Givre | 40 | 1,9 | 0,927 | 2 | 2,75 |
 | 3 | Bombarde royale | Canon | 60 | 13 | 1,236 | 11 | 2,75 |
 | 4 | Brasier du griffon | Flammes | 85 | 3,4 | 0,124 | 27 | 2,2 |
 | 5 | Sanctuaire solaire | Mage | 85 | 49,1 | 1,442 | 34 | 3,52 |
 | 6 | Tour des sentinelles | Archer | 25 | 6,2 | 0,443 | 14 | 3,45 |
 | 7 | Garde du lion | Garde | 40 | 27,2 | 0,634 | 43 | 1,65 |
-| 8 | Cristal hivernal | Givre | 50 | 4,1 | 0,927 | 4 | 2,75 |
+| 8 | Cristal hivernal | Givre | 50 | 2 | 0,927 | 2 | 2,75 |
 | 9 | Arcaniste royal | Mage | 130 | 79,5 | 1,442 | 55 | 3,8 |
 
 #### Horde
@@ -249,13 +249,13 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 |---|---|---|---|---|---|---|---|
 | 0 | Tour des chasseurs | Archer | 20 | 5,8 | 0,52 | 11 | 2,6 |
 | 1 | Totem du berserker | Garde | 35 | 20,7 | 0,572 | 36 | 1,4 |
-| 2 | Totem de glace | Givre | 40 | 3,7 | 0,936 | 4 | 2,33 |
+| 2 | Totem de glace | Givre | 40 | 1,8 | 0,936 | 2 | 2,33 |
 | 3 | Canon des clans | Canon | 55 | 12,9 | 1,248 | 10 | 2,33 |
 | 4 | Fourneau de guerre | Flammes | 85 | 3,4 | 0,125 | 27 | 1,86 |
 | 5 | Chaman des flammes | Mage | 85 | 48,6 | 1,456 | 33 | 2,98 |
 | 6 | Tour des éclaireurs | Archer | 25 | 6,2 | 0,447 | 14 | 2,92 |
 | 7 | Garde-lame | Garde | 40 | 27 | 0,641 | 42 | 1,4 |
-| 8 | Totem des esprits | Givre | 45 | 4 | 0,936 | 4 | 2,33 |
+| 8 | Totem des esprits | Givre | 45 | 2 | 0,936 | 2 | 2,33 |
 | 9 | Grand sorcier orc | Mage | 125 | 78,7 | 1,456 | 54 | 3,21 |
 
 #### Sylvestres
@@ -263,13 +263,13 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 |---|---|---|---|---|---|---|---|
 | 0 | Arbre sentinelle | Archer | 20 | 5,8 | 0,51 | 11 | 2,8 |
 | 1 | Gardien des racines | Garde | 30 | 20,7 | 0,561 | 37 | 1,5 |
-| 2 | Pierre de rosée | Givre | 40 | 3,7 | 0,918 | 4 | 2,5 |
+| 2 | Pierre de rosée | Givre | 40 | 1,8 | 0,918 | 2 | 2,5 |
 | 3 | Fleur explosive | Canon | 55 | 12,9 | 1,224 | 11 | 2,5 |
 | 4 | Cœur ardent | Flammes | 85 | 3,4 | 0,122 | 28 | 2 |
 | 5 | Cercle druidique | Mage | 85 | 48,6 | 1,428 | 34 | 3,2 |
 | 6 | Nid des faucons | Archer | 25 | 6,2 | 0,439 | 14 | 3,14 |
 | 7 | Dryade protectrice | Garde | 40 | 27 | 0,628 | 43 | 1,5 |
-| 8 | Cristal lunaire | Givre | 45 | 4 | 0,918 | 4 | 2,5 |
+| 8 | Cristal lunaire | Givre | 45 | 2 | 0,918 | 2 | 2,5 |
 | 9 | Ancien arcanique | Mage | 125 | 78,7 | 1,428 | 55 | 3,46 |
 
 #### Nains
@@ -277,13 +277,13 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 |---|---|---|---|---|---|---|---|
 | 0 | Tourelle de guet | Archer | 20 | 6,5 | 0,54 | 12 | 2,86 |
 | 1 | Automate garde | Garde | 35 | 23,3 | 0,594 | 39 | 1,53 |
-| 2 | Cryo-forge | Givre | 40 | 4,1 | 0,972 | 4 | 2,55 |
+| 2 | Cryo-forge | Givre | 40 | 2,1 | 0,972 | 2 | 2,55 |
 | 3 | Mortier runique | Canon | 60 | 14,5 | 1,296 | 11 | 2,55 |
 | 4 | Forge incandescente | Flammes | 90 | 3,8 | 0,13 | 29 | 2,04 |
 | 5 | Canon arcanique | Mage | 90 | 54,6 | 1,512 | 36 | 3,26 |
 | 6 | Baliste naine | Archer | 25 | 7 | 0,464 | 15 | 3,2 |
 | 7 | Sentinelle d'acier | Garde | 40 | 30,3 | 0,665 | 46 | 1,53 |
-| 8 | Générateur runique | Givre | 50 | 4,5 | 0,972 | 5 | 2,55 |
+| 8 | Générateur runique | Givre | 50 | 2,3 | 0,972 | 2 | 2,55 |
 | 9 | Maître ingénieur | Mage | 135 | 88,5 | 1,512 | 59 | 3,53 |
 
 #### Légion des ombres
@@ -291,13 +291,13 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 |---|---|---|---|---|---|---|---|
 | 0 | Tour des damnés | Archer | 20 | 6,1 | 0,505 | 12 | 2,77 |
 | 1 | Chevalier funeste | Garde | 35 | 21,8 | 0,556 | 39 | 1,48 |
-| 2 | Obélisque maudit | Givre | 40 | 3,9 | 0,909 | 4 | 2,48 |
+| 2 | Obélisque maudit | Givre | 40 | 1,9 | 0,909 | 2 | 2,48 |
 | 3 | Mortier infernal | Canon | 55 | 13,6 | 1,212 | 11 | 2,48 |
 | 4 | Puits de lave | Flammes | 85 | 3,6 | 0,121 | 30 | 1,98 |
 | 5 | Nexus du néant | Mage | 85 | 51,1 | 1,414 | 36 | 3,17 |
 | 6 | Œil démoniaque | Archer | 25 | 6,5 | 0,434 | 15 | 3,1 |
 | 7 | Gardien spectral | Garde | 40 | 28,4 | 0,622 | 46 | 1,48 |
-| 8 | Cristal corrupteur | Givre | 45 | 4,2 | 0,909 | 5 | 2,48 |
+| 8 | Cristal corrupteur | Givre | 45 | 2,1 | 0,909 | 2 | 2,48 |
 | 9 | Archimage noir | Mage | 125 | 82,8 | 1,414 | 59 | 3,42 |
 
 ---
@@ -826,3 +826,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-18 | 2.24 | Outillage : **banc d'essai des tours** (`tests/outils/banc-tours.js`, §12) : rendement par or investi de chaque tour et de chaque niveau dans 7 vagues types, avec comparaison avant → après. Premier constat : face à une foule (vague d'IA), une Flammes niveau 5 inflige 187 % des PV de 40 Ogres de la 8e minute, contre 19 % pour un Mage niveau 5 au même prix. **Aucun changement de jeu.** |
 | 2026-11-18 | 2.24 | **Rééquilibrage des tours de zone** (§4.1, §5.1), mesuré avec le banc d'essai : la **Flammes** ne touche plus que **8 monstres au plus par jet** (`mx`, les plus proches de la sortie) au lieu de tout son cône ; face à une foule de 40 monstres, son rendement par or passe de 459 à 185 (indice du banc, niveau 5), sans changement contre un groupe de 4 ni contre les volants ; indice global au niveau 5 : 147 → 118 (valeur choisie par le concepteur après des essais de 4 à 16 cibles). Le **Canon** voit ses dégâts de base passer de **20 à 12** (−40 %) : il garde son explosion sans limite de cibles (c'est son principe) et reste la meilleure tour contre les foules, mais son rendement global au niveau 5 passe de 222 à environ 138, au niveau du Mage, du Garde et de la Flammes. La fiche de la Flammes indique « 8 cibles au plus ». `sim.js` modifié (redéploiement automatique du serveur). Nouveau test `combats` (8 cibles au plus). Chiffres **à valider par le concepteur**. |
 | 2026-11-18 | 2.24 | **Rééquilibrage de l'Archer et du Mage** (§4.1, §5.1), mesuré avec le banc d'essai : l'**Archer** passe de **8 à 6** dégâts de base (−25 %) ; peu cher à améliorer (470 or pour le niveau 5), il était devenu la tour la plus rentable partout (indice global 222 au niveau 5). Son prix ne change pas, pour que le labyrinthe reste bon marché. Le **Mage** passe de **45 à 55** (+22 %), car il était la tour la moins rentable (indice 114). Au niveau 5, l'indice global de toutes les tours tient désormais entre 98 et 157 (Archer 157, Canon 142, Mage 139, Givre ≈ 136, Garde 128, Flammes 98). `sim.js` modifié (redéploiement automatique du serveur). Chiffres **à valider par le concepteur**. |
+| 2026-11-18 | 2.24 | **Givre deux fois moins puissant** (§4.1, §5.1), à la demande du concepteur : ses dégâts de base passent de **4 à 2** ; son ralentissement (§4.1, `GIVRE_LV`) ne change pas, car c'est lui qui fait la force de la tour. Indice du banc d'essai : 83 → 43 au niveau 1, 137 → 68 au niveau 5 (le banc ne compte pas l'aide du ralentissement aux autres tours). `sim.js` modifié (redéploiement automatique du serveur). |
