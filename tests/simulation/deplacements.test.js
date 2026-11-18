@@ -46,26 +46,37 @@ test('Espacement dans un couloir d\'une case : on ne sort jamais du couloir et p
  assert.equal(b.lives,20);assert.ok(t<25,`tous sortis en ${t.toFixed(1)} s`);
 });
 test('Vitesse ralentie : déplacement = vitesse × facteur × temps',()=>{const b=terrain();const c=apparaitre(S,b,0);
- c.sl=10;c.sf=.5;b.update(.5);proche(c.y,1.6*.5*.5,'position');
+ c.gt=10;c.gp=.5;b.update(.5);proche(c.y,1.6*.5*.5,'position');
 });
-test('Givre : ralentit à ×0,5 au niveau 1 et ×0,3 au niveau 5, pendant 1,5 s',()=>{const b=terrain();const c=apparaitre(S,b,3),T=S.TW[2];
- b.hit(c,0,T,.5-.05*0);assert.equal(c.sf,.5);assert.equal(c.sl,1.5);
- const c2=apparaitre(S,b,3);b.hit(c2,0,T,.5-.05*4);assert.equal(c2.sf,.5-.05*4);
+test('Givre : de −20 % (niveau 1) à −50 % (niveau 5), pendant 1,5 s à 2,7 s',()=>{const b=terrain(),T=S.TW[2];
+ const att=[[.8,1.5],[.725,1.8],[.65,2.1],[.575,2.4],[.5,2.7]];
+ for(let lv=1;lv<=5;lv++){const c=apparaitre(S,b,3);b.hit(c,0,T,lv);proche(c.sf,att[lv-1][0],'vitesse niveau '+lv);proche(c.sl,att[lv-1][1],'durée niveau '+lv)}
 });
-test('Givre : le facteur de ralentissement vient du niveau de la tour qui tire',()=>{const G=partie(S),b=G.B[0];b.gold=1e6;
+test('Givre : la zone d’effet passe de 1,2 case (niveau 1) à 2 cases (niveau 5)',()=>{
+ for(const [lv,ralenti] of [[1,false],[5,true]]){const b=terrain();const a=apparaitre(S,b,0),v=apparaitre(S,b,0);a.hp=a.max=v.hp=v.max=1e9;
+  Object.assign(a,{x:6,y:5,tx:6,ty:5});Object.assign(v,{x:6,y:6.8,tx:6,ty:7});
+  b.impact({k:2,tg:a,d:1,tx:a.x+.5,ty:a.y+.5,lv});assert.ok(a.sl>0,'cible');assert.equal(v.sl>0,ralenti,'voisin à 1,8 case, niveau '+lv);
+  const z=b.fx.find(f=>f.type=='boom');proche(z.r,S.GIVRE_LV.r[lv-1],'rayon affiché')}
+});
+test('Givre : le ralentissement vient du niveau de la tour qui tire',()=>{const G=partie(S),b=G.B[0];b.gold=1e6;
  b.place(5,3,2);const t=b.t[0];pret(b);for(let i=0;i<4;i++){b.upgrade(t);pret(b)}const c=apparaitre(S,b,3);c.hp=c.max=1e9;
- avancerTerrain(b,3);assert.ok(c.sl>0);assert.equal(c.sf,.5-.05*4);
+ avancerTerrain(b,3);assert.ok(c.sl>0);proche(c.sf,.5,'niveau 5');
 });
-test('Racines sylvestres : toutes leurs tours ralentissent à ×0,82 pendant 0,72 s',()=>{const b=terrain([2,0,1,3]);
- for(const k of [20,21,23,24,25,26,27,29]){const c=apparaitre(S,b,3);b.hit(c,1,S.TW[k],.5);assert.equal(c.sf,.82,S.TW[k].n);assert.equal(c.sl,.72,S.TW[k].n)}
+test('Racines sylvestres : toutes leurs tours ralentissent, de −10 % pendant 0,72 s (niveau 1) à −30 % pendant 1,3 s (niveau 5)',()=>{const b=terrain([2,0,1,3]);
+ for(const k of [20,21,23,24,25,26,27,29]){const c=apparaitre(S,b,3);b.hit(c,1,S.TW[k],1);proche(c.sf,.9,S.TW[k].n);proche(c.sl,.72,S.TW[k].n);
+  const c5=apparaitre(S,b,3);b.hit(c5,1,S.TW[k],5);proche(c5.sf,.7,S.TW[k].n+' niv. 5');proche(c5.sl,1.3,S.TW[k].n+' niv. 5')}
 });
-test('Racines : le ralentissement le plus fort reste appliqué, la durée la plus longue est retenue',()=>{const b=terrain([2,0,1,3]);const c=apparaitre(S,b,3);
- b.hit(c,0,S.TW[22],.5);assert.deepEqual([c.sf,c.sl],[.5,1.5]);
- b.hit(c,0,S.TW[20],.5);assert.deepEqual([c.sf,c.sl],[.5,1.5],'les racines n\'écrasent pas le Givre');
- c.sl=0;b.hit(c,0,S.TW[20],.5);assert.deepEqual([c.sf,c.sl],[.82,.72],'ralentissement expiré : les racines s\'appliquent');
+test('Le froid et les racines s’additionnent : Givre niveau 5 + racines niveau 5 = vitesse ×0,2',()=>{const b=terrain([2,0,1,3]);const c=apparaitre(S,b,3);
+ b.hit(c,0,S.TW[22],5);b.hit(c,0,S.TW[20],5);proche(c.sf,.2,'cumul');
+ b.update(1.4);proche(c.sf,.5,'racines finies, le froid reste');b.update(1.4);assert.equal(c.sl,0);proche(c.sf,1,'plus de ralentissement');
 });
-test('Les autres factions ne ralentissent qu\'avec le Givre',()=>{const b=terrain();
- for(const f of [0,1,3,4])for(const j of [0,1,3,4,5,6,7,9]){const c=apparaitre(S,b,3);b.hit(c,1,S.TW[f*10+j],.5);assert.equal(c.sl,0,S.TW[f*10+j].n)}
+test('Deux effets de la même famille ne s’additionnent pas : le plus fort et le plus long l’emportent',()=>{const b=terrain([2,0,1,3]);const c=apparaitre(S,b,3);
+ b.hit(c,0,S.TW[22],5);b.hit(c,0,S.TW[22],1);proche(c.sf,.5,'deux Givre');proche(c.sl,2.7,'durée');
+ b.hit(c,0,S.TW[20],1);b.hit(c,0,S.TW[20],3);proche(c.sf,.5-.2,'racines niv. 3 l’emportent sur niv. 1');
+ b.hit(c,0,S.TW[20],1);proche(c.sf,.3,'des racines plus faibles n’écrasent pas les plus fortes');
+});
+test('Les autres factions ne ralentissent qu’avec le Givre',()=>{const b=terrain();
+ for(const f of [0,1,3,4])for(const j of [0,1,3,4,5,6,7,9]){const c=apparaitre(S,b,3);b.hit(c,1,S.TW[f*10+j],1);assert.equal(c.sl,0,S.TW[f*10+j].n)}
 });
 test('Garde et Flammes sylvestres : le monstre continue d\'avancer normalement (pas de vitesse invalide)',()=>{const b=terrain([2,0,1,3]);
  for(const k of [21,24]){const c=apparaitre(S,b,3);b.hit(c,1,S.TW[k]);const y=c.y;b.update(.5);assert.ok(Number.isFinite(c.y)&&c.y>y,S.TW[k].n)}
