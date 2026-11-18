@@ -44,10 +44,15 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.23 — 2026-11-18
+### 2.24 — 2026-11-18
 - Archers deal 6 base damage instead of 8 (−25 %): cheap to upgrade, they had become the best value tower everywhere; their price is unchanged so mazes stay cheap. Mages deal 55 instead of 45 (+22 %): they were the weakest value tower.
 - Tooling: tower test bench (`node tests/outils/banc-tours.js`) measuring each tower's damage per gold invested, levels 1 to 5, against 7 typical waves, with before/after comparison. No gameplay change.
 - Area towers rebalanced, measured with the tower test bench. Flame towers now hit at most 4 monsters per burst (those closest to the exit) instead of everything in their cone: against a crowd of 40 monsters, a level-5 flame tower was worth about 5 times a normal tower per gold. Cannons deal 12 base damage instead of 20 (−40 %): their blast still hits everything around (that is the point of the tower), but their overall value is back in line with the other towers. `sim.js` changed (automatic server redeploy).
+
+### 2.23 — 2026-11-18
+- End of game (solo): a window shows Victory/Defeat with stats for the 4 players (rank, towers, maze length, waves sent, monsters killed, final income), an income curve over the game and a personal summary.
+- “Regarder la carte” lets you walk around the frozen mazes (drag, rotate, switch board, tap a tower to see it); “Quitter” goes back to the replay screen. Tap a player in the table to look at their maze.
+- `sim.js`: stat counters per board (`Board.st`), no effect on gameplay (server redeploys automatically).
 
 ### 2.22 — 2026-11-18
 - The 3D view is now the only view offered: the "Jouer en vue 2D (classique)" link is gone from the home screen. The 2D renderer stays as a fallback when WebGL is missing and for the tests (`?rendu=2d` still works).
