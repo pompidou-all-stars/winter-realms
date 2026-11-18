@@ -44,6 +44,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.19 — 2026-11-18
+- Clearer icons: tower role and target badges are now round, ringed in the role colour (the gold square that dulled the colours is gone); the wing glyph was redrawn as a real feathered wing.
+- Monster tabs show icons instead of words: paw (ground), wing (flying), star (special).
+- Monster cards show again the income gained per send, in a green “+N” badge. Interface only: `sim.js` is unchanged.
+
 ### 2.18 — 2026-11-18
 - Frost skin on the tactical-view interface: the 2.12 frosted textures and silver scrollwork frames are back, laid out like a strategy-game console (a frosted resource bar across the top, a frosted console at the bottom, both edged with a silver frieze set with ice gems). Square framed cards (silver, gold when selected, red for monsters) with the price in a medallion; framed tabs, info card, opponents panel and menu; round metal buttons ringed with gold.
 - Interface only: `sim.js` is unchanged (no server redeploy).
