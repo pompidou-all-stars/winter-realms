@@ -56,9 +56,9 @@ test('Canon : explosion de rayon 1,1, 60 % des dégâts autour, sol uniquement',
  const hp=[a,v,loin,vol].map(c=>c.hp);b.impact({k:3,tg:a,d:10,tx:a.x+.5,ty:a.y+.5,lv:1});
  proche(hp[0]-a.hp,10,'cible');proche(hp[1]-v.hp,6,'voisin');assert.equal(loin.hp,hp[2],'trop loin');assert.equal(vol.hp,hp[3],'volant épargné');
 });
-test('Flammes (2.24) : 4 monstres au plus par jet, les plus proches de la sortie',()=>{const b=terrain();b.place(5,4,4);pret(b);
- assert.equal(S.TW[4].mx,4);const L=[];for(let i=0;i<7;i++)L.push(fort(apparaitre(S,b,0)));
- L.forEach((c,i)=>Object.assign(c,{x:5.4+i*.02,y:4,tx:6,ty:4}));b.t[0].cd=0;b.update(.001);const touches=L.filter(c=>c.hp<c.max);assert.equal(touches.length,4);assert.deepEqual(touches,L.slice(3),'les 4 plus avancés vers la sortie');
+test('Flammes (2.24) : 8 monstres au plus par jet (mx), les plus proches de la sortie',()=>{const b=terrain();b.place(5,4,4);pret(b);
+ const mx=S.TW[4].mx;assert.equal(mx,8);const L=[];for(let i=0;i<mx+3;i++)L.push(fort(apparaitre(S,b,0)));
+ L.forEach((c,i)=>Object.assign(c,{x:5.4+i*.015,y:4,tx:6,ty:4}));b.t[0].cd=0;b.update(.001);const touches=L.filter(c=>c.hp<c.max);assert.equal(touches.length,mx);assert.deepEqual(touches,L.slice(3),'les plus avancés vers la sortie');
 });
 test('Spectre : invisible sauf à portée d\'une tour Mage ; un Spectre caché n\'est ni ciblé ni touché par les explosions',()=>{const b=terrain();
  b.place(5,2,0);pret(b);const s=fort(apparaitre(S,b,S.SPEC));b.update(.01);assert.equal(s.hid,true);assert.equal(b.pr.length,0);
