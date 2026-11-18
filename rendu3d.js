@@ -16,12 +16,13 @@ import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
 /* caméra tactique (2.15) : champ vertical, élévation, nombre de cases visibles en largeur au point regardé */
-export const FOV = 48, ELEV = 40 * Math.PI / 180, COLONNES = 10.5;
+/* 2.26 : champ plus étroit (moins de déformation), caméra un peu plus redressée, et 20 % plus près (8,4 cases au lieu de 10,5) */
+export const FOV = 34, ELEV = 44 * Math.PI / 180, COLONNES = 8.4;
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
 /* couleurs du terrain : mêmes valeurs que art/communs/factions.py (SOL, BIOME) */
-/* thème hiver (2.9) : terrain enneigé. Damier de neige légèrement teinté par la couleur de la faction (TEINTE),
+/* thème hiver (2.9) : terrain enneigé (NEIGE ; TEINTE n'est plus utilisée depuis le paysage continu de la 2.26),
    bord en roche givrée, décor d'hiver (sapins enneigés, rochers, cristaux de glace). */
 const NEIGE = ['#eef3f9', '#e2eaf3'];
 const TEINTE = ['#5a9a45', '#a8652f', '#356d4b', '#8a7a5a', '#7a5a9a'];
@@ -41,19 +42,41 @@ export function creer(J) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const scene = new THREE.Scene();
-  /* nuit d'hiver : le champ de neige autour du plateau se fond dans le bleu nuit au loin */
-  scene.background = new THREE.Color('#16243a'); scene.fog = new THREE.Fog('#16243a', 32, 85);
-  const champ = new THREE.Mesh(new THREE.PlaneGeometry(400, 400).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({color: '#aebfd3', roughness: 1}));
-  champ.position.set(C / 2, -.72, R / 2); scene.add(champ);
+  /* 2.26 : le terrain est entouré d'un paysage d'hiver (construirePlateau) qui se fond au loin dans la brume ;
+     ciel en dégradé (nuit en haut, bleu gris à l'horizon) et montagnes lointaines, hors de la brume */
+  const HORIZON = '#4a6385';
+  scene.background = new THREE.Color('#16243a'); scene.fog = new THREE.Fog(HORIZON, 34, 85);
+  {
+    const geo = new THREE.SphereGeometry(300, 32, 16), p = geo.attributes.position, cols = [], haut = new THREE.Color('#0a1426'), bas = new THREE.Color(HORIZON), c = new THREE.Color();
+    for (let i = 0; i < p.count; i++) { const t = Math.max(0, p.getY(i) / 300); c.copy(bas).lerp(haut, Math.pow(t, .55)); cols.push(c.r, c.g, c.b) }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+    const ciel = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({vertexColors: true, side: THREE.BackSide, fog: false, depthWrite: false}));
+    ciel.position.set(C / 2, 0, R / 2); ciel.renderOrder = -1; scene.add(ciel);
+    /* chaîne de montagnes tout autour, en silhouettes bleutées coiffées de neige */
+    const cone = new THREE.ConeGeometry(1, 1, 7).translate(0, .5, 0), N = 40;
+    const roc = new THREE.InstancedMesh(cone, new THREE.MeshBasicMaterial({color: '#2b3d5a', fog: false}), N), cime = new THREE.InstancedMesh(cone, new THREE.MeshBasicMaterial({color: '#aebcd0', fog: false}), N);
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), s = new THREE.Vector3();
+    for (let i = 0; i < N; i++) {
+      const a = i / N * Math.PI * 2 + ((i * 37) % 11) / 30, r = 120 + ((i * 53) % 29), h = 22 + ((i * 71) % 31), l = h * (.9 + ((i * 13) % 7) / 10);
+      v.set(C / 2 + Math.cos(a) * r, -2, R / 2 + Math.sin(a) * r); q.setFromAxisAngle(s.set(0, 1, 0), i);
+      m4.compose(v, q, s.set(l, h, l)); roc.setMatrixAt(i, m4);
+      m4.compose(v.set(v.x, -2 + h * .62, v.z), q, s.set(l * .38, h * .38, l * .38)); cime.setMatrixAt(i, m4);
+    }
+    scene.add(roc, cime);
+  }
 
   /* ---------- caméra tactique (2.15) ---------- */
   const cam = new THREE.PerspectiveCamera(FOV, 1, .5, 400);
   /* fx, fz : point regardé ; az : angle actuel (azC : visé, par huitièmes de tour) ; vx, vz : élan ; w, h : taille du canevas ;
      haut, bas : bandes couvertes par le bandeau et le dock (le point regardé est au centre de ce qui reste) */
   const V = {fx: C / 2, fz: R / 2 + 1.5, az: 0, azC: 0, vx: 0, vz: 0, w: 1, h: 1, haut: 0, bas: 0};
-  const borner = () => { V.fx = Math.min(C, Math.max(0, V.fx)); V.fz = Math.min(R, Math.max(0, V.fz)) };
+  /* 2.26 : le point regardé reste à au moins MARGE cases des bords du terrain : on ne voit jamais plus d'environ une case et demie
+     de paysage sur le côté (avant : jusqu'à la moitié de l'écran) */
+  const MARGE = Math.min(C / 2, Math.max(1, COLONNES / 2 - 1.2));
+  const borner = () => { V.fx = Math.min(C - MARGE, Math.max(MARGE, V.fx)); V.fz = Math.min(R - MARGE, Math.max(MARGE, V.fz)) };
   function placerCamera() {
     const asp = V.w / V.h, D = COLONNES / (2 * Math.tan(FOV * Math.PI / 360) * asp), ch = D * Math.cos(ELEV);
+    scene.fog.near = D + 8; scene.fog.far = D + 60;
     cam.aspect = asp; cam.setViewOffset(V.w, V.h, 0, V.h / 2 - (V.haut + (V.h - V.haut - V.bas) / 2), V.w, V.h);
     cam.position.set(V.fx + ch * Math.sin(V.az), D * Math.sin(ELEV), V.fz + ch * Math.cos(V.az)); cam.up.set(0, 1, 0); cam.lookAt(V.fx, 0, V.fz);
     cam.updateProjectionMatrix(); cam.updateMatrixWorld();
@@ -98,9 +121,10 @@ export function creer(J) {
   /* lumières : ciel et sol (ambiance), soleil chaud avec ombres, contre-jour */
   scene.add(new THREE.HemisphereLight('#e4efff', '#6a7890', 1.15));
   const soleil = new THREE.DirectionalLight('#fff6ea', 2.2);
-  soleil.position.set(C / 2 - 7, 14, R / 2 + 5); soleil.target.position.set(C / 2, 0, R / 2);
+  soleil.position.set(C / 2 - 6, 24, R / 2 + 6); /* 2.26 : plus haut, pour que l'ombre des sapins ne couvre pas le terrain */ soleil.target.position.set(C / 2, 0, R / 2);
   soleil.castShadow = true;
-  const sc = soleil.shadow.camera; sc.left = -12; sc.right = 12; sc.top = 13; sc.bottom = -13; sc.near = 1; sc.far = 40;
+  /* les ombres couvrent le terrain et la forêt proche (2.26) */
+  const sc = soleil.shadow.camera; sc.left = -19; sc.right = 19; sc.top = 20; sc.bottom = -20; sc.near = 1; sc.far = 60;
   soleil.shadow.mapSize.set(2048, 2048); soleil.shadow.bias = -.0006; soleil.shadow.normalBias = .02;
   scene.add(soleil, soleil.target);
   const contre = new THREE.DirectionalLight('#cfe0ff', .8); contre.position.set(C / 2 + 3, 8, -6); contre.target.position.set(C / 2, 0, R / 2);
@@ -151,26 +175,116 @@ export function creer(J) {
     plume: mat('#f4efe0'), givre: mat('#bfe8ff', {emissive: '#3d8fd0', emissiveIntensity: .8}), arcane: mat('#e3b8ff', {emissive: '#9b4ad0', emissiveIntensity: 1}),
     etoile: mat('#ffe45e', {emissive: '#806000'})};
 
-  /* ---------- plateau-diorama (refait quand la faction du terrain affiché change) ---------- */
-  let plateau = null, plateauFaction = -1;
+  /* ---------- terrain et paysage ----------
+     2.26 : plus de « diorama » posé dans le vide. Le terrain de jeu est une partie d'un grand paysage d'hiver continu, que seule
+     sa grille distingue : sol enneigé avec du relief tout autour (le terrain de jeu reste plat, sans effet sur le jeu), plaques
+     d'herbe et de neige fondue, grands sapins, rochers. Tout est calculé à partir des coordonnées (bruit déterministe) :
+     même paysage à chaque partie, aucun scintillement. Le paysage est construit une seule fois ; seul le petit décor posé sur
+     le terrain de jeu dépend de la faction (construirePlateau). */
+  let plateau = null, plateauFaction = -1, paysage = null;
   const decorSeed = (x, y, f) => (x * 92821 + y * 68917 + f * 31337) % 997;
+  const hacher = (i, j) => { let h = (i * 374761393 + j * 668265263) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296 };
+  function bruit(x, z) { const i = Math.floor(x), j = Math.floor(z), fx = x - i, fz = z - j, u = fx * fx * (3 - 2 * fx), w = fz * fz * (3 - 2 * fz);
+    const a = hacher(i, j), b = hacher(i + 1, j), c = hacher(i, j + 1), d = hacher(i + 1, j + 1); return a + (b - a) * u + (c - a) * w + (a - b - c + d) * u * w }
+  const fbm = (x, z) => bruit(x, z) * .55 + bruit(x * 2.1 + 5.3, z * 2.1 + 1.7) * .3 + bruit(x * 4.3 + 9.1, z * 4.3 + 3.3) * .15;
+  const lisse = (a, b, t) => { t = Math.min(1, Math.max(0, (t - a) / (b - a))); return t * t * (3 - 2 * t) };
+  /* distance au terrain de jeu (0 dessus) et hauteur du sol : plat sur le terrain, collines de plus en plus hautes en s'éloignant */
+  const horsTerrain = (x, z) => Math.hypot(Math.max(0, -x, x - C), Math.max(0, -z, z - R));
+  function hauteur(x, z) { const d = horsTerrain(x, z); if (d <= 0) return 0;
+    return lisse(.8, 10, d) * (.5 + 3.4 * fbm(x * .07, z * .07)) + lisse(.3, 3, d) * .45 * (fbm(x * .4 + 20, z * .4) - .35) }
+  /* plaques d'herbe (bords déchirés, neige qui reste par endroits) : 0 (neige) à 1 (herbe) ; plus rares et plus pâles sur le terrain de jeu */
+  function herbeEn(x, z) { const sur = horsTerrain(x, z) <= 0, n1 = fbm(x * .16 + 3, z * .16 + 9), brise = lisse(.3, .7, bruit(x * 2.3 + 50, z * 2.3 + 50));
+    return lisse(sur ? .68 : .62, sur ? .72 : .665, n1) * (.3 + .7 * brise) * (sur ? .5 : 1) }
+  const TAILLE = 100, RES = 1024;
+  /* couleurs du sol peintes dans une image (11 pixels par case) : neige, neige grise, herbe, terre, flaques de neige fondue */
+  function texturePaysage() {
+    const cv = document.createElement('canvas'); cv.width = cv.height = RES; const g = cv.getContext('2d'), im = g.createImageData(RES, RES), px = im.data;
+    const neige = new THREE.Color(NEIGE[0]), neige2 = new THREE.Color('#d3dde9'), herbe = new THREE.Color('#4c6136'), herbe2 = new THREE.Color('#7d7b45'),
+      fondue = new THREE.Color('#90a3ba'), bordF = new THREE.Color('#7f93ab'), terreC = new THREE.Color('#6f604f'), c = new THREE.Color(), h2 = new THREE.Color();
+    for (let j = 0; j < RES; j++) for (let i = 0; i < RES; i++) {
+      const x = C / 2 - TAILLE / 2 + (i + .5) / RES * TAILLE, z = R / 2 - TAILLE / 2 + (j + .5) / RES * TAILLE, sur = horsTerrain(x, z) <= 0;
+      const n2 = fbm(x * .21 + 17, z * .21 + 2), n3 = bruit(x * 1.3, z * 1.3), n4 = bruit(x * 6.1, z * 6.1), vH = herbeEn(x, z);
+      /* neige fondue : flaque gris bleu, au bord un peu plus sombre (neige mouillée) */
+      const sf = sur ? .65 : .6, vF = lisse(sf, sf + .05, n2) * (sur ? .35 : .8), bord = lisse(sf - .04, sf, n2) * (1 - lisse(sf + .02, sf + .05, n2)) * (sur ? .2 : .5);
+      c.copy(neige).lerp(neige2, n3 * .5 + n4 * .15).lerp(bordF, bord).lerp(fondue, vF * .8);
+      c.lerp(h2.copy(herbe).lerp(herbe2, n3 * .7 + n4 * .3), vH);
+      if (!sur && vH > .7) c.lerp(terreC, (vH - .7) * .9 * bruit(x * 2.7, z * 2.7));
+      const o = (j * RES + i) * 4; px[o] = c.r * 255; px[o + 1] = c.g * 255; px[o + 2] = c.b * 255; px[o + 3] = 255;
+    }
+    g.putImageData(im, 0, 0);
+    const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+  }
+  /* grain de la neige : petite texture répétée, en relief (bumpMap) : cristaux, traces, petites bosses */
+  function textureGrain() {
+    const cv = document.createElement('canvas'); cv.width = cv.height = 256; const g = cv.getContext('2d');
+    g.fillStyle = '#c8c8c8'; g.fillRect(0, 0, 256, 256);
+    for (let n = 0; n < 3200; n++) { const x = hacher(n, 1) * 256, y = hacher(n, 2) * 256, r = .5 + hacher(n, 3) * 2.2, l = Math.floor(120 + hacher(n, 4) * 135);
+      g.fillStyle = `rgba(${l},${l},${l},${.3 + hacher(n, 5) * .4})`; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill() }
+    const t = new THREE.CanvasTexture(cv); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(TAILLE / 2.5, TAILLE / 2.5); return t;
+  }
+  function construirePaysage() {
+    paysage = new THREE.Group();
+    const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), e = new THREE.Euler();
+    const inst = (geo, m, liste, fn) => {
+      if (!liste.length) return; const im = new THREE.InstancedMesh(geo, m, liste.length); im.castShadow = true;
+      liste.forEach((p, n) => { fn(m4, p); im.setMatrixAt(n, m4) }); paysage.add(im);
+    };
+    /* sol : une seule grande surface avec du relief autour du terrain, peinte (texturePaysage) et granuleuse (textureGrain) */
+    const geo = new THREE.PlaneGeometry(TAILLE, TAILLE, 160, 160).rotateX(-Math.PI / 2).translate(C / 2, 0, R / 2), p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) p.setY(i, hauteur(p.getX(i), p.getZ(i)));
+    geo.computeVertexNormals();
+    const sol3d = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({map: texturePaysage(), bumpMap: textureGrain(), bumpScale: 1.6, roughness: .88}));
+    sol3d.receiveShadow = true; paysage.add(sol3d);
+    /* grille du terrain de jeu : c'est elle qui montre où l'on joue ; bord un peu plus marqué */
+    const lignes = [];
+    for (let x = 0; x <= C; x++) lignes.push(x, .012, 0, x, .012, R);
+    for (let z = 0; z <= R; z++) lignes.push(0, .012, z, C, .012, z);
+    const gl = new THREE.BufferGeometry(); gl.setAttribute('position', new THREE.Float32BufferAttribute(lignes, 3));
+    paysage.add(new THREE.LineSegments(gl, new THREE.LineBasicMaterial({color: '#48638a', transparent: true, opacity: .42, depthWrite: false})));
+    const bordM = transp('#2f4d76', .7);
+    for (const [x, z, sx, sz] of [[C / 2, 0, C + .08, .08], [C / 2, R, C + .08, .08], [0, R / 2, .08, R], [C, R / 2, .08, R]]) {
+      const b = new THREE.Mesh(G.boite, bordM); b.scale.set(sx, .01, sz); b.position.set(x, .014, z); paysage.add(b) }
+    /* forêt de grands sapins enneigés autour du terrain, par bosquets avec des clairières ;
+       petits près du bord (ils ne cachent jamais le jeu), de plus en plus grands en s'éloignant */
+    const h = (a, b) => hacher(Math.round(a * 10), Math.round(b * 10)), arbres = [];
+    for (let gz = -24; gz <= R + 24; gz += 1.6) for (let gx = -24; gx <= C + 24; gx += 1.6) {
+      const x = gx + (h(gx, gz) - .5) * 1.3, z = gz + (h(gz + 3, gx) - .5) * 1.3, d = horsTerrain(x, z);
+      if (d < 1.6 || d > 25 || fbm(x * .09 + 40, z * .09 + 11) < .47 || h(x + 7, z) < .3 || herbeEn(x, z) > .5) continue;
+      arbres.push([x, hauteur(x, z) - .05, z, (.45 + .55 * lisse(1.6, 8, d)) * (1.4 + h(z, x + 5) * 1.7), h(x, z + 9) * 6]);
+    }
+    if (arbres.length) {
+      const sapin = new THREE.ConeGeometry(1, 1, 9).translate(0, .5, 0), tronc = new THREE.CylinderGeometry(.5, .65, 1, 6).translate(0, .5, 0);
+      const fut = new THREE.InstancedMesh(tronc, mat('#4f3726'), arbres.length), vert = new THREE.InstancedMesh(sapin, mat('#ffffff', {roughness: .85}), arbres.length * 3),
+        neigeA = new THREE.InstancedMesh(sapin, mat('#f3f7fc', {roughness: .95}), arbres.length * 3), VERTS = ['#2b5240', '#244636', '#32604b', '#2a4a45'].map(x => new THREE.Color(x));
+      const etages = [[.2, .62, .56], [.45, .47, .5], [.68, .32, .44]]; let k = 0;
+      arbres.forEach(([x, y, z, t, a], n) => {
+        q.setFromEuler(e.set(0, a, 0)); fut.setMatrixAt(n, m4.compose(v.set(x, y, z), q, new THREE.Vector3(.1 * t, .4 * t, .1 * t)));
+        for (const [b, r, hh] of etages) {
+          vert.setMatrixAt(k, m4.compose(v.set(x, y + b * t, z), q, new THREE.Vector3(r * t, hh * t, r * t))); vert.setColorAt(k, VERTS[(n + k) % 4]);
+          neigeA.setMatrixAt(k++, m4.compose(v.set(x, y + (b + hh * .48) * t, z), q, new THREE.Vector3(r * .58 * t, hh * .54 * t, r * .58 * t)));
+        }
+      });
+      for (const o of [fut, vert, neigeA]) { o.castShadow = true; paysage.add(o) }
+    }
+    /* rochers enneigés et touffes d'herbe sèche dans les plaques d'herbe, autour du terrain */
+    const rocs = [], touffes = [];
+    for (let n = 0; n < 150; n++) { const x = -20 + hacher(n, 31) * (C + 40), z = -20 + hacher(n, 47) * (R + 40), d = horsTerrain(x, z);
+      if (d >= 1.2 && d <= 22) rocs.push([x, hauteur(x, z), z, .25 + hacher(n, 59) * .75, hacher(n, 61) * 6]) }
+    inst(G.ico, mat('#7a8492', {flatShading: true}), rocs, (m, [x, y, z, s, a]) => m.compose(v.set(x, y + s * .2, z), q.setFromEuler(e.set(a, a * 2, 0)), new THREE.Vector3(s, s * .7, s * .9)));
+    inst(G.ico, mat('#f2f6fb'), rocs, (m, [x, y, z, s, a]) => m.compose(v.set(x, y + s * .58, z), q.setFromEuler(e.set(0, a, 0)), new THREE.Vector3(s * .78, s * .26, s * .7)));
+    for (let n = 0; n < 5000; n++) { const x = -14 + hacher(n, 71) * (C + 28), z = -14 + hacher(n, 73) * (R + 28);
+      if (horsTerrain(x, z) >= .3 && herbeEn(x, z) > .45) touffes.push([x, hauteur(x, z), z, .7 + hacher(n, 79), hacher(n, 83) * 6, n % 3]) }
+    for (const [ton, coul] of [[0, '#6f7a42'], [1, '#8a8a4e'], [2, '#56683c']])
+      inst(G.cone, mat(coul), touffes.filter(t => t[5] === ton), (m, [x, y, z, s, a]) => m.compose(v.set(x, y - .02, z), q.setFromEuler(e.set(0, a, .25)), new THREE.Vector3(.05 * s, .22 * s, .05 * s)));
+    scene.add(paysage);
+  }
+  /* petit décor posé sur le terrain de jeu (il ne gêne pas la lecture), propre à la faction du terrain affiché */
   function construirePlateau(f) {
+    if (!paysage) construirePaysage();
     if (plateau) scene.remove(plateau);
     plateau = new THREE.Group(); plateauFaction = f;
-    const bio = BIOME[f] || BIOME[0], teinte = new THREE.Color(TEINTE[f] || TEINTE[0]), sol = NEIGE.map(c => new THREE.Color(c).lerp(teinte, .07));
-    const terre = new THREE.Mesh(G.boite, mat(bio.terre)); terre.scale.set(C + .1, .3, R + .1); terre.position.set(C / 2, -.2, R / 2); terre.receiveShadow = true;
-    const falaise = new THREE.Mesh(G.boite, mat(bio.bord)); falaise.scale.set(C + .34, .4, R + .34); falaise.position.set(C / 2, -.5, R / 2);
-    plateau.add(terre, falaise);
-    const dalles = new THREE.InstancedMesh(G.dalle, mat('#ffffff', {roughness: .9}), C * R);
-    dalles.receiveShadow = true;
-    const m4 = new THREE.Matrix4(), col = new THREE.Color();
-    let i = 0;
-    for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) {
-      m4.makeTranslation(x + .5, 0, y + .5); dalles.setMatrixAt(i, m4);
-      const s = decorSeed(x, y, f); col.copy(sol[(x + y) % 2]).multiplyScalar(.95 + (s % 9) / 100); dalles.setColorAt(i++, col);
-    }
-    plateau.add(dalles);
-    /* décor déterministe (aucun scintillement) : rochers enneigés, sapins, cristaux de glace */
+    const bio = BIOME[f] || BIOME[0], m4 = new THREE.Matrix4();
+    /* décor déterministe (aucun scintillement) : rochers enneigés, sapins, congères, cristaux de glace */
     const pos = {caillou: [], herbe: [], fleur: []};
     for (let y = 0; y < R; y++) for (let x = 0; x < C; x++) {
       const s = decorSeed(x, y, f), fx = x + .2 + (s % 61) / 100, fy = y + .2 + ((s * 7) % 45) / 100;
@@ -184,10 +298,10 @@ export function creer(J) {
     // rochers gris givrés, coiffés de neige
     inst(G.ico, mat('#8c939e'), pos.caillou, (m, [x, y, s]) => m.compose(v.set(x, .02, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.09, .06, .08)));
     inst(G.ico, mat('#f4f8fc'), pos.caillou, (m, [x, y, s]) => m.compose(v.set(x, .055, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.07, .025, .06)));
-    // petits sapins : tronc, feuillage vert sombre, pointe de neige
-    inst(G.boite, mat('#5a3d26'), pos.herbe, (m, [x, y]) => m.compose(v.set(x, .03, y), q.identity(), new THREE.Vector3(.025, .06, .025)));
-    inst(G.cone, mat('#2f5a45'), pos.herbe, (m, [x, y, s]) => m.compose(v.set(x, .05, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.09, .2, .09)));
-    inst(G.cone, mat('#f4f8fc'), pos.herbe, (m, [x, y, s]) => m.compose(v.set(x, .16, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.05, .1, .05)));
+    // petits sapins : tronc, feuillage vert sombre, pointe de neige (plus grands depuis la 2.26)
+    inst(G.boite, mat('#5a3d26'), pos.herbe, (m, [x, y]) => m.compose(v.set(x, .045, y), q.identity(), new THREE.Vector3(.035, .09, .035)));
+    inst(G.cone, mat('#2f5a45'), pos.herbe, (m, [x, y, s]) => m.compose(v.set(x, .07, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.15, .32, .15)));
+    inst(G.cone, mat('#f4f8fc'), pos.herbe, (m, [x, y, s]) => m.compose(v.set(x, .25, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.08, .16, .08)));
     // congères (bosses de neige) et cristaux de glace
     inst(G.sphere, mat('#f6f9fd', {roughness: .95}), pos.fleur, (m, [x, y, s]) => m.compose(v.set(x, 0, y), q.setFromEuler(e.set(0, s, 0)), new THREE.Vector3(.14, .045, .09)));
     const cristaux = pos.fleur.filter(p => p[2] % 3 === 0);
@@ -227,22 +341,21 @@ export function creer(J) {
   /* ---------- chemin en pointillés animés ---------- */
   const NTIR = 240;
   const tirets = new THREE.InstancedMesh(G.tiret, transp('#3d5f8a', .5), NTIR); tirets.frustumCulled = false; scene.add(tirets);
-  let cheminD = null, chemin = [], longueur = 0;
+  /* points de passage en ligne droite (diagonales comprises, depuis la 2.25) et distance cumulée à chacun */
+  let cheminD = null, chemin = [], cumul = [0], longueur = 0;
   function calculerChemin(b) {
-    if (b.d === cheminD) return; cheminD = b.d; chemin = []; longueur = 0;
-    let x = SP[0], y = SP[1]; chemin.push([x + .5, y + .5]);
-    for (let n = 0; n < 200 && b.d[y][x] > 0 && b.d[y][x] < INF; n++) {
-      for (const [dx, dy] of DIRS) { const a = x + dx, c = y + dy; if (a >= 0 && c >= 0 && a < C && c < R && b.d[c][a] == b.d[y][x] - 1) { x = a; y = c; break } }
-      chemin.push([x + .5, y + .5]);
-    }
-    longueur = chemin.length - 1;
+    if (b.d === cheminD) return; cheminD = b.d;
+    chemin = J.chemin(b).map(([x, y]) => [x + .5, y + .5]); cumul = [0];
+    for (let i = 1; i < chemin.length; i++) cumul.push(cumul[i - 1] + Math.hypot(chemin[i][0] - chemin[i - 1][0], chemin[i][1] - chemin[i - 1][1]));
+    longueur = cumul[cumul.length - 1];
   }
   function dessinerChemin(t) {
     const m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), v = new THREE.Vector3(), un = new THREE.Vector3(1, 1, 1), e = new THREE.Euler();
-    let n = 0; const pas = .46, dec = (t * .9) % pas;
+    let n = 0, i = 0; const pas = .46, dec = (t * .9) % pas;
     for (let d = dec; d < longueur && n < NTIR; d += pas) {
-      const i = Math.floor(d), f = d - i, a = chemin[i], b = chemin[i + 1];
-      m4.compose(v.set(a[0] + (b[0] - a[0]) * f, .015, a[1] + (b[1] - a[1]) * f), q.setFromEuler(e.set(0, b[0] !== a[0] ? 0 : Math.PI / 2, 0)), un);
+      while (cumul[i + 1] < d) i++;
+      const a = chemin[i], b = chemin[i + 1], f = (d - cumul[i]) / ((cumul[i + 1] - cumul[i]) || 1);
+      m4.compose(v.set(a[0] + (b[0] - a[0]) * f, .015, a[1] + (b[1] - a[1]) * f), q.setFromEuler(e.set(0, -Math.atan2(b[1] - a[1], b[0] - a[0]), 0)), un);
       tirets.setMatrixAt(n++, m4);
     }
     tirets.count = n; tirets.instanceMatrix.needsUpdate = true;
