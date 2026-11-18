@@ -7,7 +7,7 @@ const BASE_TW=[
  {n:'Mage',c:90,r:3.2,d:45,cd:1.4,ps:7.5,mg:1,mag:1,col:'#8e44ad',s:'mage',tag:'magie · détecte'},
  {n:'Garde',c:30,r:1.5,d:20,cd:.55,me:1,gr:1,col:'#c0392b',s:'slash',tag:'sol'},
  {n:'Flammes',c:70,r:2,d:3,cd:.12,fl:1,mx:4,col:'#e67e22',s:'flame'}];
-/* mx (Flammes, 2.21) : nombre maximal de monstres touchés par jet de flammes (les plus proches de la sortie) ; avant, tout le cône était touché, ce qui rendait la tour imbattable face aux grosses vagues */
+/* mx (Flammes, 2.23) : nombre maximal de monstres touchés par jet de flammes (les plus proches de la sortie) ; avant, tout le cône était touché, ce qui rendait la tour imbattable face aux grosses vagues */
 /* ralentissements selon le niveau de la tour (2.18), du niveau 1 au niveau 5. p : part de vitesse retirée, d : durée (s), r : rayon de la zone du Givre (cases).
    Le froid (Givre) et les racines (Sylvestres) s'additionnent ; deux effets de la même famille ne s'additionnent pas (le plus fort et le plus long l'emportent). */
 const GIVRE_LV={p:[.2,.275,.35,.425,.5],d:[1.5,1.8,2.1,2.4,2.7],r:[1.2,1.4,1.6,1.8,2]},RACINES_LV={p:[.1,.15,.2,.25,.3],d:[.72,.85,1,1.15,1.3]};
