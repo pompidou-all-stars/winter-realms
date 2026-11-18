@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.20</title>
+<title>Winter Realms — Tower Wars · Édition 2.21</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -284,8 +284,9 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
   <div id="ctl">
    <div id="fiche" hidden></div>
    <div id="console">
-   <div id="tabs"><button data-t="t" class="tw on" type="button">🏰 Tours</button><span class="sep"></span><button data-t="n" class="mon" type="button">Sol</button><button data-t="f" class="mon" type="button">Volants</button><button data-t="s" class="mon" type="button">Spéciaux</button></div>
+   <!-- 2.21 : paliers au-dessus des onglets, pour que les onglets et les cartes ne bougent pas quand on passe des tours aux monstres -->
    <div id="paliers" hidden></div>
+   <div id="tabs"><button data-t="t" class="tw on" type="button">🏰 Tours</button><span class="sep"></span><button data-t="n" class="mon" type="button">Sol</button><button data-t="f" class="mon" type="button">Volants</button><button data-t="s" class="mon" type="button">Spéciaux</button></div>
    <div id="bar"></div>
    </div>
   </div>
