@@ -290,11 +290,19 @@ function pathCells(b){return chaine(b,SP[0],SP[1],200)}
 
 /* --- labyrinthe de l'IA (2.5, affiné en 2.6) : chaque terrain IA reçoit un plan cible au début de la partie ---
    grille plate (case i = y*C+x, 1 = mur), parcours en largeur rapide, hasard propre (graine tirée une fois) pour que le découpage dans le temps ne change rien. */
-const N=C*R,SPI=SP[1]*C+SP[0],EXI=EX[1]*C+EX[0],NB=new Int16Array(N*5),QB=new Int16Array(N),DB=new Int16Array(N);
-for(let i=0;i<N;i++){const x=i%C,y=i/C|0;let k=0;for(const[dx,dy]of DIRS){const a=x+dx,b=y+dy;if(a>=0&&b>=0&&a<C&&b<R)NB[i*5+1+k++]=b*C+a}NB[i*5]=k}
-/* longueur du plus court chemin apparition → sortie, -1 si bloqué (DB garde les distances à la sortie) */
-function plen(w){DB.fill(-1);DB[EXI]=0;QB[0]=EXI;let h=0,t=1;while(h<t){const i=QB[h++],d=DB[i]+1,o=i*5;for(let k=1;k<=NB[o];k++){const j=NB[o+k];if(!w[j]&&DB[j]<0){DB[j]=d;if(j==SPI)return d;QB[t++]=j}}}return -1}
-function mzPath(w){if(plen(w)<0)return[];const out=[SPI];let i=SPI;for(let d=DB[SPI];d>0;d--){const o=i*5;for(let k=1;k<=NB[o];k++){const j=NB[o+k];if(!w[j]&&DB[j]==d-1){i=j;break}}out.push(i)}return out}
+/* depuis la 2.18, mêmes règles que les monstres : 8 directions, sans couper le coin d'un mur. Coûts entiers : 5 en ligne droite, 7 en diagonale (≈ 5 × √2),
+   d'où un parcours par files de priorité circulaires (8 files, Dial) presque aussi rapide que le parcours en largeur d'avant. NB : par case, nombre de voisins puis (voisin, coût, coin 1, coin 2). */
+const N=C*R,SPI=SP[1]*C+SP[0],EXI=EX[1]*C+EX[0],NB=new Int16Array(N*33),DB=new Int16Array(N),BH=new Int16Array(8),EN=new Int16Array(N*8+8),ENX=new Int16Array(N*8+8);
+for(let i=0;i<N;i++){const x=i%C,y=i/C|0;let k=0;for(const[dx,dy]of DIR8){const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R)continue;const o=i*33+1+k++*4;
+ NB[o]=b*C+a;NB[o+1]=dx&&dy?7:5;NB[o+2]=dx&&dy?y*C+a:-1;NB[o+3]=dx&&dy?b*C+x:-1}NB[i*33]=k}
+/* longueur (en cases) du plus court chemin apparition → sortie, -1 si bloqué (DB garde les distances à la sortie, ×5) */
+function plen(w){DB.fill(32767);BH.fill(-1);DB[EXI]=0;let ne=1,live=1;EN[0]=EXI;ENX[0]=-1;BH[0]=0;
+ for(let d=0;live>0;d++){let e=BH[d&7];BH[d&7]=-1;
+  while(e>=0){const i=EN[e];e=ENX[e];live--;if(DB[i]!=d)continue;if(i==SPI)return d/5;const o=i*33,q=o+1+NB[o]*4;
+   for(let p=o+1;p<q;p+=4){const j=NB[p];if(w[j])continue;const nd=d+NB[p+1];if(nd>=DB[j])continue;const c1=NB[p+2];if(c1>=0&&(w[c1]||w[NB[p+3]]))continue;
+    DB[j]=nd;const b=nd&7;EN[ne]=j;ENX[ne]=BH[b];BH[b]=ne++;live++}}}return -1}
+function mzPath(w){if(plen(w)<0)return[];const out=[SPI];let i=SPI;
+ while(DB[i]>0){const o=i*33;let nx=-1;for(let k=0;k<NB[o];k++){const p=o+1+k*4,j=NB[p];if(!w[j]&&DB[j]+NB[p+1]==DB[i]&&(NB[p+2]<0||(!w[NB[p+2]]&&!w[NB[p+3]]))){nx=j;break}}if(nx<0)break;i=nx;out.push(i)}return out}
 const rnd32=a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
 const MZ_LAM=.3,MZ_NC=4,MZ_K=[2000,2500,3200],MZ_PICK=[[.5,.3,.2],[.6,.4],[1]];
 /* forme de départ tirée au hasard : serpentin horizontal (couloirs de 1 ou 2), serpentin vertical, ou semis aléatoire */
@@ -306,7 +314,7 @@ function mzTemplate(r){const w=new Uint8Array(N),f=r()<.35?0:r()<.25?1:2;
  let n=0;for(let i=0;i<N;i++)n+=w[i];const L=plen(w);return {w,f,n,L,s:L-MZ_LAM*n,best:w.slice(),bs:L-MZ_LAM*n,it:0}}
 /* recherche locale (recuit léger) : on ajoute ou retire une case ou un petit segment, on garde si le chemin s'allonge sans trop de tours */
 function mzClimb(c,r,K,steps){for(let e=0;e<steps&&c.it<K;e++,c.it++){const w=c.w,T=2*(1-c.it/K)+.05,i=r()*N|0;if(i==SPI||i==EXI)continue;
- const seg=[i];if(r()<.3){const[dx,dy]=DIRS[r()*4|0];let x=i%C,y=i/C|0;for(let k=1+(r()*3|0);k>0;k--){x+=dx;y+=dy;if(x<0||y<0||x>=C||y>=R)break;const j=y*C+x;if(j!=SPI&&j!=EXI)seg.push(j)}}
+ const seg=[i];if(r()<.3){const[dx,dy]=DIR8[r()*8|0];let x=i%C,y=i/C|0;for(let k=1+(r()*3|0);k>0;k--){x+=dx;y+=dy;if(x<0||y<0||x>=C||y>=R)break;const j=y*C+x;if(j!=SPI&&j!=EXI)seg.push(j)}}
  const v=w[i]?0:1,ch=seg.filter(j=>w[j]!=v);for(const j of ch)w[j]=v;const L=plen(w),n=c.n+(v?ch.length:-ch.length),s=L-MZ_LAM*n;
  if(L>=0&&(s>=c.s||r()<Math.exp((s-c.s)/T))){c.L=L;c.n=n;c.s=s;if(s>c.bs){c.bs=s;c.best=w.slice()}}else for(const j of ch)w[j]=1-v}}
 /* fait avancer la génération du plan d'au plus « steps » essais (un essai ≈ un parcours en largeur) ; renvoie le plan quand il est prêt.
