@@ -44,6 +44,10 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.18 — 2026-11-18
+- Frost skin on the tactical-view interface: the 2.12 frosted textures and silver scrollwork frames are back, laid out like a strategy-game console (a frosted resource bar across the top, a frosted console at the bottom, both edged with a silver frieze set with ice gems). Square framed cards (silver, gold when selected, red for monsters) with the price in a medallion; framed tabs, info card, opponents panel and menu; round metal buttons ringed with gold.
+- Interface only: `sim.js` is unchanged (no server redeploy).
+
 ### 2.17 — 2026-11-18
 - Sound library: about 230 MP3 files generated locally for free (Stable Audio Open for sound effects, Chatterbox for voices, both usable commercially): tower shots per faction, construction, deaths of all 72 monsters, boss arrivals, interface, winter and battle ambiences, and 55 comic voice lines (11 per faction) in the designer's recorded voices.
 - New `audio.js` engine (preloading, variants, priorities, one voice at a time); the synthesized sounds remain as a fallback, and `?son=synth` brings them back.
