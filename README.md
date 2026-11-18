@@ -44,6 +44,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.18 — 2026-11-18
+- Frost towers and Sylvan roots now scale with the tower level. Frost: −20 % speed at level 1 up to −50 % at level 5 (was −50 % to −70 %), lasting 1.5 s to 2.7 s, with a blast radius growing from 1.2 to 2 tiles. Roots: −10 % at level 1 up to −30 % at level 5, lasting 0.72 s to 1.3 s.
+- Cold and roots now add up (frost −50 % + roots −30 % = −80 %); two effects of the same kind do not stack (the strongest and longest wins).
+- The tower card shows the slow, duration and zone, and what the next level brings. `sim.js` changed (automatic server redeploy).
+
 ### 2.17 — 2026-11-18
 - Sound library: about 230 MP3 files generated locally for free (Stable Audio Open for sound effects, Chatterbox for voices, both usable commercially): tower shots per faction, construction, deaths of all 72 monsters, boss arrivals, interface, winter and battle ambiences, and 55 comic voice lines (11 per faction) in the designer's recorded voices.
 - New `audio.js` engine (preloading, variants, priorities, one voice at a time); the synthesized sounds remain as a fallback, and `?son=synth` brings them back.

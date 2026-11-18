@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.17</title>
+<title>Winter Realms — Tower Wars · Édition 2.18</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -831,11 +831,14 @@ function doAction(a){if(over)return;if(NET.on){NET.act(a);return ''}const e=G.ac
 const fr=n=>String(+(+n).toFixed(1)).replace('.',',');
 const dps=(k,lv)=>Math.round(dmg({k,lv})/TW[k].cd);
 /* bonus de faction, en clair, calculé à partir de FACTION_BALANCE */
+/* ralentissement d'une tour à un niveau donné (2.18) : froid du Givre (avec sa zone) ou racines sylvestres */
+const pr=x=>fr(x*100)+' %',fd=n=>String(+(+n).toFixed(2)).replace('.',',');
+function ralentit(T,lv){const i=Math.min(4,Math.max(0,lv-1));return T.fsp?{p:GIVRE_LV.p[i],d:GIVRE_LV.d[i],r:GIVRE_LV.r[i]}:T.sl?{p:RACINES_LV.p[i],d:RACINES_LV.d[i]}:null}
 function bonusFaction(f){const B=FACTION_BALANCE[f],pc=x=>Math.round((x-1)*100)+' %';
  return B.airBonus?'Anti-aérien : +'+pc(B.airBonus)+' de dégâts contre les volants':B.execute?'Frénésie : +'+pc(B.execute)+' sur les monstres à moins de 35 % de vie':
-  B.root?'Racines : chaque coup ralentit le monstre (vitesse ×'+fr(B.rootFactor)+')':B.pierce?'Perforant : ignore '+Math.round(B.pierce*100)+' % de l\'armure':B.mark?'Malédiction : chaque coup suivant sur la même cible fait +'+pc(B.mark):''}
+  B.root?'Racines : chaque coup ralentit le monstre de '+pr(RACINES_LV.p[0])+' (niveau 1) à '+pr(RACINES_LV.p[4])+' (niveau 5), en plus du froid':B.pierce?'Perforant : ignore '+Math.round(B.pierce*100)+' % de l\'armure':B.mark?'Malédiction : chaque coup suivant sur la même cible fait +'+pc(B.mark):''}
 /* effets propres à la tour, en clair */
-function effets(T,lv){const l=[];if(T.sp)l.push('explosion de zone');if(T.fsp)l.push('ralentit ×'+fr(.5-.05*(lv-1))+' pendant '+fr(T.sl)+' s');if(T.fl)l.push('souffle en cône');if(T.me)l.push('corps à corps');
+function effets(T,lv){const l=[];if(T.sp)l.push('explosion de zone');const R=ralentit(T,lv);if(R)l.push((T.fsp?'ralentit':'racines')+' −'+pr(R.p)+' pendant '+fd(R.d)+' s'+(R.r?', zone '+fr(R.r)+' cases':''));if(T.fl)l.push('souffle en cône');if(T.me)l.push('corps à corps');
  if(T.mg)l.push('révèle les Spectres invisibles');if(T.mag)l.push('magique : sans effet sur le Briseur de runes');return l}
 /* 2.15 : une seule fiche, et seulement quand on a choisi quelque chose : une tour à construire, une tour posée ou un monstre.
    Elle rappelle le geste suivant ; celle d'une tour posée porte les boutons Améliorer et Vendre. Le × la referme (et annule le choix). */
@@ -849,7 +852,7 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  teteFiche(f,ic,T.n,BASE_TW[T.skin].n+' · '+T.role+(t?' · niveau '+lv+'/5':''),stats);icone3D(ic,'tour',k,56,46);
  const ex=elt('div','ex'),part=(t,c)=>{if(ex.childNodes.length)ex.append(' · ');ex.appendChild(elt('span',c||'',t))};
  if(t&&t.b>0)part('🔨 '+(lv>1?'Amélioration':'Construction')+' en cours : '+Math.ceil(t.b)+' s','chantier');else if(!t)part('🔨 Construction : '+fr(btJ(T.c))+' s');
- if(t&&lv<5&&!(t.b>0))part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+' ('+fr(btJ(upCost(t)))+' s de travaux)','next');
+ if(t&&lv<5&&!(t.b>0))part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+(ralentit(T,lv+1)?', ❄ −'+pr(ralentit(T,lv+1).p)+' · '+fd(ralentit(T,lv+1).d)+' s'+(T.fsp?' · zone '+fr(ralentit(T,lv+1).r):''):'')+' ('+fr(btJ(upCost(t)))+' s de travaux)','next');
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
  const bf=bonusFaction(T.faction);if(bf)part(bf);
  f.appendChild(ex);
