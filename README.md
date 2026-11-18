@@ -44,6 +44,10 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.24 — 2026-11-18
+- On a computer, **Shift + click** on a tile builds the selected tower in a single click (no preview step). The tower stays selected, so you can chain builds. Touch screens keep the two-tap build.
+- Interface only (`sim.js` untouched, no server redeploy).
+
 ### 2.23 — 2026-11-18
 - End of game (solo): a window shows Victory/Defeat with stats for the 4 players (rank, towers, maze length, waves sent, monsters killed, final income), an income curve over the game and a personal summary.
 - “Regarder la carte” lets you walk around the frozen mazes (drag, rotate, switch board, tap a tower to see it); “Quitter” goes back to the replay screen. Tap a player in the table to look at their maze.
