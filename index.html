@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.19</title>
+<title>Winter Realms — Tower Wars · Édition 2.20</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -83,6 +83,9 @@ body.r2d .fleche{display:none}
 #fiche .fermer{align-self:start;background:none;border:0;color:var(--dim);font-size:20px;line-height:1;padding:0 2px}
 #tabs{display:flex;gap:4px;align-items:center}
 #tabs button{flex:1;min-width:0;height:32px;padding:0 2px;border-radius:9px;border:1px solid #8fb6d944;background:#101d33;color:var(--dim);font-size:13px;font-weight:700}
+#tabs button.mon{display:flex;align-items:center;justify-content:center}
+#tabs button.mon canvas{filter:drop-shadow(0 1px 1px #000a);opacity:.75}
+#tabs button.mon.on canvas{opacity:1}
 #tabs .sep{flex:0 0 1px;height:20px;background:#9be7ff33}
 #tabs button.on{color:#3a2205;background:var(--or-fond);border-color:#ffe597}
 #tabs button.mon.on{color:#fff;background:linear-gradient(180deg,#f07a52,#c2401f 55%,#8a2410);border-color:#ffb4a2}
@@ -99,6 +102,8 @@ body.r2d .fleche{display:none}
 #bar button canvas{filter:drop-shadow(0 2px 2px #000a)}
 #bar.mon button canvas{margin-top:3px}
 #bar button small{font-size:11px;font-weight:700;padding:0 6px;border-radius:9px;background:#060c18cc;border:1px solid #c9a24a66}
+#bar button .rev{position:absolute;top:2px;right:2px;font-style:normal;font-size:10px;line-height:13px;padding:0 4px;border-radius:7px;background:#0b2a12e6;border:1px solid #7cdc6a99;color:#9df08a;pointer-events:none}
+#bar button.sel .rev{top:17px}
 #bar button.dis{color:#ff8c7a}
 #bar button.dis canvas{opacity:.55}
 #bar button.sel{border:1.5px solid var(--gold);box-shadow:0 0 0 1px #f2c14e66,0 0 12px #f2c14e66}
@@ -862,16 +867,25 @@ const GLYPH={
   const r=g.createRadialGradient(0,0,.05,0,0,.9);r.addColorStop(0,'#fff');r.addColorStop(.35,'#e3b8ff');r.addColorStop(1,'#8e44ad');g.fillStyle=r;g.fill();g.stroke()},
  sol(g){g.beginPath();g.moveTo(-.9,.6);g.lineTo(-.35,-.35);g.lineTo(-.1,0);g.lineTo(.25,-.6);g.lineTo(.9,.6);g.closePath();g.fillStyle=glyphFill(g,'#9a7444');g.fill();g.stroke();
   g.beginPath();g.moveTo(.25,-.6);g.lineTo(.42,-.3);g.lineTo(.08,-.3);g.closePath();g.fillStyle='#fff';g.fill()},
- air(g){g.beginPath();g.moveTo(-.8,.5);g.bezierCurveTo(-.6,-.4,.2,-.8,.9,-.7);g.bezierCurveTo(.6,-.45,.7,-.35,.45,-.2);g.bezierCurveTo(.55,-.1,.45,0,.25,.1);g.bezierCurveTo(.3,.25,.1,.35,-.1,.35);g.closePath();
-  g.fillStyle=glyphFill(g,'#cfe6f5');g.fill();g.stroke()},
- magie(g){GLYPH.mage(g)}};
-function drawBadge(g,x,y,s,kind){const c=BADGE[kind];g.save();
- g.fillStyle='#000';g.fillRect(x-.5,y-.5,s+1,s+1);
- const b=g.createLinearGradient(x,y,x+s,y+s);b.addColorStop(0,'#fbe39a');b.addColorStop(.5,'#b98a2e');b.addColorStop(1,'#4d3510');g.fillStyle=b;g.fillRect(x,y,s,s);
- const p=s>11?2:1.5,r=g.createRadialGradient(x+s*.4,y+s*.35,0,x+s/2,y+s/2,s*.75);r.addColorStop(0,c);r.addColorStop(1,'#07080c');g.fillStyle=r;g.fillRect(x+p,y+p,s-2*p,s-2*p);
- g.strokeStyle='#0008';g.lineWidth=.6;g.strokeRect(x+p,y+p,s-2*p,s-2*p);
- g.beginPath();g.rect(x+p,y+p,s-2*p,s-2*p);g.clip();
- const h=(s-2*p)/2;g.translate(x+s/2,y+s/2);g.scale(h*.92,h*.92);g.lineWidth=1.1/(h*.92);g.lineJoin='round';g.strokeStyle='#0b0b10';GLYPH[kind](g);g.restore()}
+ /* aile déployée (2.19) : cinq rémiges en éventail depuis l'épaule, couvertes par un rang de plumes arrondi */
+ air(g){g.scale(.84,.84);g.lineWidth/=.84;const ox=-.5,oy=.55,F=[[-2,1],[-18,1.22],[-34,1.4],[-50,1.52],[-66,1.55],[-82,1.45]];
+  for(const[d,L]of F){g.save();g.translate(ox,oy);g.rotate(d*Math.PI/180);g.beginPath();g.moveTo(0,-.12);g.bezierCurveTo(L*.5,-.3,L*.85,-.2,L,0);g.bezierCurveTo(L*.85,.16,L*.5,.24,0,.12);g.closePath();
+   g.fillStyle=glyphFill(g,'#cfe6f5');g.fill();g.stroke();g.restore()}
+  g.save();g.translate(ox+.3,oy-.3);g.rotate(-.8);g.beginPath();g.ellipse(0,0,.68,.46,0,Math.PI,0);
+  for(let i=0;i<4;i++){const x0=.68-i*.34,x1=x0-.34;g.quadraticCurveTo((x0+x1)/2,.34,x1,0)}g.closePath();g.fillStyle=glyphFill(g,'#f4fbff');g.fill();g.stroke();g.restore()},
+ magie(g){GLYPH.mage(g)},
+ /* patte griffue (2.19) : onglet des monstres au sol */
+ patte(g){g.fillStyle=glyphFill(g,'#e8cfa4');g.beginPath();g.ellipse(0,.38,.46,.38,0,0,7);g.fill();g.stroke();
+  for(const[x,y,a]of[[-.66,-.12,-.5],[-.25,-.55,-.15],[.25,-.55,.15],[.66,-.12,.5]]){g.beginPath();g.ellipse(x,y,.19,.25,a,0,7);g.fill();g.stroke()}}};
+/* 2.19 : pastille ronde cerclée de la couleur du rôle (plus de carré doré, qui diluait la couleur) */
+function drawBadge(g,x,y,s,kind){const c=BADGE[kind],R=s/2,cx=x+R,cy=y+R,a=s>11?1.8:1.4;g.save();
+ g.beginPath();g.arc(cx,cy,R+.5,0,7);g.fillStyle='#000';g.fill();
+ g.beginPath();g.arc(cx,cy,R,0,7);g.fillStyle=c;g.fill();
+ const ri=R-a,r=g.createRadialGradient(cx-ri*.25,cy-ri*.3,0,cx,cy,ri);r.addColorStop(0,c);r.addColorStop(1,'#07080c');
+ g.beginPath();g.arc(cx,cy,ri,0,7);g.fillStyle=r;g.fill();g.clip();
+ const h=ri*.86;g.translate(cx,cy);g.scale(h,h);g.lineWidth=1.1/h;g.lineJoin='round';g.strokeStyle='#0b0b10';GLYPH[kind](g);g.restore()}
+/* glyphe seul, sans pastille (onglets des monstres, 2.19) */
+function glyphe(kind,s){return icon(g=>{const h=s/2-1.5;g.translate(s/2,s/2);g.scale(h,h);g.lineWidth=1.6/h;g.lineJoin='round';g.strokeStyle='#0b0b10';GLYPH[kind](g)},s,s)}
 /* pastilles d'une tour dans une icône 40×40 : rôle en haut à droite, cibles en bas à gauche, magie à côté */
 function drawTowerBadges(g,k,w=56,h=46){const T=TW[k];drawBadge(g,w-21,1,20,T.s);drawBadge(g,1,h-18,17,T.gr?'sol':'air');if(T.mag)drawBadge(g,20,h-14,13,'magie')}
 /* icône de carte de tour (2.2) : plus large que haute pour loger les pastilles autour de la tour */
@@ -940,7 +954,10 @@ function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!P
   else if(p==P.tier+1){b.textContent='Palier '+p+' · '+PAL_C[p-1].toLocaleString('fr-FR')+' or';b.className='achat';b.onclick=()=>{if(!NET.on&&P.gold<PAL_C[p-1]){showErr('poor');return}if(doAction({type:'tier'})===''){palv=p;mon=null;sfx('up');render()}}}
   else{b.textContent='Palier '+p+' · 🔒';b.className='ferme';b.onclick=()=>showErr('locked',{})}
   pal.appendChild(b)}
- byCat(tab).filter(k=>CR[k].t==pv).forEach(k=>{const T=CR[k],b=carte(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.c+' or',T.n,T.c,()=>toucherMonstre(k),mon===k,k);icone3D(b.querySelector('canvas'),'monstre',k,40,40)})}
+ byCat(tab).filter(k=>CR[k].t==pv).forEach(k=>{const T=CR[k],b=carte(icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1)),T.c+' or',T.n,T.c,()=>toucherMonstre(k),mon===k,k);
+  /* gain de revenu de l'envoi, en pastille verte dans le coin de la carte */
+  const r=elt('i','rev','+'+T.i);r.title='+'+T.i+' de revenu par envoi';b.appendChild(r);b.setAttribute('aria-label',T.n+', '+T.c+' or, +'+T.i+' de revenu');
+  icone3D(b.querySelector('canvas'),'monstre',k,40,40)})}
 /* 2.15 : le premier toucher sur une carte de monstre la choisit (fiche, « ENVOYER ») ; chaque toucher suivant envoie un groupe.
    Pas d'envoi automatique en rafale : marteler la carte fait partie du jeu. */
 function toucherMonstre(k){astuce(false);if(mon===k){playerSend(k);return}mon=k;pick=null;render()}
@@ -973,6 +990,8 @@ factionBox.addEventListener('click',e=>{
 });
 selectFaction(chosenClass);
 document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>setTab(b.dataset.t));
+/* 2.19 : onglets des monstres en icônes (patte, aile, étoile) ; le nom reste lisible par les lecteurs d'écran */
+for(const[t,k,n]of[['n','patte','Monstres au sol'],['f','air','Monstres volants'],['s','magie','Monstres spéciaux']]){const b=document.querySelector('#tabs button[data-t="'+t+'"]');b.textContent='';b.append(glyphe(k,28));b.setAttribute('aria-label',n);b.title=n}
 /* ---------- construction en deux touchers (depuis la 2.2) ----------
    1er toucher sur une case : aperçu (tour fantôme, portée, prix) ; 2e toucher sur la même case : construction.
    Toucher une autre case déplace l'aperçu. Une case impossible est signalée dès le 1er toucher. */

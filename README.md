@@ -44,10 +44,15 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.19 — 2026-11-18
+### 2.20 — 2026-11-18
 - Frost towers and Sylvan roots now scale with the tower level. Frost: −20 % speed at level 1 up to −50 % at level 5 (was −50 % to −70 %), lasting 1.5 s to 2.7 s, with a blast radius growing from 1.2 to 2 tiles. Roots: −10 % at level 1 up to −30 % at level 5, lasting 0.72 s to 1.3 s.
 - Cold and roots now add up (frost −50 % + roots −30 % = −80 %); two effects of the same kind do not stack (the strongest and longest wins).
 - The tower card shows the slow, duration and zone, and what the next level brings. `sim.js` changed (automatic server redeploy).
+
+### 2.19 — 2026-11-18
+- Clearer icons: tower role and target badges are now round, ringed in the role colour (the gold square that dulled the colours is gone); the wing glyph was redrawn as a real feathered wing.
+- Monster tabs show icons instead of words: paw (ground), wing (flying), star (special).
+- Monster cards show again the income gained per send, in a green “+N” badge. Interface only: `sim.js` is unchanged.
 
 ### 2.18 — 2026-11-18
 - Frost skin on the tactical-view interface: the 2.12 frosted textures and silver scrollwork frames are back, laid out like a strategy-game console (a frosted resource bar across the top, a frosted console at the bottom, both edged with a silver frieze set with ice gems). Square framed cards (silver, gold when selected, red for monsters) with the price in a medallion; framed tabs, info card, opponents panel and menu; round metal buttons ringed with gold.
