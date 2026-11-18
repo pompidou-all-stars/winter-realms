@@ -160,7 +160,9 @@ class Grid{constructor(){this.b=Array.from({length:C*R},()=>[]);this.u=[];this.o
 const GRID_MIN=12;
 class Board{
  constructor(i,name,col,ai,classId=0){this.i=i;this.name=name;this.col=col;this.ai=ai;this.classId=classId;this.dead=0;this.aiT=1+i*.2;this.ev=[];this.G=null;
-  this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=100;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=60;this.ap=40;this.lastG=100;this.flyIn=0;this.hpIn=0;this.specSeen=0;this.tier=1;this.mz=null;this.d=this.dist()}
+  this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=100;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=60;this.ap=40;this.lastG=100;this.flyIn=0;this.hpIn=0;this.specSeen=0;this.tier=1;this.mz=null;this.d=this.dist();
+  /* 2.21 : statistiques de fin de partie (sans effet sur le jeu) : tours posées, envois (groupes et or), monstres tués, revenu à chaque versement, moment de l'élimination */
+  this.st={pose:0,env:0,envOr:0,tue:0,rev:[],mort:-1}}
  dist(){const d=Array.from({length:R},()=>Array(C).fill(INF)),q=[[EX[0],EX[1]]];d[EX[1]][EX[0]]=0;
   for(let i=0;i<q.length;i++){const[x,y]=q[i];for(const[dx,dy]of DIRS){const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R||this.g[b][a]||d[b][a]<INF)continue;d[b][a]=d[y][x]+1;q.push([a,b])}}return d}
  place(x,y,k){const T=TW[k];
@@ -169,7 +171,7 @@ class Board{
   if(this.cr.some(c=>!CR[c.k].fly&&((Math.abs(c.x-x)<.9&&Math.abs(c.y-y)<.9)||(c.tx==x&&c.ty==y))))return false;
   this.g[y][x]=1;const nd=this.dist();
   if(nd[SP[1]][SP[0]]>=INF||this.cr.some(c=>!CR[c.k].fly&&nd[c.ty][c.tx]>=INF)){this.g[y][x]=0;return false}
-  this.d=nd;this.gold-=T.c;const bt=buildT(T.c,this.bm());this.t.push({x,y,k,cd:0,a:.7,lv:1,inv:T.c,sw:0,b:bt,bt});
+  this.d=nd;this.gold-=T.c;this.st.pose++;const bt=buildT(T.c,this.bm());this.t.push({x,y,k,cd:0,a:.7,lv:1,inv:T.c,sw:0,b:bt,bt});
   this.fx.push({type:'range',x:x+.5,y:y+.5,r:T.r,t:.6,d:.6,col:T.col});this.ev.push('build');return true}
  /* multiplicateur de temps de construction : selon la difficulté pour un humain, ×1 pour une IA */
  bm(){return this.G&&!this.ai?BUILD_DIFF[this.G.LV]||1:1}
@@ -238,7 +240,7 @@ class Board{
   const kids=[];
   for(const c of this.cr){
    if(c.leak){this.lives--;this.hurt=6;this.fx.push({type:'text',x:EX[0]+.5,y:EX[1]+.2,txt:'-1 vie',col:'#ff7b6e',t:.9,d:.9});this.ev.push('!leak')}
-   else if(c.hp<=0){c.dead=1;const b=Math.max(1,Math.round(CR[c.k].c/10)),fy=flyH(c.k);this.gold+=b;
+   else if(c.hp<=0){c.dead=1;this.st.tue++;const b=Math.max(1,Math.round(CR[c.k].c/10)),fy=flyH(c.k);this.gold+=b;
     this.fx.push({type:'puff',x:c.x+.5,y:c.y+.5-fy,col:CR[c.k].col,t:.35,d:.35},{type:'text',x:c.x+.5,y:c.y+.2-fy,txt:'+'+b,col:'#ffd95e',t:.7,d:.7});this.ev.push('die');
     if(CR[c.k].split){const m=c.max/CR[c.k].hp,K=CR[c.k].kid;for(let i=0;i<2;i++)kids.push({id:++UID,k:K,x:c.x,y:c.y,tx:c.tx,ty:c.ty,hp:CR[K].hp*m,max:CR[K].hp*m,sl:0,sf:1,gp:0,gt:0,rp:0,rt:0,f:c.f,ph:Math.random()*6,ox:(i-.5)*.3,oy:(Math.random()-.5)*.2,arm:0,cs:9})}}}
   this.cr=this.cr.filter(c=>!c.dead&&!c.leak).concat(kids);
@@ -366,7 +368,7 @@ class Game{
  /* 2.13 : ouvre le palier de monstres suivant (paliers 2 et 3 payants) */
  unlock(b){const c=PAL_C[b.tier];if(c===undefined||b.gold<c)return false;b.gold-=c;b.tier++;b.ev.push('up');return true}
  /* un envoi part chez tous les adversaires encore en jeu */
- send(from,k){const T=CR[k];if(from.gold<T.c||T.t>from.tier)return false;from.gold-=T.c;from.inc+=T.i;for(const b of this.foes(from))b.send(k,1+this.time/200);return true}
+ send(from,k){const T=CR[k];if(from.gold<T.c||T.t>from.tier)return false;from.gold-=T.c;from.inc+=T.i;from.st.env++;from.st.envOr+=T.c;for(const b of this.foes(from))b.send(k,1+this.time/200);return true}
  /* action d'un joueur humain : renvoie '' si accepté, sinon un code d'erreur (poor, blocked, locked, max, busy, over, bad) */
  action(i,a){const b=this.B[i];if(!b||b.dead||b.ai||this.over||!a)return 'over';
   const x=a.x|0,y=a.y|0,k=a.k|0;
@@ -378,10 +380,10 @@ class Game{
   return 'bad'}
  /* avance la partie de dt secondes (dt ≤ 0,05) ; les événements de partie vont dans this.log */
  step(dt){if(this.over)return;const B=this.B;this.time+=dt;this.tick-=dt;
-  if(this.tick<=0){this.tick+=10;for(const b of B)if(!b.dead)b.gold+=this.eff(b);this.log.push({type:'income'})}
+  if(this.tick<=0){this.tick+=10;for(const b of B)if(!b.dead){b.gold+=this.eff(b);b.st.rev.push(this.eff(b))}this.log.push({type:'income'})}
   for(const b of B)if(b.ai&&!b.dead){mzStep(b,600);b.aiT-=dt;if(b.aiT<=0){b.aiT=.6;aiAct(b)}}
   for(const b of B)if(!b.dead)b.update(dt);
-  for(const b of B)if(!b.dead&&b.lives<=0){b.dead=1;b.cr=[];b.q=[];b.pr=[];this.log.push({type:'out',i:b.i})}
+  for(const b of B)if(!b.dead&&b.lives<=0){b.dead=1;b.st.mort=this.time;b.cr=[];b.q=[];b.pr=[];this.log.push({type:'out',i:b.i})}
   /* fin : un seul terrain debout, ou plus aucun humain en jeu */
   const alive=B.filter(b=>!b.dead);
   if(alive.length<=1||!alive.some(b=>!b.ai)){this.over=true;this.winner=alive.length==1?alive[0].i:-1;this.log.push({type:'end',winner:this.winner})}}

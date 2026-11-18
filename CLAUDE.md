@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.20)
+# Winter Realms — Tower Wars (Édition 2.21)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -109,7 +109,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 
 1. **Écran d'accueil** : on choisit une **faction** (5 au choix), puis une **difficulté** (Normal, Difficile ou Brutal). Les boutons de difficulté restent grisés tant qu'aucune faction n'est choisie (en pratique, l'Alliance est présélectionnée).
 2. **Les 4 terrains** : celui du joueur (« Toi ») et ceux de IA 1 (rouge), IA 2 (bleu) et IA 3 (violet). Les IA jouent automatiquement les factions suivantes dans la liste : `(faction du joueur + 1, + 2, + 3) % 5`.
-3. **Victoire** : toutes les IA sont éliminées. **Défaite** : le joueur est éliminé.
+3. **Victoire** : toutes les IA sont éliminées. **Défaite** : le joueur est éliminé. Une fenêtre de fin donne alors les statistiques et propose de regarder la carte ou de quitter (§9, depuis la 2.21).
 4. Un joueur est **éliminé** quand ses vies tombent à 0. Son terrain est alors vidé et grisé, et il ne reçoit plus de vagues.
 
 ### Ressources de départ (pour chaque terrain)
@@ -497,6 +497,14 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 - **Toucher une tour** : ouvre sa fiche (voir plus haut), avec les boutons Améliorer et Vendre, et le × pour la fermer.
 - **Astuce** au lancement d'une partie (9 s, ou jusqu'au premier geste) : en 3D, « Glisse le doigt pour déplacer la carte ; les flèches la font pivoter. Choisis une tour en bas, puis touche deux fois une case. »
 - **Vue 3D** (par défaut depuis la 2.8) : l'accueil propose le lien « Jouer en vue 2D (classique) » (il ajoute `?rendu=2d`) ; en 2D, « Revenir à la vue 3D ». En 3D, il faut toucher le **pied** d'une tour (sa case au sol) pour l'ouvrir.
+- **Fin de partie** (depuis la 2.21, en solo ; en ligne, rien ne change : écran de fin puis retour au salon) : une fenêtre (`#fin`) affiche **Victoire !** ou **Défaite**, la durée et la difficulté, puis :
+  - un **tableau des 4 joueurs**, classés (gagnant, terrains encore debout par vies, puis éliminés du dernier au premier) : tours en place, longueur du **chemin** (cases du labyrinthe, de l'apparition à la sortie), **vagues** envoyées (groupes de 4), monstres **tués** sur son terrain, **revenu** final ;
+  - une **courbe du revenu** de chaque joueur, un point par versement (toutes les 10 s) ;
+  - un résumé pour le joueur : tours posées, or dans ses tours, or envoyé en monstres, vies perdues, tour la plus chère ;
+  - **Regarder la carte** : la partie reste figée et on se balade sur les labyrinthes (glisser, flèches de rotation, bouton Adversaires pour changer de terrain). Toucher une tour, sur n'importe quel terrain, ouvre sa fiche sans boutons (or investi). Les terrains éliminés gardent leurs tours, avec une simple étiquette « Éliminé ». La console du bas laisse place au bouton « 🏁 Partie terminée · stats et quitter », qui rouvre la fenêtre ;
+  - toucher une ligne du tableau ouvre le terrain de ce joueur ;
+  - **Quitter** : écran de fin habituel (Rejouer en Normal, Difficile ou Brutal).
+  - Les chiffres viennent de `Board.st` (`sim.js`) : `pose` (tours posées), `env` et `envOr` (envois), `tue` (monstres tués), `rev` (revenu à chaque versement), `mort` (temps de l'élimination, −1 sinon). Ils n'influencent pas le jeu et ne sont pas transmis par le serveur.
 - **Retours visuels** : case rouge si la pose est refusée, textes flottants (+or, −1 vie, niveau), et un message en bas de l'écran (« Pas assez d'or », « le chemin serait bloqué », etc.).
 
 ---
@@ -810,3 +818,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-18 | 2.18 | **Habillage « givre » sur l'interface vue tactique** (§9) : retour des textures gelées et des cadres à volutes de la 2.12, disposés comme la console d'un jeu de stratégie (style propre au jeu) : barre de ressources givrée sur toute la largeur et console du bas givrée, bordées d'une frise d'argent à gemmes de glace ; cartes carrées serties (argent, or si choisie, rouge pour les monstres) avec prix en médaillon ; onglets, fiche, bouton Adversaires, vignettes et menu dans des cadres d'argent ; boutons ronds en métal cerclés d'or ; voile de froid sur les bords du terrain. Onglets, paliers et cartes regroupés dans `#console`. Interface uniquement : `sim.js` non modifié. |
 | 2026-11-18 | 2.19 | **Icônes plus lisibles** (§9) : pastilles de rôle et de cibles des tours rondes et cerclées de la couleur du rôle (le carré doré, qui diluait la couleur, est retiré) ; aile redessinée en vraie aile à plumes. Onglets d'envoi en icônes : patte (sol), aile (volants), étoile (spéciaux). Le **gain de revenu** revient sur les cartes de monstres (pastille verte « +N »). Interface uniquement : `sim.js` non modifié. |
 | 2026-11-18 | 2.20 | **Givre et racines selon le niveau** (§4.1, §5) : le Givre ralentit de −20 % (niveau 1) à −50 % (niveau 5) au lieu de −50 % à −70 %, pendant 1,5 s à 2,7 s, avec une explosion de rayon 1,2 à 2 cases ; les racines sylvestres de −10 % pendant 0,72 s à −30 % pendant 1,3 s (avant : −18 % à tous les niveaux). **Le froid et les racines s'additionnent** (jusqu'à −80 %) ; deux effets de la même famille ne se cumulent pas. Tables `GIVRE_LV` et `RACINES_LV`. Fiche : ralentissement, durée et zone au niveau actuel et au suivant. `sim.js` modifié (redéploiement automatique du serveur). Tests `deplacements` et `combats` adaptés. Valeurs demandées par le concepteur ; durées et rayons **à valider**. |
+| 2026-11-18 | 2.21 | **Fin de partie : statistiques et exploration des labyrinthes** (§9) : en solo, une fenêtre donne Victoire ou Défaite, un tableau des 4 joueurs (classement, tours, longueur du chemin, vagues envoyées, monstres tués, revenu), la courbe du revenu et un résumé du joueur ; « Regarder la carte » fige la partie et permet de se balader sur les 4 labyrinthes (toucher une tour ouvre sa fiche), « Quitter » ramène à l'écran de fin. Compteurs `Board.st` dans `sim.js`, sans effet sur le jeu (redéploiement automatique du serveur). Test `fin-de-partie` complété. |
