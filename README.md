@@ -44,6 +44,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.18 — 2026-11-18
+- Clearer icons: tower role and target badges are now round, ringed in the role colour (the gold square that dulled the colours is gone); the wing glyph was redrawn as a real feathered wing.
+- Monster tabs show icons instead of words: paw (ground), wing (flying), star (special).
+- Monster cards show again the income gained per send, in a green “+N” badge. Interface only: `sim.js` is unchanged.
+
 ### 2.17 — 2026-11-18
 - Sound library: about 230 MP3 files generated locally for free (Stable Audio Open for sound effects, Chatterbox for voices, both usable commercially): tower shots per faction, construction, deaths of all 72 monsters, boss arrivals, interface, winter and battle ambiences, and 55 comic voice lines (11 per faction) in the designer's recorded voices.
 - New `audio.js` engine (preloading, variants, priorities, one voice at a time); the synthesized sounds remain as a fallback, and `?son=synth` brings them back.
