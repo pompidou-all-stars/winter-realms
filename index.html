@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.17</title>
+<title>Winter Realms — Tower Wars · Édition 2.18</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -597,8 +597,7 @@ function draw(b,g,s,t){
  // Lumière d'ambiance douce au centre de l'arène.
  const ambience=g.createRadialGradient(C*s*.5,R*s*.43,s*.5,C*s*.5,R*s*.43,C*s*.8);ambience.addColorStop(0,'rgba(255,238,180,.07)');ambience.addColorStop(1,'rgba(0,0,0,.18)');g.fillStyle=ambience;g.fillRect(0,0,C*s,R*s);
  g.strokeStyle='rgba(255,255,255,.3)';g.lineWidth=s*.1;g.lineCap='round';g.lineJoin='round';g.setLineDash([s*.16,s*.3]);g.lineDashOffset=-t*s*.9;g.beginPath();
- let x=SP[0],y=SP[1];g.moveTo((x+.5)*s,(y+.5)*s);
- for(let n=0;n<200&&b.d[y][x]>0&&b.d[y][x]<INF;n++){for(const[dx,dy]of DIRS){const a=x+dx,c=y+dy;if(a>=0&&c>=0&&a<C&&c<R&&b.d[c][a]==b.d[y][x]-1){x=a;y=c;break}}g.lineTo((x+.5)*s,(y+.5)*s)}
+ chemin(b).forEach(([x,y],i)=>i?g.lineTo((x+.5)*s,(y+.5)*s):g.moveTo((x+.5)*s,(y+.5)*s));
  g.stroke();g.setLineDash([]);g.lineCap='butt';
  const px=(SP[0]+.5)*s,py=(SP[1]+.5)*s;g.beginPath();g.arc(px,py,s*.48,0,7);g.fillStyle='rgba(0,0,0,.28)';g.fill();g.beginPath();g.arc(px,py,s*.42,0,7);g.fillStyle='#2a1440';g.fill();
  for(let i=0;i<3;i++){g.beginPath();g.arc(px,py,s*(.36-i*.11),t*2+i*2,t*2+i*2+4.4);g.strokeStyle=['#5b2a86','#9b59d0','#e0b3ff'][i];g.lineWidth=s*.08;g.stroke()}
@@ -732,7 +731,7 @@ function caseVersEcran(x,y){const r=main.getBoundingClientRect();if(R3D.api){con
 function caseSous(cx,cy){const r=main.getBoundingClientRect();if(R3D.api){const p=R3D.api.sol(cx-r.left,cy-r.top);return p?{x:Math.floor(p.x),y:Math.floor(p.z)}:{x:-1,y:-1}}
  return {x:Math.floor((cx-r.left-VUE.ox)/cell),y:Math.floor((cy-r.top-VUE.oy)/cell)}}
 function charger3D(){if(!R3D.on)return;
- import('./rendu3d.js').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R});stage.insertBefore(R3D.api.canvas,main);
+ import('./rendu3d.js').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R,chemin});stage.insertBefore(R3D.api.canvas,main);
   fit();recentrer();render();
   R3D.pret=R3D.api.precharger([...new Set(B.map(b=>b.classId))]).then(()=>{R3D.charge=true})})
  .catch(e=>{console.warn(e);R3D.on=false;R3D.echec=true;document.body.classList.add('r2d');toast('3D indisponible sur cet appareil : retour à la 2D')})}
@@ -916,8 +915,7 @@ let projet=null;
 /* même contrôle que Board.place, sans rien modifier : '' si la pose est possible, sinon le code d'erreur */
 function peutConstruire(x,y,k){const T=TW[k];if(x<0||y<0||x>=C||y>=R||P.g[y][x]||(x==SP[0]&&y==SP[1])||(x==EX[0]&&y==EX[1]))return 'blocked';
  if(P.gold<T.c)return 'poor';
- if(P.cr.some(c=>!CR[c.k].fly&&((Math.abs(c.x-x)<.9&&Math.abs(c.y-y)<.9)||(c.tx==x&&c.ty==y))))return 'blocked';
- P.g[y][x]=1;const nd=P.dist();P.g[y][x]=0;return nd[SP[1]][SP[0]]>=INF||P.cr.some(c=>!CR[c.k].fly&&nd[c.ty][c.tx]>=INF)?'blocked':''}
+ P.g[y][x]=1;const nd=P.dist();P.g[y][x]=0;return nd[SP[1]][SP[0]]>=INF||genant(P,x,y,nd)?'blocked':''}
 function annulerProjet(){projet=null}
 function confirmerConstruction(x,y){const k=projet.k;projet=null;
  if(NET.on){if(P.gold<TW[k].c){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr('poor');return}NET.act({type:'place',x,y,k},true);return}

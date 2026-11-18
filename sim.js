@@ -153,22 +153,56 @@ class Grid{constructor(){this.b=Array.from({length:C*R},()=>[]);this.u=[];this.o
  near(x,y,r){const o=this.o,x0=gcl(Math.floor(x-r),C),x1=gcl(Math.floor(x+r),C),y0=gcl(Math.floor(y-r),R),y1=gcl(Math.floor(y+r),R);o.length=0;
   for(let b=y0;b<=y1;b++)for(let a=x0;a<=x1;a++){const L=this.b[b*C+a];for(let k=0;k<L.length;k++)o.push(L[k])}if(o.length>1)o.sort((p,q)=>p-q);return o}}
 const GRID_MIN=12;
+/* ---------- chemin au sol en diagonale (depuis la 2.18) ----------
+   Distances à la sortie sur 8 directions (diagonale = √2), sans couper le coin d'une tour : une diagonale exige que les deux cases voisines soient libres.
+   Le monstre suit ensuite cette chaîne de cases en ligne droite, aussi loin qu'il voit (vue) : il peut donc prendre n'importe quel angle. */
+const DIR8=[[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]],S2=Math.SQRT2,MR=.3,VUE_MAX=16;
+const cel=(v,n)=>Math.max(0,Math.min(n-1,Math.floor(v+.5)));
+/* pas possible de (x, y) dans la direction (dx, dy) */
+function libre8(g,x,y,dx,dy){const a=x+dx,b=y+dy;return a>=0&&b>=0&&a<C&&b<R&&!g[b][a]&&(!(dx&&dy)||(!g[y][a]&&!g[b][x]))}
+/* case suivante vers la sortie depuis (x, y), ou null */
+function pas8(b,x,y){const d0=b.d[y][x];if(!(d0>0&&d0<INF))return null;let best=null,bv=d0+1e-6;
+ for(const[dx,dy]of DIR8){if(!libre8(b.g,x,y,dx,dy)||b.d[y+dy][x+dx]>=d0)continue;const v=b.d[y+dy][x+dx]+(dx&&dy?S2:1);if(v<bv){bv=v;best=[x+dx,y+dy]}}return best}
+/* suite de cases de (x, y) jusqu'à la sortie (au plus n pas) */
+function chaine(b,x,y,n){const out=[[x,y]];for(let p;n-->0&&(p=pas8(b,x,y));){x=p[0];y=p[1];out.push(p)}return out}
+/* le segment (x0, y0) → (x1, y1) reste-t-il à MR case des tours et dans le terrain ? (positions en cases, centre de case = entier) */
+function vue(g,x0,y0,x1,y1){const e=.5+MR-1e-6,dx=x1-x0,dy=y1-y0,
+  a0=Math.max(0,Math.floor(Math.min(x0,x1)-e)),a1=Math.min(C-1,Math.ceil(Math.max(x0,x1)+e)),b0=Math.max(0,Math.floor(Math.min(y0,y1)-e)),b1=Math.min(R-1,Math.ceil(Math.max(y0,y1)+e));
+ /* chaque tour, agrandie de MR, est un carré : le segment le traverse-t-il ? (méthode des intervalles) */
+ const coupe=(p,d,lo,hi,t)=>{if(Math.abs(d)<1e-12)return p>lo&&p<hi?t:null;let u=(lo-p)/d,v=(hi-p)/d;if(u>v)[u,v]=[v,u];return [Math.max(t[0],u),Math.min(t[1],v)]};
+ for(let b=b0;b<=b1;b++)for(let a=a0;a<=a1;a++){if(!g[b][a])continue;let t=coupe(x0,dx,a-e,a+e,[0,1]);if(t)t=coupe(y0,dy,b-e,b+e,t);if(t&&t[0]<t[1])return false}return true}
+/* chemin affiché : un monstre fantôme part de l'apparition avec les mêmes règles (cible revue tous les 0,4 case) ; on garde ses points de virage.
+   Mis en cache tant que les distances b.d ne changent pas. */
+function chemin(b){if(b._chD===b.d)return b._ch;const c={x:SP[0],y:SP[1],tx:SP[0],ty:SP[1]},out=[[SP[0],SP[1]]];
+ for(let n=0;n<3000;n++){const dd=Math.hypot(c.tx-c.x,c.ty-c.y),ox=c.tx,oy=c.ty;
+  if(dd<1e-4){if(ox==EX[0]&&oy==EX[1])break;b.viser(c);if(c.tx==ox&&c.ty==oy)break}else b.viser(c,1);
+  if((c.tx!=ox||c.ty!=oy)&&n)out.push([c.x,c.y]);const d2=Math.hypot(c.tx-c.x,c.ty-c.y),m=Math.min(.4,d2);if(d2>0){c.x+=(c.tx-c.x)/d2*m;c.y+=(c.ty-c.y)/d2*m}}
+ out.push([c.x,c.y]);b._chD=b.d;return b._ch=out}
+/* une tour en (x, y) gênerait-elle un monstre au sol ? (trop près de lui, ou sa case ne mène plus à la sortie avec les distances nd) */
+function genant(b,x,y,nd){return b.cr.some(c=>!CR[c.k].fly&&((Math.abs(c.x-x)<.9&&Math.abs(c.y-y)<.9)||nd[cel(c.y,R)][cel(c.x,C)]>=INF))}
 class Board{
  constructor(i,name,col,ai,classId=0){this.i=i;this.name=name;this.col=col;this.ai=ai;this.classId=classId;this.dead=0;this.aiT=1+i*.2;this.ev=[];this.G=null;
   this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=100;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=60;this.ap=40;this.lastG=100;this.flyIn=0;this.hpIn=0;this.specSeen=0;this.tier=1;this.mz=null;this.d=this.dist()}
- dist(){const d=Array.from({length:R},()=>Array(C).fill(INF)),q=[[EX[0],EX[1]]];d[EX[1]][EX[0]]=0;
-  for(let i=0;i<q.length;i++){const[x,y]=q[i];for(const[dx,dy]of DIRS){const a=x+dx,b=y+dy;if(a<0||b<0||a>=C||b>=R||this.g[b][a]||d[b][a]<INF)continue;d[b][a]=d[y][x]+1;q.push([a,b])}}return d}
+ /* distances à la sortie (Dijkstra sur 8 directions, diagonale √2, sans couper les coins) */
+ dist(){const d=Array.from({length:R},()=>Array(C).fill(INF)),g=this.g,f=new Uint8Array(C*R);d[EX[1]][EX[0]]=0;
+  for(;;){let x=-1,y=0,v=INF;for(let j=0;j<R;j++)for(let i=0;i<C;i++)if(!f[j*C+i]&&d[j][i]<v){v=d[j][i];x=i;y=j}if(x<0)break;f[y*C+x]=1;
+   for(const[dx,dy]of DIR8){if(!libre8(g,x,y,dx,dy))continue;const w=v+(dx&&dy?S2:1);if(w<d[y+dy][x+dx])d[y+dy][x+dx]=w}}return d}
+ /* nouvelle cible d'un monstre au sol : la case la plus lointaine de sa chaîne qu'il peut rejoindre en ligne droite */
+ viser(c,garder){const x=cel(c.x,C),y=cel(c.y,R),ch=chaine(this,x,y,VUE_MAX);let j=0;
+  for(let k=1;k<ch.length&&vue(this.g,c.x,c.y,ch[k][0],ch[k][1]);k++)j=k;
+  if(garder&&!j)return;const[a,b]=ch[j];if(Math.abs(a-c.x)>1e-3)c.f=a>c.x?1:-1;c.tx=a;c.ty=b}
+ /* après une pose ou une vente, chaque monstre au sol recalcule sa cible */
+ revoir(){for(const c of this.cr)if(!CR[c.k].fly)this.viser(c)}
  place(x,y,k){const T=TW[k];
   if(Math.floor(k/10)!==this.classId)return false;
   if(x<0||y<0||x>=C||y>=R||this.gold<T.c||this.g[y][x]||(x==SP[0]&&y==SP[1])||(x==EX[0]&&y==EX[1]))return false;
-  if(this.cr.some(c=>!CR[c.k].fly&&((Math.abs(c.x-x)<.9&&Math.abs(c.y-y)<.9)||(c.tx==x&&c.ty==y))))return false;
   this.g[y][x]=1;const nd=this.dist();
-  if(nd[SP[1]][SP[0]]>=INF||this.cr.some(c=>!CR[c.k].fly&&nd[c.ty][c.tx]>=INF)){this.g[y][x]=0;return false}
-  this.d=nd;this.gold-=T.c;const bt=buildT(T.c,this.bm());this.t.push({x,y,k,cd:0,a:.7,lv:1,inv:T.c,sw:0,b:bt,bt});
+  if(nd[SP[1]][SP[0]]>=INF||genant(this,x,y,nd)){this.g[y][x]=0;return false}
+  this.d=nd;this.revoir();this.gold-=T.c;const bt=buildT(T.c,this.bm());this.t.push({x,y,k,cd:0,a:.7,lv:1,inv:T.c,sw:0,b:bt,bt});
   this.fx.push({type:'range',x:x+.5,y:y+.5,r:T.r,t:.6,d:.6,col:T.col});this.ev.push('build');return true}
  /* multiplicateur de temps de construction : selon la difficulté pour un humain, ×1 pour une IA */
  bm(){return this.G&&!this.ai?BUILD_DIFF[this.G.LV]||1:1}
- sell(x,y){const i=this.t.findIndex(t=>t.x==x&&t.y==y);if(i<0)return false;const b=Math.floor(this.t[i].inv*.7);this.gold+=b;this.t.splice(i,1);this.g[y][x]=0;this.d=this.dist();
+ sell(x,y){const i=this.t.findIndex(t=>t.x==x&&t.y==y);if(i<0)return false;const b=Math.floor(this.t[i].inv*.7);this.gold+=b;this.t.splice(i,1);this.g[y][x]=0;this.d=this.dist();this.revoir();
   this.fx.push({type:'text',x:x+.5,y:y+.4,txt:'+'+b,col:'#ffd95e',t:.7,d:.7});this.ev.push('sell');return true}
  upgrade(t){const c=upCost(t);if(t.lv>=5||t.b>0||this.gold<c)return false;this.gold-=c;t.inv+=c;t.lv++;t.b=t.bt=buildT(c,this.bm());
   this.fx.push({type:'text',x:t.x+.5,y:t.y,txt:'Niveau '+t.lv,col:'#ffd95e',t:.9,d:.9},{type:'range',x:t.x+.5,y:t.y+.5,r:rng(t),t:.6,d:.6,col:TW[t.k].col});this.ev.push('up');return true}
@@ -204,11 +238,11 @@ class Board{
     if(bt){bt.stun=2;c.cs=3.5;this.fx.push({type:'zap',x:c.x+.5,y:c.y+.3,x2:bt.x+.5,y2:bt.y+.5-topY(bt),t:.3,d:.3});this.ev.push('zap')}else c.cs=.3}}
    let sp=T.s*(c.sl>0?c.sf:1)*(c.h?1.4:1)*(T.acc?Math.min(ACC_MAX,1+ACC*c.age):1)*dt;
    if(T.fly){const dx=EX[0]-c.x,dy=EX[1]-c.y,dd=Math.hypot(dx,dy);if(dd<=sp)c.leak=1;else{c.x+=dx/dd*sp;c.y+=dy/dd*sp}continue}
+   /* toutes les 0,25 s, le monstre regarde s'il voit plus loin sur son chemin (il coupe ainsi au plus court après un virage) */
+   c.rv=(c.rv||0)-dt;if(c.rv<=0){c.rv=.25;this.viser(c,1)}
    while(sp>0){const dx=c.tx-c.x,dy=c.ty-c.y,dd=Math.hypot(dx,dy);
     if(dd<1e-4){if(c.tx==EX[0]&&c.ty==EX[1]){c.leak=1;break}
-     let best=null,bd=this.d[c.ty][c.tx];
-     for(const[ox,oy]of DIRS){const a=c.tx+ox,b=c.ty+oy;if(a<0||b<0||a>=C||b>=R||this.g[b][a])continue;if(this.d[b][a]<bd){bd=this.d[b][a];best=[a,b]}}
-     if(!best)break;if(best[0]!=c.tx)c.f=best[0]>c.tx?1:-1;c.tx=best[0];c.ty=best[1];continue}
+     const ox=c.tx,oy=c.ty;this.viser(c);if(c.tx==ox&&c.ty==oy)break;continue}
     const m=Math.min(sp,dd);c.x+=dx/dd*m;c.y+=dy/dd*m;sp-=m}}
   this.pen*=Math.pow(.955,dt);const tot=this.d[SP[1]][SP[0]]||1;
   for(const c of this.cr){const pr=CR[c.k].fly?1-Math.hypot(EX[0]-c.x,EX[1]-c.y)/12:1-(this.d[c.ty][c.tx]+Math.hypot(c.tx-c.x,c.ty-c.y))/tot;if(pr>this.pen)this.pen=pr}
@@ -240,7 +274,7 @@ class Board{
 
 /* ---------- IA ---------- */
 const invest=b=>b.t.reduce((s,t)=>s+t.inv,0),airInv=b=>b.t.reduce((s,t)=>s+(!TW[t.k].gr&&Math.abs(t.x-6)<=2?t.inv:0),0),mages=b=>b.t.filter(t=>TW[t.k].mg).length;
-function pathCells(b){const out=[];let x=SP[0],y=SP[1];out.push([x,y]);for(let n=0;n<200&&b.d[y][x]>0&&b.d[y][x]<INF;n++){for(const[dx,dy]of DIRS){const a=x+dx,c=y+dy;if(a>=0&&c>=0&&a<C&&c<R&&b.d[c][a]==b.d[y][x]-1){x=a;y=c;break}}out.push([x,y])}return out}
+function pathCells(b){return chaine(b,SP[0],SP[1],200)}
 
 /* --- labyrinthe de l'IA (2.5, affiné en 2.6) : chaque terrain IA reçoit un plan cible au début de la partie ---
    grille plate (case i = y*C+x, 1 = mur), parcours en largeur rapide, hasard propre (graine tirée une fois) pour que le découpage dans le temps ne change rien. */
