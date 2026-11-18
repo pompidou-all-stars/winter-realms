@@ -5,7 +5,7 @@ const {charger,partie,apparaitre,avancerTerrain,pret}=require('../outils/moteur'
 const S=charger('actuel');
 const proche=(a,b,msg,eps=1e-9)=>assert.ok(Math.abs(a-b)<=eps,`${msg||''} attendu ${b}, obtenu ${a}`);
 const terrain=(f=0)=>{const b=partie(S,{factions:[f,(f+1)%5,(f+2)%5,(f+3)%5]}).B[0];b.gold=1e6;return b};
-const perte=(b,c,d,k,sf)=>{const hp=c.hp;b.hit(c,d,S.TW[k],sf);return hp-c.hp};
+const perte=(b,c,d,k,lv)=>{const hp=c.hp;b.hit(c,d,S.TW[k],lv);return hp-c.hp};
 const fort=c=>{c.hp=c.max=1e6;return c};
 const TROLL=S.CR.findIndex(T=>T.n=='Troll des glaces');
 
@@ -27,7 +27,7 @@ test('Archer et Flammes touchent les volants',()=>{for(const k of [0,4]){const b
  const c=fort(apparaitre(S,b,S.FLY[0]));avancerTerrain(b,3);assert.ok(c.hp<c.max,S.TW[k].n)}
 });
 test('Anti-magie : Givre et Mage n\'ont aucun effet sur le Briseur de runes, et ne le ciblent pas',()=>{const b=terrain();
- const c=apparaitre(S,b,S.BRK);for(const k of [2,5,8,9])assert.equal(perte(b,c,50,k,.5),0,S.TW[k].n);assert.equal(c.sl,0);
+ const c=apparaitre(S,b,S.BRK);for(const k of [2,5,8,9])assert.equal(perte(b,c,50,k,1),0,S.TW[k].n);assert.equal(c.sl,0);
  assert.ok(perte(b,c,1,0)>0,'un Archer le touche');
  const b2=terrain();b2.place(5,2,5);pret(b2);fort(apparaitre(S,b2,S.BRK));b2.update(.01);assert.equal(b2.pr.length,0);
 });
@@ -53,12 +53,12 @@ test('Légion (malédiction) : marque 1,35 s, chaque coup suivant fait +14 %',()
 test('Canon : explosion de rayon 1,1, 60 % des dégâts autour, sol uniquement',()=>{const b=terrain();
  const a=fort(apparaitre(S,b,0)),v=fort(apparaitre(S,b,0)),loin=fort(apparaitre(S,b,0)),vol=fort(apparaitre(S,b,S.FLY[0]));
  for(const [c,x,y] of [[a,6,5],[v,6.5,5.5],[loin,6,7],[vol,6.3,5.2]])Object.assign(c,{x,y,tx:6,ty:5});
- const hp=[a,v,loin,vol].map(c=>c.hp);b.impact({k:3,tg:a,d:10,tx:a.x+.5,ty:a.y+.5,sf:.5});
+ const hp=[a,v,loin,vol].map(c=>c.hp);b.impact({k:3,tg:a,d:10,tx:a.x+.5,ty:a.y+.5,lv:1});
  proche(hp[0]-a.hp,10,'cible');proche(hp[1]-v.hp,6,'voisin');assert.equal(loin.hp,hp[2],'trop loin');assert.equal(vol.hp,hp[3],'volant épargné');
 });
 test('Spectre : invisible sauf à portée d\'une tour Mage ; un Spectre caché n\'est ni ciblé ni touché par les explosions',()=>{const b=terrain();
  b.place(5,2,0);pret(b);const s=fort(apparaitre(S,b,S.SPEC));b.update(.01);assert.equal(s.hid,true);assert.equal(b.pr.length,0);
- const a=fort(apparaitre(S,b,0));Object.assign(a,{x:s.x,y:s.y});const pv=s.hp;b.impact({k:3,tg:a,d:10,tx:s.x+.5,ty:s.y+.5,sf:.5});assert.equal(s.hp,pv);
+ const a=fort(apparaitre(S,b,0));Object.assign(a,{x:s.x,y:s.y});const pv=s.hp;b.impact({k:3,tg:a,d:10,tx:s.x+.5,ty:s.y+.5,lv:1});assert.equal(s.hp,pv);
  const b2=terrain();b2.place(5,2,5);pret(b2);const s2=fort(apparaitre(S,b2,S.SPEC));b2.update(.01);assert.equal(s2.hid,false);assert.equal(b2.pr.length,1);
 });
 test('Saboteur : 2 s après son apparition, étourdit 2 s la tour la plus proche (rayon 2,3)',()=>{const b=terrain();b.place(5,3,1);b.place(9,9,0);

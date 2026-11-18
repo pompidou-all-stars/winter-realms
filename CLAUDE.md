@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.19)
+# Winter Realms — Tower Wars (Édition 2.20)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -147,14 +147,24 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 |---|---|---|---|---|---|
 | Archer | 20 | 2,8 | 8 | 0,5 s | Tir simple, touche le sol et les airs |
 | Canon | 50 | 2,5 | 20 | 1,2 s | Explosion de rayon 1,1 (60 % des dégâts autour), **sol uniquement** |
-| Givre | 40 | 2,5 | 4 | 0,9 s | Explosion de rayon 1,2, **ralentit** pendant 1,5 s, **magique** |
+| Givre | 40 | 2,5 | 4 | 0,9 s | Explosion de rayon 1,2 à 2 selon le niveau, **ralentit** (voir plus bas), **magique** |
 | Mage | 90 | 3,2 | 45 | 1,4 s | **Magique**, **détecte les invisibles** dans sa portée |
 | Garde | 30 | 1,5 | 20 | 0,55 s | Corps à corps (frappe directe), **sol uniquement** |
 | Flammes | 70 | 2,0 | 3 | 0,12 s | Cône d'environ ±29°, plus tout ce qui est à moins de 0,6 case ; touche les airs |
 
 - Les tours « magiques » (Givre, Mage) **n'ont aucun effet sur le Briseur de runes**.
 - **Ciblage** : chaque tour vise, dans sa portée, le monstre visible **le plus proche de la sortie**.
-- **Ralentissement** : le Givre multiplie la vitesse par `0,5 − 0,05 × (niveau − 1)`, soit ×0,5 au niveau 1 et ×0,3 au niveau 5, pendant 1,5 s. Les racines des Sylvestres multiplient la vitesse par ×0,82 (`T.sf`). Si un monstre est déjà ralenti, c'est le ralentissement **le plus fort** qui reste appliqué, et la durée retenue est la plus longue.
+- **Ralentissement** (depuis la 2.20, tables `GIVRE_LV` et `RACINES_LV` en tête de `sim.js`) : la force, la durée et la zone dépendent du **niveau de la tour** qui frappe.
+  | Niveau | 1 | 2 | 3 | 4 | 5 |
+  |---|---|---|---|---|---|
+  | Givre (froid) : vitesse retirée | 20 % | 27,5 % | 35 % | 42,5 % | 50 % |
+  | Givre : durée | 1,5 s | 1,8 s | 2,1 s | 2,4 s | 2,7 s |
+  | Givre : rayon de l'explosion | 1,2 | 1,4 | 1,6 | 1,8 | 2 |
+  | Racines sylvestres : vitesse retirée | 10 % | 15 % | 20 % | 25 % | 30 % |
+  | Racines : durée | 0,72 s | 0,85 s | 1 s | 1,15 s | 1,3 s |
+  - **Le froid et les racines s'additionnent** : Givre niveau 5 + racines niveau 5 = −80 %, soit vitesse ×0,2. Le monstre garde deux ralentissements séparés (`gp`/`gt` pour le froid, `rp`/`rt` pour les racines) ; `c.sl` et `c.sf` en sont déduits (`ralentir`).
+  - **Dans une même famille, pas de cumul** : si un monstre est déjà gelé (ou enraciné), c'est l'effet **le plus fort** qui reste, et la durée retenue est la plus longue.
+  - Les racines n'ont pas de zone propre : elles touchent ce que la tour touche déjà (cible, explosion du Canon, cône des Flammes).
 
 ### 4.2 Les 10 emplacements par faction (`ARCH`, `ROLE`)
 Chaque faction a 10 tours. L'emplacement `j` détermine l'archétype, un multiplicateur de puissance (qui s'applique au coût et aux dégâts) et quelques retouches :
@@ -211,7 +221,7 @@ Principe d'équilibrage (commentaire dans le code) : *des coefficients volontair
 |---|---|---|---|---|---|---|
 | Alliance | 🛡️ | ×1,04 | ×0,97 | **×1,10** | ×1,03 | **Anti-aérien** : +18 % de dégâts contre les volants |
 | Horde | 🪓 | ×1,02 | ×0,96 | ×0,93 | ×1,04 | **Frénésie** : +30 % de dégâts sur les cibles à moins de 35 % de PV |
-| Sylvestres | 🌿 | ×1,00 | ×0,96 | ×1,00 | ×1,02 | **Racines** : *toutes* leurs tours ralentissent les monstres (vitesse ×0,82 pendant 0,72 s). Leurs tours Givre gardent le ralentissement normal du Givre |
+| Sylvestres | 🌿 | ×1,00 | ×0,96 | ×1,00 | ×1,02 | **Racines** : *toutes* leurs tours ralentissent les monstres, de −10 % pendant 0,72 s (niveau 1) à −30 % pendant 1,3 s (niveau 5), **en plus du froid** (§4.1). Leurs tours Givre gardent le ralentissement normal du Givre |
 | Nains | ⚒️ | ×1,07 | **×1,08** | ×1,02 | ×1,08 | **Perforant** : ignorent 55 % de l'armure |
 | Légion des ombres | ☠️ | ×1,01 | ×1,01 | ×0,99 | ×1,01 | **Malédiction** : une cible touchée est marquée 1,35 s, et chaque coup suivant sur elle fait +14 % |
 
@@ -799,3 +809,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-18 | 2.17 | **Bibliothèque sonore** (§16) : environ 230 fichiers MP3 générés en local et gratuitement (Stable Audio Open pour les bruitages, Chatterbox pour les voix, licences compatibles avec un usage commercial) : tirs des 6 archétypes pour chaque faction, construction, fin de chantier et amélioration par faction, cris de mort des 72 monstres (10 familles), arrivées de boss, interface, ambiances d'hiver et de bataille, et **55 répliques vocales** caricaturales (11 par faction) dites avec les voix enregistrées par le concepteur. Moteur `audio.js` (préchargement, variantes, priorités, une voix à la fois, sons synthétisés en secours, `?son=synth`). Scripts de génération `art/sons/`, contrôle qualité `art/outils/controle-sons.js` et page `ecoute-sons.html`. Règle de conception n°2 adaptée. `sim.js` non modifié (pas de redéploiement du serveur). |
 | 2026-11-18 | 2.18 | **Habillage « givre » sur l'interface vue tactique** (§9) : retour des textures gelées et des cadres à volutes de la 2.12, disposés comme la console d'un jeu de stratégie (style propre au jeu) : barre de ressources givrée sur toute la largeur et console du bas givrée, bordées d'une frise d'argent à gemmes de glace ; cartes carrées serties (argent, or si choisie, rouge pour les monstres) avec prix en médaillon ; onglets, fiche, bouton Adversaires, vignettes et menu dans des cadres d'argent ; boutons ronds en métal cerclés d'or ; voile de froid sur les bords du terrain. Onglets, paliers et cartes regroupés dans `#console`. Interface uniquement : `sim.js` non modifié. |
 | 2026-11-18 | 2.19 | **Icônes plus lisibles** (§9) : pastilles de rôle et de cibles des tours rondes et cerclées de la couleur du rôle (le carré doré, qui diluait la couleur, est retiré) ; aile redessinée en vraie aile à plumes. Onglets d'envoi en icônes : patte (sol), aile (volants), étoile (spéciaux). Le **gain de revenu** revient sur les cartes de monstres (pastille verte « +N »). Interface uniquement : `sim.js` non modifié. |
+| 2026-11-18 | 2.20 | **Givre et racines selon le niveau** (§4.1, §5) : le Givre ralentit de −20 % (niveau 1) à −50 % (niveau 5) au lieu de −50 % à −70 %, pendant 1,5 s à 2,7 s, avec une explosion de rayon 1,2 à 2 cases ; les racines sylvestres de −10 % pendant 0,72 s à −30 % pendant 1,3 s (avant : −18 % à tous les niveaux). **Le froid et les racines s'additionnent** (jusqu'à −80 %) ; deux effets de la même famille ne se cumulent pas. Tables `GIVRE_LV` et `RACINES_LV`. Fiche : ralentissement, durée et zone au niveau actuel et au suivant. `sim.js` modifié (redéploiement automatique du serveur). Tests `deplacements` et `combats` adaptés. Valeurs demandées par le concepteur ; durées et rayons **à valider**. |
