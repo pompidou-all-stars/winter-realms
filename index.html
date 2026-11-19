@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.35</title>
+<title>Winter Realms — Tower Wars · Édition 2.36</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -1041,7 +1041,7 @@ const dps=(k,lv)=>Math.round(dmg({k,lv})/TW[k].cd);
 /* bonus de faction, en clair, calculé à partir de FACTION_BALANCE */
 /* ralentissement d'une tour à un niveau donné (2.18) : froid du Givre (avec sa zone) ou racines sylvestres */
 const pr=x=>fr(x*100)+' %',fd=n=>String(+(+n).toFixed(2)).replace('.',',');
-function ralentit(T,lv){const i=Math.min(4,Math.max(0,lv-1));return T.fsp?{p:GIVRE_LV.p[i],d:GIVRE_LV.d[i],r:GIVRE_LV.r[i]}:T.sl?{p:RACINES_LV.p[i],d:RACINES_LV.d[i]}:null}
+function ralentit(T,lv){const i=Math.min(4,Math.max(0,lv-1));return T.fsp?{p:GIVRE_LV.p[i]+(T.gb||0),d:GIVRE_LV.d[i],r:GIVRE_LV.r[i]}:T.sl?{p:RACINES_LV.p[i],d:RACINES_LV.d[i]}:null}
 function bonusFaction(f){const B=FACTION_BALANCE[f],pc=x=>Math.round((x-1)*100)+' %';
  return B.airBonus?'Anti-aérien : +'+pc(B.airBonus)+' de dégâts contre les volants':B.execute?'Frénésie : +'+pc(B.execute)+' sur les monstres à moins de 35 % de vie':
   B.root?'Racines : chaque coup ralentit le monstre de '+pr(RACINES_LV.p[0])+' (niveau 1) à '+pr(RACINES_LV.p[4])+' (niveau 5), en plus du froid':B.pierce?'Perforant : ignore '+Math.round(B.pierce*100)+' % de l\'armure':B.mark?'Malédiction : chaque coup suivant sur la même cible fait +'+pc(B.mark):''}
