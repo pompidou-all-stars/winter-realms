@@ -68,7 +68,7 @@ test('Estimation des défenses : un volant ne craint pas les Canons, un invisibl
  assert.equal(S.encaisse(b,inv,1),0,'invisible sans Mage');
  const G2=partie(S),b2=G2.B[0];murCanons(b2,b2.classId*10+5);assert.ok(S.encaisse(b2,inv,1)>0,'les Mages révèlent et frappent');assert.equal(S.encaisse(b2,mi,1),0,'anti-magie contre des Mages');
 });
-test('IA : contre des adversaires qui n\'ont que des Canons, elle envoie ce qu\'ils ne peuvent pas toucher (volants ou invisibles)',()=>{
+test('IA : contre des adversaires qui n\'ont que des Canons, l\'essentiel de sa vague (en or) est ce qu\'ils ne peuvent pas toucher (volants ou invisibles)',()=>{
  const G=partie(S,{ia:[0,1,0,0]});for(const i of [0,2,3])murCanons(G.B[i],G.B[i].classId*10+3);
  const A=G.B[1];G.time=60;A.gold=A.ap=600;A.inc=10;const env=[];const o=G.send.bind(G);G.send=(f,k)=>{const r=o(f,k);if(r)env.push(k);return r};
  S.aiAttack(A);assert.ok(env.length>0,'aucun envoi');const or=f=>env.filter(f).reduce((a,k)=>a+S.CR[k].c,0);
