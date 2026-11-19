@@ -68,15 +68,15 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
  test('Construction : un premier toucher montre la tour fantôme et sa portée en 3D, sans rien construire',async()=>{
   await N.toucherCase(p,3,5);await N.avancer(p,50);const e=await N.etat(p),s=(await r3d()).scene;assert.deepEqual(e.tours,[]);assert.equal(e.or,200);
   assert.deepEqual(e.projet,{x:3,y:5,k:20});assert.equal(e.toast,'','2.31 : plus de bulle au milieu du terrain');
-  assert.match(e.fiche,/Touche encore la case pour construire · 20 or/);assert.doesNotMatch(e.fiche,/Racines/,'2.31 : fiche réduite pendant l’aperçu');
+  assert.equal(await p.isVisible('#aideBat'),true,'2.34 : consigne entre les flèches');assert.match(await p.textContent('#aideBat'),/Touche encore la case pour construire/);assert.doesNotMatch(e.fiche,/Racines/,'2.31 : fiche réduite pendant l’aperçu');
   assert.equal(await val(()=>document.getElementById('fiche').classList.contains('compacte')),true);assert.equal(s.fantome,true);assert.equal(s.portee,true);
  });
  test('Construction : un second toucher sur la même case construit la tour en 3D et débite son prix',async()=>{
   await N.toucherCase(p,3,5);await N.avancer(p,50);const e=await N.etat(p),s=(await r3d()).scene;
-  assert.deepEqual(e.tours,[{x:3,y:5,k:20,lv:1}]);assert.equal(e.or,180);assert.equal(e.projet,null);assert.equal(s.tours,1);assert.equal(s.fantome,false);
+  assert.deepEqual(e.tours,[{x:3,y:5,k:20,lv:1}]);assert.equal(e.or,180);assert.equal(await p.isVisible('#aideBat'),false,'consigne retirée après la pose');assert.equal(e.projet,null);assert.equal(s.tours,1);assert.equal(s.fantome,false);
  });
  test('Construction : toucher une autre case déplace l\'aperçu, sans construire',async()=>{
-  await N.toucherCase(p,8,5);await N.toucherCase(p,9,5);const e=await N.etat(p);assert.deepEqual(e.projet,{x:9,y:5,k:20});assert.equal(e.tours.length,1);assert.equal(e.or,180);
+  await N.toucherCase(p,8,5);await N.toucherCase(p,9,5);assert.equal(await p.isVisible('#aideBat'),false,'consigne une seule fois par partie');assert.doesNotMatch((await N.etat(p)).fiche,/deux fois une case/);const e=await N.etat(p);assert.deepEqual(e.projet,{x:9,y:5,k:20});assert.equal(e.tours.length,1);assert.equal(e.or,180);
  });
  test('Une pose impossible est refusée avec un message',async()=>{
   await N.toucherCase(p,6,0);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(e.or,180);
