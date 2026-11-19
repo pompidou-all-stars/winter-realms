@@ -21,7 +21,7 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | 💡 | 🧭 Gameplay | **Point de relais** : pouvoir poser un point de passage autour duquel les monstres tournent. |
 | 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
 | ✅ | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. *Fait en 2.35 : tests et parties entre IA en parallèle ; simulation 24 s → 8 s, 15 parties 1 min 54 → 29 s (sur 22 cœurs).* |
-| 🧭 | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. |
+| ✅ | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. *Fait en 2.38 : 10 quêtes au titre décalé (« Qui a la plus grosse ? », « Clicker fou », « Picsou »…), une toutes les 3 à 4 min, annoncées par une bannière, suivies dans une pastille, gagnant annoncé ; les IA les jouent.* |
 | 🧭 | ✨ Palier 3 | **Pouvoirs magiques payants** : renforcements sur son propre terrain, ou malédictions à lancer sur le terrain d'un adversaire. |
 | 💡 | 🧊 Modèles 3D | **Refactorisation des modèles 3D**. |
 | 💡 | 🧭 Interface | **Menu de navigation** : lancement d'une partie sur plusieurs écrans successifs. |
@@ -79,6 +79,12 @@ On the site, enter a nickname, click **Créer un salon** and share the link (or 
 The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](server/). It is **redeployed automatically** by a GitHub Action whenever a change to `sim.js` or `server/` is merged into `main` (see CLAUDE.md, section 9 bis). Manual fallback: `cd server` then `npx wrangler deploy`.
 
 ## Changelog
+
+### 2.38 — quêtes bonus — 2026-11-19
+- Bonus quests: short challenges drawn at random during the game (first at 1:30, then one every 3 to 4 min), with funny titles. Races (the first to reach the goal wins): "Clicker fou" (place 10 more towers; never drawn when someone has no room left), "Le facteur sonne toujours 4 fois" (be the first to get 4 of your own monsters through to an opponent; every monster now remembers who sent it), "Gonflette" (upgrade a tower to a level above the best current one), "Frozen" (own N frost towers, N above the current best), "Le gros cadeau" (send a boss). Snapshots (best score when time runs out): "Qui a la plus grosse ?" (longest maze), "Picsou" (most gold in the bank), "Pigeons voyageurs" (most gold sent as flyers), "Bling-bling" (most expensive tower), "Mamie Gâteau" (lowest income: a catch-up gift). No race can already be won when it starts. Reward: gold, 8 × the average income (at least 100), shared on a tie.
+- Banner when a quest starts (title, rule, reward), a tracking pill under the top bar (time left, your score and rank, green when you lead; tap it for the rule), and a banner announcing the winner. "Quêtes" column in the end-of-game table.
+- AI: each AI decides whether it plays a quest (50 % in Normal, 75 % in Hard, 100 % in Brutal) and adapts: builds cheap towers, saves its gold, sends small waves early, upgrades its best tower, builds frost towers or sends a boss.
+- `sim.js` and `server/` changed (the server redeploys automatically; the snapshot carries the current quest).
 
 ### 2.37 — file d'améliorations — 2026-11-19
 - "Mes tours" panel: a button under the top bar lists all your towers by type (count per level). Tick types, pick a target level (2 to 5) and add them to an upgrade queue: each tower goes up one level at a time, lowest level first, as soon as gold allows; when gold runs short the queue spends what it can and the rest waits for income. The queue shows each order (progress bar, gold left) and can be cancelled order by order or entirely; queued towers get a gold chevron on the map. Interface only: `sim.js` unchanged.

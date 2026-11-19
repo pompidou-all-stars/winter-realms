@@ -150,6 +150,35 @@ const HPK=.55,GRACE=30,GROUP=4,
 /* vitesse d'un monstre ralenti : le froid et les racines s'additionnent */
 const ralentir=c=>{c.sl=Math.max(c.gt||0,c.rt||0);c.sf=1-(c.gt>0?c.gp:0)-(c.rt>0?c.rp:0)};
 const dmg=t=>TW[t.k].d*2**(t.lv-1),rng=t=>TW[t.k].r*(1+.05*(t.lv-1)),upCost=t=>Math.round(TW[t.k].c*1.5*2**(t.lv-1)/5)*5,topY=t=>.28+.045*(t.lv-1);
+/* 2.38 : quêtes bonus. Une à la fois, tirées au hasard sans remise : la première à QU_T0 s, puis la suivante QU_PAUSE à QU_PAUSE + 60 s après la fin de la précédente.
+   f = 'course' : le premier qui atteint la cible gagne (au plus dur s, sinon personne) ; f = 'photo' : au bout de dur s, le meilleur score gagne (sens -1 : le plus petit).
+   sc(b) : score du terrain b ; sans abs, il se compte depuis le début de la quête (écart avec le score de départ) ; cible(G) : cible d'une course, calculée au lancement
+   pour que personne ne l'ait déjà atteinte ; ok(G) : la quête peut-elle être tirée maintenant ; u : unité affichée. Récompense : quOr (or, selon le revenu moyen).
+   Chaque IA décide au lancement si elle joue la quête (QU_JOUE selon la difficulté) ; les quêtes « naturelles » n'ont pas besoin d'elle. */
+const QU_T0=90,QU_PAUSE=180,QU_JOUE=[.5,.75,1],QU_PLACE=20,
+ quVivants=G=>G.B.filter(b=>!b.dead),
+ quOr=G=>{const a=quVivants(G);return Math.max(100,Math.round(8*a.reduce((s,b)=>s+b.inc,0)/Math.max(1,a.length)/10)*10)},
+ givres=b=>b.t.filter(t=>TW[t.k].fsp).length,
+ lvMax=b=>b.t.reduce((m,t)=>Math.max(m,t.lv),0),
+ ciblesGonflette=G=>Math.max(3,1+Math.max(0,...quVivants(G).map(lvMax)));
+/* cases où une tour peut encore être posée sans fermer le chemin (au plus n : on s'arrête dès qu'on en a trouvé assez) */
+function posables(b,n){const w=new Uint8Array(C*R);for(let y=0;y<R;y++)for(let x=0;x<C;x++)w[y*C+x]=b.g[y][x];let k=0;
+ for(let i=0;i<C*R&&k<n;i++){if(w[i]||i==SP[1]*C+SP[0]||i==EX[1]*C+EX[0])continue;w[i]=1;if(plen(w)>=0)k++;w[i]=0}return k}
+const QUETES=[
+ {id:'grosse',titre:'Qui a la plus grosse ?',txt:'Le plus long labyrinthe dans 75 s',f:'photo',dur:75,abs:1,u:' cases',sc:b=>Math.round(b.d[SP[1]][SP[0]])},
+ {id:'clicker',titre:'Clicker fou',txt:'Le premier qui pose {N} tours',f:'course',dur:90,u:' tours',sc:b=>b.st.pose,cible:()=>10,
+  /* pas en fin de partie : chacun doit encore avoir de la place pour construire */
+  ok:G=>quVivants(G).every(b=>posables(b,QU_PLACE)>=QU_PLACE)},
+ {id:'picsou',titre:'Picsou',txt:'Le plus d’or en banque dans 60 s',f:'photo',dur:60,abs:1,u:' or',sc:b=>Math.floor(b.gold)},
+ {id:'facteur',titre:'Le facteur sonne toujours 4 fois',txt:'Le premier qui fait passer {N} de ses monstres chez un adversaire',f:'course',dur:120,u:' passés',sc:b=>b.st.passe,cible:()=>4},
+ {id:'gonflette',titre:'Gonflette',txt:'Le premier qui monte une tour au niveau {N}',f:'course',dur:120,abs:1,u:'',pre:'niveau ',
+  sc:b=>b.t.reduce((m,t)=>t.b>0?m:Math.max(m,t.lv),0),cible:ciblesGonflette,ok:G=>ciblesGonflette(G)<=5},
+ {id:'frozen',titre:'Frozen',txt:'Le premier qui a {N} tours de Givre',f:'course',dur:120,abs:1,u:' Givre',sc:givres,
+  cible:G=>Math.max(0,...quVivants(G).map(givres))+(G.time<300?2:G.time<600?3:4)},
+ {id:'cadeau',titre:'Le gros cadeau',txt:'Le premier qui envoie un boss',f:'course',dur:150,u:' boss',sc:b=>b.st.boss,cible:()=>1,ok:G=>G.time>=180},
+ {id:'pigeons',titre:'Pigeons voyageurs',txt:'Le plus d’or envoyé en volants dans 60 s',f:'photo',dur:60,u:' or',sc:b=>b.st.vol},
+ {id:'bling',titre:'Bling-bling',txt:'La tour la plus chère dans 60 s',f:'photo',dur:60,abs:1,u:' or',sc:b=>b.t.reduce((m,t)=>Math.max(m,t.inv),0)},
+ {id:'mamie',titre:'Mamie Gâteau',txt:'Le plus petit revenu dans 60 s touche le gâteau',f:'photo',dur:60,abs:1,sens:-1,u:'',pre:'+',sc:b=>b.inc}];
 
 /* ---------- simulation ---------- */
 /* grille de voisinage (2.5.2, performances) : chaque élément d'une liste est rangé dans sa case, pour ne tester que les voisins d'un point
@@ -191,8 +220,9 @@ function genant(b,x,y,nd){return b.cr.some(c=>!CR[c.k].fly&&((Math.abs(c.x-x)<.9
 class Board{
  constructor(i,name,col,ai,classId=0){this.i=i;this.name=name;this.col=col;this.ai=ai;this.classId=classId;this.dead=0;this.aiT=1+i*.2;this.ev=[];this.G=null;
   this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=200;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=120;this.ap=80;this.lastG=200;this.flyIn=0;this.hpIn=0;this.specSeen=0;this.tier=1;this.mz=null;this.d=this.dist();
-  /* 2.23 : statistiques de fin de partie (sans effet sur le jeu) : tours posées, envois (groupes et or), monstres tués, revenu à chaque versement, moment de l'élimination */
-  this.st={pose:0,env:0,envOr:0,tue:0,rev:[],mort:-1}}
+  /* 2.23 : statistiques de fin de partie (sans effet sur le jeu) : tours posées, envois (groupes et or), monstres tués, revenu à chaque versement, moment de l'élimination ;
+     2.38 (quêtes) : monstres de ce joueur passés chez un adversaire, boss envoyés, or envoyé en volants, quêtes gagnées et leur or */
+  this.st={pose:0,env:0,envOr:0,tue:0,rev:[],mort:-1,passe:0,boss:0,vol:0,qu:0,quOr:0}}
  /* distances à la sortie (Dijkstra sur 8 directions, diagonale √2, sans couper les coins) */
  dist(){const d=Array.from({length:R},()=>Array(C).fill(INF)),g=this.g,f=new Uint8Array(C*R);d[EX[1]][EX[0]]=0;
   for(;;){let x=-1,y=0,v=INF;for(let j=0;j<R;j++)for(let i=0;i<C;i++)if(!f[j*C+i]&&d[j][i]<v){v=d[j][i];x=i;y=j}if(x<0)break;f[y*C+x]=1;
@@ -216,7 +246,8 @@ class Board{
   this.fx.push({type:'text',x:x+.5,y:y+.4,txt:'+'+b,col:'#ffd95e',t:.7,d:.7});this.ev.push('sell');return true}
  upgrade(t){const c=upCost(t);if(t.lv>=5||t.b>0||this.gold<c)return false;this.gold-=c;t.inv+=c;t.lv++;t.b=t.bt=buildT(c,this.bm());
   this.fx.push({type:'text',x:t.x+.5,y:t.y,txt:'Niveau '+t.lv,col:'#ffd95e',t:.9,d:.9},{type:'range',x:t.x+.5,y:t.y+.5,r:rng(t),t:.6,d:.6,col:TW[t.k].col});this.ev.push('up');return true}
- send(k,m){for(let i=0;i<GROUP;i++)this.q.push({k,m,t:i*.38+Math.random()*.25})}
+ /* o : terrain qui envoie (2.38 : chaque monstre retient son envoyeur, pour la quête du facteur) */
+ send(k,m,o=-1){for(let i=0;i<GROUP;i++)this.q.push({k,m,o,t:i*.38+Math.random()*.25})}
  /* dégâts : l'anti-magie ignore Mage et Givre, la carapace retire un montant fixe à chaque coup */
  hit(c,d,T,lv){
   if(T.mag&&CR[c.k].mi)return;
@@ -248,7 +279,7 @@ class Board{
    if(F||(vue(this.g,c.x,c.y,nx,ny)&&vue(this.g,nx,ny,c.tx,c.ty))){c.x=nx;c.y=ny}}}
  update(dt){
   this.hurt=Math.max(0,this.hurt-dt);
-  for(const s of this.q){s.t-=dt;if(s.t<=0){const hp=CR[s.k].hp*s.m*HPK;this.hpIn+=hp;if(CR[s.k].fly)this.flyIn+=hp;if(CR[s.k].inv)this.specSeen=1;this.cr.push({id:++UID,k:s.k,x:SP[0],y:SP[1],tx:SP[0],ty:SP[1],hp,max:hp,sl:0,sf:1,gp:0,gt:0,rp:0,rt:0,f:1,ph:Math.random()*6,ox:(Math.random()-.5)*.3,oy:(Math.random()-.5)*.22,arm:(CR[s.k].arm||0)*s.m,cs:2})}}
+  for(const s of this.q){s.t-=dt;if(s.t<=0){const hp=CR[s.k].hp*s.m*HPK;this.hpIn+=hp;if(CR[s.k].fly)this.flyIn+=hp;if(CR[s.k].inv)this.specSeen=1;this.cr.push({id:++UID,k:s.k,o:s.o,x:SP[0],y:SP[1],tx:SP[0],ty:SP[1],hp,max:hp,sl:0,sf:1,gp:0,gt:0,rp:0,rt:0,f:1,ph:Math.random()*6,ox:(Math.random()-.5)*.3,oy:(Math.random()-.5)*.22,arm:(CR[s.k].arm||0)*s.m,cs:2})}}
   this.q=this.q.filter(s=>s.t>0);
   const au=this.cr.filter(c=>CR[c.k].aura),mg=this.t.filter(t=>TW[t.k].mg&&!(t.b>0)),hl=this.cr.filter(c=>CR[c.k].heal);
   /* hâte et soin : avec beaucoup de Chamans ou de Prêtresses, on ne regarde que ceux des cases voisines. Ils bougent pendant la boucle (au plus 3,4 cases/s × dt),
@@ -288,10 +319,10 @@ class Board{
   this.pr=this.pr.filter(p=>!p.hit);this.cgOk=false;
   const kids=[];
   for(const c of this.cr){
-   if(c.leak){this.lives--;this.hurt=6;this.fx.push({type:'text',x:EX[0]+.5,y:EX[1]+.2,txt:'-1 vie',col:'#ff7b6e',t:.9,d:.9});this.ev.push('!leak')}
+   if(c.leak){this.lives--;this.hurt=6;const ex=c.o>=0&&this.G&&this.G.B[c.o];if(ex)ex.st.passe++;this.fx.push({type:'text',x:EX[0]+.5,y:EX[1]+.2,txt:'-1 vie',col:'#ff7b6e',t:.9,d:.9});this.ev.push('!leak')}
    else if(c.hp<=0){c.dead=1;this.st.tue++;const b=Math.max(1,Math.round(CR[c.k].c/10)),fy=flyH(c.k);this.gold+=b;
     this.fx.push({type:'puff',x:c.x+.5,y:c.y+.5-fy,col:CR[c.k].col,t:.35,d:.35},{type:'text',x:c.x+.5,y:c.y+.2-fy,txt:'+'+b,col:'#ffd95e',t:.7,d:.7});this.ev.push('die');
-    if(CR[c.k].split){const m=c.max/CR[c.k].hp,K=CR[c.k].kid;for(let i=0;i<2;i++)kids.push({id:++UID,k:K,x:c.x,y:c.y,tx:c.tx,ty:c.ty,hp:CR[K].hp*m,max:CR[K].hp*m,sl:0,sf:1,gp:0,gt:0,rp:0,rt:0,f:c.f,ph:Math.random()*6,ox:(i-.5)*.3,oy:(Math.random()-.5)*.2,arm:0,cs:9})}}}
+    if(CR[c.k].split){const m=c.max/CR[c.k].hp,K=CR[c.k].kid;for(let i=0;i<2;i++)kids.push({id:++UID,k:K,o:c.o,x:c.x,y:c.y,tx:c.tx,ty:c.ty,hp:CR[K].hp*m,max:CR[K].hp*m,sl:0,sf:1,gp:0,gt:0,rp:0,rt:0,f:c.f,ph:Math.random()*6,ox:(i-.5)*.3,oy:(Math.random()-.5)*.2,arm:0,cs:9})}}}
   this.cr=this.cr.filter(c=>!c.dead&&!c.leak).concat(kids);
   for(const f of this.fx){f.t-=dt;if(f.vx!==undefined){f.x+=f.vx*dt;f.y+=f.vy*dt}}this.fx=this.fx.filter(f=>f.t>0)}
 }
@@ -400,21 +431,30 @@ function mzKind(A,i,n,bud,thr,fs){const M=A.mz,base=A.classId*10,x=i%C,cnt=js=>A
  const e={0:6,1:7,2:8,5:9}[j];if(e!==undefined&&n>=(j==5?16:j==2?12:8)&&(j!=5||A.G.time>360)&&bud>=TW[base+e].c)j=e;
  return TW[base+j].c<=bud?base+j:-1}
 /* Chaque pièce gagnée est répartie entre deux bourses, défense et attaque, selon la pression subie (pen = jusqu'où les monstres avancent chez elle). */
-function aiDefend(A){const M=mzStep(A,INF),time=A.G.time,bud=Math.min(A.dp,A.gold),g0=A.gold,base=A.classId*10,n=A.t.length,ups=A.t.filter(t=>t.lv<5&&!(t.b>0)&&bud>=upCost(t));let ok=false;
+/* 2.38 : quête en cours que cette IA a choisi de jouer (Game.qu.joue, tiré au lancement selon la difficulté), sinon '' */
+const quJ=A=>{const q=A.G&&A.G.qu;return q&&q.joue&&q.joue[A.i]?q.id:''};
+/* quêtes de construction : l'IA prend dans tout son or ; ce qu'elle dépense en trop est repris sur sa réserve d'attaque */
+function aiDefend(A){const r=aiDefendre(A);if(A.dp<0){A.ap+=A.dp;A.dp=0}return r}
+function aiDefendre(A){const M=mzStep(A,INF),time=A.G.time,qj=quJ(A),bud=['clicker','frozen','gonflette','bling'].includes(qj)?A.gold:Math.min(A.dp,A.gold),g0=A.gold,base=A.classId*10,n=A.t.length,ups=A.t.filter(t=>t.lv<5&&!(t.b>0)&&bud>=upCost(t));let ok=false;
+ const todo=M.ord.filter(i=>!A.g[i/C|0][i%C]);
+ /* 2.38, Gonflette et Bling-bling : monter sa tour la plus haute (ou la plus chère) ; si elle est en chantier ou trop chère, l'IA attend (sauf si elle prend des coups) */
+ if(qj=='gonflette'||qj=='bling'){const c=A.t.filter(t=>t.lv<5).sort((a,b)=>qj=='bling'?b.inv-a.inv:b.lv-a.lv||b.inv-a.inv)[0];
+  if(c){if(!(c.b>0)&&A.upgrade(c)){A.dp-=g0-A.gold;return true}if(!(A.hurt>0))return false}}
  const fs=(A.flyIn||0)/((A.hpIn||0)+1),thr=A.specSeen||(time>=150&&A.G.foes(A).some(b=>b.inc>=35));
  /* transformations : Mages sur leurs cases quand des Spectres deviennent possibles, Givre sur les siens quand le plafond le permet */
  for(const t of A.t){const i=t.y*C+t.x,j=M.role[i],cur=t.k-base;if(t.lv>2||t.b>0)continue;
-  const want=j==5&&thr&&!TW[t.k].mg?5:j==2&&cur!=2&&cur!=8&&A.t.filter(o=>o.k-base==2||o.k-base==8).length<1+n*.15?2:-1;if(want<0)continue;
+  const fz=qj=='frozen'&&!todo.length&&!TW[t.k].mg;
+  const want=j==5&&thr&&!TW[t.k].mg?5:(j==2||fz)&&cur!=2&&cur!=8&&(fz||A.t.filter(o=>o.k-base==2||o.k-base==8).length<1+n*.15)?2:-1;if(want<0)continue;
   const k=base+want,mc=TW[k].c-Math.floor(t.inv*.7);if(bud<mc)continue;A.gold-=mc;t.k=k;t.lv=1;t.inv=TW[k].c;t.b=t.bt=buildT(t.inv,A.bm());A.ev.push('build');A.dp-=g0-A.gold;return true}
- const todo=M.ord.filter(i=>!A.g[i/C|0][i%C]);
  /* 2.33 : défense complète (plan construit, toutes les tours au niveau 5) : l'or de défense ne peut plus servir, aiAct le passe à l'attaque */
  A.plein=!todo.length&&A.t.every(t=>t.lv>=5);
  /* amélioration : la tour qui couvre le plus de chemin (et de couloir aérien, d'autant plus que des volants arrivent) pour son prix */
- if(ups.length&&(!todo.length||(n>=12&&Math.random()<(n>=28?.5:.25)))){const path=pathCells(A),aw=.6*(1+2*fs),val=t=>{const T=TW[t.k],r=rng(t);let c=0;for(const[x,y]of path)if(Math.hypot(x-t.x,y-t.y)<=r)c++;if(!T.gr)for(let y=0;y<R;y++)if(Math.hypot(6-t.x,y-t.y)<=r)c+=aw;
+ if(ups.length&&qj!='clicker'&&qj!='frozen'&&(!todo.length||(n>=12&&Math.random()<(n>=28?.5:.25)))){const path=pathCells(A),aw=.6*(1+2*fs),val=t=>{const T=TW[t.k],r=rng(t);let c=0;for(const[x,y]of path)if(Math.hypot(x-t.x,y-t.y)<=r)c++;if(!T.gr)for(let y=0;y<R;y++)if(Math.hypot(6-t.x,y-t.y)<=r)c+=aw;
    return c*T.d/T.cd*(T.sp?2.5:T.fl?3:T.fsp?1.6:T.mg?1.4:1)/T.c};
   const vs=new Map(ups.map(t=>[t,val(t)]));ups.sort((a,b)=>vs.get(b)-vs.get(a));ok=A.upgrade(ups[Math.random()<.75?0:Math.floor(Math.random()*ups.length)])}
  /* construction : la prochaine case du plan ; si elle est occupée par un monstre, on essaie les suivantes, mais on n'en saute pas une faute d'or */
- else for(const i of todo.slice(0,4)){const k=mzKind(A,i,n,bud,thr,fs);if(k<0)break;if(A.place(i%C,i/C|0,k)){ok=true;break}}
+ /* 2.38 : Clicker fou, des Archers (les moins chers) ; Frozen, du Givre ; les cases du plan restent les mêmes */
+ else for(const i of todo.slice(0,4)){const qk=qj=='clicker'?base:qj=='frozen'?base+2:-1,k=qk>=0?(TW[qk].c<=bud?qk:-1):mzKind(A,i,n,bud,thr,fs);if(k<0)break;if(A.place(i%C,i/C|0,k)){ok=true;break}}
  A.dp-=g0-A.gold;return ok}
 /* --- 2.33 : ce que chaque adversaire peut encaisser ---
    trajet(b) : points tous les PAS_TR case le long du chemin des monstres au sol, de case en case (chaine : pas le tracé exact en ligne droite de chemin(),
@@ -444,7 +484,11 @@ function encaisse(b,k,m){const T=CR[k],p=profil(b),fly=T.fly?1:0,arm=(T.arm||0)*
 /* longueur du couloir des volants (colonne 6, de la ligne 0 à la ligne 16) à portée r de la tour t */
 function air(t,r){const dx=Math.abs(t.x-EX[0]);if(dx>=r)return 0;const h=Math.sqrt(r*r-dx*dx);return Math.max(0,Math.min(EX[1],t.y+h)-Math.max(0,t.y-h))}
 /* attaque : elle empile plusieurs revenus puis lâche une grosse vague, composée selon les faiblesses des adversaires */
-function aiAttack(A){const time=A.G.time;let bud=Math.min(A.ap,A.gold),sent=false;if(time<GRACE||bud<Math.min(6000,Math.max(60,A.inc*3)))return false;
+function aiAttack(A){const time=A.G.time,qj=quJ(A);let bud=Math.min(A.ap,A.gold),sent=false;if(time<GRACE)return false;
+ /* 2.38, Le gros cadeau : un boss dès que tout son or le paie (sinon elle garde son or pour lui) */
+ if(qj=='cadeau'){const k=BOSS.filter(k=>CR[k].t<=A.tier&&A.gold>=CR[k].c).pop();if(k===undefined)return false;const g=A.gold;if(!A.G.send(A,k))return false;A.ap-=g-A.gold;return true}
+ /* 2.38, Facteur et Pigeons : des petites vagues tout de suite, sans attendre la grosse réserve */
+ if(bud<(qj=='facteur'||qj=='pigeons'?60:Math.min(6000,Math.max(60,A.inc*3))))return false;
  /* 2.13 : ouvre le palier suivant quand sa réserve d'attaque le permet (palier 2 dès 2:30, palier 3 dès 7:00) */
  const pc=PAL_C[A.tier];if(pc!==undefined&&time>=(A.tier==1?150:420)&&bud>=pc*1.5){const g=A.gold;if(A.G.unlock(A)){bud-=g-A.gold;A.ap-=g-A.gold}}
  const fo=A.G.foes(A),m=1+time/200;
@@ -457,6 +501,7 @@ function aiAttack(A){const time=A.G.time;let bud=Math.min(A.ap,A.gold),sent=fals
  if(boss!==undefined&&time>(CR[boss].t==1?240:420))cands.push(boss);
  const vies=k=>{const T=CR[k],hp=T.hp*m*HPK,H=Math.floor(bud/T.c)*GROUP*hp;let s=0;for(const b of fo){const l=Math.max(0,H-ENC*encaisse(b,k,m))/hp;s+=Math.min(l,b.lives)+(l>=b.lives?3:0)}return s};
  const hz=VAGUE_HZ[A.G.LV|0]||VAGUE_HZ[0];let best=top(NORM),bs=0;for(const k of cands){const s=vies(k)*(1-hz+2*hz*Math.random());if(s>bs){bs=s;best=k}}
+ if(qj=='pigeons'&&top(FLY)!==undefined)best=top(FLY);
  if(best===undefined)return false;
  /* soigneur et hâte avec une vague au sol assez grosse */
  if(bud>=500&&!CR[best].fly)for(const l of[HEALS,AURAS]){const k=top(l);if(k!==undefined&&bud>=CR[k].c*4&&Math.random()<.6)go(k)}
@@ -468,6 +513,8 @@ function aiAct(A){const time=A.G.time,gain=A.gold-A.lastG,danger=A.hurt>0,need=(
  /* fin de partie : défense au maximum, tout part en attaque */
  if(A.plein){A.ap+=A.dp;A.dp=0}
  observer(A);
+ /* 2.38, Picsou : elle ne dépense rien tant que la quête dure (sauf si elle prend des coups) */
+ if(quJ(A)=='picsou'&&!danger&&A.pen<.65){A.lastG=A.gold;return}
  for(let i=0;i<3&&aiDefend(A);i++);
  if(aiAttack(A))for(const b of A.G.foes(A))b.ev.push('warn');A.lastG=A.gold}
 
@@ -477,14 +524,14 @@ function aiAct(A){const time=A.G.time,gain=A.gold-A.lastG,danger=A.hurt>0,need=(
 let UID=0;
 class Game{
  /* seats : [{name,col,ai,classId}] ; LV : difficulté, ne touche que les IA */
- constructor(seats,LV=0){this.LV=LV;this.time=0;this.tick=10;this.over=false;this.winner=-1;this.log=[];
+ constructor(seats,LV=0){this.LV=LV;this.time=0;this.tick=10;this.over=false;this.winner=-1;this.log=[];this.qu=null;this.quN=QU_T0;this.quF=[];
   this.B=seats.map((s,i)=>{const b=new Board(i,s.name,s.col,s.ai?1:0,s.classId);b.G=this;if(b.ai){b.gold+=DIFF[LV].g;b.dp+=DIFF[LV].g;b.lastG=b.gold}return b})}
  foes(b){return this.B.filter(o=>o!==b&&!o.dead)}
  eff(b){return b.ai?Math.round(b.inc*DIFF[this.LV].b):b.inc}
  /* 2.13 : ouvre le palier de monstres suivant (paliers 2 et 3 payants) */
  unlock(b){const c=PAL_C[b.tier];if(c===undefined||b.gold<c)return false;b.gold-=c;b.tier++;b.ev.push('up');return true}
  /* un envoi part chez tous les adversaires encore en jeu */
- send(from,k){const T=CR[k];if(this.time<GRACE||from.gold<T.c||T.t>from.tier)return false;from.gold-=T.c;from.inc+=T.i;from.st.env++;from.st.envOr+=T.c;for(const b of this.foes(from))b.send(k,1+this.time/200);return true}
+ send(from,k){const T=CR[k];if(this.time<GRACE||from.gold<T.c||T.t>from.tier)return false;from.gold-=T.c;from.inc+=T.i;from.st.env++;from.st.envOr+=T.c;if(T.fly)from.st.vol+=T.c;if(T.hero)from.st.boss++;for(const b of this.foes(from))b.send(k,1+this.time/200,from.i);return true}
  /* action d'un joueur humain : renvoie '' si accepté, sinon un code d'erreur (poor, blocked, locked, max, busy, early, over, bad) ; early = envoi pendant la phase « Construis » (2.30) */
  action(i,a){const b=this.B[i];if(!b||b.dead||b.ai||this.over||!a)return 'over';
   const x=a.x|0,y=a.y|0,k=a.k|0;
@@ -495,13 +542,33 @@ class Game{
   if(a.type=='tier'){if(b.tier>=PAL_C.length)return 'max';return this.unlock(b)?'':'poor'}
   return 'bad'}
  /* avance la partie de dt secondes (dt ≤ 0,05) ; les événements de partie vont dans this.log */
+ /* 2.38 : quêtes bonus (table QUETES). qu : quête en cours (id, fin, or, cible, scores sc, base, joue : les IA qui la jouent) ; quN : moment de la prochaine ;
+    quF : quêtes déjà tirées (tirage sans remise, la liste repart de zéro quand tout est passé). Journal : {type:'quete', ph:'debut'|'fin', …}. */
+ quete(){const B=this.B,al=quVivants(this);let q=this.qu;
+  if(!q){if(this.time<this.quN||al.length<2)return;
+   let L=QUETES.filter(Q=>!this.quF.includes(Q.id)&&(!Q.ok||Q.ok(this)));
+   if(!L.length){const der=this.quF[this.quF.length-1];this.quF=[];L=QUETES.filter(Q=>Q.id!=der&&(!Q.ok||Q.ok(this)))}
+   if(!L.length){this.quN=this.time+10;return}
+   const Q=L[Math.floor(Math.random()*L.length)];this.quF.push(Q.id);
+   q=this.qu={id:Q.id,t0:this.time,fin:this.time+Q.dur,or:quOr(this),cible:Q.cible?Q.cible(this):0,base:B.map(b=>Q.abs?0:Q.sc(b)),joue:B.map(b=>b.ai?Math.random()<(QU_JOUE[this.LV]||.5):false),sc:[]};
+   this.log.push({type:'quete',ph:'debut',id:q.id,or:q.or,cible:q.cible,fin:q.fin})}
+  const Q=QUETES.find(Q=>Q.id==q.id),sens=Q.sens||1;q.sc=B.map((b,i)=>b.dead?null:Q.sc(b)-q.base[i]);
+  let g=[];
+  if(Q.f=='course')g=al.filter(b=>q.sc[b.i]>=q.cible);
+  if(!g.length&&this.time>=q.fin&&Q.f=='photo'){const v=al.map(b=>q.sc[b.i]*sens),m=Math.max(...v);if(sens<0||m>0)g=al.filter(b=>q.sc[b.i]*sens==m)}
+  if(!g.length&&this.time<q.fin)return;
+  const or=g.length?Math.round(q.or/g.length):0;
+  for(const b of g){b.gold+=or;b.st.qu++;b.st.quOr+=or;b.fx.push({type:'text',x:EX[0]+.5,y:EX[1]-.6,txt:'+'+or+' or',col:'#ffd95e',t:1.6,d:1.6})}
+  this.log.push({type:'quete',ph:'fin',id:q.id,g:g.map(b=>b.i),or});
+  this.qu=null;this.quN=this.time+QU_PAUSE+Math.random()*60}
  step(dt){if(this.over)return;const B=this.B;this.time+=dt;this.tick-=dt;
   if(this.tick<=0){this.tick+=10;for(const b of B)if(!b.dead){b.gold+=this.eff(b);b.st.rev.push(this.eff(b))}this.log.push({type:'income'})}
   for(const b of B)if(b.ai&&!b.dead){mzStep(b,600);b.aiT-=dt;if(b.aiT<=0){b.aiT=.6;aiAct(b)}}
   for(const b of B)if(!b.dead)b.update(dt);
   for(const b of B)if(!b.dead&&b.lives<=0){b.dead=1;b.st.mort=this.time;b.cr=[];b.q=[];b.pr=[];this.log.push({type:'out',i:b.i})}
+  this.quete();
   /* fin : un seul terrain debout, ou plus aucun humain en jeu */
   const alive=B.filter(b=>!b.dead);
   if(alive.length<=1||!alive.some(b=>!b.ai)){this.over=true;this.winner=alive.length==1?alive[0].i:-1;this.log.push({type:'end',winner:this.winner})}}
 }
-if(typeof module!='undefined'&&module.exports)module.exports={C,R,SP,EX,INF,TW,CR,PAL_C,DIFF,GRACE,FACTIONS,GIVRE_LV,GIVRE_BONUS,RACINES_LV,Board,Game};
+if(typeof module!='undefined'&&module.exports)module.exports={C,R,SP,EX,INF,TW,CR,PAL_C,DIFF,GRACE,FACTIONS,GIVRE_LV,GIVRE_BONUS,RACINES_LV,QUETES,QU_T0,QU_PAUSE,Board,Game};
