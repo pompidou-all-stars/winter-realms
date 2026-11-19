@@ -13,7 +13,8 @@
    - Classement : le dernier debout gagne ; les autres sont classés par moment d'élimination ; au bout de 30 min, ceux encore en jeu
      sont départagés par leurs vies. Points : 3, 2, 1, 0 du 1er au 4e (1,5 en moyenne si les deux IA se valent).
 
-   Usage : node tests/outils/arene-ia.js [--avant <réf git>] [--parties N] [--difficulte 0|1|2] [--coeurs N] [--graine G]
+   --vies V : vies de départ de chaque terrain (40 par défaut) ; avec beaucoup de vies, les parties durent et la fin de partie compte davantage.
+   Usage : node tests/outils/arene-ia.js [--avant <réf git>] [--parties N] [--difficulte 0|1|2] [--coeurs N] [--graine G] [--vies V]
    (N : nombre de graines ; chaque graine donne 2 parties, sièges échangés.) */
 'use strict';
 const fs=require('fs'),path=require('path'),os=require('os'),{execSync}=require('child_process');
@@ -29,10 +30,10 @@ function composer(actuel,avant){
 
 const DT=.05,DUREE_MAX=1800;
 /* une partie : versions[i] = 0 (actuelle) ou 1 (avant) pour le siège i */
-function jouer(S,graine,versions,difficulte){
+function jouer(S,graine,versions,difficulte,vies=40){
  S.regrainer(graine);const f0=graine%5;
  const G=new S.Game([0,1,2,3].map(i=>({name:'S'+i,col:'#fff',ai:0,classId:(f0+i)%5})),difficulte);
- const aiT=[1,1.2,1.4,1.6];
+ for(const b of G.B)b.lives=vies;const aiT=[1,1.2,1.4,1.6];
  while(!G.over&&G.time<DUREE_MAX){
   for(const b of G.B)if(!b.dead){aiT[b.i]-=DT;if(aiT[b.i]<=0){aiT[b.i]=.6;b.ai=1;S.__IA[versions[b.i]](b);b.ai=0}}
   G.step(DT)}
@@ -44,15 +45,15 @@ function jouer(S,graine,versions,difficulte){
 
 if(!isMainThread){
  const S=charger({code:workerData.code});
- parentPort.on('message',j=>parentPort.postMessage({j,r:jouer(S,j.g,j.v,workerData.difficulte)}));
+ parentPort.on('message',j=>parentPort.postMessage({j,r:jouer(S,j.g,j.v,workerData.difficulte,workerData.vies)}));
 }
 
-function toutJouer(code,jobs,coeurs,difficulte){
+function toutJouer(code,jobs,coeurs,difficulte,vies){
  const res=[];let fait=0;const progres=()=>{fait++;process.stderr.write(`\r  ${fait} / ${jobs.length} parties`+(fait==jobs.length?'\n':''))};
- if(coeurs<=1){const S=charger({code});for(const j of jobs){res.push({j,r:jouer(S,j.g,j.v,difficulte)});progres()}return Promise.resolve(res)}
+ if(coeurs<=1){const S=charger({code});for(const j of jobs){res.push({j,r:jouer(S,j.g,j.v,difficulte,vies)});progres()}return Promise.resolve(res)}
  return new Promise((ok,ko)=>{let i=0,actifs=0;const ws=[];
   const donner=w=>{if(i<jobs.length){w.postMessage(jobs[i++]);actifs++}};
-  for(let n=0;n<Math.min(coeurs,jobs.length);n++){const w=new Worker(__filename,{workerData:{code,difficulte}});ws.push(w);
+  for(let n=0;n<Math.min(coeurs,jobs.length);n++){const w=new Worker(__filename,{workerData:{code,difficulte,vies}});ws.push(w);
    w.on('message',m=>{res.push(m);actifs--;progres();donner(w);if(!actifs&&i>=jobs.length){ws.forEach(x=>x.terminate());ok(res)}});
    w.on('error',e=>{ws.forEach(x=>x.terminate());ko(e)});donner(w)}});
 }
@@ -74,14 +75,14 @@ function bilan(res){
 
 if(isMainThread&&require.main===module)(async()=>{
  const arg=n=>{const i=process.argv.indexOf(n);return i>0?process.argv[i+1]:null};
- const t0=Date.now(),ref=arg('--avant')||'origin/main',np=+(arg('--parties')||20),diff=+(arg('--difficulte')||0),g0=+(arg('--graine')||1);
+ const t0=Date.now(),ref=arg('--avant')||'origin/main',np=+(arg('--parties')||20),diff=+(arg('--difficulte')||0),g0=+(arg('--graine')||1),vies=+(arg('--vies')||40);
  const coeurs=Math.max(1,+(arg('--coeurs')||Math.max(1,os.cpus().length-1)));
  const actuel=fs.readFileSync(arg('--moteur')?path.resolve(arg('--moteur')):MOTEURS.actuel,'utf8');
  const avant=execSync(`git show ${ref}:sim.js`,{cwd:RACINE,encoding:'utf8',maxBuffer:1<<26});
  const code=composer(actuel,avant),jobs=[];
  for(let g=g0;g<g0+np;g++){jobs.push({g,v:[0,1,0,1]});jobs.push({g,v:[1,0,1,0]})}
- console.error(`Arène : IA actuelle contre ${ref}, ${jobs.length} parties, ${['Normal','Difficile','Brutal'][diff]}, ${coeurs} cœur(s)`);
- const res=await toutJouer(code,jobs,coeurs,diff);
+ console.error(`Arène : IA actuelle contre ${ref}, ${jobs.length} parties, ${['Normal','Difficile','Brutal'][diff]}, ${coeurs} cœur(s)${vies!=40?', '+vies+' vies':''}`);
+ const res=await toutJouer(code,jobs,coeurs,diff,vies);
  console.log(bilan(res));console.log(`(${((Date.now()-t0)/1000).toFixed(0)} s)`);
 })().catch(e=>{console.error(e);process.exit(1)});
 module.exports={composer,jouer,bilan};
