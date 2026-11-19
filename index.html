@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.37</title>
+<title>Winter Realms — Tower Wars · Édition 2.38</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -337,7 +337,7 @@ body.r2d .fleche{display:none}
 #fin #finMoi{color:var(--ink);font-size:12.5px}
 #finBtn{display:none;margin:0 auto;height:40px;padding:0 16px;border-radius:6px;border:1px solid #f2c14e99;background:var(--givre),var(--verre-nuit);background-size:180px,auto;color:#ffe597;font-size:14px;font-weight:700;box-shadow:0 3px 10px #000a}
 #finBtn u{text-decoration:none;color:var(--ink)}
-body.explore #console,body.explore #parcBtn,body.explore #parc{display:none}
+body.explore #console,body.explore #parcBtn,body.explore #parc,body.explore #quete{display:none}
 body.explore #finBtn{display:block}
 #finBtn:focus-visible,#fin button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
 body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:none!important}
@@ -380,7 +380,27 @@ body.prep #clock{display:none}
 .an-chrono.vol{position:fixed;z-index:30;margin:0;pointer-events:none;transform-origin:center}
 #annonce .an-compte{font-size:150px;font-weight:700;line-height:1;color:#fff;text-shadow:0 0 26px #ffe597,0 6px 0 #9a6b12,0 10px 18px #000c;animation:anCompte .9s ease-out both}
 @keyframes anCompte{0%{transform:scale(2.6);opacity:0}22%{transform:scale(.92);opacity:1}32%{transform:scale(1)}75%{opacity:1}100%{transform:scale(.6);opacity:0}}
-@media (prefers-reduced-motion:reduce){#annonce *,#prep.fin,#prep.arrive,#tabs button.mon.ouvert{animation:none!important}#annonce .an-rayons,#annonce .an-flash{display:none}}
+/* 2.38 : quêtes bonus. Bannière au début (« Quête bonus ! », titre, règle, récompense), bannière du gagnant, pastille de suivi sous le bandeau */
+#annonce .an-haut{position:relative;font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#ffe597;text-shadow:0 1px 2px #000,0 0 10px #f2c14e88;animation:anSous var(--d,3s) both}
+#annonce:is(.quete,.gagne,.rate) .an-titre{font-size:clamp(26px,8.4vw,46px);text-transform:none}
+#annonce:is(.quete,.gagne,.rate) .an-sous{font-size:15px}
+#annonce .an-sous b{color:#ffe597}
+#annonce.quete .an-bande{border-color:#9be7ff;box-shadow:0 0 34px #9be7ff66,inset 0 0 40px #9be7ff33}
+#annonce.rate .an-bande{border-color:#8fb6d9;box-shadow:0 0 20px #0008}
+#annonce.rate .an-titre{background-image:linear-gradient(100deg,#e6eef8 0,#8fb6d9 40%,#fff 50%,#8fb6d9 60%,#55708d 100%);-webkit-text-stroke-color:#1c2a3c;filter:drop-shadow(0 3px 0 #000a)}
+#quete{position:absolute;z-index:5;left:50%;transform:translateX(-50%);top:calc(92px + env(safe-area-inset-top,0px));max-width:min(330px,calc(100% - 24px));display:flex;align-items:center;gap:8px;padding:4px 12px 4px 6px;border-radius:18px;
+ background-image:var(--givre),var(--verre-nuit);background-size:180px,auto;border:1px solid #f2c14eaa;box-shadow:0 0 12px #f2c14e44,0 2px 8px #0008;color:var(--ink);font-family:inherit;text-align:left;cursor:pointer}
+#quete svg{width:28px;height:28px;flex:none}
+#quete span{display:flex;flex-direction:column;min-width:0;line-height:1.15}
+#quete b{font-size:12.5px;color:#ffe597;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#quete small{font-size:11.5px;font-weight:600;color:var(--ice);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#quete i{font-style:normal;font-variant-numeric:tabular-nums}
+#quete.tete{border-color:#7ee08a;box-shadow:0 0 14px #7ee08a66,0 2px 8px #0008}
+#quete.fin i{color:#ffb4a2}
+#quete.arrive{animation:queteArrive .6s}
+@keyframes queteArrive{0%{transform:translateX(-50%) scale(.3);opacity:0}60%{transform:translateX(-50%) scale(1.12);opacity:1}100%{transform:translateX(-50%) scale(1)}}
+#quete:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){#annonce *,#prep.fin,#prep.arrive,#tabs button.mon.ouvert,#quete.arrive{animation:none!important}#annonce .an-rayons,#annonce .an-flash{display:none}}
 </style></head><body>
 <div id="app">
  <div id="stage"><canvas id="main"></canvas>
@@ -399,6 +419,8 @@ body.prep #clock{display:none}
   <!-- 2.37 : panneau « Mes tours » (amélioration de plusieurs tours, file d'attente) -->
   <button id="parcBtn" type="button" aria-expanded="false" aria-controls="parc"><svg viewBox="0 0 24 24"><path d="M5 20V9l2-2 2 2v11M15 20V9l2-2 2 2v11M3 20h18M12 13V4M9 7l3-3 3 3"/></svg><span>Mes tours</span><b id="fileN" hidden></b></button>
   <div id="parc" hidden></div>
+  <!-- 2.38 : quête bonus en cours (titre, chrono, ton score et ton rang) ; la toucher rappelle la règle -->
+  <button id="quete" type="button" hidden></button>
   <button class="fleche" id="rotG" type="button" aria-label="Pivoter la vue vers la gauche"><svg viewBox="0 0 24 24"><path d="M4 4v5h5"/><path d="M4.6 9A8 8 0 1 1 6 16.5"/></svg></button>
   <button class="fleche" id="rotD" type="button" aria-label="Pivoter la vue vers la droite"><svg viewBox="0 0 24 24"><path d="M20 4v5h-5"/><path d="M19.4 9A8 8 0 1 0 18 16.5"/></svg></button>
   <div id="aideBat" hidden>Touche encore la case pour construire</div>
@@ -911,7 +933,7 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   useBoards(boards,this.spect?0:m.you);time=0;tick=10;over=false;started=true;departReset();setTab('t');recentrer();debutSons();
   $('lobby').hidden=true;$('ov').hidden=true;if(this.spect)toast('Tu regardes la partie en spectateur');else astuce(true)},
  /* applique un instantané : les positions sont lissées entre deux instantanés dans frame() */
- apply(s){this.snapAt=performance.now();time=s.time;tick=s.tick;
+ apply(s){this.snapAt=performance.now();time=s.time;tick=s.tick;QU=s.qu||null;
   s.B.forEach((d,i)=>{const b=B[i];if(!b)return;b.gold=d.gold;b.inc=d.inc;b.lives=d.lives;b.dead=d.dead;b.tier=d.tier||1;
    const tk=JSON.stringify(d.t.map(t=>t.slice(0,5)));
    if(tk!==b.tk){b.tk=tk;b.g=Array.from({length:R},()=>Array(C).fill(0));for(const t of d.t)b.g[t[1]][t[0]]=1;b.d=b.dist()}
@@ -1002,7 +1024,7 @@ function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=null;mon=null;proje
   if(b.i!==me){const i=document.createElement('i');i.style.background=b.col;pts.appendChild(i)}}
  hudK='';pick=null;setView(me);render()}
 function newSolo(lv){G=new Game(soloSeats(chosenClass),lv);LV=lv;useBoards(G.B,0);syncSolo();departReset();debutSons()}
-function syncSolo(){time=G.time;tick=G.tick;over=G.over}
+function syncSolo(){time=G.time;tick=G.tick;over=G.over;QU=G.qu}
 function icon(fn,w=40,h=40){const c=document.createElement('canvas'),g=setup(c,w,h);fn(g);return c}
 /* 2.15 : une carte de la barre = l'icône et le prix ; le nom sert d'étiquette (lecteurs d'écran, tests), le reste est dans la fiche */
 function carte(ic,prix,nom,cost,fn,on,k){const b=document.createElement('button'),s=document.createElement('small');s.textContent=prix;b.append(ic,s);b.type='button';
@@ -1412,6 +1434,7 @@ let selVoix=[];function voixSelection(){const now=performance.now();selVoix=selV
 function onLog(l){
  if(l.type=='income'){sfx('income');const e=$('gold');e.classList.remove('pop');void e.offsetWidth;e.classList.add('pop')}
  else if(l.type=='out'){if(l.i!==me){toast(B[l.i].name+' est éliminé·e');sfx('out')}else if(NET.on){over=true;toast('Tu es éliminé·e : tu peux regarder la fin de la partie');sfx('lose')}}
+ else if(l.type=='quete')queteLog(l);
  else if(l.type=='end')end(l.winner)}
 function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.dead).join('|')+'|'+Math.floor(time);
  if(k!=hudK){hudK=k;$('gold').textContent=Math.floor(P.gold);$('inc').textContent='+'+P.inc;$('clock').textContent=mmss(time);$('lives').lastChild.textContent=Math.max(0,P.lives);
@@ -1439,13 +1462,13 @@ function remplirFin(win,winner){const st=b=>b.st||{pose:0,env:0,envOr:0,tue:0,re
  $('finTitre').textContent=win?'Victoire !':'Défaite';$('fin').classList.toggle('perdu',!win);
  $('finSous').textContent='Partie de '+mmss(time)+' en '+DIFF[LV].n+(!win&&winner>=0?' · '+B[winner].name+' l’emporte':'');
  const tb=$('finStats');tb.textContent='';const h=elt('tr');
- for(const [t,ti] of [['',''],['Joueur',''],['Tours','tours en place'],['Chemin','longueur du labyrinthe, en cases'],['Vagues','groupes de 4 monstres envoyés'],['Tués','monstres tués sur son terrain'],['Revenu','revenu final toutes les 10 s']]){const e=elt('th','',t);if(ti)e.title=ti;h.appendChild(e)}tb.appendChild(h);
+ for(const [t,ti] of [['',''],['Joueur',''],['Tours','tours en place'],['Chemin','longueur du labyrinthe, en cases'],['Vagues','groupes de 4 monstres envoyés'],['Tués','monstres tués sur son terrain'],['Quêtes','quêtes bonus gagnées'],['Revenu','revenu final toutes les 10 s']]){const e=elt('th','',t);if(ti)e.title=ti;h.appendChild(e)}tb.appendChild(h);
  classement().forEach((b,i)=>{const tr=elt('tr',(b===P?'moi ':'')+(b.dead?'mort':''));tr.dataset.i=b.i;tr.style.setProperty('--c',b.col);
   const nom=elt('td','nom',FACTIONS[b.classId].icon+' '+b.name);
-  tr.append(elt('td','rang',(i+1)+(i?'e':'er')),nom,elt('td','',b.t.length),elt('td','',longueur(b)),elt('td','',st(b).env),elt('td','',st(b).tue),elt('td','','+'+eff(b)));
+  tr.append(elt('td','rang',(i+1)+(i?'e':'er')),nom,elt('td','',b.t.length),elt('td','',longueur(b)),elt('td','',st(b).env),elt('td','',st(b).tue),elt('td','',st(b).qu||0),elt('td','','+'+eff(b)));
   tr.setAttribute('aria-label','Regarder le labyrinthe de '+b.name);tr.onclick=()=>explorer(b.i);tb.appendChild(tr)});
  const s=st(P),inv=P.t.reduce((a,t)=>a+t.inv,0),top=P.t.slice().sort((a,b)=>b.inv-a.inv)[0];
- $('finMoi').textContent='Toi : '+s.pose+' tours posées, '+inv+' or dans tes tours, '+s.envOr+' or envoyé en monstres, '+Math.min(40,40-P.lives)+' vies perdues'+(top?' · ta tour phare : '+TW[top.k].n+' (niveau '+top.lv+')':'')+'.';
+ $('finMoi').textContent='Toi : '+s.pose+' tours posées, '+inv+' or dans tes tours, '+s.envOr+' or envoyé en monstres, '+Math.min(40,40-P.lives)+' vies perdues'+(s.qu?', '+s.qu+' quête'+(s.qu>1?'s':'')+' gagnée'+(s.qu>1?'s':'')+' (+'+s.quOr+' or)':'')+(top?' · ta tour phare : '+TW[top.k].n+' (niveau '+top.lv+')':'')+'.';
  requestAnimationFrame(()=>courbeRevenu(st))}
 /* courbe du revenu de chaque joueur, un point par versement (toutes les 10 s) */
 function courbeRevenu(st){const cv=$('finCourbe'),w=cv.clientWidth||300,h=cv.clientHeight||84,g=setup(cv,w,h),L=B.map(b=>st(b).rev),n=Math.max(2,...L.map(l=>l.length)),mx=Math.max(10,...L.flat());
@@ -1466,7 +1489,37 @@ const LOGO_AN={
  construis:'<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="anOr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#9a6b12"/></linearGradient><linearGradient id="anGl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4fbff"/><stop offset="1" stop-color="#8fb6d9"/></linearGradient><linearGradient id="anRg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f07a52"/><stop offset="1" stop-color="#8a2410"/></linearGradient></defs><circle cx="50" cy="50" r="45" fill="#0b1626" stroke="url(#anOr)" stroke-width="7"/><circle cx="50" cy="50" r="36" fill="none" stroke="#9be7ff66" stroke-width="1.5" stroke-dasharray="3 4"/><path d="M30 78V46h3V30h7v6h6v-6h8v6h6v-6h7v16h3v32z" fill="url(#anGl)" stroke="#0b1626" stroke-width="2.5" stroke-linejoin="round"/><path d="M44 78V68a6 6 0 0 1 12 0v10z" fill="#0b1626"/><path d="M47 50h6v8h-6z" fill="#0b1626"/><path d="M30 46h40" stroke="#0b1626" stroke-width="2"/><g transform="rotate(38 64 52)"><rect x="61" y="40" width="7" height="46" rx="2.5" fill="#a0672e" stroke="#0b1626" stroke-width="2.5"/><rect x="50" y="27" width="29" height="15" rx="3" fill="url(#anOr)" stroke="#0b1626" stroke-width="2.5"/><path d="M53 31h23" stroke="#fff8" stroke-width="2" stroke-linecap="round"/></g><path d="M18 22l3 3m0-3l-3 3M80 16l3 3m0-3l-3 3" stroke="#eaf6ff" stroke-width="1.6" stroke-linecap="round"/></svg>',
  envoie:'<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="anOr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#9a6b12"/></linearGradient><linearGradient id="anGl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4fbff"/><stop offset="1" stop-color="#8fb6d9"/></linearGradient><linearGradient id="anRg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f07a52"/><stop offset="1" stop-color="#8a2410"/></linearGradient></defs><circle cx="50" cy="50" r="45" fill="#1a0b10" stroke="url(#anOr)" stroke-width="7"/><g transform="rotate(-42 50 50)"><path d="M50 9l4.5 8v46h-9V17z" fill="url(#anGl)" stroke="#0b1626" stroke-width="2"/><path d="M38 63h24v6H38z" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/><path d="M47 69h6v13h-6z" fill="#6b3a1e" stroke="#0b1626" stroke-width="2"/><circle cx="50" cy="86" r="4" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/></g><g transform="rotate(42 50 50)"><path d="M50 9l4.5 8v46h-9V17z" fill="url(#anGl)" stroke="#0b1626" stroke-width="2"/><path d="M38 63h24v6H38z" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/><path d="M47 69h6v13h-6z" fill="#6b3a1e" stroke="#0b1626" stroke-width="2"/><circle cx="50" cy="86" r="4" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/></g><path d="M50 30l17 6v13c0 11-7 18-17 23-10-5-17-12-17-23V36z" fill="url(#anRg)" stroke="url(#anOr)" stroke-width="4" stroke-linejoin="round"/><path d="M50 40v20M42 47l16 6M58 47l-16 6" stroke="#ffe8dd" stroke-width="2.6" stroke-linecap="round"/></svg>'};
 let dep={ph:0,n:4,k:''},anT=0;
-function departReset(){aideBat.vue=false;$('aideBat').hidden=true;dep={ph:0,n:4,k:''};clearTimeout(anT);const a=$('annonce');a.hidden=true;a.textContent=''}
+/* 2.38 : quêtes bonus (table QUETES de sim.js). QU : quête en cours (G.qu en solo, instantané du serveur en ligne) */
+let QU=null,queteK='';
+/* le dégradé doré a un identifiant propre à chaque copie (bannière, pastille) : sinon une copie cachée le rend invisible ailleurs */
+const logoQuete=k=>LOGO_QUETE.replace(/quOr/g,'quOr'+k),LOGO_QUETE='<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="quOr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#9a6b12"/></linearGradient></defs><circle cx="50" cy="50" r="45" fill="#0b1626" stroke="url(#quOr)" stroke-width="7"/><path d="M32 26h36v14c0 13-8 22-18 22S32 53 32 40z" fill="url(#quOr)" stroke="#0b1626" stroke-width="3" stroke-linejoin="round"/><path d="M32 31H22c0 11 5 17 12 18M68 31h10c0 11-5 17-12 18" fill="none" stroke="url(#quOr)" stroke-width="5" stroke-linecap="round"/><path d="M45 62h10v8H45zM36 70h28v8H36z" fill="url(#quOr)" stroke="#0b1626" stroke-width="3" stroke-linejoin="round"/><path d="M50 32l3 6 6 1-4.5 4 1 6-5.5-3-5.5 3 1-6-4.5-4 6-1z" fill="#fff8e0" stroke="#9a6b12" stroke-width="1.2"/><path d="M18 20l3 3m0-3l-3 3M80 14l3 3m0-3l-3 3" stroke="#eaf6ff" stroke-width="1.6" stroke-linecap="round"/></svg>';
+const queteDe=id=>QUETES.find(Q=>Q.id==id),nomJ=i=>B[i]===P?'Toi':B[i].name,
+ regleQuete=(Q,cible)=>Q.txt.replace('{N}',cible),
+ scoreQuete=(Q,v,cible)=>v==null?'—':(Q.pre||'')+v+(Q.f=='course'?' / '+cible:'')+Q.u;
+/* bannières de quête : début (titre, règle, récompense) ou fin (gagnant) */
+function annonceQuete(l){const a=$('annonce'),Q=queteDe(l.id);if(!Q||!P||explore)return;clearTimeout(anT);a.textContent='';
+ const debut=l.ph=='debut',moi=!debut&&l.g.includes(me),type=debut?'quete':l.g.length?'gagne':'rate',d=debut?4200:3400,lg=elt('div','an-logo');
+ a.className=type;a.hidden=false;a.style.setProperty('--d',d+'ms');lg.innerHTML='<i class="an-rayons"></i>'+logoQuete('A');
+ const sous=elt('div','an-sous');
+ if(debut){sous.append(regleQuete(Q,l.cible)+' : ',elt('b','','+'+l.or+' or'))}
+ else if(l.g.length)sous.append((l.g.length>1?'se partagent ':moi?'Tu remportes ':'remporte ')+'« '+Q.titre+' » : ',elt('b','','+'+l.or+' or'+(l.g.length>1?' chacun':'')));
+ else sous.append('Personne ne remporte « '+Q.titre+' »');
+ a.append(elt('div','an-flash'),elt('div','an-bande'),lg,elt('div','an-haut',debut?'Quête bonus !':'Fin de la quête'),
+  elt('div','an-titre',debut?Q.titre:l.g.length?(moi&&l.g.length==1?'Bravo, c’est toi !':l.g.map(nomJ).join(' et ')):'Raté !'),sous);
+ sfx(debut?'cor':moi?'win':'warn');vibrer(moi?[40,60,40]:debut?30:15);anT=setTimeout(()=>{a.hidden=true;a.textContent=''},d)}
+function queteLog(l){annonceQuete(l);const Q=queteDe(l.id);if(!Q)return;
+ if(l.ph=='debut'){queteK='';const e=$('quete');e.classList.remove('arrive');void e.offsetWidth;e.classList.add('arrive')}
+ else if(l.g.includes(me))toast('Quête « '+Q.titre+' » gagnée : +'+l.or+' or')}
+/* pastille de suivi : titre, temps restant, ton score et ton rang (en vert si tu mènes) */
+function queteTick(){const e=$('quete'),q=QU,Q=q&&queteDe(q.id),on=!!Q&&started&&!over&&!explore&&!!P&&!P.dead;
+ if(!on){if(!e.hidden){e.hidden=true;queteK=''}return}
+ const sc=q.sc||[],sens=Q.sens||1,mien=sc[me],vals=sc.filter(v=>v!=null),rang=mien==null?0:1+vals.filter(v=>v*sens>mien*sens).length,
+  reste=Math.max(0,Math.ceil(q.fin-time)),k=q.id+'|'+reste+'|'+sc.join(',');if(k==queteK)return;queteK=k;e.hidden=false;
+ const tete=rang==1&&vals.length>1&&(Q.f=='photo'?mien*sens>0||sens<0:mien>0);e.classList.toggle('tete',tete);e.classList.toggle('fin',reste<=10);
+ e.innerHTML=logoQuete('P');const t=elt('span');t.append(elt('b','',Q.titre));const s=elt('small');s.append(elt('i','',mmss(reste)),' · Toi : '+scoreQuete(Q,mien,q.cible)+(rang?' · '+rang+(rang==1?'er':'e'):''));t.appendChild(s);e.appendChild(t);
+ e.setAttribute('aria-label','Quête bonus '+Q.titre+' : '+regleQuete(Q,q.cible)+', +'+q.or+' or. Il reste '+reste+' secondes.')}
+$('quete').onclick=()=>{const Q=QU&&queteDe(QU.id);if(Q)toast(regleQuete(Q,QU.cible)+' : +'+QU.or+' or')};
+function departReset(){QU=null;queteK='';$('quete').hidden=true;aideBat.vue=false;$('aideBat').hidden=true;dep={ph:0,n:4,k:''};clearTimeout(anT);const a=$('annonce');a.hidden=true;a.textContent=''}
 function annonce(type,n){const a=$('annonce');clearTimeout(anT);a.textContent='';a.className=type;a.hidden=false;
  if(type=='compte'){a.appendChild(elt('div','an-compte',String(n)));sfx('bip');vibrer(15);anT=setTimeout(()=>{a.hidden=true},900);return}
  const go=type=='envoie',d=go?2700:3000,lg=elt('div','an-logo');a.style.setProperty('--d',d+'ms');lg.innerHTML='<i class="an-rayons"></i>'+LOGO_AN[type];
@@ -1508,7 +1561,7 @@ function loop(now){neigeAccueil(now);const dt=Math.min(.05,Math.max(0,(now-last)
   if(pick){const c=pick.b>0?Math.ceil(pick.b):0;if(c!==pickB){pickB=c;render()}}
   if(lot){const n0=lot.n,t0=lot.t.length;if(!majLot()||lot.n!==n0||lot.t.length!==t0)render()}
   fileTick(dt);majParc();majFileN();
-  departTick();dessinerVue(now/1000);if(!$('chips').hidden)for(const b of B){drawMini(b,b.ui.g,MINI);if(b===VB()&&R3D.api)cadreMini(b.ui.g)}hud()}
+  departTick();queteTick();dessinerVue(now/1000);if(!$('chips').hidden)for(const b of B){drawMini(b,b.ui.g,MINI);if(b===VB()&&R3D.api)cadreMini(b.ui.g)}hud()}
  requestAnimationFrame(loop)}
 
 fit();if(typeof ResizeObserver!='undefined')new ResizeObserver(fit).observe(stage);else addEventListener('resize',fit);

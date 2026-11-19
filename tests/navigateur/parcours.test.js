@@ -214,6 +214,16 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   await p.mouse.move(b.x+b.width/2,b.y+b.height/2);await p.mouse.wheel(0,240);await N.avancer(p,100);
   assert.ok(await p.evaluate(()=>bar.scrollLeft)>100,'la barre a défilé');
  });
+ test('Quêtes bonus (2.38) : bannière au début, pastille de suivi sous le bandeau, bannière du gagnant et or versé',async()=>{
+  const v=()=>p.evaluate(()=>({annonce:document.getElementById('annonce').hidden?'':document.getElementById('annonce').className,texte:document.getElementById('annonce').innerText,
+   pastille:document.getElementById('quete').hidden?'':document.getElementById('quete').innerText,or:Math.floor(P.gold)}));
+  await p.evaluate(()=>{G.qu=null;G.quN=0;G.quF=QUETES.map(q=>q.id).filter(x=>x!='picsou');P.gold=1e5});await N.avancer(p,100);let s=await v();
+  assert.equal(s.annonce,'quete');assert.match(s.texte,/Quête bonus/i);assert.match(s.texte,/Picsou/);assert.match(s.texte,/\+\d+ or/);
+  assert.match(s.pastille,/Picsou/);assert.match(s.pastille,/1er/,'le plus riche mène');
+  const or=await p.evaluate(()=>G.qu.or);await p.evaluate(()=>{G.time=G.qu.fin});await N.avancer(p,100);s=await v();
+  assert.equal(s.annonce,'gagne');assert.match(s.texte,/c’est toi/);assert.ok(s.or>=1e5+or,'or de la quête versé');assert.equal(s.pastille,'','pastille retirée');
+  await N.avancer(p,3500);assert.equal((await v()).annonce,'','bannière refermée');
+ });
  test('Menu (2.15) : son, rappel des gestes, reprendre ; quitter demande une confirmation',async()=>{
   await N.toucher(p,'#menuBtn');assert.equal(await p.isVisible('#menu'),true);
   await N.toucher(p,'#snd');assert.equal(await p.textContent('#snd'),'Son : coupé');await N.toucher(p,'#snd');
