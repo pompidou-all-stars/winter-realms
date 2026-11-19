@@ -20,8 +20,8 @@ import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 export const FOV = 34, ELEV = 44 * Math.PI / 180, COLONNES = 8.4;
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
-/* 2.31 : les volants sont plus compacts (ailes déployées, ils masquaient le terrain et les autres monstres) */
-const ECH_VOLANTS = .65;
+/* 2.32 : les volants sont plus compacts (ailes déployées, ils masquaient le terrain et les autres monstres) ; 2.34 : deux fois moins grands (×0,65 → ×0,5) */
+const ECH_VOLANTS = .5;
 const echMonstre = k => ECH_MONSTRES * (CR[k].fly ? ECH_VOLANTS : 1);
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
 /* couleurs du terrain : mêmes valeurs que art/communs/factions.py (SOL, BIOME) */
