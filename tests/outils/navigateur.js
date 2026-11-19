@@ -62,11 +62,16 @@ async function toucherCase(page,x,y){const c=await centreCase(page,x,y);await pa
 /* construire une tour : deux touchers sur la même case depuis la 2.2 (aperçu puis confirmation), un seul avant */
 async function construire(page,x,y){const deux=await page.evaluate(()=>typeof confirmerConstruction=='function');
  await toucherCase(page,x,y);if(deux)await toucherCase(page,x,y)}
-/* glisser un doigt d'une case à une autre (sans relâcher entre les deux) */
+/* glisser un doigt d'une case à une autre (sans relâcher entre les deux).
+   2.36.1 : chaque événement porte un horodatage (le geste dure 0,3 s) et le doigt reste immobile 0,2 s avant d'être levé.
+   Avant, tous les événements partaient au même instant : Chromium y voyait un lancer très rapide (« fling ») et, comme sur un vrai
+   écran tactile, avalait le toucher suivant, qui sert à arrêter ce défilement. Le test des flèches de rotation, juste après, ne recevait
+   donc jamais son clic (pointerdown et pointerup, mais pas de click). Le jeu, lui, ne relance pas la carte (lâcher plus de 80 ms après le dernier mouvement). */
 async function glisser(page,de,vers,etapes=8){const a=await centreCase(page,de[0],de[1]),b=await centreCase(page,vers[0],vers[1]),cdp=await page.context().newCDPSession(page);
- await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:a.x,y:a.y,id:1}]});
- for(let i=1;i<=etapes;i++){const k=i/etapes;await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:a.x+(b.x-a.x)*k,y:a.y+(b.y-a.y)*k,id:1}]})}
- await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();await page.clock.runFor(50)}
+ const t0=Date.now()/1000,duree=.3;
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:a.x,y:a.y,id:1}],timestamp:t0});
+ for(let i=1;i<=etapes;i++){const k=i/etapes;await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:a.x+(b.x-a.x)*k,y:a.y+(b.y-a.y)*k,id:1}],timestamp:t0+duree*k})}
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[],timestamp:t0+duree+.2});await cdp.detach();await page.clock.runFor(50)}
 /* geste à deux doigts (pincer / écarter / déplacer), envoyé comme de vrais événements tactiles */
 async function deuxDoigts(page,{de,vers,etapes=8}){const cdp=await page.context().newCDPSession(page);const pts=(p,q)=>[{x:p.x,y:p.y,id:1},{x:q.x,y:q.y,id:2}];
  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:pts(de[0],de[1])});
