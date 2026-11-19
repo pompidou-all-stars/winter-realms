@@ -379,9 +379,21 @@ function mzRoles(A,M){const base=A.classId*10,rg=j=>TW[base+j].r,w=M.w,P=mzPath(
  for(const i of walls)if(role[i]<0){const ax=Math.abs(MZX[i]-6),cc=cov(i,rg(3)),cg=cov(i,Math.max(rg(1),1.45));
   role[i]=ax<=2?(ax<=1&&cov(i,rg(4))>=7?4:0):cc>=12||(cg>=4&&M.r()<.3)?3:cg>=4?1:cc>=8?3:0}
  M.role=role}
+/* 2.32 : menace = PV des monstres reçus, monstre par monstre, avec un oubli progressif (×MEN_OUBLI à chaque action, environ 2 min de demi-vie) */
+const MEN_OUBLI=.997,MEN_MIN=200,MAG_MAX=.4;
+function observer(A){const mn=A.menace||(A.menace=new Float64Array(CR.length));for(let k=0;k<mn.length;k++)mn[k]*=MEN_OUBLI;for(const c of A.cr)if(!c._ia){c._ia=1;mn[c.k]+=c.max}}
+/* dégâts par seconde et par or d'une tour k (niveau 1) posée en (x, y), contre la menace reçue : armure, vol, anti-magie, zone, longueur de chemin à portée */
+function contreMenace(A,k,x,y){const W=TW[k],mn=A.menace,m=1+A.G.time/200,P=trajet(A),r=W.r;let Lg=0;for(const[a,b]of P)if(Math.hypot(a-x,b-y)<=r)Lg+=PAS_TR;const La=air({x,y},r);let v=0,tot=0;
+ for(let q=0;q<mn.length;q++){const w=mn[q];if(!w)continue;tot+=w;const T=CR[q];if((T.fly&&W.gr)||(T.mi&&W.mag))continue;let d=W.d*(T.fly&&W.airBonus?W.airBonus:1);const ar=(T.arm||0)*m;if(ar)d=Math.max(d*.2,d-ar*(1-(W.pierce||0)));
+  v+=w*d*(T.fly?La:Lg)}return tot?v/tot/W.cd*ZONE[W.skin]/W.c:0}
+/* emplacements ordinaires (Archer, Garde, Canon, Flammes du plan) : une fois la menace connue, le type qui fait le plus de dégâts par or contre elle sur cette case ;
+   le type prévu par le plan garde un petit avantage (×1,15) ; pas de tour au sol seulement dans le couloir des volants, Mages au plus MAG_MAX des tours */
+function choixType(A,i,j,n){const mn=A.menace;if(!mn||mn.reduce((a,b)=>a+b,0)<MEN_MIN)return j;const base=A.classId*10,x=i%C,y=i/C|0,ax=Math.abs(x-6);
+ const opts=ax<=2?[0,4]:[0,1,3,4];if(n>=8&&A.t.filter(t=>TW[t.k].mag).length<MAG_MAX*n)opts.push(5);let bj=j,bv=-1;
+ for(const o of opts){const v=contreMenace(A,base+o,x,y)*(o==j?1.15:1)*(.95+.1*Math.random());if(v>bv){bv=v;bj=o}}return bj}
 /* tour à poser sur la case i du plan selon la situation (-1 : attendre d'avoir l'or) */
 function mzKind(A,i,n,bud,thr,fs){const M=A.mz,base=A.classId*10,x=i%C,cnt=js=>A.t.filter(t=>js.includes(t.k-base)).length;let j=M.role[i];
- if(j==5&&!thr)j=0;if(j==2&&cnt([2,8])>=1+n*.15)j=0;if((j==1||j==3)&&fs>.35&&Math.abs(x-6)<=3)j=0;
+ if(j==5&&!thr)j=0;if(j!=2&&j!=5)j=choixType(A,i,j,n);if(j==2&&cnt([2,8])>=1+n*.15)j=0;if((j==1||j==3)&&fs>.35&&Math.abs(x-6)<=3)j=0;
  if(n<5&&TW[base+j].c>bud)j=0;
  const e={0:6,1:7,2:8,5:9}[j];if(e!==undefined&&n>=(j==5?16:j==2?12:8)&&(j!=5||A.G.time>360)&&bud>=TW[base+e].c)j=e;
  return TW[base+j].c<=bud?base+j:-1}
@@ -450,6 +462,7 @@ function aiAct(A){const time=A.G.time,gain=A.gold-A.lastG,danger=A.hurt>0,need=(
  A.dp+=gain*f;A.ap+=gain*(1-f);if(danger&&A.lives<12){A.dp+=A.ap*.5;A.ap*=.5}
  /* fin de partie : défense au maximum, tout part en attaque */
  if(A.plein){A.ap+=A.dp;A.dp=0}
+ observer(A);
  for(let i=0;i<3&&aiDefend(A);i++);
  if(aiAttack(A))for(const b of A.G.foes(A))b.ev.push('warn');A.lastG=A.gold}
 

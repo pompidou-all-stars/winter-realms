@@ -11,7 +11,7 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | 💡 | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. |
 | 💡 | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». |
 | 🛠️ | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
-| 💡 | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
+| 🛠️ | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
 | 🛠️ | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
 | 🛠️ | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
 | 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
@@ -69,6 +69,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.32 — ia plus stratège — 2026-11-19
+- AI tower types chosen against the threat it receives: the AI remembers the monsters sent to it and, on the ordinary slots of its maze, builds the type that deals the most damage per gold against them (armour, flying, anti-magic, area, path in range): fewer archers and more guards, cannons and mages against bosses and armoured monsters. Arena: +0.52 points per seat (28 wins out of 42).
 - Tooling: `--vies` option for the AI arena (long games that reach the end game). Two end-game ideas were tried with it and dropped because they made the AI weaker: rebuilding a level-5 tower as a stronger type, and capping the defence savings. No game change.
 - AI waves aimed at what each opponent cannot absorb: for every monster family the AI estimates how many would get through each opponent's towers (damage while crossing, with armour, flying, anti-magic, invisibility and slows) and sends the family that costs them the most lives, with some randomness (more in Normal than in Brutal); otherwise ground monsters for income. Bosses and armoured monsters, very hard to absorb, come much more often. **The AI becomes much more dangerous: difficulty to be checked by playing.**
 - AI end game: once its maze is complete and every tower is at level 5, the AI moves its defence savings (which could no longer be spent) into attacks. Arena: +0.76 points per seat against the previous step (35 wins out of 42).
