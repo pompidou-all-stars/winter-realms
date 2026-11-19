@@ -54,3 +54,9 @@ test('IA : elle finit par attaquer et par améliorer ses tours',()=>{const G=par
  let recu=0;for(let i=0;i<4800&&!G.over;i++){G.step(.05);recu+=G.B[0].q.length}
  assert.ok(recu>0,'le joueur a reçu des monstres');assert.ok(G.B.slice(1).some(b=>b.t.some(t=>t.lv>1)),'au moins une tour améliorée');
 });
+/* depuis la 2.32 : fin de partie, défense au maximum */
+test('IA : quand son plan est construit et toutes ses tours au niveau 5, son or de défense passe à l\'attaque',()=>{const G=partie(S,{ia:[0,1,1,1]});const b=G.B[1],M=S.mzStep(b,Infinity);
+ b.gold=1e7;for(const i of M.ord)b.place(i%13,i/13|0,b.classId*10);for(const t of b.t){t.lv=5;t.b=0}
+ assert.equal(b.t.length,M.ord.length,'plan complet');b.dp=5000;b.ap=0;b.gold=1000;b.lastG=1000;G.time=60;S.aiAct(b);S.aiAct(b);
+ assert.equal(b.dp,0,'réserve de défense vidée');assert.ok(b.ap>0,'réserve d\'attaque remplie');
+});
