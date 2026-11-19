@@ -168,6 +168,29 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   assert.equal(e.tours.filter(t=>t.k==20&&t.lv==2).length,1,'une seule tour améliorée');assert.equal(e.or,1);assert.match(e.toast,/1 tour améliorée/);
   await p.evaluate(()=>{P.gold+=1000});
  });
+ test('Panneau « Mes tours » (2.36) : cocher un type, choisir le niveau, la file paie ce qu’elle peut puis le reste, et s’annule',async()=>{
+  await N.toucher(p,'#parcBtn');assert.equal(await p.locator('#parc').isVisible(),true,'le panneau s’ouvre');
+  const n=await p.evaluate(()=>P.t.filter(t=>t.k==20&&t.lv<3).length);assert.ok(n>=3,'au moins 3 Arbres sentinelles sous le niveau 3 : '+n);
+  await p.locator('#parc .ligne',{hasText:'Arbre sentinelle'}).click();await p.locator('#parc .niv button',{hasText:'3'}).click();
+  /* juste assez d’or pour une amélioration (niveau 1 → 2) : la file la paie, le reste attend */
+  await p.evaluate(()=>{P.gold=upCost({k:20,lv:1})});await N.avancer(p,50);
+  assert.match(await p.textContent('#parcRes'),/Ton or en paie 1 tout de suite/);
+  await p.locator('#parcGo').click();await N.avancer(p,300);
+  let e=await p.evaluate(()=>({file:FILE.length,or:Math.floor(P.gold),n2:P.t.filter(t=>t.k==20&&t.lv==2).length,badge:document.getElementById('fileN').textContent}));
+  assert.equal(e.file,1,'un ordre dans la file');assert.ok(e.or<30,'l’or est dépensé : '+e.or);assert.match(e.badge,/⏫ \d+/);
+  assert.equal(await p.locator('#parc .ordre').count(),1,'l’ordre se voit dans le panneau');
+  /* avec de l’or, chaque tour monte niveau par niveau jusqu’au 3, puis l’ordre disparaît */
+  await p.evaluate(()=>{P.gold+=2000});await N.avancer(p,8000);
+  e=await p.evaluate(()=>({file:FILE.length,sous3:P.t.filter(t=>t.k==20&&t.lv<3).length,chantier:P.t.filter(t=>t.b>0).length}));
+  assert.equal(e.sous3,0,'toutes au niveau 3 au moins');assert.equal(e.file,0,'ordre terminé');
+  /* un nouvel ordre se consulte et s’annule */
+  await p.evaluate(()=>{P.gold=0});await p.locator('#parc .ligne',{hasText:'Arbre sentinelle'}).click();await p.locator('#parc .niv button',{hasText:'5'}).click();
+  await p.locator('#parcGo').click();await N.avancer(p,100);assert.equal(await p.locator('#parc .ordre').count(),1);
+  await p.locator('#parc .annuler').click();await N.avancer(p,100);
+  assert.equal(await p.evaluate(()=>FILE.length),0,'file annulée');assert.equal(await p.locator('#fileN').isVisible(),false);
+  await N.toucher(p,'#parcBtn');assert.equal(await p.locator('#parc').isVisible(),false,'le bouton referme le panneau');
+  await p.evaluate(()=>{P.gold+=1000});
+ });
  test('Tour choisie toujours visible (2.35) : si la fiche la cache, la vue glisse pour la montrer au-dessus ; détails sur une ligne',async()=>{
   /* une tour sur une rangée basse (la vue ne dépasse pas les bords du terrain : une tour du haut ne peut pas finir sous la fiche) */
   const t=await p.evaluate(()=>{pick=null;lot=null;render();for(let y=R-2;y>8;y--)for(const x of [2,10,3,9])if(peutConstruire(x,y,sel)===''){doAction({type:'place',x,y,k:sel});return {x,y}}});
