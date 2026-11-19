@@ -4,24 +4,14 @@
 
 Une idée ? **[➕ Proposer une idée](https://github.com/pompidou-all-stars/winter-realms/issues/new?template=idee.yml)** (formulaire GitHub, marche aussi sur téléphone), ou ajoute une ligne ici dans une PR. Toutes les idées : [onglet Issues, étiquette « idée »](https://github.com/pompidou-all-stars/winter-realms/issues?q=label%3Aid%C3%A9e).
 
-Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
+Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours. **Une idée terminée est retirée du tableau** : ce qui a été fait se lit dans le [Changelog](#changelog) plus bas.
 
 | Statut | Domaine | Idée |
 |---|---|---|
-| ✅ | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. *Fait en 2.32 : molette et glisser à la souris.* |
-| ✅ | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». *Fait en 2.32 : plus de bulle au milieu du terrain, fiche réduite pendant l'aperçu ; en 2.35 : détails de la fiche sur une ligne, et la vue glisse pour que la tour choisie ne soit jamais cachée par la fiche.* |
-| ✅ | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
-| ✅ | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
-| ✅ | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
-| ✅ | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
 | 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
-| ✅ | 🏰 Tours | **Améliorer en lot** : un moyen d'améliorer plusieurs tours d'un coup. *Fait en 2.32 : toucher deux fois une tour choisit jusqu'à 10 tours du même type et du même niveau, montrées en icônes ; un bouton les améliore toutes ; si l'or manque, les icônes de celles qui ne seront pas améliorées rétrécissent. En 2.37 : panneau « Mes tours » (cocher des types, niveau visé de 2 à 5) et file d'attente qui améliore niveau par niveau dès que l'or le permet, consultable et annulable.* |
 | 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
-| ✅ | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes pour qu'elles prennent moins de place (deux fois moins). *Fait en 2.35 : ×0,5 en 3D (×0,65 en 2.32).* |
 | 💡 | 🧭 Gameplay | **Point de relais** : pouvoir poser un point de passage autour duquel les monstres tournent. |
 | 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
-| ✅ | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. *Fait en 2.35 : tests et parties entre IA en parallèle ; simulation 24 s → 8 s, 15 parties 1 min 54 → 29 s (sur 22 cœurs).* |
-| ✅ | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. *Fait en 2.38 : 10 quêtes au titre décalé (« Qui a la plus grosse ? », « Clicker fou », « Picsou »…), une toutes les 3 à 4 min, annoncées par une bannière, suivies dans une pastille, gagnant annoncé ; les IA les jouent.* |
 | 🧭 | ✨ Palier 3 | **Pouvoirs magiques payants** : renforcements sur son propre terrain, ou malédictions à lancer sur le terrain d'un adversaire. |
 | 💡 | 🧊 Modèles 3D | **Refactorisation des modèles 3D**. |
 | 💡 | 🧭 Interface | **Menu de navigation** : lancement d'une partie sur plusieurs écrans successifs. |
@@ -85,6 +75,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 - Banner when a quest starts (title, rule, reward), a tracking pill under the top bar (time left, your score and rank, green when you lead; tap it for the rule), and a banner announcing the winner. "Quêtes" column in the end-of-game table.
 - AI: each AI decides whether it plays a quest (50 % in Normal, 75 % in Hard, 100 % in Brutal) and adapts: builds cheap towers, saves its gold, sends small waves early, upgrades its best tower, builds frost towers or sends a boss.
 - `sim.js` and `server/` changed (the server redeploys automatically; the snapshot carries the current quest).
+- Roadmap: finished ideas are removed from the table (what was done is in this changelog); rule added to CLAUDE.md (maintenance rule 7).
 
 ### 2.37 — file d'améliorations — 2026-11-19
 - "Mes tours" panel: a button under the top bar lists all your towers by type (count per level). Tick types, pick a target level (2 to 5) and add them to an upgrade queue: each tower goes up one level at a time, lowest level first, as soon as gold allows; when gold runs short the queue spends what it can and the rest waits for income. The queue shows each order (progress bar, gold left) and can be cancelled order by order or entirely; queued towers get a gold chevron on the map. Interface only: `sim.js` unchanged.
