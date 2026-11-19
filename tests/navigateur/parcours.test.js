@@ -168,6 +168,24 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   assert.equal(e.tours.filter(t=>t.k==20&&t.lv==2).length,1,'une seule tour améliorée');assert.equal(e.or,1);assert.match(e.toast,/1 tour améliorée/);
   await p.evaluate(()=>{P.gold+=1000});
  });
+ test('Tour choisie toujours visible (2.35) : si la fiche la cache, la vue glisse pour la montrer au-dessus ; détails sur une ligne',async()=>{
+  /* une tour sur une rangée basse (la vue ne dépasse pas les bords du terrain : une tour du haut ne peut pas finir sous la fiche) */
+  const t=await p.evaluate(()=>{pick=null;lot=null;render();for(let y=R-2;y>8;y--)for(const x of [2,10,3,9])if(peutConstruire(x,y,sel)===''){doAction({type:'place',x,y,k:sel});return {x,y}}});
+  assert.ok(t,'une case libre en bas du terrain');await N.avancer(p,50);
+  /* plus aucune fiche (le × annule aussi le choix de la carte) : la tour se touche juste au-dessus de la console */
+  await N.toucher(p,'#fiche .fermer');assert.equal((await N.etat(p)).fiche,'');
+  /* la tour est amenée tout en bas de la zone libre, là où sa fiche la recouvrira */
+  await p.evaluate(t=>{const r=main.getBoundingClientRect();R3D.api.amener(t.x+.5,t.y+.5,r.width/2,document.getElementById('console').getBoundingClientRect().top-r.top-25)},t);await N.avancer(p,1500);
+  const y0=(await N.centreCase(p,t.x,t.y)).y;await N.toucherCase(p,t.x,t.y);assert.equal((await N.etat(p)).panneauOuvert,true);
+  const haut=await p.evaluate(()=>document.getElementById('fiche').getBoundingClientRect().top);
+  assert.ok(y0>haut,'au départ, la fiche cache la tour ('+Math.round(y0)+' > '+Math.round(haut)+')');
+  await N.avancer(p,1500);const y1=(await N.centreCase(p,t.x,t.y)).y;
+  assert.ok(y1<haut-15&&y1>haut-60,'la tour est juste au-dessus de la fiche ('+Math.round(y1)+', fiche à '+Math.round(haut)+')');
+  const ex=p.locator('#fiche .ex');assert.equal(await ex.evaluate(e=>getComputedStyle(e).whiteSpace),'nowrap','détails sur une ligne');
+  await ex.click();assert.equal(await ex.evaluate(e=>e.classList.contains('ouvert')),true,'un toucher déplie les détails');
+  /* l'avance finale laisse render() finir son image suivante (position de la barre des cartes) avant le test d'après */
+  await ex.click();await p.evaluate(()=>{pick=null;render()});await N.avancer(p,50);
+ });
  test('Barre des cartes (2.31) : la molette de la souris la fait défiler',async()=>{
   await p.evaluate(()=>{bar.scrollLeft=0});const b=await p.locator('#bar').boundingBox();
   await p.mouse.move(b.x+b.width/2,b.y+b.height/2);await p.mouse.wheel(0,240);await N.avancer(p,100);

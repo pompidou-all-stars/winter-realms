@@ -9,7 +9,7 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | Statut | Domaine | Idée |
 |---|---|---|
 | ✅ | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. *Fait en 2.32 : molette et glisser à la souris.* |
-| ✅ | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». *Fait en 2.32 : plus de bulle au milieu du terrain, fiche réduite pendant l'aperçu.* |
+| ✅ | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». *Fait en 2.32 : plus de bulle au milieu du terrain, fiche réduite pendant l'aperçu ; en 2.35 : détails de la fiche sur une ligne, et la vue glisse pour que la tour choisie ne soit jamais cachée par la fiche.* |
 | ✅ | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
 | ✅ | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
 | ✅ | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
@@ -17,10 +17,10 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
 | ✅ | 🏰 Tours | **Améliorer en lot** : un moyen d'améliorer plusieurs tours d'un coup. *Fait en 2.32 : toucher deux fois une tour choisit jusqu'à 10 tours du même type et du même niveau, montrées en icônes ; un bouton les améliore toutes ; si l'or manque, les icônes de celles qui ne seront pas améliorées rétrécissent.* |
 | 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
-| ✅ | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes. *Fait en 2.32 : ×0,65 en 3D.* |
+| ✅ | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes pour qu'elles prennent moins de place (deux fois moins). *Fait en 2.35 : ×0,5 en 3D (×0,65 en 2.32).* |
 | 💡 | 🧭 Gameplay | **Point de relais** : pouvoir poser un point de passage autour duquel les monstres tournent. |
 | 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
-| 💡 | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. |
+| ✅ | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. *Fait en 2.35 : tests et parties entre IA en parallèle ; simulation 24 s → 8 s, 15 parties 1 min 54 → 29 s (sur 22 cœurs).* |
 | 🧭 | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. |
 | 🧭 | ✨ Palier 3 | **Pouvoirs magiques payants** : renforcements sur son propre terrain, ou malédictions à lancer sur le terrain d'un adversaire. |
 | 💡 | 🧊 Modèles 3D | **Refactorisation des modèles 3D**. |
@@ -66,7 +66,7 @@ Only Node.js 22 is required; browser tests also use Playwright/Chromium when ava
 node tests/tout.js
 ```
 
-- `node tests/tout.js --simulation`: simulation tests only (what GitHub runs on every pull request).
+- `node tests/tout.js --simulation`: simulation tests only (what GitHub runs on every pull request), about 10 s. Test files run in parallel; `--un-par-un` runs them one after the other.
 - `node tests/bilan.js`: the three reports (technical, gameplay, visual) in `rapports/bilan.html`, including a before/after visual comparison with `main`.
 - `node tests/captures.js`: phone screenshots (portrait and landscape) in `captures/actuel/`.
 
@@ -79,6 +79,11 @@ On the site, enter a nickname, click **Créer un salon** and share the link (or 
 The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](server/). It is **redeployed automatically** by a GitHub Action whenever a change to `sim.js` or `server/` is merged into `main` (see CLAUDE.md, section 9 bis). Manual fallback: `cd server` then `npx wrangler deploy`.
 
 ## Changelog
+
+### 2.35 — terrain dégagé — 2026-11-19
+- Flying monsters are half the size of the other monsters in 3D (×0.5 instead of ×0.65), so they hide less of the field. No rule change.
+- Less cluttered mobile display: the details line of the info panel fits on one line (tap it to unfold), and in 3D, when the chosen tower (or batch, or build preview) is hidden by the info panel or the top bar, the view glides just enough to show it above the panel. Interface only.
+- Tooling: faster tests. `node tests/tout.js` runs the test files in parallel (one process per file, one per CPU core minus one; `--un-par-un` for the old behaviour) and the AI games run at the same time in worker threads, with identical results. On 22 cores: simulation 24 s → 8 s (13 s pinned to 4 cores, like GitHub), `--complet` 1 min 54 → 29 s. No game change.
 
 ### 2.34 — consigne de construction — 2026-11-19
 - The "Touche encore la case pour construire" hint now sits between the two rotation arrows and appears only once per game (first build preview); the info card no longer repeats it afterwards. Interface only: `sim.js` unchanged.
