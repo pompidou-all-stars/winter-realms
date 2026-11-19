@@ -15,7 +15,7 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | ✅ | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
 | ✅ | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
 | 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
-| ✅ | 🏰 Tours | **Améliorer en lot** : un moyen d'améliorer plusieurs tours d'un coup. *Fait en 2.32 : toucher deux fois une tour choisit jusqu'à 10 tours du même type et du même niveau, montrées en icônes ; un bouton les améliore toutes ; si l'or manque, les icônes de celles qui ne seront pas améliorées rétrécissent.* |
+| ✅ | 🏰 Tours | **Améliorer en lot** : un moyen d'améliorer plusieurs tours d'un coup. *Fait en 2.32 : toucher deux fois une tour choisit jusqu'à 10 tours du même type et du même niveau, montrées en icônes ; un bouton les améliore toutes ; si l'or manque, les icônes de celles qui ne seront pas améliorées rétrécissent. En 2.37 : panneau « Mes tours » (cocher des types, niveau visé de 2 à 5) et file d'attente qui améliore niveau par niveau dès que l'or le permet, consultable et annulable.* |
 | 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
 | ✅ | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes pour qu'elles prennent moins de place (deux fois moins). *Fait en 2.35 : ×0,5 en 3D (×0,65 en 2.32).* |
 | 💡 | 🧭 Gameplay | **Point de relais** : pouvoir poser un point de passage autour duquel les monstres tournent. |
@@ -79,6 +79,9 @@ On the site, enter a nickname, click **Créer un salon** and share the link (or 
 The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](server/). It is **redeployed automatically** by a GitHub Action whenever a change to `sim.js` or `server/` is merged into `main` (see CLAUDE.md, section 9 bis). Manual fallback: `cd server` then `npx wrangler deploy`.
 
 ## Changelog
+
+### 2.37 — file d'améliorations — 2026-11-19
+- "Mes tours" panel: a button under the top bar lists all your towers by type (count per level). Tick types, pick a target level (2 to 5) and add them to an upgrade queue: each tower goes up one level at a time, lowest level first, as soon as gold allows; when gold runs short the queue spends what it can and the rest waits for income. The queue shows each order (progress bar, gold left) and can be cancelled order by order or entirely; queued towers get a gold chevron on the map. Interface only: `sim.js` unchanged.
 
 ### 2.36 — cristal hivernal renforcé — 2026-11-19
 - The reinforced frost tower (slot 8: Cristal hivernal and its equivalents in every faction) cost more than the basic frost tower but did exactly the same thing. It now deals more damage (modifier ×0.9 → ×1.5, Cristal hivernal 2 → 3.4) and slows 10 points more at every level (−30 % to −60 % instead of −20 % to −50 %). It still does not stack with the basic frost tower: the strongest slow wins. `sim.js` changed (server redeployed automatically).

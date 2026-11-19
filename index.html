@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.36</title>
+<title>Winter Realms — Tower Wars · Édition 2.37</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -134,7 +134,7 @@ body.r2d .fleche{display:none}
 #tourner{display:none;position:fixed;inset:0;z-index:3000;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;background:var(--bg);color:var(--ink);font-size:17px;font-weight:700;text-align:center}
 #tourner svg{width:56px;height:56px;fill:none;stroke:#ffe597;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 @media (orientation:landscape) and (pointer:coarse) and (max-height:540px){#tourner{display:flex}}
-.rondbtn:focus-visible,.fleche:focus-visible,#cartesBtn:focus-visible,#banner:focus-visible,.chip:focus-visible,#bar button:focus-visible,#tabs button:focus-visible,#paliers button:focus-visible,:is(#menu,#fin) button:focus-visible,#fiche button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
+.rondbtn:focus-visible,.fleche:focus-visible,#cartesBtn:focus-visible,#parcBtn:focus-visible,#parc button:focus-visible,#banner:focus-visible,.chip:focus-visible,#bar button:focus-visible,#tabs button:focus-visible,#paliers button:focus-visible,:is(#menu,#fin) button:focus-visible,#fiche button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){#bar.mon button.sel:after,#bar button.tape,#gold.pop{animation:none}}
 /* ===== 2.18 : habillage « givre » sur l'interface vue tactique =====
    Retour des textures gelées et des cadres à volutes de la 2.12, disposés comme la console d'un jeu de stratégie :
@@ -161,6 +161,46 @@ body.r2d .fleche{display:none}
 #cartesBtn{top:calc(54px + env(safe-area-inset-top,0px));border-radius:5px;border-color:var(--c,#8fb6d955);color:var(--c,var(--ink))}
 #cartesBtn:after{border-width:10px;border-image-width:10px}
 #chips{top:calc(96px + env(safe-area-inset-top,0px));border-radius:6px}
+/* 2.37 : bouton et panneau « Mes tours » (en miroir du bouton des adversaires) */
+#parcBtn{position:absolute;z-index:5;left:calc(8px + env(safe-area-inset-left,0px));top:calc(54px + env(safe-area-inset-top,0px));height:32px;display:flex;align-items:center;gap:6px;padding:0 11px 0 8px;border-radius:5px;color:var(--ink);font-size:12.5px;font-weight:700;box-shadow:0 2px 8px #0008;background-image:var(--givre),var(--verre-nuit);background-size:180px,auto;border:1px solid #8fb6d955}
+#parcBtn:after{content:'';position:absolute;inset:-3px;border:10px solid transparent;border-image:var(--orne-argent) 32 / 10px / 0 stretch;pointer-events:none}
+#parcBtn svg{width:18px;height:18px;fill:none;stroke:#ffd95e;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#parcBtn.on{border-color:#f2c14e;box-shadow:0 0 0 1px #f2c14e,0 2px 8px #0008}
+#parcBtn b{font-size:11px;padding:1px 6px;border-radius:8px;background:#9be7ff22;border:1px solid #9be7ff88;color:#bfefff}
+#parc{position:absolute;z-index:9;left:calc(8px + env(safe-area-inset-left,0px));right:calc(8px + env(safe-area-inset-right,0px));top:calc(96px + env(safe-area-inset-top,0px));max-height:calc(100% - 110px - var(--dock,180px) - env(safe-area-inset-top,0px));overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;gap:7px;padding:9px;border-radius:6px;background-image:var(--givre),var(--verre-nuit);background-size:180px,auto;border:1px solid #8fb6d955;box-shadow:0 8px 24px #000c;color:var(--ink);font-size:12.5px}
+#parc .tete{display:flex;align-items:center;gap:8px}
+#parc .tete b{font-size:15px;color:#ffe597}
+#parc .tete span{flex:1;color:var(--dim);font-size:12px}
+#parc button{font:inherit;color:inherit}
+#parc .fermer{width:30px;height:30px;flex:0 0 auto;border-radius:50%;border:1px solid #8fb6d966;background:#0b1626;font-size:18px;line-height:1}
+#parc .liste{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+#parc .ligne{position:relative;display:flex;align-items:center;gap:5px;min-width:0;padding:4px 5px;border-radius:8px;background:#0d1729;border:1px solid #8fb6d944;text-align:left}
+#parc .ligne.on{border-color:#f2c14e;background:#2a2410;box-shadow:0 0 0 1px #f2c14e88}
+#parc .ligne:disabled{opacity:.45}
+#parc .ligne canvas,#parc .ordre canvas{flex:0 0 auto;width:40px!important;height:33px!important}
+#parc .coche{flex:0 0 auto;width:16px;height:16px;display:grid;place-items:center;border-radius:4px;border:1.5px solid #8fb6d9aa;font-size:11px;font-weight:700;color:#14223a}
+#parc .ligne.on .coche{background:#f2c14e;border-color:#f2c14e}
+#parc .tx{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+#parc .tx b{font-size:12px;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#parc .nv{display:flex;flex-wrap:wrap;gap:2px 5px;font-size:10.5px;color:var(--dim)}
+#parc .nv i{font-style:normal}#parc .nv i.max{color:#ffd95e}
+#parc .enfile{position:absolute;top:2px;right:4px;font-size:10px;color:#bfefff}
+#parc .niv{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+#parc .niv span{color:var(--dim);margin-right:2px}
+#parc .niv button{min-width:34px;height:32px;border-radius:8px;border:1px solid #8fb6d966;background:#0b1626;font-weight:700;font-size:14px}
+#parc .niv button.on{border-color:#f2c14e;background:linear-gradient(180deg,#f2c14e,#b98a22);color:#14223a}
+#parc .niv .tout{margin-left:auto;min-width:0;padding:0 10px;font-size:12px}
+#parc .res{color:var(--dim);line-height:1.35}
+#parc .go{height:38px;border-radius:9px;border:1px solid #f2c14e;background:linear-gradient(180deg,#3a5078,#1f3152);font-weight:700;font-size:13.5px}
+#parc .go:disabled{opacity:.5}
+#parc .file{display:flex;flex-direction:column;gap:5px;padding-top:7px;border-top:1px solid #8fb6d933}
+#parc .file .tete b{font-size:13.5px;color:#bfefff}
+#parc .annuler{height:28px;padding:0 10px;border-radius:8px;border:1px solid #ff8c7a88;background:#2a1414;font-size:12px;font-weight:700}
+#parc .ordre{display:flex;align-items:center;gap:6px;padding:4px 5px;border-radius:8px;background:#0d1729;border:1px solid #9be7ff44}
+#parc .ordre .tx span{font-size:11px;color:var(--dim)}
+#parc .jauge{display:block;height:5px;border-radius:3px;background:#0b1626;border:1px solid #8fb6d944;overflow:hidden}
+#parc .jauge i{display:block;height:100%;background:linear-gradient(90deg,#9be7ff,#ffd95e)}
+#parc .vide{color:var(--dim);font-size:12px;line-height:1.35}
 #astuce{top:calc(100px + env(safe-area-inset-top,0px))}
 .chip{border-radius:5px;background:linear-gradient(180deg,#07101e,#0d1a2e);box-shadow:inset 0 2px 4px #000a}
 /* 2.28 : vignette d'hiver sertie d'argent ; vies et revenu avec le cœur et la pièce du bandeau */
@@ -297,7 +337,7 @@ body.r2d .fleche{display:none}
 #fin #finMoi{color:var(--ink);font-size:12.5px}
 #finBtn{display:none;margin:0 auto;height:40px;padding:0 16px;border-radius:6px;border:1px solid #f2c14e99;background:var(--givre),var(--verre-nuit);background-size:180px,auto;color:#ffe597;font-size:14px;font-weight:700;box-shadow:0 3px 10px #000a}
 #finBtn u{text-decoration:none;color:var(--ink)}
-body.explore #console{display:none}
+body.explore #console,body.explore #parcBtn,body.explore #parc{display:none}
 body.explore #finBtn{display:block}
 #finBtn:focus-visible,#fin button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
 body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:none!important}
@@ -356,6 +396,9 @@ body.prep #clock{display:none}
   </div>
   <button id="cartesBtn" type="button" aria-expanded="false" aria-controls="chips"><svg viewBox="0 0 24 24"><path d="M4 4l10 10M4 4h4M4 4v4M20 4L10 14M20 4h-4M20 4v4M7 15l2 2M5 19l3-3M17 15l-2 2M19 19l-3-3"/></svg><span id="cartesTxt">Adversaires</span><span id="advPoints"></span></button>
   <div id="chips" hidden></div>
+  <!-- 2.37 : panneau « Mes tours » (amélioration de plusieurs tours, file d'attente) -->
+  <button id="parcBtn" type="button" aria-expanded="false" aria-controls="parc"><svg viewBox="0 0 24 24"><path d="M5 20V9l2-2 2 2v11M15 20V9l2-2 2 2v11M3 20h18M12 13V4M9 7l3-3 3 3"/></svg><span>Mes tours</span><b id="fileN" hidden></b></button>
+  <div id="parc" hidden></div>
   <button class="fleche" id="rotG" type="button" aria-label="Pivoter la vue vers la gauche"><svg viewBox="0 0 24 24"><path d="M4 4v5h5"/><path d="M4.6 9A8 8 0 1 1 6 16.5"/></svg></button>
   <button class="fleche" id="rotD" type="button" aria-label="Pivoter la vue vers la droite"><svg viewBox="0 0 24 24"><path d="M20 4v5h-5"/><path d="M19.4 9A8 8 0 1 0 18 16.5"/></svg></button>
   <div id="aideBat" hidden>Touche encore la case pour construire</div>
@@ -770,7 +813,8 @@ function draw(b,g,s,t){
  g.beginPath();g.arc(kx,ky+s*.38,s*.12,Math.PI,0);g.lineTo(kx+s*.12,ky+s*.38);g.lineTo(kx-s*.12,ky+s*.38);fs(g,'#5a3a1c');
  g.beginPath();g.moveTo(kx,ky-s*.28);g.lineTo(kx,ky-s*.48);g.stroke();pg(g,b.col,kx,ky-s*.48,kx+s*.2,ky-s*.42,kx,ky-s*.35);
  for(const c of b.cr){const rc=CR[c.k].aura?'255,228,94':CR[c.k].heal?'111,207,151':0;if(rc){g.beginPath();g.arc((c.x+.5)*s,(c.y+.5)*s,AURA_R*s,0,7);g.fillStyle='rgba('+rc+',.1)';g.fill();g.strokeStyle='rgba('+rc+','+(.35+Math.sin(t*5)*.15)+')';g.lineWidth=2;g.stroke()}}
- if(lot&&b===P){g.strokeStyle='#ffd95e';g.lineWidth=2;for(const t of lot.t)g.strokeRect(t.x*s+2,t.y*s+2,s-4,s-4)}
+ if(b===P&&FILE.length)for(const u of b.t)if(viseFile(u)>u.lv)marqueFile(g,(u.x+.84)*s,(u.y+.8)*s,Math.max(5,s*.15));
+ if(cadresLot()&&b===P){g.strokeStyle='#ffd95e';g.lineWidth=2;for(const t of cadresLot())g.strokeRect(t.x*s+2,t.y*s+2,s-4,s-4)}
  else if(pick&&b===VB()&&b.t.includes(pick)){const cx=(pick.x+.5)*s,cy=(pick.y+.5)*s;g.beginPath();g.arc(cx,cy,rng(pick)*s,0,7);g.fillStyle='rgba(255,255,255,.1)';g.fill();g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=1.5;g.stroke();
   g.strokeStyle='#ffd95e';g.lineWidth=3;g.strokeRect(pick.x*s+1.5,pick.y*s+1.5,s-3,s-3)}
  if(projet&&b===P){const T=TW[projet.k],cx=(projet.x+.5)*s,cy=(projet.y+.5)*s,ok=!peutConstruire(projet.x,projet.y,projet.k);
@@ -928,11 +972,12 @@ window.R3D_ETAT=()=>({on:R3D.on,charge:!!R3D.charge,echec:R3D.echec,scene:R3D.ap
 /* image en 3D, puis surcouche 2D (barres de vie, chantiers, textes flottants, terrain éliminé) sur le canevas #main ;
    en perspective, la taille d'une case à l'écran (s) dépend de l'endroit : echelle la donne */
 function dessinerVue3D(t){const g=mx,b=VB(),A=R3D.api,E=(x,z,h)=>A.projeter(x,h,z);g.clearRect(0,0,VUE.w,VUE.h);
- A.dessiner(b,t,{pick:b===VB()&&b.t.includes(pick)&&!lot?pick:null,lot:lot&&b===P?lot.t:null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
+ A.dessiner(b,t,{pick:b===VB()&&b.t.includes(pick)&&!lot?pick:null,lot:b===P?cadresLot():null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
  for(const c of b.cr){const hp=c.hp/c.max;if(hp>=1)continue;const x=c.x+.5+(c.ox||0),z=c.y+.5+(c.oy||0),p=E(x,z,A.hauteurMonstre(c.k));if(p.z>1)continue;const s=A.echelle(x,z),w=s*.6;
   g.fillStyle='rgba(0,0,0,.6)';g.fillRect(p.x-w/2,p.y-s*.12,w,s*.09);g.fillStyle=c.sl>0?'#5dc8ff':hp>.4?'#7cdc6a':'#ff6b4a';g.fillRect(p.x-w/2,p.y-s*.12,w*Math.max(0,hp),s*.09)}
  for(const t of b.t)if(t.b>0){const p=1-t.b/(t.bt||1),q=E(t.x+.5,t.y+.5,0);if(q.z>1)continue;const s=A.echelle(t.x+.5,t.y+.5),w=s*.7,h=Math.max(3,s*.09),y=q.y+s*.3;
   g.fillStyle='rgba(20,16,10,.75)';g.fillRect(q.x-w/2-1,y-1,w+2,h+2);g.fillStyle='#ffc95e';g.fillRect(q.x-w/2,y,w*p,h)}
+ if(b===P&&FILE.length)for(const t of b.t)if(viseFile(t)>t.lv){const q=E(t.x+.5,t.y+.5,0);if(q.z>1)continue;const s=A.echelle(t.x+.5,t.y+.5);marqueFile(g,q.x+s*.36,q.y+s*.06,Math.max(6,s*.15))}
  for(const f of b.fx)if(f.type=='text'){const p=1-f.t/f.d,q=E(f.x,f.y,.9+p*.6);if(q.z>1)continue;const s=A.echelle(f.x,f.y);g.save();g.globalAlpha=Math.max(0,1-p);
   g.font='700 '+Math.round(Math.max(11,s*.36))+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='rgba(0,0,0,.6)';g.strokeText(f.txt,q.x,q.y);g.fillStyle=f.col;g.fillText(f.txt,q.x,q.y);g.restore()}
  if(b.dead&&explore)etiquetteElimine(g,VUE.w/2,bandes().haut+70);else if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,VUE.w,VUE.h);g.font='700 32px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',VUE.w/2,VUE.h*.42)}}
@@ -951,7 +996,7 @@ function setView(v){view=v;projet=null;const b=B[v],bn=$('banner'),cb=$('cartesB
 const SOLO_COL=['#e4572e','#4aa3df','#b06ad0'];
 function soloSeats(f){return [{name:'Toi',col:FACTIONS[f].color,ai:0,classId:f}].concat([1,2,3].map(i=>({name:'IA '+i,col:SOLO_COL[i-1],ai:1,classId:(f+i)%5})))}
 /* installe une partie (locale ou reçue du serveur) : vignettes, joueur, vue */
-function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=null;mon=null;projet=null;
+function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=null;mon=null;projet=null;FILE.length=0;parcSel.clear();parc(false);
  const ch=$('chips'),pts=$('advPoints');ch.textContent='';pts.textContent='';for(const b of B){const e=document.createElement('button'),cv=document.createElement('canvas'),tx=document.createElement('span'),n=document.createElement('b'),s=document.createElement('span');
   e.type='button';e.className='chip';e.style.setProperty('--c',b.col);e.setAttribute('aria-label','Voir le terrain de '+b.name);n.textContent=b.name;tx.append(n,s);e.append(cv,tx);e.onclick=()=>setView(b.i);ch.appendChild(e);b.ui={e,g:setup(cv,C*MINI,R*MINI),s};
   if(b.i!==me){const i=document.createElement('i');i.style.background=b.col;pts.appendChild(i)}}
@@ -1060,6 +1105,7 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  const ic=towerIcon(k,lv),stats=[['⚔ Dégâts/s',dps(k,lv)],['◎ Portée',fr(rng({k,lv}))],['Cibles',T.gr?'sol uniquement':'sol et air']];if(!t)stats.push(['Prix',T.c+' or']);
  teteFiche(f,ic,T.n,BASE_TW[T.skin].n+' · '+T.role+(t?' · niveau '+lv+'/5':''),stats);icone3D(ic,'tour',k,56,46);
  const ex=elt('div','ex'),part=(t,c)=>{if(ex.childNodes.length)ex.append(' · ');ex.appendChild(elt('span',c||'',t))};
+ if(t&&P.t.includes(t)&&viseFile(t)>lv)part('⏫ Dans la file : vers le niveau '+viseFile(t),'chantier');
  if(t&&t.b>0)part('🔨 '+(lv>1?'Amélioration':'Construction')+' en cours : '+Math.ceil(t.b)+' s','chantier');else if(!t)part('🔨 Construction : '+fr(btJ(T.c))+' s');
  if(t&&lv<5&&!(t.b>0)&&!explore)part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+(ralentit(T,lv+1)?', ❄ −'+pr(ralentit(T,lv+1).p)+' · '+fd(ralentit(T,lv+1).d)+' s'+(T.fsp?' · zone '+fr(ralentit(T,lv+1).r):''):'')+' ('+fr(btJ(upCost(t)))+' s de travaux)','next');
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
@@ -1101,6 +1147,89 @@ function ficheLot(){const f=$('fiche'),T=TW[lot.k],n=lot.t.length,ok=lot.n;f.tex
 function ameliorerLot(){if(!lot||!majLot())return;const l=lot.t.slice(0,lot.n);let r=0;
  for(const t of l)if(doAction({type:'upgrade',x:t.x,y:t.y})==='')r++;
  if(r){sfx('up');vibrer(15);toast(r+(r>1?' tours améliorées':' tour améliorée')+' · niveau '+(lot.lv+1))}lot=null;render()}
+/* ---------- 2.37 : panneau « Mes tours » et file d'améliorations ----------
+   Le bouton « Mes tours » ouvre la liste de ses tours, rangées par type (nombre de tours par niveau).
+   On coche des types, on choisit le niveau visé (2 à 5) et on ajoute l'ordre à la file : chaque tour monte
+   niveau par niveau (1 → 2 → 3 → 4), toujours la moins avancée d'abord, dès que l'or suffit.
+   Faute d'or, la file dépense ce qu'elle peut et le reste attend les revenus suivants. La file se consulte
+   et s'annule dans le même panneau (un ordre ou tous). Rien ne change côté sim.js : une action « upgrade » par niveau. */
+const FILE=[];let fileId=0,fileT=0,parcSel=new Set(),parcNiv=2,parcK='',parcRK='';
+const cleCase=t=>t.x+','+t.y;
+/* niveau visé par la file pour une tour (le plus haut des ordres qui la contiennent), 0 sinon */
+function viseFile(t){let n=0;for(const o of FILE)if(o.k==t.k&&o.niv>n&&o.c.has(cleCase(t)))n=o.niv;return n}
+const toursOrdre=o=>P.t.filter(t=>t.k==o.k&&o.c.has(cleCase(t)));
+/* prix pour amener une tour du niveau actuel au niveau n */
+function coutVers(t,n){let s=0;for(let l=t.lv;l<n;l++)s+=upCost({k:t.k,lv:l});return s}
+const resteOrdre=o=>toursOrdre(o).reduce((s,t)=>s+Math.max(0,o.niv-t.lv),0);
+/* combien d'améliorations l'or actuel paie, la moins avancée d'abord (même ordre que la file) */
+function payables(l,or){const v=l.map(([t,n])=>({k:t.k,lv:t.lv,n}));let c=0;
+ for(;;){let m=null;for(const u of v)if(u.lv<u.n&&(!m||u.lv<m.lv))m=u;if(!m)return c;const p=upCost(m);if(or<p)return c;or-=p;m.lv++;c++}}
+/* chaque fraction de seconde : retire les ordres finis, puis paie les améliorations, la tour la moins avancée d'abord.
+   On s'arrête à la première qu'on ne peut pas payer : la file garde l'or pour elle (pas de passe-droit aux plus chères). */
+function fileTick(dt){if(!FILE.length||over||explore||!P||P.dead||!started)return;fileT-=dt;if(fileT>0)return;fileT=NET.on?.35:.12;
+ for(let i=FILE.length-1;i>=0;i--){const o=FILE[i];if(!resteOrdre(o)){FILE.splice(i,1);toast('File : '+TW[o.k].n+(o.n>1?' (×'+o.n+')':'')+' au niveau '+o.niv+' ✓')}}
+ const rang=new Map();FILE.forEach((o,i)=>{for(const t of toursOrdre(o))if(!rang.has(t))rang.set(t,i)});
+ const l=P.t.filter(t=>!(t.b>0)&&t.lv<5&&viseFile(t)>t.lv).sort((a,b)=>a.lv-b.lv||rang.get(a)-rang.get(b));
+ for(const t of l){if(P.gold<upCost(t))break;const a={type:'upgrade',x:t.x,y:t.y};
+  if(NET.on){NET.act(a,false);break}if(G.action(me,a)!=='')break}}
+/* ouvrir ou fermer le panneau (il ferme celui des adversaires, et inversement) */
+/* tours encadrées d'or sur le terrain : le lot (2.32), ou les types cochés dans le panneau ouvert */
+const cadresLot=()=>lot?lot.t:!$('parc').hidden&&parcSel.size?parcTours():null;
+/* petit chevron sur les tours qui attendent dans la file */
+function marqueFile(g,x,y,r){g.save();g.beginPath();g.arc(x,y,r,0,7);g.fillStyle='#0b1626e6';g.fill();g.lineWidth=Math.max(1.2,r*.18);g.strokeStyle='#9be7ff';g.stroke();
+ g.beginPath();g.moveTo(x-r*.45,y+r*.2);g.lineTo(x,y-r*.3);g.lineTo(x+r*.45,y+r*.2);g.strokeStyle='#ffd95e';g.lineWidth=Math.max(1.5,r*.28);g.lineCap='round';g.lineJoin='round';g.stroke();g.restore()}
+/* pastille du bouton : améliorations qui restent dans la file */
+let fileNK='';function majFileN(){const n=FILE.reduce((s,o)=>s+resteOrdre(o),0),e=$('fileN');if(n+''===fileNK)return;fileNK=n+'';e.hidden=!n;e.textContent='⏫ '+n}
+function parc(o){const p=$('parc'),b=$('parcBtn');p.hidden=!o;b.classList.toggle('on',o);b.setAttribute('aria-expanded',o?'true':'false');
+ if(o){cartes(false);astuce(false);parcK='';parcRK='';majParc()}}
+const parcTours=()=>P.t.filter(t=>parcSel.has(t.k)&&t.lv<parcNiv);
+function ajouterFile(){const l=parcTours();if(!l.length)return;let n=0;
+ for(const k of parcSel){const c=l.filter(t=>t.k==k);if(!c.length)continue;const tot=c.reduce((s,t)=>s+parcNiv-t.lv,0);n+=tot;
+  const o=FILE.find(o=>o.k==k&&o.niv==parcNiv);if(o){const nv=c.filter(t=>!o.c.has(cleCase(t)));for(const t of nv){o.c.add(cleCase(t));o.tot+=parcNiv-t.lv}o.n=o.c.size}
+  else FILE.push({id:++fileId,k,niv:parcNiv,c:new Set(c.map(cleCase)),n:c.length,tot})}
+ parcSel.clear();sfx('up');vibrer(15);toast(n+(n>1?' améliorations ajoutées':' amélioration ajoutée')+' à la file');fileT=0;parcK=''}
+function annulerOrdre(id){const i=FILE.findIndex(o=>o.id==id);if(i>=0)FILE.splice(i,1);sfx('tap');parcK=''}
+/* le panneau est reconstruit quand les tours, leurs niveaux, le choix ou la file changent ; le résumé suit l'or à chaque image */
+function majParc(){const p=$('parc');if(p.hidden)return;
+ const k=P.t.map(t=>t.k+'.'+t.lv+(t.b>0?'b':'')).join()+'|'+[...parcSel]+'|'+parcNiv+'|'+FILE.map(o=>o.id+':'+resteOrdre(o)).join();
+ if(k!==parcK){parcK=k;parcRK='';dessinerParc()}
+ const res=$('parcRes'),go=$('parcGo');if(!res)return;const l=parcTours(),or=Math.floor(P.gold),rk=l.length+'|'+or+'|'+k;if(rk===parcRK)return;parcRK=rk;
+ if(!parcSel.size){res.textContent='Coche un ou plusieurs types de tours.';go.disabled=true;go.textContent='Ajouter à la file';return}
+ if(!l.length){res.textContent='Ces tours sont déjà au niveau '+parcNiv+' ou plus.';go.disabled=true;go.textContent='Ajouter à la file';return}
+ const tot=l.reduce((s,t)=>s+parcNiv-t.lv,0),prix=l.reduce((s,t)=>s+coutVers(t,parcNiv),0),now=payables(l.map(t=>[t,parcNiv]),or);
+ res.textContent=l.length+(l.length>1?' tours':' tour')+' · '+tot+' amélioration'+(tot>1?'s':'')+' · '+prix.toLocaleString('fr-FR')+' or. '+
+  (now>=tot?'Ton or suffit pour tout.':now?'Ton or en paie '+now+' tout de suite ; le reste attend tes revenus.':'Pas assez d’or pour l’instant : la file attendra tes revenus.');
+ go.disabled=false;go.textContent='Ajouter à la file · niveau '+parcNiv}
+function dessinerParc(){const p=$('parc');p.textContent='';
+ const tete=elt('div','tete'),x=elt('button','fermer','×');x.type='button';x.setAttribute('aria-label','Fermer le panneau');x.onclick=()=>parc(false);
+ tete.append(elt('b','','Mes tours'),elt('span','',P.t.length+(P.t.length>1?' tours':' tour')),x);p.appendChild(tete);
+ const ks=[...new Set(P.t.map(t=>t.k))].sort((a,b)=>a-b);
+ if(!ks.length){p.appendChild(elt('div','vide','Aucune tour posée pour l’instant.'))}
+ else{const li=elt('div','liste');
+  for(const k of ks){const l=P.t.filter(t=>t.k==k),b=elt('button','ligne'+(parcSel.has(k)?' on':''));b.type='button';b.setAttribute('aria-pressed',parcSel.has(k)?'true':'false');
+   const lvMin=Math.min(...l.map(t=>t.lv)),ic=towerIcon(k,lvMin),nv=elt('span','nv'),q=l.filter(t=>viseFile(t)>t.lv).length;
+   for(let v=1;v<=5;v++){const m=l.filter(t=>t.lv==v).length;if(m)nv.appendChild(elt('i',v==5?'max':'',(v==5?'max':'niv. '+v)+' ×'+m))}
+   const tx=elt('span','tx');tx.append(elt('b','',TW[k].n+' ×'+l.length),nv);
+   b.append(elt('span','coche',parcSel.has(k)?'✓':''),ic,tx);if(q)b.appendChild(elt('span','enfile','⏫ '+q));
+   if(l.every(t=>t.lv>=5)){b.disabled=true;b.title='Toutes au niveau maximum'}
+   b.onclick=()=>{parcSel.has(k)?parcSel.delete(k):parcSel.add(k);sfx('tap');majParc()};li.appendChild(b);icone3D(ic,'tour',k,56,46)}
+  p.appendChild(li);
+  const nv=elt('div','niv');nv.appendChild(elt('span','','Amener au niveau'));
+  for(let v=2;v<=5;v++){const b=elt('button',v==parcNiv?'on':'',String(v));b.type='button';b.setAttribute('aria-pressed',v==parcNiv?'true':'false');b.onclick=()=>{parcNiv=v;sfx('tap');majParc()};nv.appendChild(b)}
+  const tout=elt('button','tout',ks.every(k=>parcSel.has(k))?'Aucune':'Toutes');tout.type='button';
+  tout.onclick=()=>{if(ks.every(k=>parcSel.has(k)))parcSel.clear();else for(const k of ks)parcSel.add(k);sfx('tap');majParc()};nv.appendChild(tout);p.appendChild(nv);
+  const res=elt('div','res');res.id='parcRes';p.appendChild(res);
+  const go=elt('button','go','Ajouter à la file');go.type='button';go.id='parcGo';go.onclick=ajouterFile;p.appendChild(go)}
+ const fi=elt('div','file'),t2=elt('div','tete');t2.append(elt('b','','File d’attente'),elt('span','',FILE.length?FILE.length+(FILE.length>1?' ordres':' ordre'):'vide'));
+ if(FILE.length){const an=elt('button','annuler','Tout annuler');an.type='button';an.onclick=()=>{FILE.length=0;sfx('tap');parcK=''};t2.appendChild(an)}
+ fi.appendChild(t2);
+ if(!FILE.length)fi.appendChild(elt('div','vide','Choisis des tours et un niveau : elles s’amélioreront toutes seules, dès que ton or le permet.'));
+ for(const o of FILE){const l=toursOrdre(o),reste=resteOrdre(o),fait=Math.max(0,o.tot-reste),prix=l.reduce((s,t)=>s+coutVers(t,o.niv),0),r=elt('div','ordre'),ic=towerIcon(o.k,o.niv),tx=elt('span','tx'),bar=elt('span','jauge'),pl=elt('i');
+  pl.style.width=Math.round(100*fait/Math.max(1,o.tot))+'%';bar.appendChild(pl);
+  tx.append(elt('b','',TW[o.k].n+' ×'+l.length+' → niveau '+o.niv),bar,elt('span','',fait+' / '+o.tot+' faites · reste '+prix.toLocaleString('fr-FR')+' or'));
+  const x=elt('button','fermer','×');x.type='button';x.setAttribute('aria-label','Annuler cet ordre');x.title='Annuler (les travaux en cours continuent)';x.onclick=()=>annulerOrdre(o.id);
+  r.append(ic,tx,x);fi.appendChild(r);icone3D(ic,'tour',o.k,56,46)}
+ p.appendChild(fi)}
 /* fiche d'un monstre choisi : PV actuels (ils montent avec le temps de jeu), vitesse, revenu gagné, prix */
 function ficheMonstre(k){const f=$('fiche'),T=CR[k];f.textContent='';f.className='envoyer';f.dataset.mode='envoyer';f.hidden=false;
  const ic=icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1));
@@ -1218,13 +1347,15 @@ $('rotG').onclick=()=>{if(R3D.api){R3D.api.pivoter(-1);vibrer(8);astuce(false)}}
 $('rotD').onclick=()=>{if(R3D.api){R3D.api.pivoter(1);vibrer(8);astuce(false)}};
 /* 2.3 puis 2.15 : panneau des terrains des joueurs, ouvert par le bouton des adversaires.
    Toucher ailleurs le ferme sans poser de tour ; la bannière ramène à son terrain. */
-function cartes(o){const c=$('chips'),cb=$('cartesBtn');c.hidden=!o;cb.classList.toggle('on',o);cb.setAttribute('aria-expanded',o?'true':'false');if(o)astuce(false)}
+function cartes(o){const c=$('chips'),cb=$('cartesBtn');if(o)parc(false);c.hidden=!o;cb.classList.toggle('on',o);cb.setAttribute('aria-expanded',o?'true':'false');if(o)astuce(false)}
 $('cartesBtn').onclick=()=>cartes($('chips').hidden);
+$('parcBtn').onclick=()=>parc($('parc').hidden);
+stage.addEventListener('pointerdown',e=>{if(!$('parc').hidden&&!e.target.closest('#parc,#parcBtn')){parc(false);e.stopPropagation();e.preventDefault()}},true);
 $('banner').onclick=()=>setView(me);
 stage.addEventListener('pointerdown',e=>{if(!$('chips').hidden&&!e.target.closest('#chips,#cartesBtn')){cartes(false);e.stopPropagation();e.preventDefault()}},true);
 /* menu : reprendre, son, vibrations, rappel des gestes, quitter (en deux touchers, pour éviter une erreur) */
 let quitter=0;
-function menu(o){$('menu').hidden=!o;quitter=0;$('mQuitter').textContent='Quitter la partie';if(o){cartes(false);astuce(false);$('mReprendre').focus()}}
+function menu(o){$('menu').hidden=!o;quitter=0;$('mQuitter').textContent='Quitter la partie';if(o){cartes(false);parc(false);astuce(false);$('mReprendre').focus()}}
 $('menuBtn').onclick=()=>menu(true);$('mReprendre').onclick=()=>menu(false);
 $('menu').addEventListener('click',e=>{if(e.target===e.currentTarget)menu(false)});
 $('snd').onclick=()=>{muted=!muted;$('snd').textContent='Son : '+(muted?'coupé':'activé');audio();if(muted)finSons();else{sfx('income');if(started&&!over&&window.SON){SON.ambiance('amb-hiver',.35);SON.ambiance('amb-bataille',.14)}}};
@@ -1376,6 +1507,7 @@ function loop(now){neigeAccueil(now);const dt=Math.min(.05,Math.max(0,(now-last)
   playEvents();ecouterSons();
   if(pick){const c=pick.b>0?Math.ceil(pick.b):0;if(c!==pickB){pickB=c;render()}}
   if(lot){const n0=lot.n,t0=lot.t.length;if(!majLot()||lot.n!==n0||lot.t.length!==t0)render()}
+  fileTick(dt);majParc();majFileN();
   departTick();dessinerVue(now/1000);if(!$('chips').hidden)for(const b of B){drawMini(b,b.ui.g,MINI);if(b===VB()&&R3D.api)cadreMini(b.ui.g)}hud()}
  requestAnimationFrame(loop)}
 
