@@ -72,7 +72,7 @@ export function creer(J) {
   const cam = new THREE.PerspectiveCamera(FOV, 1, .5, 400);
   /* fx, fz : point regardé ; az : angle actuel (azC : visé, par huitièmes de tour) ; vx, vz : élan ; w, h : taille du canevas ;
      haut, bas : bandes couvertes par le bandeau et le dock (le point regardé est au centre de ce qui reste) */
-  const V = {fx: C / 2, fz: R / 2 + 1.5, az: 0, azC: 0, vx: 0, vz: 0, w: 1, h: 1, haut: 0, bas: 0};
+  const V = {fx: C / 2, fz: R / 2 + 1.5, az: 0, azC: 0, vx: 0, vz: 0, w: 1, h: 1, haut: 0, bas: 0, cx: null, cz: null};
   /* 2.26 : le point regardé reste à au moins MARGE cases des bords du terrain : on ne voit jamais plus d'environ une case et demie
      de paysage sur le côté (avant : jusqu'à la moitié de l'écran) */
   const MARGE = Math.min(C / 2, Math.max(1, COLONNES / 2 - 1.2));
@@ -101,7 +101,7 @@ export function creer(J) {
   }
   /* le doigt passe de (x0, y0) à (x1, y1) : la caméra suit pour garder le même point du sol sous le doigt. Renvoie le déplacement. */
   function glisser(x0, y0, x1, y1) {
-    const a = sol(x0, y0), b = sol(x1, y1), ax = V.fx, az = V.fz; let dx, dz;
+    V.cx = null; const a = sol(x0, y0), b = sol(x1, y1), ax = V.fx, az = V.fz; let dx, dz;
     if (a && b && Math.hypot(a.x - V.fx, a.z - V.fz) < 40) { dx = a.x - b.x; dz = a.z - b.z }
     else { const k = echelle(V.fx, V.fz) || 30, k2 = k * Math.sin(ELEV), c = Math.cos(V.az), s = Math.sin(V.az), du = (x1 - x0) / k, dv = (y1 - y0) / k2;
       dx = -du * c - dv * s; dz = du * s - dv * c }
@@ -111,13 +111,20 @@ export function creer(J) {
   /* un huitième de tour à gauche (-1) ou à droite (+1), animé dans dessiner */
   function pivoter(sens) { V.azC += sens * Math.PI / 4 }
   /* élan au lâcher (cases par seconde), amorti dans dessiner */
-  function lancer(vx, vz) { const n = Math.hypot(vx, vz), m = n > 14 ? 14 / n : 1; V.vx = vx * m; V.vz = vz * m }
-  function viser(x, z) { V.fx = x; V.fz = z; V.vx = V.vz = 0; borner(); placerCamera() }
+  function lancer(vx, vz) { const n = Math.hypot(vx, vz), m = n > 14 ? 14 / n : 1; V.vx = vx * m; V.vz = vz * m; V.cx = null }
+  function viser(x, z) { V.fx = x; V.fz = z; V.vx = V.vz = 0; V.cx = null; borner(); placerCamera() }
+  /* 2.34 : fait glisser la vue, en douceur, pour que le point (x, z) du sol arrive au pixel (px, py) du canevas
+     (par exemple une tour choisie qui serait cachée par la fiche). Glisser le doigt ou viser annule le mouvement. */
+  function amener(x, z, px, py) {
+    const g = sol(px, py); if (!g) return;
+    V.cx = Math.min(C - MARGE, Math.max(MARGE, V.fx + x - g.x)); V.cz = Math.min(R - MARGE, Math.max(MARGE, V.fz + z - g.z)); V.vx = V.vz = 0;
+  }
   /* coins de la zone libre, au sol (pour le cadre de la vignette) */
   const empreinte = () => [[0, V.haut], [V.w, V.haut], [V.w, V.h - V.bas], [0, V.h - V.bas]].map(([x, y]) => sol(x, y, true));
   function bougerCamera(dt) {
     V.az = Math.abs(V.azC - V.az) > 1e-3 ? V.az + (V.azC - V.az) * Math.min(1, dt * 8) : V.azC;
-    if (Math.hypot(V.vx, V.vz) > .05) { V.fx += V.vx * dt; V.fz += V.vz * dt; borner(); const f = Math.exp(-dt * 4); V.vx *= f; V.vz *= f } else V.vx = V.vz = 0;
+    if (V.cx != null) { const f = Math.min(1, dt * 7); V.fx += (V.cx - V.fx) * f; V.fz += (V.cz - V.fz) * f; if (Math.hypot(V.cx - V.fx, V.cz - V.fz) < .01) { V.fx = V.cx; V.fz = V.cz; V.cx = null } }
+    else if (Math.hypot(V.vx, V.vz) > .05) { V.fx += V.vx * dt; V.fz += V.vz * dt; borner(); const f = Math.exp(-dt * 4); V.vx *= f; V.vz *= f } else V.vx = V.vz = 0;
     placerCamera();
   }
 
@@ -633,5 +640,5 @@ export function creer(J) {
     portee: portee.visible, dessins: renderer.info.render.calls, triangles: renderer.info.render.triangles,
     vue: {fx: V.fx, fz: V.fz, az: Math.round(V.azC / (Math.PI / 4)), perspective: cam.isPerspectiveCamera}});
   return {canvas, dessiner, taille, versEcran, precharger, hauteurMonstre: HAUT, vignette, renderer, etat,
-    cadre, projeter, echelle, sol, glisser, pivoter, lancer, viser, empreinte};
+    cadre, projeter, echelle, sol, glisser, pivoter, lancer, viser, amener, empreinte};
 }

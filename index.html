@@ -70,7 +70,8 @@ body.r2d .fleche{display:none}
 #fiche .tt span{font-size:11.5px;color:var(--ice)}
 #fiche .st{display:flex;flex-wrap:wrap;gap:2px 10px;margin-top:1px}
 #fiche .st i{font-style:normal;color:var(--ink);font-weight:700}
-#fiche .ex{grid-column:1/-1;font-size:11.5px}
+#fiche .ex{grid-column:1/-1;font-size:11.5px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+#fiche .ex.ouvert{white-space:normal}
 #fiche .ex:empty{display:none}
 #fiche .next{color:#a8e07a}
 #fiche .chantier{color:#ffc95e;font-weight:700}
@@ -1051,6 +1052,7 @@ function teteFiche(f,ic,nom,sous,stats){const txt=elt('div','txt'),tt=elt('div',
  for(const [lbl,val] of stats){const e=elt('span');e.append(lbl+' ',elt('i','',val));st.appendChild(e)}txt.append(tt,st);
  const x=elt('button','fermer','×');x.type='button';x.setAttribute('aria-label','Fermer la fiche');x.onclick=()=>{pick=null;lot=null;sel=null;mon=null;projet=null;render()};f.append(ic,txt,x)}
 const aideFiche=(geste,txt)=>{const d=elt('div','aide');d.append(elt('i','',geste),txt);return d};
+let detailsOuverts=false;
 function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textContent='';f.className='';f.dataset.mode=mode;f.hidden=false;
  const ic=towerIcon(k,lv),stats=[['⚔ Dégâts/s',dps(k,lv)],['◎ Portée',fr(rng({k,lv}))],['Cibles',T.gr?'sol uniquement':'sol et air']];if(!t)stats.push(['Prix',T.c+' or']);
  teteFiche(f,ic,T.n,BASE_TW[T.skin].n+' · '+T.role+(t?' · niveau '+lv+'/5':''),stats);icone3D(ic,'tour',k,56,46);
@@ -1059,6 +1061,8 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  if(t&&lv<5&&!(t.b>0)&&!explore)part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+(ralentit(T,lv+1)?', ❄ −'+pr(ralentit(T,lv+1).p)+' · '+fd(ralentit(T,lv+1).d)+' s'+(T.fsp?' · zone '+fr(ralentit(T,lv+1).r):''):'')+' ('+fr(btJ(upCost(t)))+' s de travaux)','next');
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
  const bf=bonusFaction(T.faction);if(bf)part(bf);
+ /* 2.34 : les détails tiennent sur une ligne (la fiche cachait trop de terrain) ; la toucher la déplie ou la replie */
+ ex.classList.toggle('ouvert',detailsOuverts);ex.onclick=()=>{detailsOuverts=!detailsOuverts;ex.classList.toggle('ouvert',detailsOuverts)};
  f.appendChild(ex);
  /* 2.31 : pendant l'aperçu d'une construction, la fiche se réduit (sans la ligne de détails) et porte la consigne,
     à la place de l'ancienne bulle « Touchez encore la case… » posée au milieu du terrain */
@@ -1099,7 +1103,16 @@ function ficheMonstre(k){const f=$('fiche'),T=CR[k];f.textContent='';f.className
  teteFiche(f,ic,T.n,{n:'Sol',f:'Volant',s:'Spécial'}[T.cat]+(T.tag?' · '+T.tag:'')+' · palier '+T.t,[['PV',Math.round(T.hp*(1+time/200)*HPK)],['Vitesse',fr(T.s)],['Revenu','+'+T.i],['Prix',T.c+' or']]);icone3D(ic,'monstre',k,40,40);
  f.appendChild(aideFiche('1×','Chaque toucher sur la carte envoie '+GROUP+' × '+T.n+' à chaque adversaire et augmente ton revenu'))}
 function cacherFiche(){const f=$('fiche');f.hidden=true;f.textContent='';f.dataset.mode=''}
-function render(){const sx=bar.scrollLeft,tb=tab;requestAnimationFrame(()=>{if(tab==tb)bar.scrollLeft=sx});bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!VB().t.includes(pick))pick=null;
+/* 2.34 : la tour choisie (ou l'aperçu de construction) ne doit pas rester cachée sous la fiche ou le bandeau :
+   en 3D, la vue glisse juste assez pour la montrer au-dessus de la fiche. Seulement quand le choix change. */
+let vuCible='';
+function garderVisible(){const c=lot?lot.a:pick||projet,cle=c?(lot?'L':pick?'P':'A')+c.x+','+c.y+','+view:'';if(cle==vuCible)return;vuCible=cle;
+ if(!c||!R3D.api||explore&&!pick)return;const r=main.getBoundingClientRect(),p=caseVersEcran(c.x,c.y),f=$('fiche'),
+  bas=(f.hidden?$('console'):f).getBoundingClientRect().top-28,haut=$('cartesBtn').getBoundingClientRect().bottom+52;
+ /* 64 px sur les côtés : hors des flèches de rotation, posées juste au-dessus de la fiche */
+ let px=Math.min(r.right-64,Math.max(r.left+64,p.x)),py=Math.min(bas,Math.max(haut,p.y));if(bas<haut)py=(bas+haut)/2;
+ if(Math.abs(px-p.x)>1||Math.abs(py-p.y)>1)R3D.api.amener(c.x+.5,c.y+.5,px-r.left,py-r.top)}
+function render(){const sx=bar.scrollLeft,tb=tab;requestAnimationFrame(()=>{if(tab==tb)bar.scrollLeft=sx;garderVisible()});bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!VB().t.includes(pick))pick=null;
  if(lot&&(pick!==lot.a||!majLot()))lot=null;
  if(lot)ficheLot();else if(pick)remplirFiche('tour',pick.k,pick);else if(tab=='t'&&sel!=null)remplirFiche('construire',sel);else if(tab!='t'&&mon!=null)ficheMonstre(mon);else cacherFiche();
  const pal=$('paliers');pal.hidden=tab=='t';pal.textContent='';

@@ -9,7 +9,7 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | Statut | Domaine | Idée |
 |---|---|---|
 | ✅ | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. *Fait en 2.32 : molette et glisser à la souris.* |
-| ✅ | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». *Fait en 2.32 : plus de bulle au milieu du terrain, fiche réduite pendant l'aperçu.* |
+| ✅ | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». *Fait en 2.32 : plus de bulle au milieu du terrain, fiche réduite pendant l'aperçu ; en 2.34 : détails de la fiche sur une ligne, et la vue glisse pour que la tour choisie ne soit jamais cachée par la fiche.* |
 | ✅ | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
 | ✅ | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
 | ✅ | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
@@ -82,6 +82,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ### 2.34 — terrain dégagé — 2026-11-19
 - Flying monsters are half the size of the other monsters in 3D (×0.5 instead of ×0.65), so they hide less of the field. No rule change.
+- Less cluttered mobile display: the details line of the info panel fits on one line (tap it to unfold), and in 3D, when the chosen tower (or batch, or build preview) is hidden by the info panel or the top bar, the view glides just enough to show it above the panel. Interface only.
 
 ### 2.33 — ia plus stratège — 2026-11-19
 - AI builds more towers and upgrades less while its maze is unfinished (random upgrades from 12 towers at 25 %, 50 % from 28, instead of 10 towers at 35 %, 60 % from 24). Arena: +0.18 and +0.27 on two seed sets, neutral in long games. Other tweaks tried and dropped (earlier tiers and bosses, sending thresholds, a 20,000-gold wave cap, defence share, estimate caution, more upgrades).
