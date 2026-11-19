@@ -645,6 +645,13 @@ function chantier(g,o,s,t){const x=(o.x+.5)*s,y=(o.y+.5)*s,p=1-o.b/(o.bt||1);g.s
  g.save();const w=s*.7,h=Math.max(3,s*.09),bx=x-w/2,by=y+s*.38;g.fillStyle='rgba(20,16,10,.75)';g.fillRect(bx-1,by-1,w+2,h+2);g.fillStyle='#ffc95e';g.fillRect(bx,by,w*p,h);g.restore()}
 function drawTower(g,k,x,y,s,a,t,lv,sw,stun){drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun)}
 function drawProj(g,p,s){const x=p.x*s,y=p.y*s,skin=TW[p.k].skin;g.save();
+ // Traînée courte et directionnelle, lisible sans masquer les ennemis.
+ const dx=(p.sx??p.x)-p.x,dy=(p.sy??p.y)-p.y,dist=Math.hypot(dx,dy);
+ if(dist>.01){const densite=VB().pr.length,taille=densite>35?.18:densite>18?.32:.52;
+  g.beginPath();g.moveTo(x,y);g.lineTo(x+dx/dist*Math.min(taille,dist)*s,y+dy/dist*Math.min(taille,dist)*s);
+  g.strokeStyle=['#f3d18b','#f7a65b','#8bd9ff','#d6a5ff','#ff9b6c'][TW[p.k].faction]||'#ffffff';
+  g.globalAlpha=densite>35?.35:.65;g.lineWidth=Math.max(1,s*.045);g.stroke();g.globalAlpha=1;
+ }
  if(skin==0){g.translate(x,y);g.rotate(p.a);g.lineCap='round';g.strokeStyle='#5a3a1c';g.lineWidth=Math.max(1.5,s*.05);g.beginPath();g.moveTo(-s*.2,0);g.lineTo(s*.1,0);g.stroke();
   g.fillStyle='#ececec';g.beginPath();g.moveTo(s*.21,0);g.lineTo(s*.07,-s*.07);g.lineTo(s*.07,s*.07);g.fill();
   g.strokeStyle='#fff';g.beginPath();g.moveTo(-s*.2,0);g.lineTo(-s*.28,-s*.06);g.moveTo(-s*.2,0);g.lineTo(-s*.28,s*.06);g.stroke()}
