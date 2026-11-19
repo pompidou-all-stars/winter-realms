@@ -64,6 +64,10 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.28 — mini-cartes d'hiver — 2026-11-19
+- The opponents panel (« Adversaires ») gets winter mini-maps: snow and grid like the 3D view, the monsters' path as a navy dotted line, the portal and a small castle with the player's flag. Towers are small tiles in the colour of their role (green archer, red guard, blue frost, copper cannon, orange flames, purple mage), so you can read an opponent's defence at a glance; monsters are outlined (red on the ground, white in the air). Slightly bigger mini-maps with a silver frame; lives with a heart and income with the gold coin.
+- Interface only (`sim.js` untouched, no server redeploy).
+
 ### 2.27 — sons dark fantasy — 2026-11-18
 - Darker, more warlike sound effects: monster death cries and boss arrivals move from cartoon to dark fantasy; tower shots, explosions and sabotage are punchier. 45 prompts rewritten, 124 files regenerated locally. Voices, music and interface sounds are unchanged.
 
