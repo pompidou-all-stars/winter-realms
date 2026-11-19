@@ -23,6 +23,18 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | 💡 | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. |
 | 🧭 | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. |
 | 🧭 | ✨ Palier 3 | **Pouvoirs magiques payants** : renforcements sur son propre terrain, ou malédictions à lancer sur le terrain d'un adversaire. |
+| 💡 | 🧊 Modèles 3D | **Refactorisation des modèles 3D**. |
+| 💡 | 🧭 Interface | **Menu de navigation** : lancement d'une partie sur plusieurs écrans successifs. |
+| 💡 | 🛡️ Factions | **Gameplay unique par race** : chaque race se joue différemment. |
+| 💡 | 🌍 Langues | **Version anglaise** (localisation). |
+| 💡 | 📊 Analytique | **Analytique** : mesurer comment le jeu est utilisé. |
+| 💡 | 🌐 Site web | **Site web propre** autour du jeu, optimisé pour les moteurs de recherche (SEO) et les moteurs d'IA (GEO). |
+| 💡 | 🎓 Tutoriel | **Tutoriel au lancement** du jeu. |
+| 💡 | 🔑 Compte | **Connexion** avec Google, ou création d'un compte. |
+| 💡 | 🛒 Boutique | **Boutique** (store). |
+| 💡 | 📣 Promotion | **Campagnes de promotion** : visuels de campagne, agent pour Reddit et jeuxvideo.com. |
+| 💡 | 💳 Paiement | **Système de paiement**. |
+| 💡 | 💰 Monétisation | **Monétisation**, une fois les idées précédentes en place. |
 
 A browser tower-wars game: the game itself is `index.html` (interface, drawing, sounds) plus `sim.js` (the simulation, also used by the multiplayer server). No build step, no dependencies.
 
@@ -69,6 +81,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.31 — équilibrage des tours — 2026-11-19
+- Roadmap: the designer's ideas added to the roadmap table (3D model refactoring, multi-screen launch menu, unique gameplay per race, English version, analytics, website with SEO and GEO, launch tutorial, Google login or account, store, promotion campaigns, payment, then monetization). No game change.
 - Roadmap: five new ideas (AI mazes where every tower can shoot, cluttered mobile display, batch upgrades, more compact flying units, waypoint for monsters). No game change.
 - Tooling: the tower test bench now runs on all CPU cores with identical results (a comparison with `main` takes about 3 min instead of 20–25). It stays out of the GitHub checks.
 - Frost towers deal 2 base damage instead of 4 (half as strong); their slow is unchanged, since it is what makes them strong.
