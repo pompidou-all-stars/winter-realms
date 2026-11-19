@@ -483,7 +483,14 @@ export function creer(J) {
     if (skin == 0) { r.add(new THREE.Mesh(G.fleche, M.bois), new THREE.Mesh(G.pointe, M.blanc)) }
     else if (skin == 1) { const m = new THREE.Mesh(G.sphere, M.fer); m.scale.setScalar(.08); m.castShadow = true; r.add(m) }
     else { const m = new THREE.Mesh(G.octa, skin == 2 ? M.givre : M.arcane); m.scale.set(.07, .07, .12); r.add(m) }
-    scene.add(r); return {r, skin};
+    // Trace directionnelle : permet de remonter visuellement du projectile à sa tour.
+    // Un seul segment par projectile, sans particules ni allocations par image.
+    const couleurs = ['#f3d18b','#f7a65b','#8bd9ff','#d6a5ff','#ff9b6c'];
+    const trace = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(), new THREE.Vector3()
+    ]), new THREE.LineBasicMaterial({color: couleurs[TW[p.k].faction] || '#ffffff', transparent: true, opacity: .65, depthWrite: false}));
+    r.add(trace);
+    scene.add(r); return {r, skin, trace};
   }
   function majProj(Pj, p) {
     const q = Math.max(0, Math.min(1, 1 - Math.hypot(p.tx - p.x, p.ty - p.y) / (p.tot || 1)));
@@ -491,6 +498,18 @@ export function creer(J) {
     Pj.r.position.set(p.x, h, p.y + .3 * (1 - q));
     Pj.r.rotation.y = Math.atan2(p.tx - p.x, p.ty - p.y);
     if (Pj.skin >= 2) Pj.r.rotation.z += .2;
+    // Segment local, orienté vers la position de tir initiale ; raccourci en mêlée dense.
+    const densite = projs.size;
+    const longueur = densite > 35 ? .18 : densite > 18 ? .32 : .52;
+    const depart = new THREE.Vector3(p.x, h, p.y + .3 * (1 - q));
+    const origine = new THREE.Vector3(p.sx ?? p.x, h, p.sy ?? p.y);
+    const direction = origine.sub(depart);
+    if (direction.lengthSq() > 1e-6) direction.setLength(Math.min(longueur, direction.length()));
+    const positions = Pj.trace.geometry.attributes.position;
+    positions.setXYZ(0, 0, 0, 0);
+    positions.setXYZ(1, direction.x, direction.y, direction.z);
+    positions.needsUpdate = true;
+    Pj.trace.material.opacity = densite > 35 ? .35 : .65;
   }
 
   /* ---------- effets ---------- */
