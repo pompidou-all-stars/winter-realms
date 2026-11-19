@@ -362,12 +362,11 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
  <p id="sub">L'hiver éternel s'abat sur les royaumes du Nord. Fortifie ton domaine et lance tes armées contre trois seigneurs rivaux : le dernier debout régnera sur les terres gelées.</p>
  <ul class="regles"><li><i>🏰</i><span><b>Bâtis</b>des tours pour tracer ton labyrinthe</span></li><li><i>⚔️</i><span><b>Envoie</b>des monstres : chaque vague augmente ton revenu</span></li><li><i>❤️</i><span><b>Résiste</b>40 vies, pas une de plus</span></li></ul></div>
  <div id="classPick"><h2>Choisis ta faction</h2><div id="factions">
- <button type="button" data-faction="0" aria-pressed="false" onclick="window.chooseFaction(0)"><span class="ficon">🛡️</span><span><strong>Alliance</strong><small>Défense équilibrée · portée et anti-aérien</small></span></button>
- <button type="button" data-faction="1" aria-pressed="false" onclick="window.chooseFaction(1)"><span class="ficon">🪓</span><span><strong>Horde</strong><small>Agressivité · exécution des ennemis affaiblis</small></span></button>
- <button type="button" data-faction="2" aria-pressed="false" onclick="window.chooseFaction(2)"><span class="ficon">🌿</span><span><strong>Peuples sylvestres</strong><small>Contrôle · racines et ralentissements</small></span></button>
- <button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">⚒️</span><span><strong>Clans nains</strong><small>Artillerie · perforation des armures</small></span></button>
- <button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">☠️</span><span><strong>Légion des ombres</strong><small>Malédictions · amplification des dégâts</small></span></button>
- </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><h2 id="difficultyLabel" hidden>Lance la bataille</h2><div id="lv"><button id="go0" disabled>Normal<small>IA à revenu égal</small></button><button id="go1" disabled>Difficile<small>IA : +25 % de revenu</small></button><button id="go2" disabled>Brutal<small>IA : +50 % de revenu</small></button></div>
+ <button type="button" data-faction="0" aria-pressed="false"><span class="ficon">🏹</span><span><strong>Humains</strong><small>Archers et chevaliers · portée et anti-aérien</small></span></button>
+ <button type="button" data-faction="1" aria-pressed="false"><span class="ficon">🤖</span><span><strong>Robots</strong><small>Drones et automates · surcharge</small></span></button>
+ <button type="button" data-faction="2" aria-pressed="false"><span class="ficon">🐉</span><span><strong>Créatures</strong><small>Prédateurs et monstres · instinct</small></span></button>
+ <button type="button" data-faction="3" aria-pressed="false"><span class="ficon">🌿</span><span><strong>Nature</strong><small>Arbres et dryades · racines</small></span></button>
+ <button type="button" data-faction="4" aria-pressed="false"><span class="ficon">🔮</span><span><strong>Magiques</strong><small>Mages et esprits · malédictions</small></span></button> </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><h2 id="difficultyLabel" hidden>Lance la bataille</h2><div id="lv"><button id="go0" disabled>Normal<small>IA à revenu égal</small></button><button id="go1" disabled>Difficile<small>IA : +25 % de revenu</small></button><button id="go2" disabled>Brutal<small>IA : +50 % de revenu</small></button></div>
  <p id="hint">Carte de 13 × 17 cases. En Difficile et en Brutal, tes chantiers prennent aussi plus de temps.</p>
  <div id="online"><h2>Jouer entre amis</h2><input id="pname" maxlength="16" placeholder="Ton pseudo" autocomplete="nickname">
   <div class="orow"><button id="mkRoom" type="button">Créer un salon</button><input id="rcode" maxlength="4" placeholder="CODE" autocapitalize="characters"><button id="joinRoom" type="button">Rejoindre</button></div></div>
@@ -1049,9 +1048,8 @@ function selectFaction(i){
  $('hint').textContent='Faction sélectionnée : '+FACTIONS[i].name+'. Choisis ensuite la difficulté pour commencer.';
  if(NET.on)NET.send({t:'faction',f:i});
 }
-// Sélection redondante et robuste : onclick inline + délégation click.
+// Un seul gestionnaire délégué évite les doubles sélections et envois réseau.
 // Le clic natif fonctionne au doigt, à la souris et dans les navigateurs intégrés iOS.
-window.chooseFaction=selectFaction;
 factionBox.addEventListener('click',e=>{
  const b=e.target.closest('button[data-faction]');
  if(!b||!factionBox.contains(b))return;
