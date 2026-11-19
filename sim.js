@@ -402,19 +402,48 @@ function aiDefend(A){const M=mzStep(A,INF),time=A.G.time,bud=Math.min(A.dp,A.gol
  /* construction : la prochaine case du plan ; si elle est occupée par un monstre, on essaie les suivantes, mais on n'en saute pas une faute d'or */
  else for(const i of todo.slice(0,4)){const k=mzKind(A,i,n,bud,thr,fs);if(k<0)break;if(A.place(i%C,i/C|0,k)){ok=true;break}}
  A.dp-=g0-A.gold;return ok}
+/* --- 2.32 : ce que chaque adversaire peut encaisser ---
+   trajet(b) : points tous les PAS_TR case le long du chemin réel des monstres au sol (en cache tant que le labyrinthe ne change pas).
+   encaisse(b, k, m) : PV qu'une foule du monstre k (PV × m) perd en traversant le terrain b : pour chaque tour, dégâts par seconde contre ce monstre
+   (armure, vol, anti-magie, invisibilité, bonus de faction), × temps passé à portée, × nombre de cibles touchées (zone). Une estimation, pas une simulation. */
+const PAS_TR=.5,ZONE=[1,2.5,2,1,1,3],ENC=1.5,VAGUE_HZ=[.4,.25,.1];
+function trajet(b){if(b._trD===b.d)return b._tr;const ch=chemin(b),out=[];
+ for(let n=1;n<ch.length;n++){const[a,c]=ch[n-1],[d,e]=ch[n],k=Math.max(1,Math.round(Math.hypot(d-a,e-c)/PAS_TR));for(let q=0;q<k;q++)out.push([a+(d-a)*q/k,c+(e-c)*q/k])}
+ b._trD=b.d;return b._tr=out}
+/* profil de défense d'un terrain (en cache tant que ses tours et son chemin ne changent pas) : pour chaque tour active, dégâts d'un coup et longueur
+   de chemin à portée (au sol, Lg ; couloir des volants, La) ; part du chemin à portée d'un Mage (détection) et d'un Givre (ralentissement) */
+function profil(b){let h=b.t.length;for(const t of b.t)h=(h*31+t.k*7+t.lv*131+(t.b>0?3:0)+t.x*17+t.y*19)%1e9;if(b._prD===b.d&&b._prH===h)return b._pr;
+ const P=trajet(b),act=b.t.filter(t=>!(t.b>0)),tw=[];
+ for(const t of act){const r=rng(t);let Lg=0;for(const[x,y]of P)if(Math.hypot(x-t.x,y-t.y)<=r)Lg+=PAS_TR;tw.push({W:TW[t.k],d:dmg(t),Lg,La:air(t,r)})}
+ const part=f=>{const ts=act.filter(t=>f(TW[t.k]));let n=0;for(const[x,y]of P)if(ts.some(t=>Math.hypot(x-t.x,y-t.y)<=rng(t)))n++;
+  return[P.length?n/P.length:0,Math.min(1,ts.reduce((s,t)=>s+air(t,rng(t)),0)/16)]};
+ b._prD=b.d;b._prH=h;return b._pr={tw,mg:part(W=>W.mg),gel:part(W=>W.fsp)}}
+function encaisse(b,k,m){const T=CR[k],p=profil(b),fly=T.fly?1:0,arm=(T.arm||0)*m;
+ const vu=T.inv?p.mg[fly]:1,v=T.s*(T.acc?1.6:1)*(1-(T.mi?0:.3*p.gel[fly]));let K=0;
+ for(const{W,d:d0,Lg,La}of p.tw){if((fly&&W.gr)||(T.mi&&W.mag))continue;const L=fly?La:Lg;if(!L)continue;
+  let d=d0*(fly&&W.airBonus?W.airBonus:1)*(W.mark?1.07:1)*(W.execute?1.1:1);if(arm)d=Math.max(d*.2,d-arm*(1-(W.pierce||0)));
+  K+=d/W.cd*ZONE[W.skin]*(L/v+1)}
+ return K*vu}
+/* longueur du couloir des volants (colonne 6, de la ligne 0 à la ligne 16) à portée r de la tour t */
+function air(t,r){const dx=Math.abs(t.x-EX[0]);if(dx>=r)return 0;const h=Math.sqrt(r*r-dx*dx);return Math.max(0,Math.min(EX[1],t.y+h)-Math.max(0,t.y-h))}
 /* attaque : elle empile plusieurs revenus puis lâche une grosse vague, composée selon les faiblesses des adversaires */
 function aiAttack(A){const time=A.G.time;let bud=Math.min(A.ap,A.gold),sent=false;if(time<GRACE||bud<Math.min(6000,Math.max(60,A.inc*3)))return false;
  /* 2.13 : ouvre le palier suivant quand sa réserve d'attaque le permet (palier 2 dès 2:30, palier 3 dès 7:00) */
  const pc=PAL_C[A.tier];if(pc!==undefined&&time>=(A.tier==1?150:420)&&bud>=pc*1.5){const g=A.gold;if(A.G.unlock(A)){bud-=g-A.gold;A.ap-=g-A.gold}}
- const fo=A.G.foes(A),share=ks=>{let a=0,b=0;for(const o of fo)for(const t of o.t){b+=t.inv;if(ks.includes(t.k))a+=t.inv}return b?a/b:0};
- const weakAir=fo.some(b=>airInv(b)<50+time*1.5),noMage=fo.some(b=>!mages(b)),phys=share(fo.flatMap(b=>[b.classId*10,b.classId*10+4])),magic=share(fo.flatMap(b=>[b.classId*10+2,b.classId*10+5]));
- /* dans chaque liste, le monstre le plus cher que la réserve paie, parmi les paliers ouverts */
+ const fo=A.G.foes(A),m=1+time/200;
+ /* dans chaque famille, le monstre le plus cher que la réserve paie, parmi les paliers ouverts */
  const ok=k=>bud>=CR[k].c&&CR[k].t<=A.tier,top=l=>l.filter(ok).pop(),go=k=>{const g=A.gold;if(!A.G.send(A,k))return false;sent=true;bud-=g-A.gold;A.ap-=g-A.gold;return true};
- if(bud>=500)for(const l of[HEALS,AURAS]){const k=top(l);if(k!==undefined&&Math.random()<.6)go(k)}
- for(let n=0;n<12;n++){const opts=[[top(NORM),5],[top(FLY),weakAir?4:1],[top(SPECS),noMage?4:.8],[top(ARMS),phys>.45?2.5:.7],[top(MIS),magic>.3?2.5:.6],[top(SPLITS),.7],[top(ACCS),.7],[top(STUNS),1]].filter(o=>o[0]!==undefined);
-  if(!opts.length)break;let r=Math.random()*opts.reduce((s,o)=>s+o[1],0),k=opts[0][0];for(const o of opts){r-=o[1];if(r<=0){k=o[0];break}}
-  if(!go(k))break}
- const boss=top(BOSS);if(boss!==undefined&&time>(CR[boss].t==1?240:420)&&Math.random()<.28)go(boss);
+ /* 2.32 : pour chaque famille, combien de monstres passeraient chez chaque adversaire si toute la réserve y allait (encaisse, ×ENC car l'estimation est prudente) ;
+    on retient la famille qui fait perdre le plus de vies (avec du hasard : ±VAGUE_HZ selon la difficulté, plus en Normal), avec un bonus si un adversaire serait éliminé.
+    Si aucune ne passe, la vague sert l'économie : monstres au sol, ceux qui rapportent le plus de revenu. */
+ const cands=[...new Set([NORM,FLY,SPECS,ARMS,MIS,SPLITS,ACCS,STUNS].map(top).filter(k=>k!==undefined))],boss=top(BOSS);
+ if(boss!==undefined&&time>(CR[boss].t==1?240:420))cands.push(boss);
+ const vies=k=>{const T=CR[k],hp=T.hp*m*HPK,H=Math.floor(bud/T.c)*GROUP*hp;let s=0;for(const b of fo){const l=Math.max(0,H-ENC*encaisse(b,k,m))/hp;s+=Math.min(l,b.lives)+(l>=b.lives?3:0)}return s};
+ const hz=VAGUE_HZ[A.G.LV|0]||VAGUE_HZ[0];let best=top(NORM),bs=0;for(const k of cands){const s=vies(k)*(1-hz+2*hz*Math.random());if(s>bs){bs=s;best=k}}
+ if(best===undefined)return false;
+ /* soigneur et hâte avec une vague au sol assez grosse */
+ if(bud>=500&&!CR[best].fly)for(const l of[HEALS,AURAS]){const k=top(l);if(k!==undefined&&bud>=CR[k].c*4&&Math.random()<.6)go(k)}
+ for(let n=0;n<12;n++){const k=ok(best)?best:top(NORM);if(k===undefined||!go(k))break}
  return sent}
 function aiAct(A){const time=A.G.time,gain=A.gold-A.lastG,danger=A.hurt>0,need=(A.G.foes(A).reduce((s,b)=>s+b.inc,0)*4+20)*(1+time/400);
  const f=danger||A.pen>.85?.8:A.pen>.65?.55:invest(A)<need*.35?.5:A.pen>.45?.3:.15;

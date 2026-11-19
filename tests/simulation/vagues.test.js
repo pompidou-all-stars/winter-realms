@@ -60,3 +60,17 @@ test('IA : quand son plan est construit et toutes ses tours au niveau 5, son or 
  assert.equal(b.t.length,M.ord.length,'plan complet');b.dp=5000;b.ap=0;b.gold=1000;b.lastG=1000;G.time=60;S.aiAct(b);S.aiAct(b);
  assert.equal(b.dp,0,'réserve de défense vidée');assert.ok(b.ap>0,'réserve d\'attaque remplie');
 });
+/* depuis la 2.32 : vagues composées selon ce que chaque adversaire peut encaisser */
+const murCanons=(b,k)=>{b.gold=1e6;for(let x=0;x<12;x++)b.place(x,8,k);for(let x=1;x<13;x++)b.place(x,4,k);for(const t of b.t)t.b=0};
+test('Estimation des défenses : un volant ne craint pas les Canons, un invisible rien sans Mage, un anti-magie rien contre les Mages',()=>{
+ const G=partie(S),b=G.B[0],vol=S.FLY[1],sol=S.NORM[5],inv=S.SPEC,mi=S.BRK;murCanons(b,b.classId*10+3);
+ assert.ok(S.encaisse(b,sol,1)>0,'les Canons touchent le sol');assert.equal(S.encaisse(b,vol,1),0,'les Canons ne touchent pas les airs');
+ assert.equal(S.encaisse(b,inv,1),0,'invisible sans Mage');
+ const G2=partie(S),b2=G2.B[0];murCanons(b2,b2.classId*10+5);assert.ok(S.encaisse(b2,inv,1)>0,'les Mages révèlent et frappent');assert.equal(S.encaisse(b2,mi,1),0,'anti-magie contre des Mages');
+});
+test('IA : contre des adversaires qui n\'ont que des Canons, elle envoie ce qu\'ils ne peuvent pas toucher (volants ou invisibles)',()=>{
+ const G=partie(S,{ia:[0,1,0,0]});for(const i of [0,2,3])murCanons(G.B[i],G.B[i].classId*10+3);
+ const A=G.B[1];G.time=60;A.gold=A.ap=600;A.inc=10;const env=[];const o=G.send.bind(G);G.send=(f,k)=>{const r=o(f,k);if(r)env.push(k);return r};
+ S.aiAttack(A);assert.ok(env.length>0,'aucun envoi');const or=f=>env.filter(f).reduce((a,k)=>a+S.CR[k].c,0);
+ assert.ok(or(k=>S.CR[k].fly||S.CR[k].inv)>=or(()=>1)/2,env.map(k=>S.CR[k].n).join(', '));
+});
