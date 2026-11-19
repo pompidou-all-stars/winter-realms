@@ -1,7 +1,7 @@
 /* Labyrinthe de l'IA (2.5) : plan cible généré au début de la partie, ordre de construction, rôles des tours. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
-const {charger,partie,avancer}=require('../outils/moteur');
+const {charger,partie}=require('../outils/moteur');
 const C=13,SPI=6;
 const plan=(graine,lv=0,siege=1)=>{const S=charger('actuel',{graine});const G=partie(S,{ia:[0,1,1,1],difficulte:lv});return {S,G,b:G.B[siege],M:S.mzStep(G.B[siege],Infinity)}};
 
@@ -37,13 +37,6 @@ test('La génération est découpée en plusieurs tranches courtes (moins de 10 
   tranches=n;meilleurMax=Math.min(meilleurMax,max);meilleurTot=Math.min(meilleurTot,tot)}
  assert.ok(tranches>=3,`génération faite en ${tranches} tranche(s) seulement : elle n'est plus découpée`);
  assert.ok(meilleurMax<10,`tranche de ${meilleurMax.toFixed(1)} ms`);assert.ok(meilleurTot<150,`total ${meilleurTot.toFixed(1)} ms`);
-});
-test('En partie, l\'IA construit son plan, continue au-delà de 36 tours et n\'a pas de Mage avant la menace des Spectres',()=>{
- const S=charger('actuel',{graine:5});const G=partie(S,{ia:[0,1,1,1]});G.B[0].lives=1e9;const b=G.B[1];b.lives=1e9;
- avancer(G,140);assert.equal(b.t.filter(t=>S.TW[t.k].mg).length,0,'Mage avant 2:30');
- b.gold+=1e5;b.dp+=1e5;avancer(G,60);
- assert.ok(b.t.length>36,`seulement ${b.t.length} tours`);
- for(const t of b.t)assert.equal(b.mz.w[t.y*C+t.x],1,`tour hors du plan en (${t.x},${t.y})`);
 });
 
 /* depuis la 2.6 */

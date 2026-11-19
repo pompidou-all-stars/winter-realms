@@ -31,4 +31,18 @@ function jouer(source,sc,{surEtape,dureeMax=DUREE_MAX}={}){
   invalide:G.B.some(b=>b.cr.some(c=>!isFinite(c.x)||!isFinite(c.y)||!isFinite(c.hp))||!isFinite(b.gold)),
   controles,final:empreinte(etat(G))};
 }
-module.exports={SCENARIOS,COURTS,jouer,etat,empreinte,DT};
+/* 2.34 : plusieurs parties en même temps, chacune dans son propre fil (worker_threads), au plus une par cœur moins un.
+   travaux : [{sc, opts}] ; renvoie une promesse par travail, dans le même ordre. Chaque partie repart de sa graine dans
+   un moteur à elle : les résultats sont identiques à ceux de jouer() appelée l'une après l'autre. */
+const WT=require('worker_threads');
+function jouerEnParallele(source,travaux){
+ const os=require('os'),coeurs=os.availableParallelism?os.availableParallelism():os.cpus().length,n=Math.max(1,Math.min(travaux.length,coeurs-1));
+ const res=travaux.map(()=>{const r={};r.p=new Promise((a,b)=>{r.ok=a;r.ko=b});r.p.catch(()=>{});return r});let i=0;
+ const lancer=()=>{if(i>=travaux.length)return;const j=i++,{sc,opts={}}=travaux[j];let fini=false;
+  const w=new WT.Worker(__filename,{workerData:{partieIA:true,source,sc,opts}});
+  w.once('message',r=>{fini=true;res[j].ok(r)});w.once('error',e=>{fini=true;res[j].ko(e)});
+  w.once('exit',c=>{if(!fini)res[j].ko(new Error('partie interrompue (code '+c+')'));lancer()})};
+ for(let k=0;k<n;k++)lancer();
+ return res.map(r=>r.p)}
+if(!WT.isMainThread&&WT.workerData&&WT.workerData.partieIA){const d=WT.workerData;WT.parentPort.postMessage(jouer(d.source,d.sc,d.opts))}
+module.exports={SCENARIOS,COURTS,jouer,jouerEnParallele,etat,empreinte,DT};
