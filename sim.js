@@ -337,22 +337,32 @@ function mzStep(A,steps){let M=A.mz;if(M&&M.ok)return M;
  mzChoose(M,LV);mzRoles(A,M);M.ok=1;return M}
 const MZX=new Int8Array(N),MZY=new Int8Array(N);for(let i=0;i<N;i++){MZX[i]=i%C;MZY[i]=i/C|0}
 const near=(i,j,d)=>{const dx=MZX[i]-MZX[j],dy=MZY[i]-MZY[j];return dx*dx+dy*dy<=d*d};
+/* 2.32 : exposition = nombre de cases du chemin que voit chaque tour (rayon MZ_RE, à peu près la portée d'un Archer), additionné sur toutes les tours.
+   C'est le temps que les monstres passent à portée des tours : une tour loin du chemin ne compte pas, et un chemin plus long compte pour chaque tour qui le borde.
+   VOI : pour chaque case, les cases à moins de MZ_RE (21 au plus), pour un calcul rapide sur la grille. */
+const MZ_RE=2.5,VOI=[],VOH=new Uint8Array(N);
+for(let i=0;i<N;i++){const l=[];for(let j=0;j<N;j++)if(near(i,j,MZ_RE))l.push(j);VOI.push(Int16Array.from(l))}
+function expo(w,P=mzPath(w)){VOH.fill(0);for(const j of P){const l=VOI[j];for(let k=0;k<l.length;k++)VOH[l[k]]++}let e=0;for(let i=0;i<N;i++)if(w[i])e+=VOH[i];return e}
 /* murs inutiles : une tour qui ne touche pas le chemin (8 cases autour) et dont le retrait ne le raccourcit pas est retirée du plan ; puis l'ordre de construction est préparé */
 function mzPrune(c){const w=c.best.slice(),L=plen(w);let n=1,ch=1;
  while(ch){ch=0;const adj=new Uint8Array(N);for(const j of mzPath(w)){n++;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const x=MZX[j]+dx,y=MZY[j]+dy;if(x>=0&&y>=0&&x<C&&y<R)adj[y*C+x]=1}}
   for(let i=0;i<N;i++)if(w[i]&&!adj[i]){w[i]=0;n++;if(plen(w)==L)ch=1;else w[i]=1}}
  c.w=w;c.cur=w.slice();c.left=[];for(let i=0;i<N;i++)if(w[i])c.left.push(i);c.walls=c.left.slice();c.rev=[];return n}
-/* ordre de construction : on retire une à une, depuis le plan complet, la tour qui raccourcit le moins le chemin (puis la moins utile au chemin actuel et au couloir aérien) ;
-   construire dans l'ordre inverse allonge le chemin presque à chaque tour et, au début, place les tours près du chemin droit et des volants */
-function mzRemove(c,r){const cur=c.cur,left=c.left,L0=plen(cur),Pc=mzPath(cur);let bi=0,bk=INF;
- const smp=left.length<=24?left.map((_,k)=>k):Array.from({length:24},()=>r()*left.length|0);
- for(const k of smp){const i=left[k];cur[i]=0;const L=plen(cur);cur[i]=1;let cv=0;for(const j of Pc)if(near(i,j,2.5))cv++;
-  const key=(L0-L)+.05*cv+(Math.abs(MZX[i]-6)<=2?.3:0)+r()*.2;if(key<bk){bk=key;bi=k}}
- const i=left[bi];left.splice(bi,1);cur[i]=0;c.rev.push(i);return smp.length+2}
-/* note d'un candidat : longueur moyenne du chemin après 15, 25, 40 et 60 tours (l'IA en a rarement plus en milieu de partie) et une fois complet */
+/* ordre de construction : on retire une à une, depuis le plan complet, la tour dont le retrait fait perdre le moins d'exposition (à égalité, celle hors du couloir aérien) ;
+   construire dans l'ordre inverse donne, à chaque étape, des tours qui voient le chemin du moment. 2.32 : avant, seule comptait la longueur du chemin,
+   et vers 3 min de jeu jusqu'à un tiers des tours de l'IA étaient loin du chemin (elles bouchaient un raccourci sans jamais tirer). */
+const MZ_SMP=24;
+function mzRemove(c,r){const cur=c.cur,left=c.left,E0=expo(cur);let bi=0,bk=INF;
+ const smp=left.length<=MZ_SMP?left.map((_,k)=>k):Array.from({length:MZ_SMP},()=>r()*left.length|0);
+ for(const k of smp){const i=left[k];cur[i]=0;const E=expo(cur);cur[i]=1;
+  const key=(E0-E)+(Math.abs(MZX[i]-6)<=2?.3:0)+r()*.2;if(key<bk){bk=key;bi=k}}
+ const i=left[bi];left.splice(bi,1);cur[i]=0;c.rev.push(i);return 2*smp.length+2}
+/* note d'un candidat : exposition par tour après 15, 25, 40 et 60 tours (l'IA en a rarement plus en milieu de partie) et une fois complet
+   (2.32 ; avant : longueur du chemin). pre garde la longueur du chemin à ces étapes. */
 const MZ_AT=[15,25,40,60];
-function mzEval(c){c.ord=c.rev.reverse();const w=new Uint8Array(N),Ls=[];c.ord.forEach((i,n)=>{w[i]=1;if(MZ_AT.includes(n+1))Ls.push(plen(w))});
- c.L=plen(c.w);while(Ls.length<MZ_AT.length)Ls.push(c.L);c.pre=Ls;c.note=(Ls.reduce((a,b)=>a+b,0)+c.L)/(MZ_AT.length+1);delete c.cur;delete c.rev;delete c.left;return MZ_AT.length+2}
+function mzEval(c){c.ord=c.rev.reverse();const w=new Uint8Array(N),Ls=[],Es=[];c.ord.forEach((i,n)=>{w[i]=1;if(MZ_AT.includes(n+1)){Ls.push(plen(w));Es.push(expo(w)/(n+1))}});
+ c.L=plen(c.w);const Ef=expo(c.w)/c.ord.length;while(Ls.length<MZ_AT.length){Ls.push(c.L);Es.push(Ef)}
+ c.pre=Ls;c.note=(Es.reduce((a,b)=>a+b,0)+Ef)/(MZ_AT.length+1);delete c.cur;delete c.rev;delete c.left;return 3*MZ_AT.length+4}
 /* choix du plan parmi les candidats, sur la note de milieu de partie (le meilleur en Brutal, un des 2 ou 3 meilleurs sinon) */
 function mzChoose(M,LV){const r=M.r;M.c.sort((a,b)=>b.note-a.note);const P=MZ_PICK[LV];let q=r(),ch=0;for(;ch<P.length-1;ch++){q-=P[ch];if(q<=0)break}
  const c=M.c[ch];M.f=c.f;M.w=c.w;M.ord=c.ord;M.walls=c.walls;M.pre=c.pre;M.note=c.note;M.c=null}

@@ -10,7 +10,7 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 |---|---|---|
 | 💡 | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. |
 | 💡 | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». |
-| 💡 | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
+| 🛠️ | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
 | 💡 | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
 | 💡 | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
 | 💡 | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
@@ -69,6 +69,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.32 — ia plus stratège — 2026-11-19
+- AI mazes where every tower shoots: the AI now builds its maze in an order that keeps each new tower next to the current monster path ("exposure": path cells seen by each tower), instead of only maximising the path length. Around 15–25 towers, towers far from the path drop from 3–4 to 1–2 on average, and each tower sees 10–50 % more path. In the AI arena it beats the previous AI by +0.64 points per seat (29 wins out of 42 games). `sim.js` changed (automatic server redeploy).
 - Tooling: AI arena (`node tests/outils/arene-ia.js`): the current AI plays against the AI of another version (`origin/main` by default) in the same game engine, seats and factions swapped, on all CPU cores; reports points, wins and the gap with its standard error. Not part of the GitHub checks. No game change.
 
 ### 2.31 — équilibrage des tours — 2026-11-19
