@@ -24,13 +24,15 @@ const OPTIONS_WEBGL=OPTIONS_STABLES.filter(o=>o!='--disable-gpu').concat(['--use
 const OPTIONS_GPU=OPTIONS_STABLES.filter(o=>o!='--disable-gpu').concat(['--ignore-gpu-blocklist'],process.platform=='win32'?['--use-angle=d3d11']:[]);
 async function lancer({webgl=false}={}){return playwright.chromium.launch({args:webgl?(process.env.WR_GPU=='1'?OPTIONS_GPU:OPTIONS_WEBGL):OPTIONS_STABLES,...(process.env.WR_CANAL?{channel:process.env.WR_CANAL}:{})})}
 
-/* ouvre le jeu ; options : format, graine, police ('reelle' ou 'bloquee'), echelle (densité de pixels) */
-async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='reelle',echelle=2}={}){
+/* ouvre le jeu ; options : format, graine, police ('reelle' ou 'bloquee'), echelle (densité de pixels),
+   bloquer (fichiers du jeu à rendre introuvables, par exemple ['rendu3d.js'] pour simuler un appareil où la 3D ne se charge pas) */
+async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='reelle',echelle=2,bloquer=[]}={}){
  const ctx=await navigateur.newContext({...FORMATS[format],deviceScaleFactor:echelle,isMobile:true,hasTouch:true,locale:'fr-FR',timezoneId:'Europe/Paris',reducedMotion:'no-preference'});
  const page=await ctx.newPage();
  const erreurs=[];page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()=='error')erreurs.push(m.text())});
  /* aucune connexion vers l'extérieur, sauf la police si demandée (le multijoueur n'est jamais contacté) */
  const origine=new URL(url).origin+'/';
+ if(bloquer.length)await page.route(u=>bloquer.some(b=>u.pathname.endsWith('/'+b)),r=>r.abort());
  await page.route(u=>!u.href.startsWith(origine),r=>{const h=new URL(r.request().url()).hostname;
   if(police=='reelle'&&(h=='fonts.googleapis.com'||h=='fonts.gstatic.com'))return r.continue();return r.abort()});
  await page.addInitScript(`window.__GRAINE__=${graine>>>0};`+SOURCE_NAVIGATEUR);
@@ -44,8 +46,10 @@ async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='ree
   await Promise.all(fr().map(f=>f.load().catch(()=>{})));await document.fonts.ready;return fr().length>0&&fr().every(f=>f.status=='loaded')});
  await page.clock.runFor(100);
  /* l'horloge simulée démarre avec 1 ou 2 ms de décalage selon les passages (temps réel écoulé pendant son installation) :
-    on l'aligne sur exactement 200 ms pour que les animations (chemin, portail, barre de revenu) soient identiques à chaque passage */
- const pn=await page.evaluate(()=>performance.now());if(pn<200)await page.clock.runFor(200-pn);
+    on l'aligne sur exactement 2 000 ms pour que les animations (chemin, portail, barre de revenu, neige) soient identiques à chaque passage.
+    2.29 : 2 000 ms au lieu de 200 : en 3D, le chargement est plus long et l'horloge dépassait parfois déjà 200 ms (jusqu'à 986) ;
+    l'alignement était alors sauté et toute la partie décalée de quelques millisecondes d'un passage à l'autre */
+ const pn=await page.evaluate(()=>performance.now());if(pn>=2000)throw new Error('horloge déjà à '+Math.round(pn)+' ms : impossible de l’aligner sur 2 000 ms');await page.clock.runFor(2000-pn);
  return {ctx,page,erreurs,policeChargee,fermer:()=>ctx.close()};
 }
 
