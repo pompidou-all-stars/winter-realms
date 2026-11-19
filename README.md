@@ -69,6 +69,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.32 — ia plus stratège — 2026-11-19
+- AI builds more towers and upgrades less while its maze is unfinished (random upgrades from 12 towers at 25 %, 50 % from 28, instead of 10 towers at 35 %, 60 % from 24). Arena: +0.18 and +0.27 on two seed sets, neutral in long games. Other tweaks tried and dropped (earlier tiers and bosses, sending thresholds, a 20,000-gold wave cap, defence share, estimate caution, more upgrades).
 - AI performance: the defence estimate follows the path cell by cell and caches what each tower sees. The AI costs 0.02–0.04 ms per game step on average (0.01–0.03 on `main`); its slowest call drops from 7–10 ms to 3–5 ms (2–3 ms on `main`).
 - AI tower types chosen against the threat it receives: the AI remembers the monsters sent to it and, on the ordinary slots of its maze, builds the type that deals the most damage per gold against them (armour, flying, anti-magic, area, path in range): fewer archers and more guards, cannons and mages against bosses and armoured monsters. Arena: +0.52 points per seat (28 wins out of 42).
 - Tooling: `--vies` option for the AI arena (long games that reach the end game). Two end-game ideas were tried with it and dropped because they made the AI weaker: rebuilding a level-5 tower as a stronger type, and capping the defence savings. No game change.
