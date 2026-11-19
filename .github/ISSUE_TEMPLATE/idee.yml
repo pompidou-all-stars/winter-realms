@@ -1,0 +1,40 @@
+name: 💡 Idée d'amélioration
+description: Proposer une idée pour la feuille de route du jeu
+title: "Idée : "
+labels: ["idée"]
+body:
+  - type: dropdown
+    id: domaine
+    attributes:
+      label: Domaine
+      options:
+        - IA
+        - Difficulté
+        - Tours
+        - Monstres
+        - Factions / races
+        - Quêtes
+        - Interface
+        - Visuel / son
+        - Multijoueur
+        - Correctif (bug)
+        - Autre
+    validations:
+      required: true
+  - type: textarea
+    id: idee
+    attributes:
+      label: L'idée
+      description: Ce que tu proposes, en quelques phrases.
+    validations:
+      required: true
+  - type: textarea
+    id: pourquoi
+    attributes:
+      label: Pourquoi ?
+      description: Ce que ça apporte au jeu, ou le problème que ça règle (facultatif).
+  - type: textarea
+    id: exemple
+    attributes:
+      label: Exemple ou détails
+      description: Un exemple concret, des chiffres, une capture… (facultatif).

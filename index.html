@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.26</title>
+<title>Winter Realms — Tower Wars · Édition 2.31</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -153,6 +153,12 @@ body.r2d .fleche{display:none}
 #chips{top:calc(96px + env(safe-area-inset-top,0px));border-radius:6px}
 #astuce{top:calc(100px + env(safe-area-inset-top,0px))}
 .chip{border-radius:5px;background:linear-gradient(180deg,#07101e,#0d1a2e);box-shadow:inset 0 2px 4px #000a}
+/* 2.28 : vignette d'hiver sertie d'argent ; vies et revenu avec le cœur et la pièce du bandeau */
+.chip canvas{border-radius:4px;box-shadow:0 0 0 1px #0a1220,0 0 0 2.5px #b8c8dc,0 0 0 3.5px #0a1220,0 3px 8px #000c}
+.chip>span{margin-left:4px;font-size:13px;font-weight:600;color:#c9d6e6;line-height:1.55}
+.chip .vie{font-style:normal;color:#ff8f8f}
+.chip .coin{width:10px;height:10px;vertical-align:-1px}
+.chip.dead canvas{filter:saturate(.4)}
 /* console du bas : onglets, paliers et cartes sur une dalle de verre givré, frise d'argent dessus ; la fiche flotte au-dessus */
 #ctl{padding:0;gap:10px;background:none}
 #fiche{margin:0 calc(8px + env(safe-area-inset-right,0px)) 0 calc(8px + env(safe-area-inset-left,0px));border-radius:6px}
@@ -285,6 +291,46 @@ body.explore #console{display:none}
 body.explore #finBtn{display:block}
 #finBtn:focus-visible,#fin button:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
 body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:none!important}
+/* 2.30 : départ façon course. « Construis ! » (30 s sans envoi, chrono dans le bandeau), 3-2-1, puis « Envoie et résiste ! » */
+#prep{color:#ffe597;border-color:#f2c14eaa;box-shadow:inset 0 2px 4px #000c,0 0 10px #f2c14e55}
+#prep svg{width:16px;height:16px;flex:none}
+#prep.fin{color:#ffb4a2;border-color:#ff8a6a;animation:pouls .5s infinite}
+#prep.arrive{animation:prepArrive .45s}
+@keyframes prepArrive{40%{transform:scale(1.45);filter:brightness(1.8)}}
+body.prep #clock{display:none}
+#tabs button.mon:disabled{opacity:.42;filter:grayscale(.85);cursor:not-allowed}
+#tabs button.mon:disabled:before{content:'🔒';position:absolute;right:2px;top:0;font-size:10px;filter:none}
+#tabs button.mon.ouvert{animation:tabOuvert .5s 3}
+@keyframes tabOuvert{50%{transform:scale(1.12);filter:brightness(1.6) drop-shadow(0 0 8px #ff8a6a)}}
+#annonce{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;pointer-events:none;overflow:hidden;text-align:center;font-family:Fredoka,system-ui,sans-serif}
+#annonce .an-bande{position:absolute;left:-15%;right:-15%;top:50%;height:230px;margin-top:-125px;background:linear-gradient(90deg,transparent,#08111fe8 16%,#0d1a2ef0 50%,#08111fe8 84%,transparent);border-block:3px solid #f2c14e;box-shadow:0 0 30px #f2c14e55,inset 0 0 40px #9be7ff22;transform:skewY(-5deg);animation:anBande var(--d,3s) cubic-bezier(.2,.8,.3,1) both}
+#annonce.envoie .an-bande{border-color:#ff8a6a;box-shadow:0 0 34px #e4572e88,inset 0 0 40px #ff8a6a33}
+@keyframes anBande{0%{transform:skewY(-5deg) scaleY(0);opacity:0}10%{transform:skewY(-5deg) scaleY(1.15);opacity:1}16%{transform:skewY(-5deg) scaleY(1)}84%{opacity:1;transform:skewY(-5deg)}100%{opacity:0;transform:skewY(-5deg) translateX(35%)}}
+#annonce .an-flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 48%,#fff8 0,#ffe59744 30%,transparent 65%);animation:anFlash .7s ease-out both}
+#annonce.envoie .an-flash{background:radial-gradient(circle at 50% 48%,#fffb 0,#ff8a6a66 30%,transparent 70%)}
+@keyframes anFlash{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+#annonce .an-logo{position:relative;width:96px;height:96px;animation:anLogo var(--d,3s) both}
+#annonce .an-logo svg{position:relative;width:100%;height:100%;filter:drop-shadow(0 4px 8px #000c)}
+#annonce .an-rayons{position:absolute;left:50%;top:50%;width:250px;height:250px;margin:-125px;border-radius:50%;background:repeating-conic-gradient(#ffe59740 0 8deg,transparent 8deg 22deg);-webkit-mask:radial-gradient(circle,#000 25%,transparent 70%);mask:radial-gradient(circle,#000 25%,transparent 70%);animation:anRayons 6s linear infinite}
+#annonce.envoie .an-rayons{background:repeating-conic-gradient(#ff8a6a55 0 8deg,transparent 8deg 22deg)}
+@keyframes anRayons{to{transform:rotate(360deg)}}
+@keyframes anLogo{0%{transform:scale(0) rotate(-220deg);opacity:0}18%{transform:scale(1.3) rotate(12deg);opacity:1}26%{transform:scale(1) rotate(0)}84%{transform:scale(1);opacity:1}100%{transform:scale(.4);opacity:0}}
+#annonce .an-titre{position:relative;font-size:clamp(34px,11vw,58px);font-weight:700;line-height:1.05;letter-spacing:.02em;text-transform:uppercase;padding:0 12px;
+ background:linear-gradient(100deg,#fff1b8 0,#f2c14e 30%,#fffbe8 45%,#f2c14e 60%,#b07d16 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1px #5a3a08;filter:drop-shadow(0 3px 0 #000a) drop-shadow(0 0 14px #f2c14e88);
+ animation:anTitre var(--d,3s) cubic-bezier(.2,.9,.3,1) .12s both,anReflet 1.6s linear .5s infinite}
+#annonce.envoie .an-titre{font-size:clamp(28px,8.6vw,50px);background-image:linear-gradient(100deg,#ffe0d6 0,#ff8a6a 30%,#fff5f0 45%,#ff6a45 60%,#a32a12 100%);-webkit-text-stroke-color:#4a1306;filter:drop-shadow(0 3px 0 #000a) drop-shadow(0 0 16px #e4572eaa)}
+@keyframes anTitre{0%{transform:translateX(-110vw) skewX(-25deg);opacity:0}20%{transform:translateX(5%) skewX(-10deg);opacity:1}28%{transform:translateX(0) skewX(0)}84%{transform:translateX(0);opacity:1}100%{transform:translateX(110vw) skewX(-25deg);opacity:0}}
+@keyframes anReflet{from{background-position:120% 0}to{background-position:-130% 0}}
+#annonce .an-sous{position:relative;max-width:88%;font-size:14px;font-weight:600;color:var(--ice);text-shadow:0 1px 2px #000;animation:anSous var(--d,3s) both}
+@keyframes anSous{0%,20%{opacity:0;transform:translateY(8px)}30%,84%{opacity:1;transform:none}100%{opacity:0}}
+.an-chrono{font-family:Fredoka,system-ui,sans-serif;font-size:78px;font-weight:700;line-height:1;color:#fff;font-variant-numeric:tabular-nums;text-shadow:0 0 18px #9be7ff,0 4px 0 #0b1626,0 6px 12px #000c}
+#annonce .an-chrono{position:relative;animation:anChrono var(--d,3s) both}
+#annonce .an-chrono small{display:block;font-size:13px;font-weight:600;color:var(--ice);text-shadow:0 1px 2px #000;letter-spacing:.08em}
+@keyframes anChrono{0%,22%{transform:scale(3);opacity:0}32%{transform:scale(.9);opacity:1}38%{transform:scale(1)}100%{transform:scale(1);opacity:1}}
+.an-chrono.vol{position:fixed;z-index:30;margin:0;pointer-events:none;transform-origin:center}
+#annonce .an-compte{font-size:150px;font-weight:700;line-height:1;color:#fff;text-shadow:0 0 26px #ffe597,0 6px 0 #9a6b12,0 10px 18px #000c;animation:anCompte .9s ease-out both}
+@keyframes anCompte{0%{transform:scale(2.6);opacity:0}22%{transform:scale(.92);opacity:1}32%{transform:scale(1)}75%{opacity:1}100%{transform:scale(.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){#annonce *,#prep.fin,#prep.arrive,#tabs button.mon.ouvert{animation:none!important}#annonce .an-rayons,#annonce .an-flash{display:none}}
 </style></head><body>
 <div id="app">
  <div id="stage"><canvas id="main"></canvas>
@@ -294,6 +340,7 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
    <span class="pastille" title="Revenu toutes les 10 s"><svg class="anneau" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="#9be7ff33" stroke-width="3"/><circle id="arc" cx="10" cy="10" r="8" fill="none" stroke="#f2c14e" stroke-width="3" stroke-dasharray="50.3" stroke-dashoffset="50.3" transform="rotate(-90 10 10)"/></svg><b id="inc">+0</b></span>
    <span class="pastille" id="lives">♥ <b>40</b></span>
    <span class="vide"></span>
+   <span class="pastille" id="prep" hidden title="Phase de construction : pas d'envoi de monstres"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4l6 6-3 3-6-6z" fill="#f2c14e" stroke="#0b1626" stroke-width="1.4" stroke-linejoin="round"/><path d="M12.5 8.5L4 17l3 3 8.5-8.5" fill="#a0672e" stroke="#0b1626" stroke-width="1.4" stroke-linejoin="round"/></svg><b id="prepN">0:30</b></span>
    <span class="pastille" id="clock">0:00</span>
    <button class="rondbtn" id="fs" type="button" aria-label="Passer en plein écran"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
   </div>
@@ -304,6 +351,7 @@ body.net #lv,body.net #difficultyLabel,body.net #online,body.net #hint{display:n
   <button id="banner" type="button" hidden></button>
   <div id="astuce" hidden></div>
   <div id="toast" hidden></div>
+  <div id="annonce" hidden aria-live="assertive"></div>
   <div id="ctl">
    <div id="fiche" hidden></div>
    <div id="console">
@@ -404,21 +452,27 @@ const SFX={
  tap(){tone(660,.04,'triangle',.05)},
  out(){[659,523,392].forEach((f,i)=>tone(f,.18,'square',.05,0,i*.1))},
  win(){[523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.09,0,i*.13))},
- lose(){[392,330,262,196].forEach((f,i)=>tone(f,.3,'sawtooth',.06,0,i*.16))}};
+ lose(){[392,330,262,196].forEach((f,i)=>tone(f,.3,'sawtooth',.06,0,i*.16))},
+ /* 2.30 : départ façon course : cor de « Construis ! », bips du 3-2-1, signal de « Envoie et résiste ! » */
+ cor(){[392,523,659,784].forEach((f,i)=>tone(f,.22,'triangle',.08,0,i*.09))},
+ bip(){tone(523,.16,'square',.06)},
+ go(){tone(1047,.45,'square',.07);tone(1568,.5,'triangle',.06,0,.04);[523,659,784].forEach((f,i)=>tone(f,.3,'sawtooth',.03,0,.1+i*.06))}};
 /* nom du son (événement du jeu) → identifiant du fichier ; b = terrain qui le produit (sa faction choisit la variante) */
 const FAC_SON=['alliance','horde','sylvestres','nains','legion'],facSon=b=>FAC_SON[(b||P).classId]||'alliance';
 const PRIO_SON={win:5,lose:5,out:4,leak:4,warn:3,send:3,income:3,build:2,up:2,sell:2,nope:2,tap:2,boom:2,zap:2};
 function idSon(n,b){if(/^(arrow|canon|frost|mage|slash|flame)$/.test(n))return 'tir-'+n+'-'+facSon(b);
  if(n=='build')return 'chantier-'+facSon(b);if(n=='up')return 'up-'+facSon(b);return n}
 function sfx(n,b){if(!AC||muted)return;const now=performance.now();if(now-(lastS[n]||0)<(n=='flame'?170:70))return;lastS[n]=now;
- if(window.SON&&SON.joue(idSon(n,b),{prio:PRIO_SON[n]||1,ecart:n=='flame'?300:0}))return;
- try{SFX[n]()}catch(e){}}
+ const base=n.split('-')[0];if(window.SON&&SON.joue(idSon(n,b),{prio:PRIO_SON[base]||1,ecart:n=='flame'?300:0}))return;
+ try{SFX[base]()}catch(e){}}
+/* envoi : le cor change selon la catégorie du monstre envoyé (sol, volant, spécial, boss) */
+const CAT_SON={n:'sol',f:'volant',s:'special',x:'boss'},sonEnvoi=k=>'send-'+(CAT_SON[(CR[k]||{}).cat]||'sol');
 /* sons sans équivalent synthétisé (mort d'un monstre précis, construction finie, voix) : fichier seulement */
 function son(id,o){if(AC&&!muted&&window.SON)SON.joue(id,o)}
 function voix(ctx,ecart){if(AC&&!muted&&window.SON&&!NET.spect)SON.voix(facSon(P),ctx,ecart)}
 /* début de partie : préchargement de la faction du joueur et des sons communs, ambiances */
 function debutSons(){if(!window.SON)return;audio();const f=facSon(P),aut=[...new Set(B.map(b=>facSon(b)))];
- SON.precharge(['*-'+f,'voix-'+f+'-*','boom','mort-*','arrivee-*','warn','zap','leak','income','send','sell','nope','tap','ouvre','ferme','out','win','lose']);
+ SON.precharge(['*-'+f,'voix-'+f+'-*','boom','mort-*','cri-*','arrivee-*','send-*','warn','zap','leak','income','sell','nope','tap','ouvre','ferme','out','win','lose']);
  setTimeout(()=>SON.precharge(aut.map(x=>'*-'+x)),4000);
  if(!muted){SON.ambiance('amb-hiver',.35);SON.ambiance('amb-bataille',.14)}}
 function finSons(){if(window.SON){SON.ambiance('amb-hiver',0);SON.ambiance('amb-bataille',0)}}
@@ -719,14 +773,35 @@ function draw(b,g,s,t){
  for(const f of b.fx)drawFx(g,f,s);
  if(b.dead&&explore){etiquetteElimine(g,C*s/2,s*.9)}else if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,C*s,R*s);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',C*s/2,R*s/2)}}
 /* sur la vignette du terrain affiché, en 3D, un cadre montre la partie visible (la vue tactique ne montre pas tout le terrain) */
-function cadreMini(g){const m=MINI,pts=R3D.api.empreinte();g.save();g.beginPath();g.rect(0,0,C*m,R*m);g.clip();g.strokeStyle='#fff';g.lineWidth=1.5;g.beginPath();
- pts.forEach((p,i)=>i?g.lineTo(p.x*m,p.z*m):g.moveTo(p.x*m,p.z*m));g.closePath();g.stroke();g.fillStyle='#ffffff22';g.fill();g.restore()}
-function drawMini(b,g,m){g.fillStyle=b.dead?'#333':'#426c3e';g.fillRect(0,0,C*m,R*m);
- for(const t of b.t){g.fillStyle=TW[t.k].col;g.fillRect(t.x*m+.5,t.y*m+.5,m-1,m-1)}
- for(const c of b.cr){g.fillStyle=CR[c.k].fly?'#fff':'#ffd23f';g.fillRect((c.x+.5)*m-1,(c.y+.5)*m-1,2,2)}}
+function cadreMini(g){const m=MINI,pts=R3D.api.empreinte();g.save();g.beginPath();g.rect(0,0,C*m,R*m);g.clip();g.beginPath();
+ pts.forEach((p,i)=>i?g.lineTo(p.x*m,p.z*m):g.moveTo(p.x*m,p.z*m));g.closePath();g.fillStyle='#f2c14e26';g.fill();
+ g.strokeStyle='#14223acc';g.lineWidth=3;g.stroke();g.strokeStyle='#f2c14e';g.lineWidth=1.4;g.stroke();g.restore()}
+/* 2.28 : vignette d'hiver, comme la 3D : neige et grille, chemin en pointillés bleu nuit, portail, château au drapeau du joueur,
+   tours en petites pièces à la couleur de leur rôle (celle des pastilles : vert Archer, rouge Garde, bleu Givre…), monstres cerclés */
+function drawMini(b,g,m){const W=C*m,H=R*m,d=b.dead,fond=g.createLinearGradient(0,0,0,H);
+ fond.addColorStop(0,d?'#7d8899':'#f4f8fc');fond.addColorStop(1,d?'#5b6577':'#d9e3ee');g.fillStyle=fond;g.fillRect(0,0,W,H);
+ g.strokeStyle=d?'#ffffff22':'#48638a2e';g.lineWidth=.6;g.beginPath();for(let x=1;x<C;x++){g.moveTo(x*m,0);g.lineTo(x*m,H)}for(let y=1;y<R;y++){g.moveTo(0,y*m);g.lineTo(W,y*m)}g.stroke();
+ if(!d&&b.d[SP[1]][SP[0]]<INF){g.save();g.setLineDash([m*.4,m*.35]);g.strokeStyle='#3d5f8acc';g.lineWidth=Math.max(1,m*.2);g.beginPath();
+  chemin(b).forEach(([x,y],i)=>i?g.lineTo((x+.5)*m,(y+.5)*m):g.moveTo((x+.5)*m,(y+.5)*m));g.stroke();g.restore()}
+ /* portail : anneau violet lumineux */
+ const px=(SP[0]+.5)*m,py=(SP[1]+.5)*m;g.fillStyle='#b9a2ff55';g.beginPath();g.arc(px,py,m*.62,0,7);g.fill();g.strokeStyle='#6a3fc8';g.lineWidth=m*.22;g.beginPath();g.arc(px,py,m*.4,0,7);g.stroke();
+ /* château : donjon de pierre à créneaux, toit bleu, drapeau à la couleur du joueur */
+ const cx=(EX[0]+.5)*m,cy=(EX[1]+1)*m-1,w=m*1.4,h=m*1;g.fillStyle='#14223a55';g.fillRect(cx-w/2,cy-m*.1,w,m*.12);
+ g.fillStyle='#e6ebf1';g.strokeStyle='#3b4a60';g.lineWidth=.7;g.beginPath();g.rect(cx-w/2,cy-h,w,h);
+ for(let i=0;i<3;i++)g.rect(cx-w/2+i*w*.4,cy-h-m*.2,w*.2,m*.2);g.fill();g.stroke();
+ g.fillStyle='#2d4f8f';g.beginPath();g.moveTo(cx-m*.28,cy-h-m*.15);g.lineTo(cx,cy-h-m*.7);g.lineTo(cx+m*.28,cy-h-m*.15);g.closePath();g.fill();
+ g.strokeStyle='#3b4a60';g.beginPath();g.moveTo(cx,cy-h-m*.7);g.lineTo(cx,cy-h-m*1.15);g.stroke();g.fillStyle=b.col;g.fillRect(cx,cy-h-m*1.15,m*.45,m*.28);
+ /* tours : petite pièce biseautée (ombre, corps à la couleur du rôle, reflet), en transparence pendant le chantier */
+ const r=m*.18;for(const t of b.t){const x=t.x*m+m*.12,y=t.y*m+m*.08,s=m*.76;g.globalAlpha=d?.45:t.b>0?.5:1;
+  g.fillStyle='#14223a66';g.beginPath();g.roundRect(x,y+m*.14,s,s,r);g.fill();
+  g.fillStyle=BADGE[TW[t.k].s]||TW[t.k].col;g.beginPath();g.roundRect(x,y,s,s,r);g.fill();g.strokeStyle='#14223a';g.lineWidth=.6;g.stroke();
+  g.fillStyle='#ffffff66';g.fillRect(x+s*.2,y+s*.14,s*.6,Math.max(.8,s*.16));
+  if(t.lv>1){g.fillStyle='#f2c14e';g.beginPath();g.arc(x+s*.78,y+s*.78,Math.min(m*.2,.6+t.lv*.25),0,7);g.fill()}}g.globalAlpha=1;
+ /* monstres : rouges au sol, blancs en vol, cerclés de nuit */
+ for(const c of b.cr){const f=CR[c.k].fly;g.fillStyle=f?'#ffffff':'#d33a2c';g.strokeStyle='#14223a';g.lineWidth=.8;g.beginPath();g.arc((c.x+.5)*m,(c.y+.5)*m,f?m*.3:m*.26,0,7);g.fill();g.stroke()}}
 
 /* ---------- interface ---------- */
-const $=id=>document.getElementById(id),main=$('main'),stage=$('stage'),bar=$('bar'),MINI=4,SUB0=$('sub').textContent;
+const $=id=>document.getElementById(id),main=$('main'),stage=$('stage'),bar=$('bar'),MINI=6,SUB0=$('sub').textContent;
 if(typeof CanvasRenderingContext2D!='undefined'&&!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 /* G : partie locale (solo). B, P, time, tick, over, LV : vue courante, recopiée de G à chaque image. */
 /* 2.15 : sel = tour choisie pour construire (null : aucune), mon = monstre choisi pour envoyer (null : aucun), pick = tour posée ouverte */
@@ -763,7 +838,7 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   if(m.t=='lobby'){this.lob=m;$('lnote').textContent='';if(this.playing&&!m.playing){this.playing=false;over=true;$('msg').textContent='Winter Realms'}this.showLobby();return}
   if(m.t=='start'){this.start(m);return}
   if(m.t=='snap'){if(this.playing)this.apply(m);return}
-  if(m.t=='res'){const a=m.a||{};if(m.err){if(!m.q){showErr(m.err,a);if(a.type=='place')P.fx.push({type:'bad',x:a.x+.5,y:a.y+.5,t:.35,d:.35})}}else if(a.type=='send')sfx('send');return}},
+  if(m.t=='res'){const a=m.a||{};if(m.err){if(!m.q){showErr(m.err,a);if(a.type=='place')P.fx.push({type:'bad',x:a.x+.5,y:a.y+.5,t:.35,d:.35})}}else if(a.type=='send')sfx(sonEnvoi(a.k));return}},
  showLobby(){const m=this.lob;if(this.playing)return;$('ov').hidden=false;$('lobby').hidden=false;
   const box=$('lseats');box.textContent='';
   m.seats.forEach((s,i)=>{const d=document.createElement('div'),n=document.createElement('b');d.style.setProperty('--c',['#f2c14e','#e4572e','#4aa3df','#b06ad0'][i]);
@@ -777,7 +852,7 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   $('lnote').textContent='Difficulté des IA : '+DIFF[m.lv].n+'.'},
  start(m){this.playing=true;this.spect=m.you<0;LV=m.lv;
   const boards=m.seats.map((s,i)=>new Board(i,s.name,s.col,s.ai,s.classId));
-  useBoards(boards,this.spect?0:m.you);time=0;tick=10;over=false;started=true;setTab('t');recentrer();debutSons();
+  useBoards(boards,this.spect?0:m.you);time=0;tick=10;over=false;started=true;departReset();setTab('t');recentrer();debutSons();
   $('lobby').hidden=true;$('ov').hidden=true;if(this.spect)toast('Tu regardes la partie en spectateur');else astuce(true)},
  /* applique un instantané : les positions sont lissées entre deux instantanés dans frame() */
  apply(s){this.snapAt=performance.now();time=s.time;tick=s.tick;
@@ -869,7 +944,7 @@ function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=null;mon=null;proje
   e.type='button';e.className='chip';e.style.setProperty('--c',b.col);e.setAttribute('aria-label','Voir le terrain de '+b.name);n.textContent=b.name;tx.append(n,s);e.append(cv,tx);e.onclick=()=>setView(b.i);ch.appendChild(e);b.ui={e,g:setup(cv,C*MINI,R*MINI),s};
   if(b.i!==me){const i=document.createElement('i');i.style.background=b.col;pts.appendChild(i)}}
  hudK='';pick=null;setView(me);render()}
-function newSolo(lv){G=new Game(soloSeats(chosenClass),lv);LV=lv;useBoards(G.B,0);syncSolo();debutSons()}
+function newSolo(lv){G=new Game(soloSeats(chosenClass),lv);LV=lv;useBoards(G.B,0);syncSolo();departReset();debutSons()}
 function syncSolo(){time=G.time;tick=G.tick;over=G.over}
 function icon(fn,w=40,h=40){const c=document.createElement('canvas'),g=setup(c,w,h);fn(g);return c}
 /* 2.15 : une carte de la barre = l'icône et le prix ; le nom sert d'étiquette (lecteurs d'écran, tests), le reste est dans la fiche */
@@ -932,8 +1007,8 @@ function icone3D(cv,type,k,w,h){if(!R3D.api||!R3D.api.vignette||!cv)return;const
 const towerIcon=(k,lv)=>icon(g=>{drawTower(g,k,28,27,30,.7,0,lv,0);drawTowerBadges(g,k)},56,46);
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 /* messages d'erreur renvoyés par Game.action */
-const ERR={poor:"Pas assez d'or",blocked:'Impossible ici : le chemin serait bloqué',max:'Niveau maximum atteint',busy:'Tour en chantier : attends la fin des travaux',over:'Partie terminée',bad:'Action impossible'};
-function showErr(e,a){if(!e)return;sfx('nope');if(e!='locked')voix('impossible',5000);if(e=='locked'){const T=CR[a.k];toast(T?'Ouvre le palier '+T.t+' pour envoyer : '+T.n:'Ouvre d’abord le palier précédent',true)}else toast(ERR[e]||ERR.bad,true)}
+const ERR={early:'Construis d’abord : les envois s’ouvrent à 0:30',poor:"Pas assez d'or",blocked:'Impossible ici : le chemin serait bloqué',max:'Niveau maximum atteint',busy:'Tour en chantier : attends la fin des travaux',over:'Partie terminée',bad:'Action impossible'};
+function showErr(e,a){if(!e)return;sfx('nope');if(e!='locked')voix('impossible',5000);if(e=='locked'){const T=CR[a.k];toast(T?'Ouvre le palier '+T.t+' pour envoyer : '+T.n:'Ouvre d’abord le palier précédent',true)}else if(e=='early'&&time<GRACE)toast('Construis d’abord : envoi des monstres dans '+Math.ceil(GRACE-time)+' s',true);else toast(ERR[e]||ERR.bad,true)}
 /* toutes les actions du joueur passent par ici : en solo vers G, en ligne vers le serveur */
 function doAction(a){if(over)return;if(NET.on){NET.act(a);return ''}const e=G.action(me,a);showErr(e,a);return e}
 /* ---------- fiche d'information (au-dessus des boutons) ---------- */
@@ -999,8 +1074,8 @@ function toucherMonstre(k){astuce(false);if(mon===k){playerSend(k);return}mon=k;
 function setTab(t){tab=t;pick=null;projet=null;mon=null;document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x.dataset.t==t));render()}
 /* chaque envoi réussi : rebond de la carte, petite vibration, et un compteur ×2, ×3… quand on enchaîne sur le même monstre */
 const rafale={k:-1,n:0,t:0};
-function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(T.t>P.tier){showErr('locked',a);return}if(!NET.on&&P.gold<T.c){showErr('poor',a);return}
- if(doAction(a)!=='')return;sfx('send');vibrer(12);const now=performance.now();if(rafale.k===k&&now-rafale.t<1500)rafale.n++;else{rafale.k=k;rafale.n=1}rafale.t=now;
+function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(time<GRACE){showErr('early',a);return}if(T.t>P.tier){showErr('locked',a);return}if(!NET.on&&P.gold<T.c){showErr('poor',a);return}
+ if(doAction(a)!=='')return;sfx(sonEnvoi(k));vibrer(12);const now=performance.now();if(rafale.k===k&&now-rafale.t<1500)rafale.n++;else{rafale.k=k;rafale.n=1}rafale.t=now;
  const c=bar.querySelector('button[data-k="'+k+'"]');if(c){c.classList.remove('tape');void c.offsetWidth;c.classList.add('tape')}
  toast((rafale.n>1?'×'+rafale.n+' · ':'')+GROUP+' × '+T.n+' chez chaque adversaire · +'+T.i+' revenu')}
 
@@ -1125,8 +1200,16 @@ function ecouterSons(){if(!AC||muted||!window.SON)return;const b=VB();
  for(const f of b.fx)if(f.type=='puff'&&!vusFx.has(f)){vusFx.add(f);const fam=COL_SON[f.col];if(fam)son('mort-'+fam,{ecart:90})}
  const nb={};for(const c of b.cr){const g=CR[c.k].g;if(BOSS_SON[g])nb[g]=(nb[g]||0)+1}
  for(const g in BOSS_SON)if((nb[g]||0)>(obsBoss[g]||0))son(BOSS_SON[g],{prio:4,ecart:4000});obsBoss=nb;
- const vu={};for(const t of P.t){const k=t.x+','+t.y;vu[k]=t.b;if(obsChantier[k]>0&&!(t.b>0)){son('fini-'+facSon(P),{prio:3,ecart:400});voix(t.lv>1?'ameliore':'construit',7000)}}
- obsChantier=vu}
+ /* tours du joueur : fin de chantier (bruitage), nouvelle tour (« du travail… »), amélioration (intermédiaire ou maximale) */
+ const vu={},nv={};for(const t of P.t){const k=t.x+','+t.y;vu[k]=t.b;nv[k]=t.lv;if(obsChantier[k]>0&&!(t.b>0))son('fini-'+facSon(P),{prio:3,ecart:400});
+  if(obsNiv){if(!(k in obsNiv))voix('construit',6000);else if(t.lv>obsNiv[k])voix(t.lv>=5?'max':'ameliore',t.lv>=5?0:5000)}}
+ obsChantier=vu;obsNiv=nv;
+ /* vague éliminée : le terrain du joueur a reçu au moins 4 monstres, et il n'en reste plus */
+ const n=P.cr.length;if(n>picVague)picVague=n;if(!n){if(picVague>=4)voix('vague',12000);picVague=0}
+ /* cris des monstres : de temps en temps, un monstre du terrain regardé grogne */
+ const now=performance.now();if(now>prochainCri){prochainCri=now+3500+Math.random()*4500;
+  const vis=b.cr.filter(c=>!c.hid);if(vis.length){const c=vis[Math.floor(Math.random()*vis.length)],fam=FAM_SON[CR[c.k].g];if(fam)son('cri-'+fam,{prio:1,vol:.7,ecart:2500})}}}
+let obsNiv=null,picVague=0,prochainCri=0;
 /* toucher une tour : réplique de sélection ; au 4e toucher rapproché, la tour s'agace */
 let selVoix=[];function voixSelection(){const now=performance.now();selVoix=selVoix.filter(t=>now-t<5000);selVoix.push(now);voix(selVoix.length>=4?'agace':'sel',600)}
 function onLog(l){
@@ -1135,7 +1218,7 @@ function onLog(l){
  else if(l.type=='end')end(l.winner)}
 function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.dead).join('|')+'|'+Math.floor(time);
  if(k!=hudK){hudK=k;$('gold').textContent=Math.floor(P.gold);$('inc').textContent='+'+P.inc;$('clock').textContent=mmss(time);$('lives').lastChild.textContent=Math.max(0,P.lives);
-  for(const b of B){b.ui.s.textContent=b.dead?'éliminé':Math.max(0,b.lives)+' vies\n+'+eff(b);b.ui.e.className='chip'+(b.i==view?' on':'')+(b.dead?' dead':'')}}
+  for(const b of B){const v=b.dead?'éliminé':Math.max(0,b.lives)+'|'+eff(b);if(b.ui.v!==v){b.ui.v=v;b.ui.s.innerHTML=b.dead?v:'<i class="vie">♥</i> '+Math.max(0,b.lives)+' vies<br><span class="coin"></span> +'+eff(b)}b.ui.e.className='chip'+(b.i==view?' on':'')+(b.dead?' dead':'')}}
  if(P.tier!==hudPal){hudPal=P.tier;if(tab!='t')render()}
  /* anneau du revenu : il se remplit pendant les 10 secondes qui précèdent le versement */
  $('arc').setAttribute('stroke-dashoffset',(50.3*Math.max(0,tick)/10).toFixed(1));
@@ -1179,6 +1262,36 @@ function finExplore(){explore=false;document.body.classList.remove('explore');$(
 $('finBtn').onclick=()=>{pick=null;render();cartes(false);finFenetre(true)};
 $('fRegarder').onclick=()=>explorer(view);
 $('fQuitter').onclick=()=>{finExplore();render();$('ov').hidden=false};
+/* 2.30 : départ façon jeu de course. Pendant la phase « Construis » (GRACE = 30 s, sim.js), personne ne peut envoyer de monstres :
+   bannière « Construis ! » avec le chrono en gros (il s'envole ensuite dans le bandeau), onglets de monstres verrouillés, 3-2-1, puis « Envoie et résiste ! ».
+   Tout suit le temps de jeu (solo ou instantanés du serveur). Logos dessinés en SVG dans le code. */
+const LOGO_AN={
+ construis:'<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="anOr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#9a6b12"/></linearGradient><linearGradient id="anGl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4fbff"/><stop offset="1" stop-color="#8fb6d9"/></linearGradient><linearGradient id="anRg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f07a52"/><stop offset="1" stop-color="#8a2410"/></linearGradient></defs><circle cx="50" cy="50" r="45" fill="#0b1626" stroke="url(#anOr)" stroke-width="7"/><circle cx="50" cy="50" r="36" fill="none" stroke="#9be7ff66" stroke-width="1.5" stroke-dasharray="3 4"/><path d="M30 78V46h3V30h7v6h6v-6h8v6h6v-6h7v16h3v32z" fill="url(#anGl)" stroke="#0b1626" stroke-width="2.5" stroke-linejoin="round"/><path d="M44 78V68a6 6 0 0 1 12 0v10z" fill="#0b1626"/><path d="M47 50h6v8h-6z" fill="#0b1626"/><path d="M30 46h40" stroke="#0b1626" stroke-width="2"/><g transform="rotate(38 64 52)"><rect x="61" y="40" width="7" height="46" rx="2.5" fill="#a0672e" stroke="#0b1626" stroke-width="2.5"/><rect x="50" y="27" width="29" height="15" rx="3" fill="url(#anOr)" stroke="#0b1626" stroke-width="2.5"/><path d="M53 31h23" stroke="#fff8" stroke-width="2" stroke-linecap="round"/></g><path d="M18 22l3 3m0-3l-3 3M80 16l3 3m0-3l-3 3" stroke="#eaf6ff" stroke-width="1.6" stroke-linecap="round"/></svg>',
+ envoie:'<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="anOr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#9a6b12"/></linearGradient><linearGradient id="anGl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4fbff"/><stop offset="1" stop-color="#8fb6d9"/></linearGradient><linearGradient id="anRg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f07a52"/><stop offset="1" stop-color="#8a2410"/></linearGradient></defs><circle cx="50" cy="50" r="45" fill="#1a0b10" stroke="url(#anOr)" stroke-width="7"/><g transform="rotate(-42 50 50)"><path d="M50 9l4.5 8v46h-9V17z" fill="url(#anGl)" stroke="#0b1626" stroke-width="2"/><path d="M38 63h24v6H38z" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/><path d="M47 69h6v13h-6z" fill="#6b3a1e" stroke="#0b1626" stroke-width="2"/><circle cx="50" cy="86" r="4" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/></g><g transform="rotate(42 50 50)"><path d="M50 9l4.5 8v46h-9V17z" fill="url(#anGl)" stroke="#0b1626" stroke-width="2"/><path d="M38 63h24v6H38z" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/><path d="M47 69h6v13h-6z" fill="#6b3a1e" stroke="#0b1626" stroke-width="2"/><circle cx="50" cy="86" r="4" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/></g><path d="M50 30l17 6v13c0 11-7 18-17 23-10-5-17-12-17-23V36z" fill="url(#anRg)" stroke="url(#anOr)" stroke-width="4" stroke-linejoin="round"/><path d="M50 40v20M42 47l16 6M58 47l-16 6" stroke="#ffe8dd" stroke-width="2.6" stroke-linecap="round"/></svg>'};
+let dep={ph:0,n:4,k:''},anT=0;
+function departReset(){dep={ph:0,n:4,k:''};clearTimeout(anT);const a=$('annonce');a.hidden=true;a.textContent=''}
+function annonce(type,n){const a=$('annonce');clearTimeout(anT);a.textContent='';a.className=type;a.hidden=false;
+ if(type=='compte'){a.appendChild(elt('div','an-compte',String(n)));sfx('bip');vibrer(15);anT=setTimeout(()=>{a.hidden=true},900);return}
+ const go=type=='envoie',d=go?2700:3000,lg=elt('div','an-logo');a.style.setProperty('--d',d+'ms');lg.innerHTML='<i class="an-rayons"></i>'+LOGO_AN[type];
+ a.append(elt('div','an-flash'),elt('div','an-bande'),lg,elt('div','an-titre',go?'Envoie et résiste !':'Construis !'),
+  elt('div','an-sous',go?'Les envois sont ouverts : chaque monstre envoyé augmente ton revenu':'Bâtis tes défenses : personne ne peut encore envoyer de monstres'));
+ if(!go){const c=elt('div','an-chrono',String(Math.max(1,Math.ceil(GRACE-time))));c.appendChild(elt('small','','secondes'));a.appendChild(c);setTimeout(volerChrono,d-700)}
+ else document.querySelectorAll('#tabs button.mon').forEach(b=>{b.classList.remove('ouvert');void b.offsetWidth;b.classList.add('ouvert')});
+ sfx(go?'go':'cor');vibrer(go?60:25);anT=setTimeout(()=>{a.hidden=true;a.textContent=''},d)}
+/* le gros chrono de la bannière s'envole vers le chrono du bandeau */
+function volerChrono(){const c=$('annonce').querySelector('.an-chrono'),p=$('prep');if(!c||p.hidden||!c.animate)return;
+ const r1=c.getBoundingClientRect(),r2=p.getBoundingClientRect(),f=elt('div','an-chrono vol',String(Math.max(1,Math.ceil(GRACE-time))));
+ Object.assign(f.style,{left:r1.left+'px',top:r1.top+'px',width:r1.width+'px',textAlign:'center'});document.body.appendChild(f);c.style.visibility='hidden';
+ const s=Math.max(.15,r2.height/r1.height),dx=r2.left+r2.width/2-(r1.left+r1.width/2),dy=r2.top+r2.height/2-(r1.top+r1.height/2);
+ f.animate([{transform:'none',opacity:1},{transform:'translate('+dx+'px,'+dy+'px) scale('+s+')',opacity:.6}],{duration:600,easing:'cubic-bezier(.55,0,.3,1)'}).onfinish=()=>{f.remove();p.classList.remove('arrive');void p.offsetWidth;p.classList.add('arrive')}}
+/* appelée à chaque image : chrono du bandeau, onglets de monstres verrouillés, annonces */
+function departTick(){const prep=started&&!over&&!explore&&!!P&&time<GRACE,k=prep?Math.ceil(GRACE-time):-1;
+ if(k!==dep.k){dep.k=k;document.body.classList.toggle('prep',prep);const p=$('prep');p.hidden=!prep;p.classList.toggle('fin',prep&&k<=5);if(prep)$('prepN').textContent=mmss(k);
+  document.querySelectorAll('#tabs button.mon').forEach(b=>{b.disabled=prep;b.title=prep?'Envoi des monstres dans '+k+' s':b.getAttribute('aria-label')});if(prep&&tab!='t')setTab('t')}
+ if(!started||over||explore||!P)return;
+ if(dep.ph==0){dep.ph=1;if(time<2)annonce('construis')}
+ if(time<GRACE){const r=GRACE-time;if(r<=3&&Math.ceil(r)<dep.n){dep.n=Math.ceil(r);annonce('compte',dep.n)}}
+ else if(dep.ph<2){dep.ph=2;if(time<GRACE+4)annonce('envoie')}}
 let last=performance.now();
 let pickB=0;
 /* 2.11 : neige qui tombe sur l'écran d'accueil (positions calculées, sans hasard) */
@@ -1196,7 +1309,7 @@ function loop(now){neigeAccueil(now);const dt=Math.min(.05,Math.max(0,(now-last)
   else if(G&&!G.over){G.step(dt);syncSolo();const lg=G.log.splice(0);for(const l of lg)onLog(l)}
   playEvents();ecouterSons();
   if(pick){const c=pick.b>0?Math.ceil(pick.b):0;if(c!==pickB){pickB=c;render()}}
-  dessinerVue(now/1000);if(!$('chips').hidden)for(const b of B){drawMini(b,b.ui.g,MINI);if(b===VB()&&R3D.api)cadreMini(b.ui.g)}hud()}
+  departTick();dessinerVue(now/1000);if(!$('chips').hidden)for(const b of B){drawMini(b,b.ui.g,MINI);if(b===VB()&&R3D.api)cadreMini(b.ui.g)}hud()}
  requestAnimationFrame(loop)}
 
 fit();if(typeof ResizeObserver!='undefined')new ResizeObserver(fit).observe(stage);else addEventListener('resize',fit);

@@ -1,5 +1,25 @@
 # Winter Realms — Tower Wars
 
+## 🗺️ Feuille de route — idées d'améliorations
+
+Une idée ? **[➕ Proposer une idée](https://github.com/pompidou-all-stars/winter-realms/issues/new?template=idee.yml)** (formulaire GitHub, marche aussi sur téléphone), ou ajoute une ligne ici dans une PR. Toutes les idées : [onglet Issues, étiquette « idée »](https://github.com/pompidou-all-stars/winter-realms/issues?q=label%3Aid%C3%A9e).
+
+Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
+
+| Statut | Domaine | Idée |
+|---|---|---|
+| 💡 | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. |
+| 💡 | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. |
+| 💡 | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
+| 💡 | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
+| 💡 | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
+| 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
+| 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
+| 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
+| 💡 | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. |
+| 🧭 | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. |
+| 🧭 | ✨ Palier 3 | **Pouvoirs magiques payants** : renforcements sur son propre terrain, ou malédictions à lancer sur le terrain d'un adversaire. |
+
 A browser tower-wars game: the game itself is `index.html` (interface, drawing, sounds) plus `sim.js` (the simulation, also used by the multiplayer server). No build step, no dependencies.
 
 ## Play
@@ -44,14 +64,40 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.26 — équilibrage des tours — 2026-11-18
+### 2.31 — équilibrage des tours — 2026-11-19
 - Tooling: the tower test bench now runs on all CPU cores with identical results (a comparison with `main` takes about 3 min instead of 20–25). It stays out of the GitHub checks.
 - Frost towers deal 2 base damage instead of 4 (half as strong); their slow is unchanged, since it is what makes them strong.
 - Mages deal 55 base damage instead of 45 (+22 %): they were the weakest value tower. Archers (8) and cannons (20) keep their damage.
 - Tooling: tower test bench (`node tests/outils/banc-tours.js`) measuring each tower's damage per gold invested, levels 1 to 5, against 7 typical waves, with before/after comparison. No gameplay change.
 - Area towers rebalanced, measured with the tower test bench. Flame towers now hit at most 8 monsters per burst (those closest to the exit) instead of everything in their cone: against a crowd of 40 monsters, a level-5 flame tower was worth about 5 times a normal tower per gold. `sim.js` changed (automatic server redeploy).
 
+### 2.30 — départ façon course — 2026-11-19
+- Starting gold is doubled: 200 instead of 100 for every board.
+- The first 30 seconds are a "Build!" phase: nobody (human or AI) can send monsters; the monster tabs are disabled and a countdown runs in the top bar.
+- Racing-style start: an animated "Construis !" banner with a logo and a big 30-second timer, a 3-2-1 countdown, then an animated "Envoie et résiste !" banner with its own logo.
+- `sim.js` is modified (automatic server redeploy).
+- Reproducible snowflakes: in 3D, each falling snowflake's position is now computed from the time instead of moving a little at each drawn frame. Same motion on screen, but two captures at the same instant are identical: the visual comparison witness drops from 0.1% to 0.00%, so the 3D comparison is reliable again. Only `rendu3d.js` changes.
+
+### 2.29 — bibliothèque elevenlabs — 2026-11-19
+- The whole sound library is remade with ElevenLabs (paid plan, commercial use): 371 files. Realistic, medieval, never shrill tower shots; monster deaths and growls while walking; a war horn when sending a wave, different for ground, flying, special and boss monsters; new interface sounds and ambiences.
+- 100 sarcastic dark-fantasy voice lines, with new contexts: placing a tower, maximum level and wave cleared. New voices made for the Horde (deeper, more bestial) and the Dwarves.
+- `sim.js` is unchanged (no server redeploy).
+- Tooling: lighter 3D tests. When a test fast-forwards the game in 3D, the view is now redrawn 4 times per second of game time instead of 60 (the game itself still advances frame by frame). The software-rendered test browser used to crash around 30 s of play since the 2.26 landscape, although the game runs fine on phones. 3D run in about 1 min instead of 5, 3D screenshots in 1.5 min instead of 10. New `WR_GPU=1` option to run the 3D tests on the machine's real graphics card (about 20 s). No game change.
+- Tooling: tests in 3D. The automated mobile walkthrough now runs in the real game (3D view): the former 2D and 3D walkthroughs are merged (26 checks), plus a test that the 2D fallback still works when 3D cannot load. Screenshots and the visual report are taken in 3D. Fixed along the way: the « before » version was extracted without three.js, models or sounds; three.js drew from the same seeded random numbers as the simulation, so the game differed between runs; the clock alignment was sometimes skipped in 3D. Known limit: falling snowflakes leave about 0.1% of changed pixels between two identical captures. No game change.
+
+### 2.28 — mini-cartes d'hiver — 2026-11-19
+- The opponents panel (« Adversaires ») gets winter mini-maps: snow and grid like the 3D view, the monsters' path as a navy dotted line, the portal and a small castle with the player's flag. Towers are small tiles in the colour of their role (green archer, red guard, blue frost, copper cannon, orange flames, purple mage), so you can read an opponent's defence at a glance; monsters are outlined (red on the ground, white in the air). Slightly bigger mini-maps with a silver frame; lives with a heart and income with the gold coin.
+- Interface only (`sim.js` untouched, no server redeploy).
+
+### 2.27 — sons dark fantasy — 2026-11-18
+- Darker, more warlike sound effects: monster death cries and boss arrivals move from cartoon to dark fantasy; tower shots, explosions and sabotage are punchier. 45 prompts rewritten, 124 files regenerated locally. Voices, music and interface sounds are unchanged.
+
+### 2.26 — terrain immersif — 2026-11-18
+- More immersive 3D terrain: a less distorted camera (34° field of view instead of 48°), 20% closer, and you can no longer pan far away from the board. The board is now part of a continuous winter landscape, told apart only by its grid: relief around it (the board itself stays flat), patches of grass and melted snow, snow grain, a forest of tall snowy pines, rocks, a gradient sky, distant mountains and haze.
+- 3D renderer only: `sim.js` is unchanged (no server redeploy).
+
 ### 2.25 — 2026-11-18
+- Organisation: **roadmap** at the top of this README (improvement ideas with a status) and an “Idée d'amélioration” issue form to propose new ones. No need to run the simulation tests when a change cannot affect gameplay (docs, project rules). No game change.
 - Ground monsters now move diagonally and at any angle: they take the shortest straight-line route (e.g. corner to corner along the diagonal) instead of only horizontal and vertical steps, without cutting through tower corners. They keep a small clearance from towers.
 - Monsters no longer pile up: nearby monsters push each other sideways only, never slowing anyone down, so they spread out without creating traffic jams.
 - The AI plans its mazes with the same rules (8 directions, no corner cutting), so its walls are judged by the path monsters really take; diagonal walls (towers touching by a corner) now count.

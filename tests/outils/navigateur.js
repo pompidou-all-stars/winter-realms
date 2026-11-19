@@ -19,15 +19,20 @@ const OPTIONS_STABLES=['--disable-gpu','--disable-lcd-text','--font-render-hinti
 /* webgl : pour le rendu 3D (2.7), WebGL en rendu logiciel SwiftShader (identique sur toutes les machines, sans carte graphique) */
 const OPTIONS_WEBGL=OPTIONS_STABLES.filter(o=>o!='--disable-gpu').concat(['--use-angle=swiftshader','--enable-unsafe-swiftshader','--ignore-gpu-blocklist']);
 /* WR_CANAL permet d'utiliser un navigateur déjà installé (par exemple msedge) au lieu du Chromium de Playwright */
-async function lancer({webgl=false}={}){return playwright.chromium.launch({args:webgl?OPTIONS_WEBGL:OPTIONS_STABLES,...(process.env.WR_CANAL?{channel:process.env.WR_CANAL}:{})})}
+/* WR_GPU=1 : la 3D utilise la vraie carte graphique de la machine, plus rapide et plus proche d'un téléphone (pour un PC qui en a une ;
+   GitHub et le cloud n'en ont pas et gardent SwiftShader). Les captures restent comparables tant que l'avant et l'après sont pris dans la même séance. */
+const OPTIONS_GPU=OPTIONS_STABLES.filter(o=>o!='--disable-gpu').concat(['--ignore-gpu-blocklist'],process.platform=='win32'?['--use-angle=d3d11']:[]);
+async function lancer({webgl=false}={}){return playwright.chromium.launch({args:webgl?(process.env.WR_GPU=='1'?OPTIONS_GPU:OPTIONS_WEBGL):OPTIONS_STABLES,...(process.env.WR_CANAL?{channel:process.env.WR_CANAL}:{})})}
 
-/* ouvre le jeu ; options : format, graine, police ('reelle' ou 'bloquee'), echelle (densité de pixels) */
-async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='reelle',echelle=2}={}){
+/* ouvre le jeu ; options : format, graine, police ('reelle' ou 'bloquee'), echelle (densité de pixels),
+   bloquer (fichiers du jeu à rendre introuvables, par exemple ['rendu3d.js'] pour simuler un appareil où la 3D ne se charge pas) */
+async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='reelle',echelle=2,bloquer=[]}={}){
  const ctx=await navigateur.newContext({...FORMATS[format],deviceScaleFactor:echelle,isMobile:true,hasTouch:true,locale:'fr-FR',timezoneId:'Europe/Paris',reducedMotion:'no-preference'});
  const page=await ctx.newPage();
  const erreurs=[];page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()=='error')erreurs.push(m.text())});
  /* aucune connexion vers l'extérieur, sauf la police si demandée (le multijoueur n'est jamais contacté) */
  const origine=new URL(url).origin+'/';
+ if(bloquer.length)await page.route(u=>bloquer.some(b=>u.pathname.endsWith('/'+b)),r=>r.abort());
  await page.route(u=>!u.href.startsWith(origine),r=>{const h=new URL(r.request().url()).hostname;
   if(police=='reelle'&&(h=='fonts.googleapis.com'||h=='fonts.gstatic.com'))return r.continue();return r.abort()});
  await page.addInitScript(`window.__GRAINE__=${graine>>>0};`+SOURCE_NAVIGATEUR);
@@ -41,8 +46,10 @@ async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='ree
   await Promise.all(fr().map(f=>f.load().catch(()=>{})));await document.fonts.ready;return fr().length>0&&fr().every(f=>f.status=='loaded')});
  await page.clock.runFor(100);
  /* l'horloge simulée démarre avec 1 ou 2 ms de décalage selon les passages (temps réel écoulé pendant son installation) :
-    on l'aligne sur exactement 200 ms pour que les animations (chemin, portail, barre de revenu) soient identiques à chaque passage */
- const pn=await page.evaluate(()=>performance.now());if(pn<200)await page.clock.runFor(200-pn);
+    on l'aligne sur exactement 2 000 ms pour que les animations (chemin, portail, barre de revenu, neige) soient identiques à chaque passage.
+    2.29 : 2 000 ms au lieu de 200 : en 3D, le chargement est plus long et l'horloge dépassait parfois déjà 200 ms (jusqu'à 986) ;
+    l'alignement était alors sauté et toute la partie décalée de quelques millisecondes d'un passage à l'autre */
+ const pn=await page.evaluate(()=>performance.now());if(pn>=2000)throw new Error('horloge déjà à '+Math.round(pn)+' ms : impossible de l’aligner sur 2 000 ms');await page.clock.runFor(2000-pn);
  return {ctx,page,erreurs,policeChargee,fermer:()=>ctx.close()};
 }
 
@@ -66,7 +73,15 @@ async function deuxDoigts(page,{de,vers,etapes=8}){const cdp=await page.context(
   await cdp.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:pts(l(de[0],vers[0]),l(de[1],vers[1]))})}
  await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});await cdp.detach();await page.clock.runFor(50)}
 async function toucher(page,selecteur){await page.locator(selecteur).first().tap();await page.clock.runFor(50)}
-async function avancer(page,ms){await page.clock.runFor(ms)}
+/* En 3D, la partie avance toujours image par image (G.step à chaque image), mais la vue 3D n'est redessinée que 4 fois par seconde de jeu,
+   puis une dernière fois à l'instant exact. Avant, chaque seconde de jeu dessinait 60 images en rendu logiciel, sans pause : depuis le paysage
+   de la 2.26, environ 10 min pour 30 s de jeu, puis un plantage du navigateur de test (« Target crashed ») à l'arrivée des vagues, qui
+   n'existe pas sur un vrai téléphone. En 2D, rien ne change. */
+async function avancer(page,ms){
+ const allege=await page.evaluate(()=>{if(typeof R3D=='undefined'||!R3D.api||typeof dessinerVue!='function'||window.__vueComplete)return false;
+  const f=dessinerVue;window.__vueComplete=f;let d=-1e9;dessinerVue=t=>{if(t-d>=.25){d=t;f(t)}};return true});
+ try{await page.clock.runFor(ms)}
+ finally{if(allege)await page.evaluate(()=>{const f=window.__vueComplete;dessinerVue=f;delete window.__vueComplete;f(performance.now()/1000)}).catch(()=>{})}}
 /* 2.15 : la fiche n'est visible que lorsqu'on a choisi quelque chose ; les boutons Améliorer et Vendre sont dans la fiche */
 async function etat(page){return page.evaluate(()=>{const f=document.getElementById('fiche');return {or:P.gold,revenu:P.inc,vies:P.lives,tours:P.t.map(t=>({x:t.x,y:t.y,k:t.k,lv:t.lv})),temps:time,horloge:document.getElementById('clock').textContent,
  vue:view,fin:over,faction:chosenClass,panneauOuvert:f?.dataset.mode=='tour',fiche:f&&!f.hidden?f.innerText:'',choix:typeof sel!='undefined'?sel:null,monstre:typeof mon!='undefined'?mon:null,
