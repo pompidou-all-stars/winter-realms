@@ -9,6 +9,8 @@ const BASE_TW=[
  {n:'Flammes',c:70,r:2,d:3,cd:.12,fl:1,col:'#e67e22',s:'flame'}];
 /* ralentissements selon le niveau de la tour (2.18), du niveau 1 au niveau 5. p : part de vitesse retirée, d : durée (s), r : rayon de la zone du Givre (cases).
    Le froid (Givre) et les racines (Sylvestres) s'additionnent ; deux effets de la même famille ne s'additionnent pas (le plus fort et le plus long l'emportent). */
+/* GIVRE_BONUS (2.36) : ralentissement en plus pour les Givre renforcées (emplacement 8, « Entrave »). Même famille que le Givre : pas de cumul, le plus fort l'emporte. */
+const GIVRE_BONUS=.1;
 const GIVRE_LV={p:[.2,.275,.35,.425,.5],d:[1.5,1.8,2.1,2.4,2.7],r:[1.2,1.4,1.6,1.8,2]},RACINES_LV={p:[.1,.15,.2,.25,.3],d:[.72,.85,1,1.15,1.3]};
 const FACTIONS=[
  {name:'Alliance',icon:'🛡️',color:'#d8b45c',dark:'#59451f',desc:'Portée supérieure et maîtrise des airs ; dégâts directs légèrement plus modestes.', towers:['Tour des archers','Bastion du chevalier','Obélisque de givre','Bombarde royale','Brasier du griffon','Sanctuaire solaire','Tour des sentinelles','Garde du lion','Cristal hivernal','Arcaniste royal']},
@@ -37,10 +39,10 @@ const TW=FACTIONS.flatMap((F,fi)=>F.towers.map((name,j)=>{
  const base=BASE_TW[ARCH[j]],scale=[1,1.08,.96,1.12,1.18,.92,1.22,1.30,1.16,1.38][j],bal=FACTION_BALANCE[fi];
  const late=j>=6,role=ROLE[j];
  return {...base,n:name,c:Math.max(10,Math.round(base.c*scale*bal.cost/5)*5),
-  d:+(base.d*scale*bal.dmg*(late&&j==6?.88:late&&j==7?1.08:late&&j==8?.9:late&&j==9?1.08:1)).toFixed(1),
+  d:+(base.d*scale*bal.dmg*(late&&j==6?.88:late&&j==7?1.08:late&&j==8?1.5:late&&j==9?1.08:1)).toFixed(1),
   cd:+(base.cd*bal.cd*(late&&j==6?.86:late&&j==7?1.12:1)).toFixed(3),
   r:+(base.r*bal.range*(late&&j==6?1.12:late&&j==9?1.08:1)).toFixed(2),
-  sl:base.fsp?GIVRE_LV.d[0]:bal.root?RACINES_LV.d[0]:0,
+  sl:base.fsp?GIVRE_LV.d[0]:bal.root?RACINES_LV.d[0]:0,gb:late&&j==8?GIVRE_BONUS:0,
   airBonus:bal.airBonus||0,execute:bal.execute||0,pierce:bal.pierce||0,mark:bal.mark||0,
   col:F.color,skin:ARCH[j],faction:fi,role:role.name,tag:bal.tag+' · '+role.tag};
 }));
@@ -225,7 +227,7 @@ class Board{
   c.hp-=d;
   /* ralentissement selon le niveau de la tour : froid (Givre, GIVRE_LV) ou racines (autres tours sylvestres, RACINES_LV).
      Dans une même famille, un effet plus faible n'écrase jamais un plus fort en cours, et la durée la plus longue est gardée. */
-  if(T.sl){const i=Math.min(4,Math.max(0,(lv||1)-1));if(T.fsp){c.gp=c.gt>0?Math.max(c.gp,GIVRE_LV.p[i]):GIVRE_LV.p[i];c.gt=Math.max(c.gt||0,GIVRE_LV.d[i])}
+  if(T.sl){const i=Math.min(4,Math.max(0,(lv||1)-1));if(T.fsp){const gp=GIVRE_LV.p[i]+(T.gb||0);c.gp=c.gt>0?Math.max(c.gp,gp):gp;c.gt=Math.max(c.gt||0,GIVRE_LV.d[i])}
    else{c.rp=c.rt>0?Math.max(c.rp,RACINES_LV.p[i]):RACINES_LV.p[i];c.rt=Math.max(c.rt||0,RACINES_LV.d[i])}ralentir(c)}
  }
  impact(p){const T=TW[p.k],tg=p.tg,rad=T.sp||(T.fsp?GIVRE_LV.r[Math.min(4,Math.max(0,(p.lv||1)-1))]:0);
@@ -502,4 +504,4 @@ class Game{
   const alive=B.filter(b=>!b.dead);
   if(alive.length<=1||!alive.some(b=>!b.ai)){this.over=true;this.winner=alive.length==1?alive[0].i:-1;this.log.push({type:'end',winner:this.winner})}}
 }
-if(typeof module!='undefined'&&module.exports)module.exports={C,R,SP,EX,INF,TW,CR,PAL_C,DIFF,GRACE,FACTIONS,GIVRE_LV,RACINES_LV,Board,Game};
+if(typeof module!='undefined'&&module.exports)module.exports={C,R,SP,EX,INF,TW,CR,PAL_C,DIFF,GRACE,FACTIONS,GIVRE_LV,GIVRE_BONUS,RACINES_LV,Board,Game};

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.36</title>
+<title>Winter Realms — Tower Wars · Édition 2.37</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -161,7 +161,7 @@ body.r2d .fleche{display:none}
 #cartesBtn{top:calc(54px + env(safe-area-inset-top,0px));border-radius:5px;border-color:var(--c,#8fb6d955);color:var(--c,var(--ink))}
 #cartesBtn:after{border-width:10px;border-image-width:10px}
 #chips{top:calc(96px + env(safe-area-inset-top,0px));border-radius:6px}
-/* 2.36 : bouton et panneau « Mes tours » (en miroir du bouton des adversaires) */
+/* 2.37 : bouton et panneau « Mes tours » (en miroir du bouton des adversaires) */
 #parcBtn{position:absolute;z-index:5;left:calc(8px + env(safe-area-inset-left,0px));top:calc(54px + env(safe-area-inset-top,0px));height:32px;display:flex;align-items:center;gap:6px;padding:0 11px 0 8px;border-radius:5px;color:var(--ink);font-size:12.5px;font-weight:700;box-shadow:0 2px 8px #0008;background-image:var(--givre),var(--verre-nuit);background-size:180px,auto;border:1px solid #8fb6d955}
 #parcBtn:after{content:'';position:absolute;inset:-3px;border:10px solid transparent;border-image:var(--orne-argent) 32 / 10px / 0 stretch;pointer-events:none}
 #parcBtn svg{width:18px;height:18px;fill:none;stroke:#ffd95e;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -396,7 +396,7 @@ body.prep #clock{display:none}
   </div>
   <button id="cartesBtn" type="button" aria-expanded="false" aria-controls="chips"><svg viewBox="0 0 24 24"><path d="M4 4l10 10M4 4h4M4 4v4M20 4L10 14M20 4h-4M20 4v4M7 15l2 2M5 19l3-3M17 15l-2 2M19 19l-3-3"/></svg><span id="cartesTxt">Adversaires</span><span id="advPoints"></span></button>
   <div id="chips" hidden></div>
-  <!-- 2.36 : panneau « Mes tours » (amélioration de plusieurs tours, file d'attente) -->
+  <!-- 2.37 : panneau « Mes tours » (amélioration de plusieurs tours, file d'attente) -->
   <button id="parcBtn" type="button" aria-expanded="false" aria-controls="parc"><svg viewBox="0 0 24 24"><path d="M5 20V9l2-2 2 2v11M15 20V9l2-2 2 2v11M3 20h18M12 13V4M9 7l3-3 3 3"/></svg><span>Mes tours</span><b id="fileN" hidden></b></button>
   <div id="parc" hidden></div>
   <button class="fleche" id="rotG" type="button" aria-label="Pivoter la vue vers la gauche"><svg viewBox="0 0 24 24"><path d="M4 4v5h5"/><path d="M4.6 9A8 8 0 1 1 6 16.5"/></svg></button>
@@ -1086,7 +1086,7 @@ const dps=(k,lv)=>Math.round(dmg({k,lv})/TW[k].cd);
 /* bonus de faction, en clair, calculé à partir de FACTION_BALANCE */
 /* ralentissement d'une tour à un niveau donné (2.18) : froid du Givre (avec sa zone) ou racines sylvestres */
 const pr=x=>fr(x*100)+' %',fd=n=>String(+(+n).toFixed(2)).replace('.',',');
-function ralentit(T,lv){const i=Math.min(4,Math.max(0,lv-1));return T.fsp?{p:GIVRE_LV.p[i],d:GIVRE_LV.d[i],r:GIVRE_LV.r[i]}:T.sl?{p:RACINES_LV.p[i],d:RACINES_LV.d[i]}:null}
+function ralentit(T,lv){const i=Math.min(4,Math.max(0,lv-1));return T.fsp?{p:GIVRE_LV.p[i]+(T.gb||0),d:GIVRE_LV.d[i],r:GIVRE_LV.r[i]}:T.sl?{p:RACINES_LV.p[i],d:RACINES_LV.d[i]}:null}
 function bonusFaction(f){const B=FACTION_BALANCE[f],pc=x=>Math.round((x-1)*100)+' %';
  return B.airBonus?'Anti-aérien : +'+pc(B.airBonus)+' de dégâts contre les volants':B.execute?'Frénésie : +'+pc(B.execute)+' sur les monstres à moins de 35 % de vie':
   B.root?'Racines : chaque coup ralentit le monstre de '+pr(RACINES_LV.p[0])+' (niveau 1) à '+pr(RACINES_LV.p[4])+' (niveau 5), en plus du froid':B.pierce?'Perforant : ignore '+Math.round(B.pierce*100)+' % de l\'armure':B.mark?'Malédiction : chaque coup suivant sur la même cible fait +'+pc(B.mark):''}
@@ -1147,7 +1147,7 @@ function ficheLot(){const f=$('fiche'),T=TW[lot.k],n=lot.t.length,ok=lot.n;f.tex
 function ameliorerLot(){if(!lot||!majLot())return;const l=lot.t.slice(0,lot.n);let r=0;
  for(const t of l)if(doAction({type:'upgrade',x:t.x,y:t.y})==='')r++;
  if(r){sfx('up');vibrer(15);toast(r+(r>1?' tours améliorées':' tour améliorée')+' · niveau '+(lot.lv+1))}lot=null;render()}
-/* ---------- 2.36 : panneau « Mes tours » et file d'améliorations ----------
+/* ---------- 2.37 : panneau « Mes tours » et file d'améliorations ----------
    Le bouton « Mes tours » ouvre la liste de ses tours, rangées par type (nombre de tours par niveau).
    On coche des types, on choisit le niveau visé (2 à 5) et on ajoute l'ordre à la file : chaque tour monte
    niveau par niveau (1 → 2 → 3 → 4), toujours la moins avancée d'abord, dès que l'or suffit.

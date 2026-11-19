@@ -6,6 +6,7 @@
    (--rapide est gardé comme synonyme de --simulation)
    2.35 : les fichiers de test tournent en parallèle (un processus par fichier, autant que de cœurs moins un),
    les plus longs en premier ; les parties entre IA sont elles aussi jouées en parallèle (tests/outils/parties.js).
+   2.36 : les tests qui mesurent un temps réel (liste SEULS) sont lancés ensuite, seuls, pour que la charge ne fausse pas la mesure.
    Code de sortie : 0 si tout passe, 1 sinon. */
 'use strict';
 const {spawnSync}=require('child_process'),path=require('path'),fs=require('fs'),os=require('os');
@@ -14,11 +15,16 @@ const complet=args.includes('--complet'),simulation=args.includes('--rapide')||a
 const fichiers=d=>fs.readdirSync(path.join(ici,d)).filter(f=>f.endsWith('.test.js')).sort().map(f=>path.join(ici,d,f));
 /* les plus longs d'abord, pour qu'ils ne restent pas seuls à la fin */
 const LONGS=['parcours.test.js','parties-ia.test.js','labyrinthe-partie.test.js','labyrinthe.test.js'],rang=f=>{const i=LONGS.indexOf(path.basename(f));return i<0?LONGS.length:i};
-const liste=[...fichiers('simulation'),...(simulation?[]:fichiers('navigateur'))].sort((a,b)=>rang(a)-rang(b));
+const SEULS=['labyrinthe-duree.test.js'],seul=f=>SEULS.includes(path.basename(f));
+const tous=[...fichiers('simulation'),...(simulation?[]:fichiers('navigateur'))].sort((a,b)=>rang(a)-rang(b));
+const liste=tous.filter(f=>!seul(f)),apres=tous.filter(seul);
 const coeurs=os.availableParallelism?os.availableParallelism():os.cpus().length,paralleles=args.includes('--un-par-un')?1:Math.max(1,coeurs-1);
 console.log(`Tests Winter Realms — ${simulation?'simulation':'simulation + navigateur'}${complet?' (15 parties complètes)':''} · ${paralleles} fichier(s) à la fois\n`);
 /* le rapporteur est passé sous forme d'URL file:// : sous Windows, un chemin « C:\… » est refusé par Node */
 const rapporteur=require('url').pathToFileURL(path.join(ici,'outils','rapporteur.mjs')).href;
-const r=spawnSync(process.execPath,['--test',`--test-concurrency=${paralleles}`,`--test-reporter=${rapporteur}`,...liste],
- {stdio:'inherit',env:{...process.env,...(complet?{WR_COMPLET:'1'}:{})}});
-process.exit(r.status===0?0:1);
+const lancer=(fs_,n)=>fs_.length?spawnSync(process.execPath,['--test',`--test-concurrency=${n}`,`--test-reporter=${rapporteur}`,...fs_],
+ {stdio:'inherit',env:{...process.env,...(complet?{WR_COMPLET:'1'}:{})}}).status:0;
+const a=lancer(liste,paralleles);
+if(apres.length)console.log('\nMesures de durée, lancées seules :');
+const b=lancer(apres,1);
+process.exit(a===0&&b===0?0:1);

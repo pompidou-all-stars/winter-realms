@@ -52,6 +52,15 @@ test('Givre : de −20 % (niveau 1) à −50 % (niveau 5), pendant 1,5 s à 2,7 
  const att=[[.8,1.5],[.725,1.8],[.65,2.1],[.575,2.4],[.5,2.7]];
  for(let lv=1;lv<=5;lv++){const c=apparaitre(S,b,3);b.hit(c,0,T,lv);proche(c.sf,att[lv-1][0],'vitesse niveau '+lv);proche(c.sl,att[lv-1][1],'durée niveau '+lv)}
 });
+test('Cristal hivernal (Givre renforcé, emplacement 8) : 10 points de ralentissement de plus que le Givre, à chaque niveau',()=>{const b=terrain(),T=S.TW[8];
+ for(let lv=1;lv<=5;lv++){const c=apparaitre(S,b,3);b.hit(c,0,T,lv);proche(c.sf,1-S.GIVRE_LV.p[lv-1]-S.GIVRE_BONUS,'niveau '+lv);proche(c.sl,S.GIVRE_LV.d[lv-1],'durée niveau '+lv)}
+ assert.ok(T.d>S.TW[2].d*1.5,'plus de dégâts que l’Obélisque de givre');
+});
+test('Cristal hivernal et Givre ne se cumulent pas : le plus fort l’emporte, dans les deux sens',()=>{const b=terrain();
+ let c=apparaitre(S,b,3);b.hit(c,0,S.TW[2],1);b.hit(c,0,S.TW[8],1);proche(c.sf,.7,'Givre puis Cristal');
+ c=apparaitre(S,b,3);b.hit(c,0,S.TW[8],1);b.hit(c,0,S.TW[2],5);proche(c.sf,.5,'Givre niveau 5 plus fort');
+ c=apparaitre(S,b,3);b.hit(c,0,S.TW[8],5);b.hit(c,0,S.TW[2],5);proche(c.sf,.4,'Cristal niveau 5 garde son effet');
+});
 test('Givre : la zone d’effet passe de 1,2 case (niveau 1) à 2 cases (niveau 5)',()=>{
  for(const [lv,ralenti] of [[1,false],[5,true]]){const b=terrain();const a=apparaitre(S,b,0),v=apparaitre(S,b,0);a.hp=a.max=v.hp=v.max=1e9;
   Object.assign(a,{x:6,y:5,tx:6,ty:5});Object.assign(v,{x:6,y:6.8,tx:6,ty:7});

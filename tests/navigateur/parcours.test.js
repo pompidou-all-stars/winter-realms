@@ -168,7 +168,7 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   assert.equal(e.tours.filter(t=>t.k==20&&t.lv==2).length,1,'une seule tour améliorée');assert.equal(e.or,1);assert.match(e.toast,/1 tour améliorée/);
   await p.evaluate(()=>{P.gold+=1000});
  });
- test('Panneau « Mes tours » (2.36) : cocher un type, choisir le niveau, la file paie ce qu’elle peut puis le reste, et s’annule',async()=>{
+ test('Panneau « Mes tours » (2.37) : cocher un type, choisir le niveau, la file paie ce qu’elle peut puis le reste, et s’annule',async()=>{
   await N.toucher(p,'#parcBtn');assert.equal(await p.locator('#parc').isVisible(),true,'le panneau s’ouvre');
   const n=await p.evaluate(()=>P.t.filter(t=>t.k==20&&t.lv<3).length);assert.ok(n>=3,'au moins 3 Arbres sentinelles sous le niveau 3 : '+n);
   await p.locator('#parc .ligne',{hasText:'Arbre sentinelle'}).click();await p.locator('#parc .niv button',{hasText:'3'}).click();
