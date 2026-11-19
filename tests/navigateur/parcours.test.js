@@ -1,6 +1,8 @@
-/* Parcours automatisé d'un joueur dans un navigateur Chromium au format téléphone, en 2D (?rendu=2d).
-   Depuis la 2.15, le jeu se joue en portrait seulement : le parcours complet est en portrait, et en paysage on vérifie
-   que le jeu demande de tourner le téléphone.
+/* Parcours automatisé d'un joueur dans un navigateur Chromium au format téléphone, dans le vrai jeu : la vue 3D
+   (seule vue proposée depuis la 2.22). Depuis la 2.29, ce fichier réunit l'ancien parcours 2D (interface) et l'ancien parcours 3D.
+   WebGL tourne en rendu logiciel SwiftShader (pas besoin de carte graphique) ; WR_GPU=1 utilise la vraie carte graphique.
+   Depuis la 2.15, le jeu se joue en portrait : en paysage, on vérifie que le jeu demande de tourner le téléphone.
+   La 2D ne sert plus qu'en secours (appareil où la 3D ne se charge pas) : un test court à la fin vérifie qu'on peut y jouer.
    Ce test vérifie que le parcours fonctionne dans CE navigateur de test : ce n'est pas une garantie
    de compatibilité avec tous les téléphones (Safari iOS, anciens Android, etc. ne sont pas testés). */
 'use strict';
@@ -9,16 +11,26 @@ const N=require('../outils/navigateur'),{demarrer}=require('../outils/serveur'),
 
 if(!N.disponible()){test('Parcours navigateur',{skip:'Playwright n\'est pas installé sur cette machine : tests navigateur ignorés'},()=>{})}
 else{
-test.describe('Parcours mobile — portrait',()=>{
+test.describe('Parcours mobile en 3D — portrait',()=>{
  let srv,nav,o,p;
- test.before(async()=>{srv=await demarrer(RACINE);nav=await N.lancer();o=await N.ouvrir(nav,srv.url+'?rendu=2d',{format:'portrait'});p=o.page});
+ test.before(async()=>{srv=await demarrer(RACINE);nav=await N.lancer({webgl:true});o=await N.ouvrir(nav,srv.url,{format:'portrait'});p=o.page});
  test.after(async()=>{if(o)await o.fermer();if(nav)await nav.close();if(srv)await srv.fermer()});
- const val=f=>p.evaluate(f);
+ const val=f=>p.evaluate(f),r3d=()=>p.evaluate(()=>R3D_ETAT());
+ /* une case dont le centre est bien visible, entre le bandeau et le dock */
+ async function caseVisible(exclues=[]){const b=await p.locator('#stage').boundingBox(),d=await p.locator('#ctl').boundingBox();
+  for(let y=4;y<15;y++)for(let x=1;x<12;x++){if(x==6||exclues.some(([a,c])=>a==x&&c==y))continue;const c=await N.centreCase(p,x,y);
+   if(c.x>b.x+60&&c.x<b.x+b.width-60&&c.y>b.y+140&&c.y<d.y-70)return {x,y}}return null}
 
- test('La page s\'ouvre sans erreur, avec l\'écran d\'accueil',async()=>{
+ test('La page s\'ouvre sans erreur, avec l\'écran d\'accueil, sans lien vers la 2D',async()=>{
   assert.match(await p.title(),/Winter Realms/);assert.equal(await val(()=>document.getElementById('ov').hidden),false);
   assert.equal(await p.isVisible('#tourner'),false,'pas de message « tourne ton téléphone » en portrait');
+  assert.equal(await p.locator('#mode3d').count(),0,'pas de lien vers la 2D sur l’accueil');
   assert.deepEqual(o.erreurs,[]);
+ });
+ test('Le rendu 3D se charge (WebGL, modèles) avec la caméra tactique en perspective',async()=>{
+  assert.equal(await N.attendre3D(p),true,'rendu 3D prêt');
+  const e=await r3d();assert.equal(e.on,true);assert.equal(e.scene.vue.perspective,true);assert.equal(e.scene.vue.az,0);
+  assert.equal(await p.locator('#main3d').count(),1,'canevas WebGL présent');assert.deepEqual(o.erreurs,[]);
  });
  test('À l\'ouverture, l\'Alliance est présélectionnée et les boutons de difficulté sont actifs',async()=>{
   assert.equal(await p.getAttribute('[data-faction="0"]','aria-pressed'),'true');
@@ -38,11 +50,11 @@ test.describe('Parcours mobile — portrait',()=>{
   const a=await m();assert.match(a.src,/assets\/musique\/winter-realm(-1|-2)?\.mp3$/,'thème en cours : '+a.src);assert.equal(a.n,3);
   for(let k=1;k<=3;k++){await p.evaluate(()=>MUSIQUE.el.dispatchEvent(new Event('ended')));const b=await m();assert.equal(b.i,(a.i+k)%3,'thème suivant ('+k+')')}
  });
- test('Interface (2.15) : bandeau en haut, dock en bas, terrain sur tout l\'écran ; pas de flèches de rotation en 2D',async()=>{
+ test('Interface (2.15) : bandeau en haut, dock en bas, terrain 3D sur tout l\'écran, flèches de rotation',async()=>{
   const s=await p.locator('#stage').boundingBox(),h=await p.locator('#hud').boundingBox(),c=await p.locator('#ctl').boundingBox(),v=p.viewportSize();
   assert.ok(s.width>=v.width-1&&s.height>=v.height-1,'le terrain couvre l\'écran');assert.ok(h.y<60,'bandeau en haut');assert.ok(c.y+c.height>=v.height-1,'dock en bas');
-  for(const id of ['#menuBtn','#fs','#cartesBtn'])assert.equal(await p.isVisible(id),true,id+' visible');
-  assert.equal(await p.isVisible('#rotG'),false);assert.equal(await p.isVisible('#rotD'),false);
+  for(const id of ['#menuBtn','#fs','#cartesBtn','#rotG','#rotD'])assert.equal(await p.isVisible(id),true,id+' visible');
+  const e=(await r3d()).scene;assert.ok(e.dessins>5,'appels de dessin : '+e.dessins);assert.ok(e.triangles>3000,'triangles : '+e.triangles);
  });
  test('Sans tour choisie, toucher une case ne construit rien et le dit',async()=>{
   await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[]);assert.equal(e.projet,null);assert.match(e.toast,/Choisis d’abord une tour/);
@@ -53,39 +65,43 @@ test.describe('Parcours mobile — portrait',()=>{
   assert.equal(await p.getAttribute('#bar button[aria-label^="Arbre sentinelle,"]','class'),'sel');
   assert.match(await p.textContent('#bar button[aria-label^="Arbre sentinelle,"]'),/^20 or$/,'la carte ne montre que le prix');
  });
- test('Construction : un premier toucher montre un aperçu, sans rien construire',async()=>{
-  await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[]);assert.equal(e.or,100);
-  assert.deepEqual(e.projet,{x:3,y:5,k:20});assert.match(e.toast,/Touchez encore la case pour construire \(20 or/);
+ test('Construction : un premier toucher montre la tour fantôme et sa portée en 3D, sans rien construire',async()=>{
+  await N.toucherCase(p,3,5);await N.avancer(p,50);const e=await N.etat(p),s=(await r3d()).scene;assert.deepEqual(e.tours,[]);assert.equal(e.or,100);
+  assert.deepEqual(e.projet,{x:3,y:5,k:20});assert.match(e.toast,/Touchez encore la case pour construire \(20 or/);assert.equal(s.fantome,true);assert.equal(s.portee,true);
  });
- test('Construction : un second toucher sur la même case construit la tour et débite son prix',async()=>{
-  await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[{x:3,y:5,k:20,lv:1}]);assert.equal(e.or,80);assert.equal(e.projet,null);
+ test('Construction : un second toucher sur la même case construit la tour en 3D et débite son prix',async()=>{
+  await N.toucherCase(p,3,5);await N.avancer(p,50);const e=await N.etat(p),s=(await r3d()).scene;
+  assert.deepEqual(e.tours,[{x:3,y:5,k:20,lv:1}]);assert.equal(e.or,80);assert.equal(e.projet,null);assert.equal(s.tours,1);assert.equal(s.fantome,false);
  });
  test('Construction : toucher une autre case déplace l\'aperçu, sans construire',async()=>{
   await N.toucherCase(p,8,5);await N.toucherCase(p,9,5);const e=await N.etat(p);assert.deepEqual(e.projet,{x:9,y:5,k:20});assert.equal(e.tours.length,1);assert.equal(e.or,80);
- });
- test('Construction : glisser le doigt sur plusieurs cases ne construit rien',async()=>{
-  await N.glisser(p,[1,12],[5,12]);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(e.or,80);
  });
  test('Une pose impossible est refusée avec un message',async()=>{
   await N.toucherCase(p,6,0);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(e.or,80);
   assert.equal(await p.textContent('#toast'),'Impossible ici : le chemin serait bloqué');assert.equal(await val(()=>document.getElementById('toast').hidden),false);
  });
- test('Toucher une tour ouvre sa fiche ; Améliorer (après le chantier) puis Vendre fonctionnent',async()=>{
+ test('Toucher le pied de la tour ouvre sa fiche ; Améliorer (après le chantier) puis Vendre fonctionnent',async()=>{
   await N.avancer(p,1500);await N.toucherCase(p,3,5);let e=await N.etat(p);assert.equal(e.panneauOuvert,true);
   assert.match(e.fiche,/niveau 1\/5/);assert.match(e.fiche,/Niveau 2 :/);
   assert.ok(e.boutons.some(b=>b.startsWith('Améliorer'))&&e.boutons.some(b=>b.startsWith('Vendre')));
   await N.toucher(p,'#fiche button:has-text("Améliorer")');e=await N.etat(p);assert.equal(e.tours[0].lv,2);assert.equal(e.or,50);
   await N.toucher(p,'#fiche button:has-text("Vendre")');e=await N.etat(p);assert.equal(e.tours.length,0);assert.equal(e.or,85);assert.equal(e.panneauOuvert,false);
+  await N.avancer(p,50);assert.equal((await r3d()).scene.tours,0,'tour retirée de la scène 3D');
  });
  test('Le × de la fiche annule le choix de la tour',async()=>{
   await N.toucher(p,'#fiche .fermer');const e=await N.etat(p);assert.equal(e.choix,null);assert.equal(e.fiche,'');
  });
- test('Envoyer (2.15) : le 1er toucher choisit le monstre, chaque toucher suivant envoie un groupe',async()=>{
+ test('Envoyer (2.15) : le 1er toucher choisit le monstre, chaque toucher suivant envoie un groupe ; les monstres apparaissent en 3D chez l\'adversaire',async()=>{
   await N.toucher(p,'#tabs button[data-t="n"]');await N.toucherCarte(p,'Sapeur gobelin');let e=await N.etat(p);
   assert.equal(e.or,85,'le premier toucher n\'envoie rien');assert.match(e.fiche,/Sapeur gobelin/);assert.match(e.fiche,/Chaque toucher/);
   await N.toucherCarte(p,'Sapeur gobelin');e=await N.etat(p);assert.equal(e.or,75);assert.equal(e.revenu,11);
   await N.toucherCarte(p,'Sapeur gobelin');e=await N.etat(p);assert.equal(e.or,65);assert.equal(e.revenu,12);assert.match(e.toast,/^×2 · /,'compteur des envois enchaînés');
   await N.toucher(p,'#tabs button[data-t="t"]');
+  /* les monstres apparaissent en moins de 1,4 s ; l'IA peut les tuer vite : on garde le maximum observé */
+  await p.evaluate(()=>setView(1));let max=0;
+  try{for(let i=0;i<12;i++){await N.avancer(p,200);max=Math.max(max,(await r3d()).scene.monstres)}}
+  finally{await p.evaluate(()=>setView(0));await N.avancer(p,50)}
+  assert.ok(max>=1,'monstres en 3D : '+max);
  });
  test('Onglet « Spéciaux » : paliers de monstres ; le palier 2 s’ouvre contre son prix et montre ses monstres',async()=>{
   await N.toucher(p,'#tabs button[data-t="s"]');assert.equal(await p.isVisible('#paliers'),true);
@@ -108,6 +124,23 @@ test.describe('Parcours mobile — portrait',()=>{
  test('Le revenu tombe à 10 s de jeu',async()=>{
   const avant=(await N.etat(p)).or;await N.avancer(p,10000);const e=await N.etat(p);assert.ok(e.temps>10);assert.equal(e.or,avant+12);
  });
+ test('Glisser le doigt déplace la carte (le terrain suit le doigt), sans rien construire',async()=>{
+  await N.toucherCarte(p,'Arbre sentinelle');
+  const avant=await N.etat(p),c0=await N.centreCase(p,6,9);await N.glisser(p,[6,9],[6,6]);await N.avancer(p,600);
+  const c1=await N.centreCase(p,6,9),e=await N.etat(p);assert.ok(c0.y-c1.y>40,'la case (6,9) est remontée à l\'écran : '+Math.round(c0.y)+' → '+Math.round(c1.y));
+  assert.equal(e.tours.length,avant.tours.length);assert.equal(e.or,avant.or);assert.equal(e.projet,null);
+ });
+ test('Les flèches font pivoter la vue d\'un huitième de tour, dans un sens puis dans l\'autre',async()=>{
+  const c0=await N.centreCase(p,3,5);await N.toucher(p,'#rotD');await N.avancer(p,800);assert.equal((await r3d()).scene.vue.az,1);
+  const c1=await N.centreCase(p,3,5);assert.ok(Math.hypot(c1.x-c0.x,c1.y-c0.y)>20,'la case (3,5) a bougé à l\'écran');
+  await N.toucher(p,'#rotG');await N.toucher(p,'#rotG');await N.avancer(p,800);assert.equal((await r3d()).scene.vue.az,-1);
+ });
+ test('Vue pivotée : toucher une case pose la tour exactement sur cette case',async()=>{
+  assert.equal((await N.etat(p)).choix,20,'la tour choisie est restée');
+  const cible=await caseVisible();assert.ok(cible,'une case visible');
+  const avant=(await N.etat(p)).or;await N.construire(p,cible.x,cible.y);
+  const e=await N.etat(p);assert.ok(e.tours.some(t=>t.x==cible.x&&t.y==cible.y),'tour posée en ('+cible.x+','+cible.y+')');assert.equal(e.or,avant-20);
+ });
  test('Menu (2.15) : son, rappel des gestes, reprendre ; quitter demande une confirmation',async()=>{
   await N.toucher(p,'#menuBtn');assert.equal(await p.isVisible('#menu'),true);
   await N.toucher(p,'#snd');assert.equal(await p.textContent('#snd'),'Son : coupé');await N.toucher(p,'#snd');
@@ -121,9 +154,22 @@ test.describe('Parcours mobile — portrait',()=>{
 });
 
 test('Paysage (2.15) : sur un téléphone tenu en paysage, le jeu demande de le tourner',async()=>{
- const srv=await demarrer(RACINE),nav=await N.lancer();
- try{const o=await N.ouvrir(nav,srv.url+'?rendu=2d',{format:'paysage'});
+ const srv=await demarrer(RACINE),nav=await N.lancer({webgl:true});
+ try{const o=await N.ouvrir(nav,srv.url,{format:'paysage'});
   assert.equal(await o.page.isVisible('#tourner'),true);assert.match(await o.page.textContent('#tourner'),/Tourne ton téléphone/);
   assert.deepEqual(o.erreurs,[]);await o.fermer()}
+ finally{await nav.close();await srv.fermer()}});
+
+/* secours : si la 3D ne se charge pas (appareil sans WebGL 2, module introuvable), le jeu passe en 2D et reste jouable ;
+   ?rendu=2d force la même 2D (dépannage et anciens outils) */
+test('Secours 2D : si la 3D ne se charge pas, le jeu le dit, passe en 2D et on peut construire',async()=>{
+ const srv=await demarrer(RACINE),nav=await N.lancer();
+ try{const o=await N.ouvrir(nav,srv.url,{bloquer:['rendu3d.js']}),p=o.page;
+  assert.equal(await N.attendre3D(p,15000),false,'la 3D échoue');const r=await p.evaluate(()=>R3D_ETAT());assert.equal(r.on,false);assert.equal(r.echec,true);
+  assert.match(await p.textContent('#toast'),/3D indisponible sur cet appareil/);assert.equal(await p.locator('#main3d').count(),0);
+  await N.toucher(p,'#go0');await N.avancer(p,600);assert.equal(await p.isVisible('#rotG'),false,'pas de flèches de rotation en 2D');
+  await N.toucherCarte(p,'Tour des archers');await N.construire(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[{x:3,y:5,k:0,lv:1}]);assert.equal(e.or,80);
+  assert.deepEqual(o.erreurs.filter(m=>!/rendu3d|Failed to load|ERR_FAILED|module script/i.test(m)),[]);await o.fermer();
+  const o2=await N.ouvrir(nav,srv.url+'?rendu=2d');assert.equal((await o2.page.evaluate(()=>R3D_ETAT())).on,false,'?rendu=2d force la 2D');assert.deepEqual(o2.erreurs,[]);await o2.fermer()}
  finally{await nav.close();await srv.fermer()}});
 }

@@ -1,7 +1,8 @@
 /* Captures d'écran du jeu, format téléphone : 5 écrans en portrait, et l'accueil en paysage
    (depuis la 2.15, le jeu se joue en portrait ; en paysage, un téléphone affiche « Tourne ton téléphone »).
-   Usage : node tests/captures.js            → images dans captures/actuel/
-           node tests/captures.js --3d       → la même chose avec le rendu 3D (2.7), dans captures/3d/
+   Usage : node tests/captures.js            → images du vrai jeu (vue 3D, depuis la 2.29) dans captures/actuel/
+           node tests/captures.js --2d       → la même chose avec la 2D de secours, dans captures/2d/
+   (--3d, l'ancienne option, est gardé : c'est désormais le choix par défaut)
    Le scénario est toujours le même (graine fixe, horloge figée) : deux lancements donnent les mêmes images
    sur une même machine. Il fonctionne aussi avec les versions d'avant la 2.15 (comparaison visuelle avec main).
    Voir CLAUDE.md, « Conditions de la comparaison visuelle ». */
@@ -20,8 +21,8 @@ const FORMATS=['portrait','paysage'];
 const ECRANS_DU_FORMAT={portrait:ECRANS.map(e=>e.id),paysage:['1-accueil']};
 
 /* joue le scénario et enregistre les images ; renvoie la liste des captures et l'état de la police */
-/* rendu : '2d' (par défaut) ou '3d' (2.7, ?rendu=3d, WebGL logiciel) */
-async function capturer({racine=RACINE,sortie,police='reelle',echelle=2,graine=12345,nav=null,rendu='2d'}={}){
+/* rendu : '3d' (par défaut depuis la 2.29 : le vrai jeu, WebGL logiciel ou carte graphique avec WR_GPU=1) ou '2d' (secours, ?rendu=2d) */
+async function capturer({racine=RACINE,sortie,police='reelle',echelle=2,graine=12345,nav=null,rendu='3d'}={}){
  fs.mkdirSync(sortie,{recursive:true});
  const srv=await demarrer(racine),proprio=!nav;if(!nav)nav=await N.lancer({webgl:rendu=='3d'});
  const res={police,policeChargee:true,images:[],erreurs:[]};
@@ -52,7 +53,7 @@ module.exports={capturer,ECRANS,FORMATS,ECRANS_DU_FORMAT};
 
 if(require.main===module){
  if(!N.disponible()){console.log('Playwright n\'est pas installé : captures impossibles sur cette machine.');process.exit(0)}
- const rendu=process.argv.includes('--3d')?'3d':'2d',sortie=path.join(RACINE,'captures',rendu=='3d'?'3d':'actuel');
+ const rendu=process.argv.includes('--2d')?'2d':'3d',sortie=path.join(RACINE,'captures',rendu=='2d'?'2d':'actuel');
  capturer({sortie,rendu}).then(r=>{
   console.log(`${r.images.length} captures enregistrées dans ${path.relative(RACINE,sortie)}/`);
   if(!r.policeChargee)console.log('⚠️ La police Fredoka n\'a pas pu être chargée : le texte utilise une police de remplacement.');
