@@ -324,16 +324,19 @@ export function creer(J) {
   }
 
   /* ---------- flocons (thème hiver, 2.9) : 260 points qui tombent en boucle au-dessus du plateau ---------- */
-  const NF = 260, flocons = new Float32Array(NF * 3), vitesses = new Float32Array(NF);
+  /* 2.29 : la position de chaque flocon ne dépend que du temps (x0, y0 : position de départ), plus de l'enchaînement des images :
+     même mouvement à l'écran, mais deux captures au même instant sont identiques (comparaison visuelle des tests) */
+  const NF = 260, flocons = new Float32Array(NF * 3), vitesses = new Float32Array(NF), x0 = new Float32Array(NF), y0 = new Float32Array(NF);
   for (let i = 0; i < NF; i++) { const h = (i * 2654435761 >>> 0) / 4294967296, h2 = (i * 40503 % 997) / 997, h3 = (i * 7919 % 389) / 389;
-    flocons[i * 3] = -1 + h * (C + 2); flocons[i * 3 + 1] = h2 * 6; flocons[i * 3 + 2] = -1 + h3 * (R + 2); vitesses[i] = .35 + h2 * .35 }
+    x0[i] = flocons[i * 3] = -1 + h * (C + 2); y0[i] = flocons[i * 3 + 1] = h2 * 6; flocons[i * 3 + 2] = -1 + h3 * (R + 2); vitesses[i] = .35 + h2 * .35 }
   const geoF = new THREE.BufferGeometry(); geoF.setAttribute('position', new THREE.BufferAttribute(flocons, 3));
   const neige = new THREE.Points(geoF, new THREE.PointsMaterial({color: '#ffffff', size: .07, transparent: true, opacity: .85, depthWrite: false}));
   neige.frustumCulled = false; neige.renderOrder = 4; scene.add(neige);
-  function fairePleuvoir(dt, temps) {
+  /* chute à vitesse constante en boucle sur 6 unités de hauteur ; balancement latéral = intégrale de sin(0,8 t + i) × 0,08 */
+  function fairePleuvoir(temps) {
     for (let i = 0; i < NF; i++) {
-      let y = flocons[i * 3 + 1] - vitesses[i] * dt; if (y < 0) y += 6;
-      flocons[i * 3 + 1] = y; flocons[i * 3] += Math.sin(temps * .8 + i) * dt * .08;
+      let y = (y0[i] - vitesses[i] * temps) % 6; if (y < 0) y += 6;
+      flocons[i * 3 + 1] = y; flocons[i * 3] = x0[i] - .1 * Math.cos(temps * .8 + i);
     }
     geoF.attributes.position.needsUpdate = true;
   }
@@ -553,7 +556,7 @@ export function creer(J) {
     if (b.classId !== plateauFaction) construirePlateau(b.classId);
     placerDecor(b);
     if (decor.portail) decor.portail.traverse(o => { const m = /^Anneau(\d)$/.exec(o.name); if (m) o.rotation.y = temps * (2 + +m[1] * .6) * (m[1] % 2 ? 1 : -1) });
-    calculerChemin(b); dessinerChemin(temps); fairePleuvoir(dt, temps);
+    calculerChemin(b); dessinerChemin(temps); fairePleuvoir(temps);
 
     synchro(tours, b.t, t => t.x + ',' + t.y + ',' + t.k, t => { const T = creerTour(t); if (T) { T.r.position.set(t.x + .5, 0, t.y + .5); scene.add(T.r) } return T },
       (T, t) => majTour(T, t, temps), retirerGroupe);
