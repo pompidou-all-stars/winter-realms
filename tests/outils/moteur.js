@@ -7,7 +7,7 @@ const {mulberry32}=require('./hasard');
 const RACINE=path.join(__dirname,'..','..');
 /* WR_MOTEUR permet de faire passer toute la suite de tests à un autre moteur (vérification, comparaison de versions) */
 const MOTEURS={actuel:process.env.WR_MOTEUR?path.resolve(process.env.WR_MOTEUR):path.join(RACINE,'sim.js')};
-const INTERNES=['aiAct','aiDefend','aiAttack','PLAN','pathCells','mzStep','mzPath','plen','mzKind','invest','airInv','mages','BASE_TW','FACTION_BALANCE','ARCH','ROLE','ORDER','HPK','GRACE','GROUP','AURA_R','DIRS','dmg','rng','upCost','topY','flyH','NORM','FLY','AURA','SPEC','HEAL','SPLIT','TURT','BRK','SAP','KID'];
+const INTERNES=['aiAct','encaisse','trajet','expo','observer','contreMenace','choixType','aiDefend','aiAttack','PLAN','pathCells','mzStep','mzPath','plen','mzKind','invest','airInv','mages','BASE_TW','FACTION_BALANCE','ARCH','ROLE','ORDER','HPK','GRACE','GROUP','AURA_R','DIRS','dmg','rng','upCost','topY','flyH','NORM','FLY','AURA','SPEC','HEAL','SPLIT','TURT','BRK','SAP','KID'];
 
 function sha256(fichier){return crypto.createHash('sha256').update(fs.readFileSync(fichier)).digest('hex')}
 

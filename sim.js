@@ -337,22 +337,32 @@ function mzStep(A,steps){let M=A.mz;if(M&&M.ok)return M;
  mzChoose(M,LV);mzRoles(A,M);M.ok=1;return M}
 const MZX=new Int8Array(N),MZY=new Int8Array(N);for(let i=0;i<N;i++){MZX[i]=i%C;MZY[i]=i/C|0}
 const near=(i,j,d)=>{const dx=MZX[i]-MZX[j],dy=MZY[i]-MZY[j];return dx*dx+dy*dy<=d*d};
+/* 2.33 : exposition = nombre de cases du chemin que voit chaque tour (rayon MZ_RE, à peu près la portée d'un Archer), additionné sur toutes les tours.
+   C'est le temps que les monstres passent à portée des tours : une tour loin du chemin ne compte pas, et un chemin plus long compte pour chaque tour qui le borde.
+   VOI : pour chaque case, les cases à moins de MZ_RE (21 au plus), pour un calcul rapide sur la grille. */
+const MZ_RE=2.5,VOI=[],VOH=new Uint8Array(N);
+for(let i=0;i<N;i++){const l=[];for(let j=0;j<N;j++)if(near(i,j,MZ_RE))l.push(j);VOI.push(Int16Array.from(l))}
+function expo(w,P=mzPath(w)){VOH.fill(0);for(const j of P){const l=VOI[j];for(let k=0;k<l.length;k++)VOH[l[k]]++}let e=0;for(let i=0;i<N;i++)if(w[i])e+=VOH[i];return e}
 /* murs inutiles : une tour qui ne touche pas le chemin (8 cases autour) et dont le retrait ne le raccourcit pas est retirée du plan ; puis l'ordre de construction est préparé */
 function mzPrune(c){const w=c.best.slice(),L=plen(w);let n=1,ch=1;
  while(ch){ch=0;const adj=new Uint8Array(N);for(const j of mzPath(w)){n++;for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const x=MZX[j]+dx,y=MZY[j]+dy;if(x>=0&&y>=0&&x<C&&y<R)adj[y*C+x]=1}}
   for(let i=0;i<N;i++)if(w[i]&&!adj[i]){w[i]=0;n++;if(plen(w)==L)ch=1;else w[i]=1}}
  c.w=w;c.cur=w.slice();c.left=[];for(let i=0;i<N;i++)if(w[i])c.left.push(i);c.walls=c.left.slice();c.rev=[];return n}
-/* ordre de construction : on retire une à une, depuis le plan complet, la tour qui raccourcit le moins le chemin (puis la moins utile au chemin actuel et au couloir aérien) ;
-   construire dans l'ordre inverse allonge le chemin presque à chaque tour et, au début, place les tours près du chemin droit et des volants */
-function mzRemove(c,r){const cur=c.cur,left=c.left,L0=plen(cur),Pc=mzPath(cur);let bi=0,bk=INF;
- const smp=left.length<=24?left.map((_,k)=>k):Array.from({length:24},()=>r()*left.length|0);
- for(const k of smp){const i=left[k];cur[i]=0;const L=plen(cur);cur[i]=1;let cv=0;for(const j of Pc)if(near(i,j,2.5))cv++;
-  const key=(L0-L)+.05*cv+(Math.abs(MZX[i]-6)<=2?.3:0)+r()*.2;if(key<bk){bk=key;bi=k}}
- const i=left[bi];left.splice(bi,1);cur[i]=0;c.rev.push(i);return smp.length+2}
-/* note d'un candidat : longueur moyenne du chemin après 15, 25, 40 et 60 tours (l'IA en a rarement plus en milieu de partie) et une fois complet */
+/* ordre de construction : on retire une à une, depuis le plan complet, la tour dont le retrait fait perdre le moins d'exposition (à égalité, celle hors du couloir aérien) ;
+   construire dans l'ordre inverse donne, à chaque étape, des tours qui voient le chemin du moment. 2.33 : avant, seule comptait la longueur du chemin,
+   et vers 3 min de jeu jusqu'à un tiers des tours de l'IA étaient loin du chemin (elles bouchaient un raccourci sans jamais tirer). */
+const MZ_SMP=24;
+function mzRemove(c,r){const cur=c.cur,left=c.left,E0=expo(cur);let bi=0,bk=INF;
+ const smp=left.length<=MZ_SMP?left.map((_,k)=>k):Array.from({length:MZ_SMP},()=>r()*left.length|0);
+ for(const k of smp){const i=left[k];cur[i]=0;const E=expo(cur);cur[i]=1;
+  const key=(E0-E)+(Math.abs(MZX[i]-6)<=2?.3:0)+r()*.2;if(key<bk){bk=key;bi=k}}
+ const i=left[bi];left.splice(bi,1);cur[i]=0;c.rev.push(i);return 2*smp.length+2}
+/* note d'un candidat : exposition par tour après 15, 25, 40 et 60 tours (l'IA en a rarement plus en milieu de partie) et une fois complet
+   (2.33 ; avant : longueur du chemin). pre garde la longueur du chemin à ces étapes. */
 const MZ_AT=[15,25,40,60];
-function mzEval(c){c.ord=c.rev.reverse();const w=new Uint8Array(N),Ls=[];c.ord.forEach((i,n)=>{w[i]=1;if(MZ_AT.includes(n+1))Ls.push(plen(w))});
- c.L=plen(c.w);while(Ls.length<MZ_AT.length)Ls.push(c.L);c.pre=Ls;c.note=(Ls.reduce((a,b)=>a+b,0)+c.L)/(MZ_AT.length+1);delete c.cur;delete c.rev;delete c.left;return MZ_AT.length+2}
+function mzEval(c){c.ord=c.rev.reverse();const w=new Uint8Array(N),Ls=[],Es=[];c.ord.forEach((i,n)=>{w[i]=1;if(MZ_AT.includes(n+1)){Ls.push(plen(w));Es.push(expo(w)/(n+1))}});
+ c.L=plen(c.w);const Ef=expo(c.w)/c.ord.length;while(Ls.length<MZ_AT.length){Ls.push(c.L);Es.push(Ef)}
+ c.pre=Ls;c.note=(Es.reduce((a,b)=>a+b,0)+Ef)/(MZ_AT.length+1);delete c.cur;delete c.rev;delete c.left;return 3*MZ_AT.length+4}
 /* choix du plan parmi les candidats, sur la note de milieu de partie (le meilleur en Brutal, un des 2 ou 3 meilleurs sinon) */
 function mzChoose(M,LV){const r=M.r;M.c.sort((a,b)=>b.note-a.note);const P=MZ_PICK[LV];let q=r(),ch=0;for(;ch<P.length-1;ch++){q-=P[ch];if(q<=0)break}
  const c=M.c[ch];M.f=c.f;M.w=c.w;M.ord=c.ord;M.walls=c.walls;M.pre=c.pre;M.note=c.note;M.c=null}
@@ -369,9 +379,21 @@ function mzRoles(A,M){const base=A.classId*10,rg=j=>TW[base+j].r,w=M.w,P=mzPath(
  for(const i of walls)if(role[i]<0){const ax=Math.abs(MZX[i]-6),cc=cov(i,rg(3)),cg=cov(i,Math.max(rg(1),1.45));
   role[i]=ax<=2?(ax<=1&&cov(i,rg(4))>=7?4:0):cc>=12||(cg>=4&&M.r()<.3)?3:cg>=4?1:cc>=8?3:0}
  M.role=role}
+/* 2.33 : menace = PV des monstres reçus, monstre par monstre, avec un oubli progressif (×MEN_OUBLI à chaque action, environ 2 min de demi-vie) */
+const MEN_OUBLI=.997,MEN_MIN=200,MAG_MAX=.4;
+function observer(A){const mn=A.menace||(A.menace=new Float64Array(CR.length));for(let k=0;k<mn.length;k++)mn[k]*=MEN_OUBLI;for(const c of A.cr)if(!c._ia){c._ia=1;mn[c.k]+=c.max}}
+/* dégâts par seconde et par or d'une tour k (niveau 1) posée en (x, y), contre la menace reçue : armure, vol, anti-magie, zone, longueur de chemin à portée */
+function contreMenace(A,k,x,y){const W=TW[k],mn=A.menace,m=1+A.G.time/200,P=trajet(A),r=W.r;let Lg=0;for(const[a,b]of P)if(Math.hypot(a-x,b-y)<=r)Lg+=PAS_TR;const La=air({x,y},r);let v=0,tot=0;
+ for(let q=0;q<mn.length;q++){const w=mn[q];if(!w)continue;tot+=w;const T=CR[q];if((T.fly&&W.gr)||(T.mi&&W.mag))continue;let d=W.d*(T.fly&&W.airBonus?W.airBonus:1);const ar=(T.arm||0)*m;if(ar)d=Math.max(d*.2,d-ar*(1-(W.pierce||0)));
+  v+=w*d*(T.fly?La:Lg)}return tot?v/tot/W.cd*ZONE[W.skin]/W.c:0}
+/* emplacements ordinaires (Archer, Garde, Canon, Flammes du plan) : une fois la menace connue, le type qui fait le plus de dégâts par or contre elle sur cette case ;
+   le type prévu par le plan garde un petit avantage (×1,15) ; pas de tour au sol seulement dans le couloir des volants, Mages au plus MAG_MAX des tours */
+function choixType(A,i,j,n){const mn=A.menace;if(!mn||mn.reduce((a,b)=>a+b,0)<MEN_MIN)return j;const base=A.classId*10,x=i%C,y=i/C|0,ax=Math.abs(x-6);
+ const opts=ax<=2?[0,4]:[0,1,3,4];if(n>=8&&A.t.filter(t=>TW[t.k].mag).length<MAG_MAX*n)opts.push(5);let bj=j,bv=-1;
+ for(const o of opts){const v=contreMenace(A,base+o,x,y)*(o==j?1.15:1)*(.95+.1*Math.random());if(v>bv){bv=v;bj=o}}return bj}
 /* tour à poser sur la case i du plan selon la situation (-1 : attendre d'avoir l'or) */
 function mzKind(A,i,n,bud,thr,fs){const M=A.mz,base=A.classId*10,x=i%C,cnt=js=>A.t.filter(t=>js.includes(t.k-base)).length;let j=M.role[i];
- if(j==5&&!thr)j=0;if(j==2&&cnt([2,8])>=1+n*.15)j=0;if((j==1||j==3)&&fs>.35&&Math.abs(x-6)<=3)j=0;
+ if(j==5&&!thr)j=0;if(j!=2&&j!=5)j=choixType(A,i,j,n);if(j==2&&cnt([2,8])>=1+n*.15)j=0;if((j==1||j==3)&&fs>.35&&Math.abs(x-6)<=3)j=0;
  if(n<5&&TW[base+j].c>bud)j=0;
  const e={0:6,1:7,2:8,5:9}[j];if(e!==undefined&&n>=(j==5?16:j==2?12:8)&&(j!=5||A.G.time>360)&&bud>=TW[base+e].c)j=e;
  return TW[base+j].c<=bud?base+j:-1}
@@ -383,30 +405,67 @@ function aiDefend(A){const M=mzStep(A,INF),time=A.G.time,bud=Math.min(A.dp,A.gol
   const want=j==5&&thr&&!TW[t.k].mg?5:j==2&&cur!=2&&cur!=8&&A.t.filter(o=>o.k-base==2||o.k-base==8).length<1+n*.15?2:-1;if(want<0)continue;
   const k=base+want,mc=TW[k].c-Math.floor(t.inv*.7);if(bud<mc)continue;A.gold-=mc;t.k=k;t.lv=1;t.inv=TW[k].c;t.b=t.bt=buildT(t.inv,A.bm());A.ev.push('build');A.dp-=g0-A.gold;return true}
  const todo=M.ord.filter(i=>!A.g[i/C|0][i%C]);
+ /* 2.33 : défense complète (plan construit, toutes les tours au niveau 5) : l'or de défense ne peut plus servir, aiAct le passe à l'attaque */
+ A.plein=!todo.length&&A.t.every(t=>t.lv>=5);
  /* amélioration : la tour qui couvre le plus de chemin (et de couloir aérien, d'autant plus que des volants arrivent) pour son prix */
- if(ups.length&&(!todo.length||(n>=10&&Math.random()<(n>=24?.6:.35)))){const path=pathCells(A),aw=.6*(1+2*fs),val=t=>{const T=TW[t.k],r=rng(t);let c=0;for(const[x,y]of path)if(Math.hypot(x-t.x,y-t.y)<=r)c++;if(!T.gr)for(let y=0;y<R;y++)if(Math.hypot(6-t.x,y-t.y)<=r)c+=aw;
+ if(ups.length&&(!todo.length||(n>=12&&Math.random()<(n>=28?.5:.25)))){const path=pathCells(A),aw=.6*(1+2*fs),val=t=>{const T=TW[t.k],r=rng(t);let c=0;for(const[x,y]of path)if(Math.hypot(x-t.x,y-t.y)<=r)c++;if(!T.gr)for(let y=0;y<R;y++)if(Math.hypot(6-t.x,y-t.y)<=r)c+=aw;
    return c*T.d/T.cd*(T.sp?2.5:T.fl?3:T.fsp?1.6:T.mg?1.4:1)/T.c};
   const vs=new Map(ups.map(t=>[t,val(t)]));ups.sort((a,b)=>vs.get(b)-vs.get(a));ok=A.upgrade(ups[Math.random()<.75?0:Math.floor(Math.random()*ups.length)])}
  /* construction : la prochaine case du plan ; si elle est occupée par un monstre, on essaie les suivantes, mais on n'en saute pas une faute d'or */
  else for(const i of todo.slice(0,4)){const k=mzKind(A,i,n,bud,thr,fs);if(k<0)break;if(A.place(i%C,i/C|0,k)){ok=true;break}}
  A.dp-=g0-A.gold;return ok}
+/* --- 2.33 : ce que chaque adversaire peut encaisser ---
+   trajet(b) : points tous les PAS_TR case le long du chemin des monstres au sol, de case en case (chaine : pas le tracé exact en ligne droite de chemin(),
+   environ 4 % plus long mais bien moins coûteux), en cache tant que le labyrinthe ne change pas.
+   encaisse(b, k, m) : PV qu'une foule du monstre k (PV × m) perd en traversant le terrain b : pour chaque tour, dégâts par seconde contre ce monstre
+   (armure, vol, anti-magie, invisibilité, bonus de faction), × temps passé à portée, × nombre de cibles touchées (zone). Une estimation, pas une simulation. */
+const PAS_TR=.5,ZONE=[1,2.5,2,1,1,3],ENC=1.5,VAGUE_HZ=[.4,.25,.1];
+function trajet(b){if(b._trD===b.d)return b._tr;const ch=chaine(b,SP[0],SP[1],C*R),out=[];
+ for(let n=1;n<ch.length;n++){const[a,c]=ch[n-1],[d,e]=ch[n],k=Math.max(1,Math.round(Math.hypot(d-a,e-c)/PAS_TR));for(let q=0;q<k;q++)out.push([a+(d-a)*q/k,c+(e-c)*q/k])}
+ b._trD=b.d;return b._tr=out}
+/* profil de défense d'un terrain (en cache tant que ses tours et son chemin ne changent pas) : pour chaque tour active, dégâts d'un coup et longueur
+   de chemin à portée (au sol, Lg ; couloir des volants, La) ; part du chemin à portée d'un Mage (détection) et d'un Givre (ralentissement) */
+function profil(b){let h=b.t.length;for(const t of b.t)h=(h*31+t.k*7+t.lv*131+(t.b>0?3:0)+t.x*17+t.y*19)%1e9;if(b._prD===b.d&&b._prH===h)return b._pr;
+ const P=trajet(b),act=b.t.filter(t=>!(t.b>0)),tw=[];
+ /* points du chemin à portée de chaque tour, gardés sur la tour tant que le chemin, sa position et sa portée ne changent pas (une amélioration ailleurs ne refait pas tout) */
+ const vus=t=>{const r=rng(t);if(t._vP===P&&t._vR===r)return t._v;const r2=r*r,v=[];for(let n=0;n<P.length;n++){const dx=P[n][0]-t.x,dy=P[n][1]-t.y;if(dx*dx+dy*dy<=r2)v.push(n)}t._vP=P;t._vR=r;return t._v=v};
+ for(const t of act){const r=rng(t);tw.push({W:TW[t.k],d:dmg(t),Lg:vus(t).length*PAS_TR,La:air(t,r)})}
+ const part=f=>{const ts=act.filter(t=>f(TW[t.k])),m=new Uint8Array(P.length);let n=0;for(const t of ts)for(const q of vus(t))if(!m[q]){m[q]=1;n++}
+  return[P.length?n/P.length:0,Math.min(1,ts.reduce((s,t)=>s+air(t,rng(t)),0)/16)]};
+ b._prD=b.d;b._prH=h;return b._pr={tw,mg:part(W=>W.mg),gel:part(W=>W.fsp)}}
+function encaisse(b,k,m){const T=CR[k],p=profil(b),fly=T.fly?1:0,arm=(T.arm||0)*m;
+ const vu=T.inv?p.mg[fly]:1,v=T.s*(T.acc?1.6:1)*(1-(T.mi?0:.3*p.gel[fly]));let K=0;
+ for(const{W,d:d0,Lg,La}of p.tw){if((fly&&W.gr)||(T.mi&&W.mag))continue;const L=fly?La:Lg;if(!L)continue;
+  let d=d0*(fly&&W.airBonus?W.airBonus:1)*(W.mark?1.07:1)*(W.execute?1.1:1);if(arm)d=Math.max(d*.2,d-arm*(1-(W.pierce||0)));
+  K+=d/W.cd*ZONE[W.skin]*(L/v+1)}
+ return K*vu}
+/* longueur du couloir des volants (colonne 6, de la ligne 0 à la ligne 16) à portée r de la tour t */
+function air(t,r){const dx=Math.abs(t.x-EX[0]);if(dx>=r)return 0;const h=Math.sqrt(r*r-dx*dx);return Math.max(0,Math.min(EX[1],t.y+h)-Math.max(0,t.y-h))}
 /* attaque : elle empile plusieurs revenus puis lâche une grosse vague, composée selon les faiblesses des adversaires */
 function aiAttack(A){const time=A.G.time;let bud=Math.min(A.ap,A.gold),sent=false;if(time<GRACE||bud<Math.min(6000,Math.max(60,A.inc*3)))return false;
  /* 2.13 : ouvre le palier suivant quand sa réserve d'attaque le permet (palier 2 dès 2:30, palier 3 dès 7:00) */
  const pc=PAL_C[A.tier];if(pc!==undefined&&time>=(A.tier==1?150:420)&&bud>=pc*1.5){const g=A.gold;if(A.G.unlock(A)){bud-=g-A.gold;A.ap-=g-A.gold}}
- const fo=A.G.foes(A),share=ks=>{let a=0,b=0;for(const o of fo)for(const t of o.t){b+=t.inv;if(ks.includes(t.k))a+=t.inv}return b?a/b:0};
- const weakAir=fo.some(b=>airInv(b)<50+time*1.5),noMage=fo.some(b=>!mages(b)),phys=share(fo.flatMap(b=>[b.classId*10,b.classId*10+4])),magic=share(fo.flatMap(b=>[b.classId*10+2,b.classId*10+5]));
- /* dans chaque liste, le monstre le plus cher que la réserve paie, parmi les paliers ouverts */
+ const fo=A.G.foes(A),m=1+time/200;
+ /* dans chaque famille, le monstre le plus cher que la réserve paie, parmi les paliers ouverts */
  const ok=k=>bud>=CR[k].c&&CR[k].t<=A.tier,top=l=>l.filter(ok).pop(),go=k=>{const g=A.gold;if(!A.G.send(A,k))return false;sent=true;bud-=g-A.gold;A.ap-=g-A.gold;return true};
- if(bud>=500)for(const l of[HEALS,AURAS]){const k=top(l);if(k!==undefined&&Math.random()<.6)go(k)}
- for(let n=0;n<12;n++){const opts=[[top(NORM),5],[top(FLY),weakAir?4:1],[top(SPECS),noMage?4:.8],[top(ARMS),phys>.45?2.5:.7],[top(MIS),magic>.3?2.5:.6],[top(SPLITS),.7],[top(ACCS),.7],[top(STUNS),1]].filter(o=>o[0]!==undefined);
-  if(!opts.length)break;let r=Math.random()*opts.reduce((s,o)=>s+o[1],0),k=opts[0][0];for(const o of opts){r-=o[1];if(r<=0){k=o[0];break}}
-  if(!go(k))break}
- const boss=top(BOSS);if(boss!==undefined&&time>(CR[boss].t==1?240:420)&&Math.random()<.28)go(boss);
+ /* 2.33 : pour chaque famille, combien de monstres passeraient chez chaque adversaire si toute la réserve y allait (encaisse, ×ENC car l'estimation est prudente) ;
+    on retient la famille qui fait perdre le plus de vies (avec du hasard : ±VAGUE_HZ selon la difficulté, plus en Normal), avec un bonus si un adversaire serait éliminé.
+    Si aucune ne passe, la vague sert l'économie : monstres au sol, ceux qui rapportent le plus de revenu. */
+ const cands=[...new Set([NORM,FLY,SPECS,ARMS,MIS,SPLITS,ACCS,STUNS].map(top).filter(k=>k!==undefined))],boss=top(BOSS);
+ if(boss!==undefined&&time>(CR[boss].t==1?240:420))cands.push(boss);
+ const vies=k=>{const T=CR[k],hp=T.hp*m*HPK,H=Math.floor(bud/T.c)*GROUP*hp;let s=0;for(const b of fo){const l=Math.max(0,H-ENC*encaisse(b,k,m))/hp;s+=Math.min(l,b.lives)+(l>=b.lives?3:0)}return s};
+ const hz=VAGUE_HZ[A.G.LV|0]||VAGUE_HZ[0];let best=top(NORM),bs=0;for(const k of cands){const s=vies(k)*(1-hz+2*hz*Math.random());if(s>bs){bs=s;best=k}}
+ if(best===undefined)return false;
+ /* soigneur et hâte avec une vague au sol assez grosse */
+ if(bud>=500&&!CR[best].fly)for(const l of[HEALS,AURAS]){const k=top(l);if(k!==undefined&&bud>=CR[k].c*4&&Math.random()<.6)go(k)}
+ for(let n=0;n<12;n++){const k=ok(best)?best:top(NORM);if(k===undefined||!go(k))break}
  return sent}
 function aiAct(A){const time=A.G.time,gain=A.gold-A.lastG,danger=A.hurt>0,need=(A.G.foes(A).reduce((s,b)=>s+b.inc,0)*4+20)*(1+time/400);
  const f=danger||A.pen>.85?.8:A.pen>.65?.55:invest(A)<need*.35?.5:A.pen>.45?.3:.15;
  A.dp+=gain*f;A.ap+=gain*(1-f);if(danger&&A.lives<12){A.dp+=A.ap*.5;A.ap*=.5}
+ /* fin de partie : défense au maximum, tout part en attaque */
+ if(A.plein){A.ap+=A.dp;A.dp=0}
+ observer(A);
  for(let i=0;i<3&&aiDefend(A);i++);
  if(aiAttack(A))for(const b of A.G.foes(A))b.ev.push('warn');A.lastG=A.gold}
 
