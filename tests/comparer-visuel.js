@@ -12,7 +12,10 @@ const SEUIL_CANAL=16;       // écart minimal (sur 255) pour qu'un pixel compte 
 const SEUIL_IDENTIQUE=0.05; // en dessous de ce pourcentage de pixels changés, l'écran est considéré comme identique
 
 function extraire(ref){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'wr-avant-'));
- const tar=execFileSync('git',['archive',ref,'index.html','sim.js'],{cwd:RACINE});execFileSync('tar',['-x','-C',dir],{input:tar});return dir}
+ /* 2.29 : tout le jeu (rendu 3D, three.js, modèles, sons, images), pas seulement index.html et sim.js : sinon la version d'avant
+    tournait sans 3D ni sons (erreurs 404 et fausses différences). Les dossiers d'outils (art, tests, server) ne servent pas. */
+ const tar=execFileSync('git',['archive',ref,'--','.',':(exclude)art',':(exclude)tests',':(exclude)server'],{cwd:RACINE,maxBuffer:1<<30});
+ execFileSync('tar',['-x','-C',dir],{input:tar,maxBuffer:1<<30});return dir}
 
 /* compare deux images dans le navigateur ; renvoie le % de pixels changés et une image « avant | après | différences » */
 async function difference(nav,fa,fb,titre,sortie){
@@ -37,17 +40,19 @@ async function difference(nav,fa,fb,titre,sortie){
 /* lance toute la comparaison ; renvoie un résultat détaillé (utilisé aussi par le bilan) */
 async function comparer(ref='origin/main',{temoin=true}={}){
  const dossier=path.join(RACINE,'captures','comparaison');fs.rmSync(dossier,{recursive:true,force:true});fs.mkdirSync(dossier,{recursive:true});
- const avantDir=extraire(ref),nav=await N.lancer();
- const res={avant:ref,apres:'fichiers actuels',ecrans:[],remarques:[],fiable:true};
+ const avantDir=extraire(ref);
+ /* 2.29 : comparaison dans la vue 3D, celle que voient les joueurs ; en 2D seulement si la version d'avant n'a pas de 3D (avant la 2.7) */
+ const rendu=fs.existsSync(path.join(avantDir,'rendu3d.js'))?'3d':'2d',nav=await N.lancer({webgl:rendu=='3d'});
+ const res={avant:ref,apres:'fichiers actuels',ecrans:[],remarques:rendu=='2d'?["La version d'avant n'a pas de vue 3D : comparaison faite en 2D."]:[],fiable:true,rendu};
  try{
   let police='reelle';
-  let A=await capturer({racine:avantDir,sortie:path.join(dossier,'avant'),police,nav});
-  let B=await capturer({sortie:path.join(dossier,'apres'),police,nav});
+  let A=await capturer({racine:avantDir,sortie:path.join(dossier,'avant'),police,nav,rendu});
+  let B=await capturer({sortie:path.join(dossier,'apres'),police,nav,rendu});
   if(!A.policeChargee||!B.policeChargee){police='bloquee';res.remarques.push('La police Fredoka n\'a pas pu être chargée des deux côtés : la comparaison a été refaite avec la police de remplacement, pour les deux versions.');
-   A=await capturer({racine:avantDir,sortie:path.join(dossier,'avant'),police,nav});B=await capturer({sortie:path.join(dossier,'apres'),police,nav})}
+   A=await capturer({racine:avantDir,sortie:path.join(dossier,'avant'),police,nav,rendu});B=await capturer({sortie:path.join(dossier,'apres'),police,nav,rendu})}
   res.police=police;
   for(const e of A.erreurs)res.remarques.push('Avant : '+e);for(const e of B.erreurs)res.remarques.push('Après : '+e);
-  if(temoin){const T=await capturer({sortie:path.join(dossier,'temoin'),police,nav});let pire=0;
+  if(temoin){const T=await capturer({sortie:path.join(dossier,'temoin'),police,nav,rendu});let pire=0;
    for(const im of B.images){const t=T.images.find(x=>x.format==im.format&&x.id==im.id);if(t)pire=Math.max(pire,await difference(nav,im.fichier,t.fichier,'Témoin',path.join(dossier,'temoin',`diff-${im.format}-${im.id}.png`)))}
    res.temoin=pire;if(pire>=SEUIL_IDENTIQUE){res.fiable=false;res.remarques.push(`Le témoin n'est pas stable (${pire.toFixed(2)} %) : la comparaison n'est pas fiable sur cette machine.`)}}
   for(const im of B.images){const av=A.images.find(x=>x.format==im.format&&x.id==im.id);
