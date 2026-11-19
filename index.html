@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.31</title>
+<title>Winter Realms — Tower Wars · Édition 2.32</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -75,6 +75,13 @@ body.r2d .fleche{display:none}
 #fiche .next{color:#a8e07a}
 #fiche .chantier{color:#ffc95e;font-weight:700}
 #fiche .aide{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ice)}
+#fiche.compacte .ex{display:none}
+#fiche .rangee{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px}
+#fiche .rangee span{display:grid;place-items:center;width:30px;height:26px;border-radius:6px;background:#0b1626;border:1px solid #f2c14e88;transition:transform .2s,opacity .2s}
+#fiche .rangee canvas{width:30px!important;height:25px!important}
+#fiche .rangee span.non{transform:scale(.62);opacity:.5;border-color:#ff8c7a88}
+#fiche.compacte .aide{color:#ffe597;font-weight:700}
+#fiche.compacte .aide i{background:#f2c14e33;border-color:#f2c14e;color:#ffe597;animation:pouls 1s ease-in-out infinite}
 #fiche .aide i{font-style:normal;display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#9be7ff22;border:1px solid #9be7ff55;font-size:11px}
 #fiche .actions{grid-column:1/-1;display:flex;gap:6px}
 #fiche .actions button{flex:1;height:34px;border-radius:9px;border:1px solid #f2c14e99;background:linear-gradient(180deg,#3a5078,#1f3152);color:var(--ink);font-size:13px;font-weight:700}
@@ -759,7 +766,8 @@ function draw(b,g,s,t){
  g.beginPath();g.arc(kx,ky+s*.38,s*.12,Math.PI,0);g.lineTo(kx+s*.12,ky+s*.38);g.lineTo(kx-s*.12,ky+s*.38);fs(g,'#5a3a1c');
  g.beginPath();g.moveTo(kx,ky-s*.28);g.lineTo(kx,ky-s*.48);g.stroke();pg(g,b.col,kx,ky-s*.48,kx+s*.2,ky-s*.42,kx,ky-s*.35);
  for(const c of b.cr){const rc=CR[c.k].aura?'255,228,94':CR[c.k].heal?'111,207,151':0;if(rc){g.beginPath();g.arc((c.x+.5)*s,(c.y+.5)*s,AURA_R*s,0,7);g.fillStyle='rgba('+rc+',.1)';g.fill();g.strokeStyle='rgba('+rc+','+(.35+Math.sin(t*5)*.15)+')';g.lineWidth=2;g.stroke()}}
- if(pick&&b===VB()&&b.t.includes(pick)){const cx=(pick.x+.5)*s,cy=(pick.y+.5)*s;g.beginPath();g.arc(cx,cy,rng(pick)*s,0,7);g.fillStyle='rgba(255,255,255,.1)';g.fill();g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=1.5;g.stroke();
+ if(lot&&b===P){g.strokeStyle='#ffd95e';g.lineWidth=2;for(const t of lot.t)g.strokeRect(t.x*s+2,t.y*s+2,s-4,s-4)}
+ else if(pick&&b===VB()&&b.t.includes(pick)){const cx=(pick.x+.5)*s,cy=(pick.y+.5)*s;g.beginPath();g.arc(cx,cy,rng(pick)*s,0,7);g.fillStyle='rgba(255,255,255,.1)';g.fill();g.strokeStyle='rgba(255,255,255,.75)';g.lineWidth=1.5;g.stroke();
   g.strokeStyle='#ffd95e';g.lineWidth=3;g.strokeRect(pick.x*s+1.5,pick.y*s+1.5,s-3,s-3)}
  if(projet&&b===P){const T=TW[projet.k],cx=(projet.x+.5)*s,cy=(projet.y+.5)*s,ok=!peutConstruire(projet.x,projet.y,projet.k);
   g.beginPath();g.arc(cx,cy,T.r*s,0,7);g.fillStyle=ok?'rgba(255,255,255,.1)':'rgba(255,77,61,.12)';g.fill();g.strokeStyle='rgba(255,255,255,.7)';g.lineWidth=1.5;g.setLineDash([6,5]);g.stroke();g.setLineDash([]);
@@ -805,7 +813,7 @@ const $=id=>document.getElementById(id),main=$('main'),stage=$('stage'),bar=$('b
 if(typeof CanvasRenderingContext2D!='undefined'&&!CanvasRenderingContext2D.prototype.roundRect)CanvasRenderingContext2D.prototype.roundRect=function(x,y,w,h){this.rect(x,y,w,h)};
 /* G : partie locale (solo). B, P, time, tick, over, LV : vue courante, recopiée de G à chaque image. */
 /* 2.15 : sel = tour choisie pour construire (null : aucune), mon = monstre choisi pour envoyer (null : aucun), pick = tour posée ouverte */
-let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',palv=1,hudPal=1,sel=null,mon=null,view=0,mx,hudK='',tt=0,pick=null,vibre=true,explore=false;
+let chosenClass=0;let G=null,B=[],P,me=0,time=0,tick=10,over=true,LV=0,started=false,cell=30,tab='t',palv=1,hudPal=1,sel=null,mon=null,view=0,mx,hudK='',tt=0,pick=null,vibre=true,explore=false,lot=null;
 const VB=()=>B[view],dpr=()=>Math.min(3,window.devicePixelRatio||1);
 const eff=b=>b.ai?Math.round(b.inc*DIFF[LV].b):b.inc;
 /* ---------- multijoueur ---------- */
@@ -916,7 +924,7 @@ window.R3D_ETAT=()=>({on:R3D.on,charge:!!R3D.charge,echec:R3D.echec,scene:R3D.ap
 /* image en 3D, puis surcouche 2D (barres de vie, chantiers, textes flottants, terrain éliminé) sur le canevas #main ;
    en perspective, la taille d'une case à l'écran (s) dépend de l'endroit : echelle la donne */
 function dessinerVue3D(t){const g=mx,b=VB(),A=R3D.api,E=(x,z,h)=>A.projeter(x,h,z);g.clearRect(0,0,VUE.w,VUE.h);
- A.dessiner(b,t,{pick:b===VB()&&b.t.includes(pick)?pick:null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
+ A.dessiner(b,t,{pick:b===VB()&&b.t.includes(pick)&&!lot?pick:null,lot:lot&&b===P?lot.t:null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
  for(const c of b.cr){const hp=c.hp/c.max;if(hp>=1)continue;const x=c.x+.5+(c.ox||0),z=c.y+.5+(c.oy||0),p=E(x,z,A.hauteurMonstre(c.k));if(p.z>1)continue;const s=A.echelle(x,z),w=s*.6;
   g.fillStyle='rgba(0,0,0,.6)';g.fillRect(p.x-w/2,p.y-s*.12,w,s*.09);g.fillStyle=c.sl>0?'#5dc8ff':hp>.4?'#7cdc6a':'#ff6b4a';g.fillRect(p.x-w/2,p.y-s*.12,w*Math.max(0,hp),s*.09)}
  for(const t of b.t)if(t.b>0){const p=1-t.b/(t.bt||1),q=E(t.x+.5,t.y+.5,0);if(q.z>1)continue;const s=A.echelle(t.x+.5,t.y+.5),w=s*.7,h=Math.max(3,s*.09),y=q.y+s*.3;
@@ -949,7 +957,19 @@ function syncSolo(){time=G.time;tick=G.tick;over=G.over}
 function icon(fn,w=40,h=40){const c=document.createElement('canvas'),g=setup(c,w,h);fn(g);return c}
 /* 2.15 : une carte de la barre = l'icône et le prix ; le nom sert d'étiquette (lecteurs d'écran, tests), le reste est dans la fiche */
 function carte(ic,prix,nom,cost,fn,on,k){const b=document.createElement('button'),s=document.createElement('small');s.textContent=prix;b.append(ic,s);b.type='button';
- b.setAttribute('aria-label',nom+', '+prix);b.dataset.c=cost;b.dataset.k=k;b.className=on?'sel':'';b.onclick=fn;bar.appendChild(b);return b}
+ b.setAttribute('aria-label',nom+', '+prix);b.dataset.c=cost;b.dataset.k=k;b.className=on?'sel':'';b.onclick=e=>{if(barGlisse.bloque){e.preventDefault();return}fn(e)};bar.appendChild(b);return b}
+/* 2.31 : défilement de la barre des cartes à la souris (sur PC, la barre n'a pas d'ascenseur visible) :
+   la molette (verticale) fait défiler la barre horizontalement, et on peut la faire glisser bouton appuyé.
+   Un glissement ne choisit pas la carte sous la souris. Au doigt, le défilement natif reste inchangé. */
+const barGlisse={id:null,x0:0,s0:0,actif:false,bloque:false};
+bar.addEventListener('wheel',e=>{if(bar.scrollWidth<=bar.clientWidth)return;const d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
+ if(!d)return;e.preventDefault();bar.scrollLeft+=d*(e.deltaMode==1?32:1)},{passive:false});
+bar.addEventListener('pointerdown',e=>{if(e.pointerType!='mouse'||e.button!==0)return;Object.assign(barGlisse,{id:e.pointerId,x0:e.clientX,s0:bar.scrollLeft,actif:false,bloque:false})});
+bar.addEventListener('pointermove',e=>{if(e.pointerId!==barGlisse.id)return;const dx=e.clientX-barGlisse.x0;
+ if(!barGlisse.actif){if(Math.abs(dx)<6)return;barGlisse.actif=true;try{bar.setPointerCapture(e.pointerId)}catch(_){}}
+ bar.scrollLeft=barGlisse.s0-dx});
+for(const n of['pointerup','pointercancel'])bar.addEventListener(n,e=>{if(e.pointerId!==barGlisse.id)return;barGlisse.id=null;
+ if(barGlisse.actif){barGlisse.bloque=true;setTimeout(()=>{barGlisse.bloque=false},0)}});
 const IC={coin(g){g.lineWidth=2;g.strokeStyle='#9a6b12';g.beginPath();g.arc(20,20,12,0,7);fs(g,'#f2c14e');g.beginPath();g.arc(20,20,6,0,7);g.stroke()},
  up(g){g.lineWidth=2;g.strokeStyle=OUT;g.lineJoin='round';pg(g,'#7cdc6a',20,7,32,21,25,21,25,33,15,33,15,21,8,21)},
  x(g){g.lineWidth=4;g.lineCap='round';g.strokeStyle='#b9c4ab';g.beginPath();g.moveTo(12,12);g.lineTo(28,28);g.moveTo(28,12);g.lineTo(12,28);g.stroke()}};
@@ -1029,7 +1049,7 @@ function effets(T,lv){const l=[];if(T.sp)l.push('explosion de zone');const R=ral
 const elt=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e};
 function teteFiche(f,ic,nom,sous,stats){const txt=elt('div','txt'),tt=elt('div','tt'),st=elt('div','st');tt.append(elt('b','',nom),elt('span','',sous));
  for(const [lbl,val] of stats){const e=elt('span');e.append(lbl+' ',elt('i','',val));st.appendChild(e)}txt.append(tt,st);
- const x=elt('button','fermer','×');x.type='button';x.setAttribute('aria-label','Fermer la fiche');x.onclick=()=>{pick=null;sel=null;mon=null;projet=null;render()};f.append(ic,txt,x)}
+ const x=elt('button','fermer','×');x.type='button';x.setAttribute('aria-label','Fermer la fiche');x.onclick=()=>{pick=null;lot=null;sel=null;mon=null;projet=null;render()};f.append(ic,txt,x)}
 const aideFiche=(geste,txt)=>{const d=elt('div','aide');d.append(elt('i','',geste),txt);return d};
 function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textContent='';f.className='';f.dataset.mode=mode;f.hidden=false;
  const ic=towerIcon(k,lv),stats=[['⚔ Dégâts/s',dps(k,lv)],['◎ Portée',fr(rng({k,lv}))],['Cibles',T.gr?'sol uniquement':'sol et air']];if(!t)stats.push(['Prix',T.c+' or']);
@@ -1040,21 +1060,48 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
  const bf=bonusFaction(T.faction);if(bf)part(bf);
  f.appendChild(ex);
+ /* 2.31 : pendant l'aperçu d'une construction, la fiche se réduit (sans la ligne de détails) et porte la consigne,
+    à la place de l'ancienne bulle « Touchez encore la case… » posée au milieu du terrain */
+ if(mode=='construire'&&projet&&view==me){f.classList.add('compacte');f.appendChild(aideFiche('2×','Touche encore la case pour construire · '+T.c+' or · '+fr(btJ(T.c))+' s'));return}
  if(mode=='construire')f.appendChild(view==me?aideFiche('2×','Touche deux fois une case du terrain pour construire'+(matchMedia('(pointer:fine)').matches?' (Maj + clic : en un seul clic)':'')):aideFiche('↩','Reviens sur ton terrain pour construire'));
  if(mode=='tour'&&explore){f.appendChild(aideFiche('🏁','Partie terminée · '+t.inv+' or investis dans cette tour'));return}
  if(mode=='tour'){const a=elt('div','actions'),up=elt('button'),ve=elt('button','vendre','Vendre · +'+Math.floor(t.inv*.7)+' or');up.type=ve.type='button';
   if(t.b>0){up.textContent='Améliorer · en chantier…';up.onclick=()=>showErr('busy')}
   else if(lv<5){up.textContent='Améliorer · '+upCost(t)+' or';up.onclick=()=>{doAction({type:'upgrade',x:t.x,y:t.y});render()}}
   else{up.textContent='Niveau maximum';up.disabled=true}
-  ve.onclick=()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()};a.append(up,ve);f.appendChild(a)}}
+  ve.onclick=()=>{doAction({type:'sell',x:t.x,y:t.y});pick=null;render()};a.append(up,ve);f.appendChild(a);
+  if(view==me&&lv<5&&pareilles(t).length>1)f.appendChild(aideFiche('2×','Touche encore la tour : améliorer les '+Math.min(LOT_MAX,pareilles(t).length)+' pareilles d’un coup'))}}
+/* ---------- 2.31 : amélioration en lot ----------
+   Toucher deux fois une tour posée choisit toutes les tours du même type et du même niveau (jusqu'à LOT_MAX, les plus proches d'abord),
+   hors tours en chantier. La fiche les montre en rangée d'icônes ; un bouton les améliore toutes d'un coup.
+   Si l'or ne suffit pas pour toutes, les icônes de celles qui ne seront pas améliorées rétrécissent. */
+const LOT_MAX=10;
+const pareilles=t=>P.t.filter(u=>u.k==t.k&&u.lv==t.lv&&u.lv<5&&!(u.b>0)).sort((a,b)=>(a===t?-1:b===t?1:Math.hypot(a.x-t.x,a.y-t.y)-Math.hypot(b.x-t.x,b.y-t.y)));
+function ouvrirLot(t){if(t.lv>=5){showErr('max');return}if(t.b>0){showErr('busy');return}
+ lot={a:t,k:t.k,lv:t.lv,t:[],n:0};majLot();sfx('tap');vibrer(10);render();
+ if(lot.t.length<2)toast('Aucune autre '+TW[t.k].n+' de niveau '+t.lv+' prête à améliorer')}
+/* recalcule le lot (tours encore là, toujours pareilles) et combien on peut en payer ; faux si le lot est vide */
+function majLot(){if(!lot)return false;lot.t=pareilles(lot.a).slice(0,LOT_MAX);if(!lot.t.length||lot.t[0]!==lot.a)return false;
+ lot.c=upCost(lot.a);lot.n=Math.min(lot.t.length,Math.floor(P.gold/lot.c));return true}
+function ficheLot(){const f=$('fiche'),T=TW[lot.k],n=lot.t.length,ok=lot.n;f.textContent='';f.className='lot';f.dataset.mode='lot';f.hidden=false;
+ const ic=towerIcon(lot.k,lot.lv);teteFiche(f,ic,n+' × '+T.n,'niveau '+lot.lv+' → '+(lot.lv+1),[['Prix',lot.c+' or chacune'],['Total',n*lot.c+' or']]);icone3D(ic,'tour',lot.k,56,46);
+ const rg=elt('div','rangee');lot.t.forEach((t,i)=>{const s=elt('span',i<ok?'':'non'),ci=towerIcon(lot.k,lot.lv);s.appendChild(ci);icone3D(ci,'tour',lot.k,56,46);s.title=i<ok?'sera améliorée':'pas assez d’or';rg.appendChild(s)});f.appendChild(rg);
+ const a=elt('div','actions'),up=elt('button'),an=elt('button','vendre','Annuler');up.type=an.type='button';
+ if(!ok){up.textContent='Pas assez d’or · '+lot.c+' or';up.disabled=true}
+ else up.textContent='Améliorer '+(ok<n?ok+' / '+n:n===1?'la tour':'les '+n)+' · '+ok*lot.c+' or';
+ up.onclick=()=>ameliorerLot();an.onclick=()=>{lot=null;render()};a.append(up,an);f.appendChild(a);}
+function ameliorerLot(){if(!lot||!majLot())return;const l=lot.t.slice(0,lot.n);let r=0;
+ for(const t of l)if(doAction({type:'upgrade',x:t.x,y:t.y})==='')r++;
+ if(r){sfx('up');vibrer(15);toast(r+(r>1?' tours améliorées':' tour améliorée')+' · niveau '+(lot.lv+1))}lot=null;render()}
 /* fiche d'un monstre choisi : PV actuels (ils montent avec le temps de jeu), vitesse, revenu gagné, prix */
 function ficheMonstre(k){const f=$('fiche'),T=CR[k];f.textContent='';f.className='envoyer';f.dataset.mode='envoyer';f.hidden=false;
  const ic=icon(g=>drawCreep(g,k,20,T.fly?30:22,26/T.z,0,1,0,1));
  teteFiche(f,ic,T.n,{n:'Sol',f:'Volant',s:'Spécial'}[T.cat]+(T.tag?' · '+T.tag:'')+' · palier '+T.t,[['PV',Math.round(T.hp*(1+time/200)*HPK)],['Vitesse',fr(T.s)],['Revenu','+'+T.i],['Prix',T.c+' or']]);icone3D(ic,'monstre',k,40,40);
  f.appendChild(aideFiche('1×','Chaque toucher sur la carte envoie '+GROUP+' × '+T.n+' à chaque adversaire et augmente ton revenu'))}
 function cacherFiche(){const f=$('fiche');f.hidden=true;f.textContent='';f.dataset.mode=''}
-function render(){bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!VB().t.includes(pick))pick=null;
- if(pick)remplirFiche('tour',pick.k,pick);else if(tab=='t'&&sel!=null)remplirFiche('construire',sel);else if(tab!='t'&&mon!=null)ficheMonstre(mon);else cacherFiche();
+function render(){const sx=bar.scrollLeft,tb=tab;requestAnimationFrame(()=>{if(tab==tb)bar.scrollLeft=sx});bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!VB().t.includes(pick))pick=null;
+ if(lot&&(pick!==lot.a||!majLot()))lot=null;
+ if(lot)ficheLot();else if(pick)remplirFiche('tour',pick.k,pick);else if(tab=='t'&&sel!=null)remplirFiche('construire',sel);else if(tab!='t'&&mon!=null)ficheMonstre(mon);else cacherFiche();
  const pal=$('paliers');pal.hidden=tab=='t';pal.textContent='';
  if(tab=='t'){ORDER.map(i=>P.classId*10+i).forEach(k=>{const T=TW[k],b=carte(towerIcon(k,1),T.c+' or',T.n,T.c,()=>{sel=k;pick=null;if(projet)projet.k=k;astuce(false);render()},sel===k,k);icone3D(b.querySelector('canvas'),'tour',k,56,46)});return}
  /* 2.13 : paliers de monstres (celui qu'on affiche, ou ouvrir le suivant) ; 2.15 : sur une ligne au-dessus des cartes */
@@ -1110,8 +1157,8 @@ let projet=null;
 function peutConstruire(x,y,k){const T=TW[k];if(x<0||y<0||x>=C||y>=R||P.g[y][x]||(x==SP[0]&&y==SP[1])||(x==EX[0]&&y==EX[1]))return 'blocked';
  if(P.gold<T.c)return 'poor';
  P.g[y][x]=1;const nd=P.dist();P.g[y][x]=0;return nd[SP[1]][SP[0]]>=INF||genant(P,x,y,nd)?'blocked':''}
-function annulerProjet(){projet=null}
-function confirmerConstruction(x,y){const k=projet.k;projet=null;
+function annulerProjet(){if(projet){projet=null;render()}}
+function confirmerConstruction(x,y){const k=projet.k;projet=null;render();
  if(NET.on){if(P.gold<TW[k].c){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr('poor');return}NET.act({type:'place',x,y,k},true);return}
  const e2=G.action(me,{type:'place',x,y,k});if(e2){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(e2)}}
 /* toucher une case du terrain (au relâcher, sans avoir glissé) */
@@ -1120,7 +1167,7 @@ function act(cx,cy,direct){if(explore){const {x,y}=caseSous(cx,cy),tw=VB().t.fin
  if(x<0||y<0||x>=C||y>=R)return;
  if(view!=me){if(tab=='t'&&sel!=null)toast('Terrain de '+B[view].name+' : lecture seule. Reviens sur le tien pour construire.',true);return}
  const tw=P.t.find(t=>t.x==x&&t.y==y);
- if(tw){projet=null;pick=tw;render();sfx('tap');voixSelection();return}
+ if(tw){projet=null;if(pick===tw&&!lot){ouvrirLot(tw);return}pick=tw;lot=null;render();sfx('tap');voixSelection();return}
  if(pick){pick=null;render();return}
  if(tab!='t'){if(mon!=null){mon=null;render()}else toast('Passe sur l’onglet « Tours » pour construire');return}
  if(sel==null){toast('Choisis d’abord une tour en bas de l’écran');return}
@@ -1129,7 +1176,7 @@ function act(cx,cy,direct){if(explore){const {x,y}=caseSous(cx,cy),tw=VB().t.fin
  if(err){projet=null;P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(err);return}
  /* Maj + clic (ordinateur, 2.24) : construit tout de suite, sans aperçu ; la tour reste choisie pour enchaîner */
  if(direct){projet={x,y,k:sel};confirmerConstruction(x,y);return}
- projet={x,y,k:sel};sfx('tap');toast('Touchez encore la case pour construire ('+TW[sel].c+' or, '+fr(btJ(TW[sel].c))+' s)')}
+ projet={x,y,k:sel};sfx('tap');$('toast').hidden=true;render()}
 /* Gestes sur le terrain (2.15) :
    - un toucher (relâché sans glisser) sur une case : aperçu, puis un 2e toucher sur la même case : construction ;
    - glisser le doigt (ou la souris, bouton appuyé) : en 3D, déplace la carte comme une appli de cartes (le terrain suit le doigt),
@@ -1309,6 +1356,7 @@ function loop(now){neigeAccueil(now);const dt=Math.min(.05,Math.max(0,(now-last)
   else if(G&&!G.over){G.step(dt);syncSolo();const lg=G.log.splice(0);for(const l of lg)onLog(l)}
   playEvents();ecouterSons();
   if(pick){const c=pick.b>0?Math.ceil(pick.b):0;if(c!==pickB){pickB=c;render()}}
+  if(lot){const n0=lot.n,t0=lot.t.length;if(!majLot()||lot.n!==n0||lot.t.length!==t0)render()}
   departTick();dessinerVue(now/1000);if(!$('chips').hidden)for(const b of B){drawMini(b,b.ui.g,MINI);if(b===VB()&&R3D.api)cadreMini(b.ui.g)}hud()}
  requestAnimationFrame(loop)}
 
