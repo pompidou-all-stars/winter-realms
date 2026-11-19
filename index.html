@@ -1022,7 +1022,7 @@ function bonusFaction(f){const B=FACTION_BALANCE[f],pc=x=>Math.round((x-1)*100)+
  return B.airBonus?'Anti-aérien : +'+pc(B.airBonus)+' de dégâts contre les volants':B.execute?'Frénésie : +'+pc(B.execute)+' sur les monstres à moins de 35 % de vie':
   B.root?'Racines : chaque coup ralentit le monstre de '+pr(RACINES_LV.p[0])+' (niveau 1) à '+pr(RACINES_LV.p[4])+' (niveau 5), en plus du froid':B.pierce?'Perforant : ignore '+Math.round(B.pierce*100)+' % de l\'armure':B.mark?'Malédiction : chaque coup suivant sur la même cible fait +'+pc(B.mark):''}
 /* effets propres à la tour, en clair */
-function effets(T,lv){const l=[];if(T.sp)l.push('explosion de zone');const R=ralentit(T,lv);if(R)l.push((T.fsp?'ralentit':'racines')+' −'+pr(R.p)+' pendant '+fd(R.d)+' s'+(R.r?', zone '+fr(R.r)+' cases':''));if(T.fl)l.push('souffle en cône, '+T.mx+' cibles au plus');if(T.me)l.push('corps à corps');
+function effets(T,lv){const l=[];if(T.sp)l.push('explosion de zone');const R=ralentit(T,lv);if(R)l.push((T.fsp?'ralentit':'racines')+' −'+pr(R.p)+' pendant '+fd(R.d)+' s'+(R.r?', zone '+fr(R.r)+' cases':''));if(T.fl)l.push('souffle en cône');if(T.me)l.push('corps à corps');
  if(T.mg)l.push('révèle les Spectres invisibles');if(T.mag)l.push('magique : sans effet sur le Briseur de runes');return l}
 /* 2.15 : une seule fiche, et seulement quand on a choisi quelque chose : une tour à construire, une tour posée ou un monstre.
    Elle rappelle le geste suivant ; celle d'une tour posée porte les boutons Améliorer et Vendre. Le × la referme (et annule le choix). */

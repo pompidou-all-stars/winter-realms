@@ -67,9 +67,8 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ### 2.31 — équilibrage des tours — 2026-11-19
 - Tooling: the tower test bench now runs on all CPU cores with identical results (a comparison with `main` takes about 3 min instead of 20–25). It stays out of the GitHub checks.
 - Frost towers deal 2 base damage instead of 4 (half as strong); their slow is unchanged, since it is what makes them strong.
-- Mages deal 55 base damage instead of 45 (+22 %): they were the weakest value tower. Archers (8) and cannons (20) keep their damage.
+- Mages deal 55 base damage instead of 45 (+22 %): they were the weakest value tower. Archers (8) and cannons (20) keep their damage. Flame towers still hit everything in their cone (a 4 then 8 target cap was tried, but since monsters spread out in 2.25 it barely mattered). `sim.js` changed (automatic server redeploy).
 - Tooling: tower test bench (`node tests/outils/banc-tours.js`) measuring each tower's damage per gold invested, levels 1 to 5, against 7 typical waves, with before/after comparison. No gameplay change.
-- Area towers rebalanced, measured with the tower test bench. Flame towers now hit at most 8 monsters per burst (those closest to the exit) instead of everything in their cone: against a crowd of 40 monsters, a level-5 flame tower was worth about 5 times a normal tower per gold. `sim.js` changed (automatic server redeploy).
 
 ### 2.30 — départ façon course — 2026-11-19
 - Starting gold is doubled: 200 instead of 100 for every board.
