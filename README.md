@@ -9,12 +9,16 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | Statut | Domaine | Idée |
 |---|---|---|
 | 💡 | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. |
-| 💡 | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. |
+| 💡 | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit. |
+| 💡 | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
 | 💡 | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
 | 💡 | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
 | 💡 | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
 | 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
+| 💡 | 🏰 Tours | **Améliorer en lot** : un moyen d'améliorer plusieurs tours d'un coup. |
 | 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
+| 💡 | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes. |
+| 💡 | 🧭 Gameplay | **Point de relais** : pouvoir poser un point de passage autour duquel les monstres tournent. |
 | 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
 | 💡 | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. |
 | 🧭 | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. |
@@ -65,6 +69,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.31 — équilibrage des tours — 2026-11-19
+- Roadmap: five new ideas (AI mazes where every tower can shoot, cluttered mobile display, batch upgrades, more compact flying units, waypoint for monsters). No game change.
 - Tooling: the tower test bench now runs on all CPU cores with identical results (a comparison with `main` takes about 3 min instead of 20–25). It stays out of the GitHub checks.
 - Frost towers deal 2 base damage instead of 4 (half as strong); their slow is unchanged, since it is what makes them strong.
 - Mages deal 55 base damage instead of 45 (+22 %): they were the weakest value tower. Archers (8) and cannons (20) keep their damage. Flame towers still hit everything in their cone (a 4 then 8 target cap was tried, but since monsters spread out in 2.25 it barely mattered). `sim.js` changed (automatic server redeploy).
