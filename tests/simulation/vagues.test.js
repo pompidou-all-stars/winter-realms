@@ -4,19 +4,19 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const {charger,partie,avancer}=require('../outils/moteur');
 const S=charger('actuel');
 
-test('Un envoi fait apparaître un groupe de 4 chez chaque adversaire encore en jeu, et rien chez soi',()=>{const G=partie(S);
+test('Un envoi fait apparaître un groupe de 4 chez chaque adversaire encore en jeu, et rien chez soi',()=>{const G=partie(S);G.time=S.GRACE;
  G.action(0,{type:'send',k:0});assert.equal(G.B[0].q.length,0);
- for(const b of G.B.slice(1)){assert.equal(b.q.length,4);for(const s of b.q){assert.equal(s.k,0);assert.equal(s.m,1);assert.ok(s.t>=0&&s.t<=.38*3+.25)}}
+ for(const b of G.B.slice(1)){assert.equal(b.q.length,4);for(const s of b.q){assert.equal(s.k,0);assert.equal(s.m,1+S.GRACE/200);assert.ok(s.t>=0&&s.t<=.38*3+.25)}}
 });
-test('Les 4 monstres apparaissent en moins de 1,4 s, à la case de départ',()=>{const G=partie(S);assert.equal(G.action(0,{type:'send',k:1}),'');
+test('Les 4 monstres apparaissent en moins de 1,4 s, à la case de départ',()=>{const G=partie(S);G.time=S.GRACE;assert.equal(G.action(0,{type:'send',k:1}),'');
  avancer(G,1.4);for(const b of G.B.slice(1)){assert.equal(b.q.length,0);assert.equal(b.cr.length,4)}
 });
-test('Un terrain éliminé ne reçoit plus de vagues',()=>{const G=partie(S);G.B[2].dead=1;G.action(0,{type:'send',k:0});
+test('Un terrain éliminé ne reçoit plus de vagues',()=>{const G=partie(S);G.time=S.GRACE;G.B[2].dead=1;G.action(0,{type:'send',k:0});
  assert.equal(G.B[2].q.length,0);assert.equal(G.B[1].q.length,4);
 });
 test('Les monstres se renforcent avec le temps : PV = PV de base × (1 + temps/200) × 0,55',()=>{
- for(const t of [0,100,600]){const G=partie(S);G.time=t;G.B[0].gold=1e6;G.action(0,{type:'send',k:3});avancer(G,1.5);
-  const m=1+t/200;for(const c of G.B[1].cr){assert.equal(c.max,S.CR[3].hp*m*.55);assert.equal(c.hp,c.max)}}
+ for(const t of [S.GRACE,100,600]){const G=partie(S);G.time=t;G.B[0].gold=1e6;G.action(0,{type:'send',k:3});avancer(G,1.5);
+  const m=1+t/200;assert.equal(G.B[1].cr.length,4);for(const c of G.B[1].cr){assert.equal(c.max,S.CR[3].hp*m*.55);assert.equal(c.hp,c.max)}}
 });
 test('Paliers (2.13) : 3 paliers de 24 monstres (12 au sol, 3 volants, 8 magiques, 1 boss)',()=>{
  const CAP=['aura','inv','split','acc','mi','heal','arm','stun'];
@@ -25,7 +25,7 @@ test('Paliers (2.13) : 3 paliers de 24 monstres (12 au sol, 3 volants, 8 magique
   const mag=L.filter(T=>T.cat=='s'&&!T.hero);assert.equal(mag.length,8);for(const f of CAP)assert.equal(mag.filter(T=>T[f]).length,1,'palier '+t+' : '+f)}
 });
 test('Paliers (2.13) : un monstre d’un palier fermé est refusé (« locked ») ; ouvrir un palier coûte PAL_C et débloque ses monstres',()=>{
- const G=partie(S),b=G.B[0];b.gold=1e6;const k2=S.CR.findIndex(T=>T.t==2&&T.cat=='n'),k3=S.CR.findIndex(T=>T.t==3&&T.cat=='n');
+ const G=partie(S),b=G.B[0];G.time=S.GRACE;b.gold=1e6;const k2=S.CR.findIndex(T=>T.t==2&&T.cat=='n'),k3=S.CR.findIndex(T=>T.t==3&&T.cat=='n');
  assert.equal(b.tier,1);assert.equal(G.action(0,{type:'send',k:k2}),'locked');
  let or=b.gold;assert.equal(G.action(0,{type:'tier'}),'');assert.equal(b.tier,2);assert.equal(b.gold,or-S.PAL_C[1]);
  assert.equal(G.action(0,{type:'send',k:k2}),'');assert.equal(G.action(0,{type:'send',k:k3}),'locked');
@@ -47,8 +47,8 @@ test('IA : chaque IA agit pour la première fois à 1 s + 0,2 s × son numéro d
 test('IA : sa première tour est une tour de sa faction, posée sur une case de son plan de labyrinthe',()=>{const G=partie(S,{ia:[0,1,1,1],factions:[0,1,2,3]});avancer(G,2);
  for(const b of G.B.slice(1)){const t=b.t[0];assert.ok(t,'aucune tour');assert.equal(Math.floor(t.k/10),b.classId);assert.equal(b.mz.w[t.y*13+t.x],1);assert.equal(t.y*13+t.x,b.mz.ord[0])}
 });
-test('IA : aucune attaque pendant les 25 premières secondes',()=>{const G=partie(S,{ia:[0,1,1,1],difficulte:2});
- avancer(G,24.9);assert.equal(G.B[0].q.length+G.B[0].cr.length,0);
+test('IA : aucune attaque pendant les 30 premières secondes (phase « Construis »)',()=>{const G=partie(S,{ia:[0,1,1,1],difficulte:2});
+ avancer(G,29.9);assert.equal(G.B[0].q.length+G.B[0].cr.length,0);
 });
 test('IA : elle finit par attaquer et par améliorer ses tours',()=>{const G=partie(S,{ia:[0,1,1,1]});G.B[0].lives=1e6;
  let recu=0;for(let i=0;i<4800&&!G.over;i++){G.step(.05);recu+=G.B[0].q.length}

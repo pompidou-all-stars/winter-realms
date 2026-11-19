@@ -324,7 +324,7 @@ export function creer(J) {
   }
 
   /* ---------- flocons (thème hiver, 2.9) : 260 points qui tombent en boucle au-dessus du plateau ---------- */
-  /* 2.29 : la position de chaque flocon ne dépend que du temps (x0, y0 : position de départ), plus de l'enchaînement des images :
+  /* 2.30 : la position de chaque flocon ne dépend que du temps (x0, y0 : position de départ), plus de l'enchaînement des images :
      même mouvement à l'écran, mais deux captures au même instant sont identiques (comparaison visuelle des tests) */
   const NF = 260, flocons = new Float32Array(NF * 3), vitesses = new Float32Array(NF), x0 = new Float32Array(NF), y0 = new Float32Array(NF);
   for (let i = 0; i < NF; i++) { const h = (i * 2654435761 >>> 0) / 4294967296, h2 = (i * 40503 % 997) / 997, h3 = (i * 7919 % 389) / 389;

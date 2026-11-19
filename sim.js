@@ -140,7 +140,8 @@ const byCat=c=>CR.map((T,k)=>k).filter(k=>CR[k].cat==c).sort((a,b)=>CR[a].c-CR[b
  AURAS=byF('aura'),SPECS=byF('inv'),HEALS=byF('heal'),SPLITS=byF('split'),ACCS=byF('acc'),ARMS=byF('arm'),MIS=byF('mi'),STUNS=byF('stun'),BOSS=CR.map((T,k)=>k).filter(k=>CR[k].hero),
  AURA=idx('aura'),SPEC=idx('inv'),HEAL=idx('heal'),SPLIT=idx('split'),TURT=idx('arm'),BRK=idx('mi'),SAP=idx('stun'),KID=CR.findIndex(T=>T.cat=='x'),AURA_R=1.7;
 const DIFF=[{n:'Normal',b:1,g:0},{n:'Difficile',b:1.25,g:30},{n:'Brutal',b:1.5,g:60}];
-const HPK=.55,GRACE=25,GROUP=4,
+/* 2.30 : GRACE = phase « Construis » du début de partie : personne (humain ou IA) ne peut envoyer de monstres pendant ces 30 s */
+const HPK=.55,GRACE=30,GROUP=4,
 /* temps de construction : 1 s pour BUILD_OR pièces d'or dépensées (achat ou amélioration), entre BUILD_MIN et BUILD_MAX secondes,
    multiplié pour les humains par BUILD_DIFF selon la difficulté (les IA gardent ×1, comme pour le revenu) */
  BUILD_OR=50,BUILD_MIN=.5,BUILD_MAX=8,BUILD_DIFF=[1,1.25,1.5],buildT=(c,m=1)=>Math.min(BUILD_MAX,Math.max(BUILD_MIN,c/BUILD_OR))*m,flyH=k=>CR[k].fly?CR[k].z*.35:0;
@@ -187,7 +188,7 @@ function chemin(b){if(b._chD===b.d)return b._ch;const c={x:SP[0],y:SP[1],tx:SP[0
 function genant(b,x,y,nd){return b.cr.some(c=>!CR[c.k].fly&&((Math.abs(c.x-x)<.9&&Math.abs(c.y-y)<.9)||nd[cel(c.y,R)][cel(c.x,C)]>=INF))}
 class Board{
  constructor(i,name,col,ai,classId=0){this.i=i;this.name=name;this.col=col;this.ai=ai;this.classId=classId;this.dead=0;this.aiT=1+i*.2;this.ev=[];this.G=null;
-  this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=100;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=60;this.ap=40;this.lastG=100;this.flyIn=0;this.hpIn=0;this.specSeen=0;this.tier=1;this.mz=null;this.d=this.dist();
+  this.g=Array.from({length:R},()=>Array(C).fill(0));this.t=[];this.cr=[];this.pr=[];this.fx=[];this.q=[];this.gold=200;this.inc=10;this.lives=40;this.hurt=0;this.pen=0;this.dp=120;this.ap=80;this.lastG=200;this.flyIn=0;this.hpIn=0;this.specSeen=0;this.tier=1;this.mz=null;this.d=this.dist();
   /* 2.23 : statistiques de fin de partie (sans effet sur le jeu) : tours posées, envois (groupes et or), monstres tués, revenu à chaque versement, moment de l'élimination */
   this.st={pose:0,env:0,envOr:0,tue:0,rev:[],mort:-1}}
  /* distances à la sortie (Dijkstra sur 8 directions, diagonale √2, sans couper les coins) */
@@ -422,14 +423,14 @@ class Game{
  /* 2.13 : ouvre le palier de monstres suivant (paliers 2 et 3 payants) */
  unlock(b){const c=PAL_C[b.tier];if(c===undefined||b.gold<c)return false;b.gold-=c;b.tier++;b.ev.push('up');return true}
  /* un envoi part chez tous les adversaires encore en jeu */
- send(from,k){const T=CR[k];if(from.gold<T.c||T.t>from.tier)return false;from.gold-=T.c;from.inc+=T.i;from.st.env++;from.st.envOr+=T.c;for(const b of this.foes(from))b.send(k,1+this.time/200);return true}
- /* action d'un joueur humain : renvoie '' si accepté, sinon un code d'erreur (poor, blocked, locked, max, busy, over, bad) */
+ send(from,k){const T=CR[k];if(this.time<GRACE||from.gold<T.c||T.t>from.tier)return false;from.gold-=T.c;from.inc+=T.i;from.st.env++;from.st.envOr+=T.c;for(const b of this.foes(from))b.send(k,1+this.time/200);return true}
+ /* action d'un joueur humain : renvoie '' si accepté, sinon un code d'erreur (poor, blocked, locked, max, busy, early, over, bad) ; early = envoi pendant la phase « Construis » (2.30) */
  action(i,a){const b=this.B[i];if(!b||b.dead||b.ai||this.over||!a)return 'over';
   const x=a.x|0,y=a.y|0,k=a.k|0;
   if(a.type=='place'){const T=TW[k];if(!T)return 'bad';if(b.place(x,y,k))return '';return b.gold<T.c?'poor':'blocked'}
   if(a.type=='sell')return b.sell(x,y)?'':'bad';
   if(a.type=='upgrade'){const t=b.t.find(t=>t.x==x&&t.y==y);if(!t)return 'bad';return b.upgrade(t)?'':t.lv>=5?'max':t.b>0?'busy':'poor'}
-  if(a.type=='send'){const T=CR[k];if(!T||T.cat=='x')return 'bad';if(T.t>b.tier)return 'locked';return this.send(b,k)?'':'poor'}
+  if(a.type=='send'){const T=CR[k];if(!T||T.cat=='x')return 'bad';if(this.time<GRACE)return 'early';if(T.t>b.tier)return 'locked';return this.send(b,k)?'':'poor'}
   if(a.type=='tier'){if(b.tier>=PAL_C.length)return 'max';return this.unlock(b)?'':'poor'}
   return 'bad'}
  /* avance la partie de dt secondes (dt ≤ 0,05) ; les événements de partie vont dans this.log */
@@ -442,4 +443,4 @@ class Game{
   const alive=B.filter(b=>!b.dead);
   if(alive.length<=1||!alive.some(b=>!b.ai)){this.over=true;this.winner=alive.length==1?alive[0].i:-1;this.log.push({type:'end',winner:this.winner})}}
 }
-if(typeof module!='undefined'&&module.exports)module.exports={C,R,SP,EX,INF,TW,CR,PAL_C,DIFF,FACTIONS,GIVRE_LV,RACINES_LV,Board,Game};
+if(typeof module!='undefined'&&module.exports)module.exports={C,R,SP,EX,INF,TW,CR,PAL_C,DIFF,GRACE,FACTIONS,GIVRE_LV,RACINES_LV,Board,Game};
