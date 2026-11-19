@@ -45,6 +45,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.26 — équilibrage des tours — 2026-11-18
+- Tooling: the tower test bench now runs on all CPU cores with identical results (a comparison with `main` takes about 3 min instead of 20–25). It stays out of the GitHub checks.
 - Frost towers deal 2 base damage instead of 4 (half as strong); their slow is unchanged, since it is what makes them strong.
 - Archers deal 6 base damage instead of 8 (−25 %): cheap to upgrade, they had become the best value tower everywhere; their price is unchanged so mazes stay cheap. Mages deal 55 instead of 45 (+22 %): they were the weakest value tower.
 - Tooling: tower test bench (`node tests/outils/banc-tours.js`) measuring each tower's damage per gold invested, levels 1 to 5, against 7 typical waves, with before/after comparison. No gameplay change.
