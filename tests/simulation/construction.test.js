@@ -8,7 +8,7 @@ const chemin=b=>b.d[S.SP[1]][S.SP[0]];
 
 test('Poser une tour débite son coût et occupe la case',()=>{const {G,b}=nouveau();
  assert.equal(G.action(0,{type:'place',x:3,y:5,k:0}),'');
- assert.equal(b.gold,100-S.TW[0].c);assert.equal(b.g[5][3],1);
+ assert.equal(b.gold,200-S.TW[0].c);assert.equal(b.g[5][3],1);
  assert.equal(b.t.length,1);assert.deepEqual([b.t[0].lv,b.t[0].inv],[1,S.TW[0].c]);
 });
 test('Refus sur la case d\'apparition, la sortie ou une case occupée (code « blocked »), sans débit',()=>{const {G,b}=nouveau();
@@ -20,8 +20,8 @@ test('Refus sur la case d\'apparition, la sortie ou une case occupée (code « b
 test('Refus hors du terrain (code « blocked »)',()=>{const {G}=nouveau();
  assert.equal(G.action(0,{type:'place',x:-1,y:3,k:0}),'blocked');assert.equal(G.action(0,{type:'place',x:13,y:3,k:0}),'blocked');
 });
-test('Refus quand l\'or manque (code « poor »)',()=>{const {G,b}=nouveau();
- assert.equal(G.action(0,{type:'place',x:3,y:3,k:9}),'poor');assert.equal(b.gold,100);assert.equal(b.t.length,0);
+test('Refus quand l\'or manque (code « poor »)',()=>{const {G,b}=nouveau();b.gold=50;
+ assert.equal(G.action(0,{type:'place',x:3,y:3,k:9}),'poor');assert.equal(b.gold,50);assert.equal(b.t.length,0);
 });
 test('Refus d\'une tour d\'une autre faction (code « blocked » si l\'or suffit)',()=>{const {G,b}=nouveau();
  assert.equal(G.action(0,{type:'place',x:3,y:3,k:10}),'blocked');assert.equal(b.t.length,0);

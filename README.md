@@ -64,6 +64,12 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.30 — départ façon course — 2026-11-19
+- Starting gold is doubled: 200 instead of 100 for every board.
+- The first 30 seconds are a "Build!" phase: nobody (human or AI) can send monsters; the monster tabs are disabled and a countdown runs in the top bar.
+- Racing-style start: an animated "Construis !" banner with a logo and a big 30-second timer, a 3-2-1 countdown, then an animated "Envoie et résiste !" banner with its own logo.
+- `sim.js` is modified (automatic server redeploy).
+
 ### 2.29 — bibliothèque elevenlabs — 2026-11-19
 - The whole sound library is remade with ElevenLabs (paid plan, commercial use): 371 files. Realistic, medieval, never shrill tower shots; monster deaths and growls while walking; a war horn when sending a wave, different for ground, flying, special and boss monsters; new interface sounds and ambiences.
 - 100 sarcastic dark-fantasy voice lines, with new contexts: placing a tower, maximum level and wave cleared. New voices made for the Horde (deeper, more bestial) and the Dwarves.

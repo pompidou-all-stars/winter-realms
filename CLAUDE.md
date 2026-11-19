@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.29)
+# Winter Realms — Tower Wars (Édition 2.30)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -75,7 +75,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 - **Le jeu tient en deux fichiers, sans build ni dépendances** :
   - `sim.js` contient **toute la simulation** : tables de données, `class Board`, IA, et `class Game`, qui fait tourner une partie de 4 terrains. Il ne touche ni au DOM ni au son, ce qui permet au serveur multijoueur de le réutiliser tel quel. Les sons y sont seulement notés dans `board.ev` (un `!` devant signifie « toujours audible pour le propriétaire du terrain »). Les événements de partie (revenu, élimination, fin) vont dans `game.log`.
   - `index.html` contient l'interface, le dessin et les sons. Il charge `sim.js` avec `<script src="sim.js">`.
-  - **Toutes les actions du joueur passent par `doAction()`**, qui appelle `Game.action()`. Cette fonction renvoie `''` si l'action réussit, sinon un code d'erreur : `poor`, `blocked`, `locked`, `max`, `busy` (tour en chantier, depuis la 2.4), `over` ou `bad`.
+  - **Toutes les actions du joueur passent par `doAction()`**, qui appelle `Game.action()`. Cette fonction renvoie `''` si l'action réussit, sinon un code d'erreur : `poor`, `blocked`, `locked`, `max`, `busy` (tour en chantier, depuis la 2.4), `early` (envoi pendant la phase « Construis », depuis la 2.30), `over` ou `bad`.
 - **Autour du jeu** (ces dossiers ne sont pas chargés par la page) :
   - `server/` : le serveur multijoueur (Cloudflare Workers), qui importe `sim.js` tel quel (voir §9 bis) ;
   - `tests/` : les tests automatiques, les captures et les bilans (voir §12) ;
@@ -117,11 +117,12 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 2. **Les 4 terrains** : celui du joueur (« Toi ») et ceux de IA 1 (rouge), IA 2 (bleu) et IA 3 (violet). Les IA jouent automatiquement les factions suivantes dans la liste : `(faction du joueur + 1, + 2, + 3) % 5`.
 3. **Victoire** : toutes les IA sont éliminées. **Défaite** : le joueur est éliminé. Une fenêtre de fin donne alors les statistiques et propose de regarder la carte ou de quitter (§9, depuis la 2.23).
 4. Un joueur est **éliminé** quand ses vies tombent à 0. Son terrain est alors vidé et grisé, et il ne reçoit plus de vagues.
+5. **Départ façon jeu de course** (depuis la 2.30) : les **30 premières secondes** (`GRACE`, `sim.js`) sont la phase « Construis » : **personne, humain ou IA, ne peut envoyer de monstres** (`Game.send` refuse, `Game.action` renvoie `early`). On ne fait que construire. Voir §9 pour les annonces et le chrono.
 
 ### Ressources de départ (pour chaque terrain)
 | Ressource | Valeur |
 |---|---|
-| Or | 100 |
+| Or | 200 (doublé depuis la 2.30 ; avant : 100) |
 | Revenu | +10 toutes les 10 s |
 | Vies | 40 |
 
@@ -460,7 +461,7 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
 - sinon, elle **construit** la prochaine case du plan. Si un monstre l'occupe, elle essaie les 3 suivantes, mais ne saute jamais une case faute d'or. L'IA ne pose jamais de tour hors de son plan, ce qui corrige le blocage d'avant la 2.5 (l'IA cessait de construire vers 36 tours).
 
 **Attaque** (`aiAttack`) :
-- rien pendant les **25 premières secondes** (`GRACE`) ;
+- rien pendant les **30 premières secondes** (`GRACE`, phase « Construis » du §2 ; 25 s avant la 2.30) ;
 - elle accumule de l'or jusqu'à `min(6000, max(60, revenu × 3))`, puis envoie une grosse vague ;
 - elle compose cette vague selon les **faiblesses de ses adversaires** : des volants s'ils ont peu de défense aérienne, des invisibles s'ils n'ont pas de Mage, des blindés s'ils ont beaucoup de tours « physiques », des anti-magie s'ils ont beaucoup de tours magiques ;
 - **paliers** (2.13) : elle ouvre le palier 2 à partir de 2:30 et le palier 3 à partir de 7:00, dès que sa réserve d'attaque vaut 1,5 fois le prix ; dans chaque famille (sol, volants, invisibles, blindés, anti-magie, se divise, accélérés, étourdissants), elle envoie le monstre **le plus cher qu'elle peut payer parmi ses paliers ouverts** ;
@@ -479,6 +480,12 @@ Chaque IA agit toutes les **0,6 s**. Elle range chaque pièce d'or gagnée dans 
   - bouton Adversaires, panneau des vignettes et menu : verre givré et cadre d'argent ; léger voile de froid sur les bords du terrain.
 - **Portrait seulement** (depuis la 2.15) : un téléphone tenu en paysage affiche « Tourne ton téléphone : Winter Realms se joue en portrait » (`#tourner`, écran tactile de moins de 540 px de haut). Sur ordinateur ou tablette en paysage, le jeu tient dans une colonne au format portrait, centrée.
 - **Bandeau du haut** (2.15 ; barre givrée depuis la 2.18) : bouton **menu** (☰), or, revenu avec un **anneau** qui se remplit pendant les 10 s avant le versement, **vies du joueur** (♥), horloge, bouton **plein écran**. Le plein écran verrouille l'écran en portrait quand le téléphone le permet.
+- **Départ façon jeu de course** (depuis la 2.30, `departTick()`, `annonce()`), piloté par le temps de jeu (solo ou instantanés du serveur), sans bloquer les gestes (`pointer-events:none`) :
+  - au lancement, bannière animée **« Construis ! »** (≈ 3 s) : bande inclinée à liseré d'or, **logo** (médaillon doré, tour de glace et marteau, rayons qui tournent), titre doré qui traverse l'écran avec un reflet, et le **chrono « 30 » en gros**, qui s'envole ensuite vers le bandeau ;
+  - pendant la phase, le **chrono du bandeau** (`#prep`, marteau doré) remplace l'horloge et décompte de 0:30 à 0:01 (rouge et pulsant sous 5 s) ; les **onglets de monstres** (Sol, Volants, Spéciaux) sont **désactivés** (grisés, cadenas, non cliquables) ;
+  - **3, 2, 1** en très gros au centre, avec un bip à chaque chiffre ;
+  - à 0:30, bannière **« Envoie et résiste ! »** (≈ 2,7 s) : flash, bande à liseré rouge, **logo** (deux épées croisées derrière un écu rouge), titre rouge ; les onglets de monstres se déverrouillent en clignotant. L'horloge normale revient.
+  - sons synthétisés : `cor` (Construis), `bip` (3-2-1), `go` (Envoie et résiste). Logos en SVG dans le code. Avec « réduire les animations », les annonces s'affichent sans mouvement.
 - **Menu** (2.15, `#menu`) : Reprendre, Musique (activée/coupée, depuis la 2.16), Son (activé/coupé, les bruitages seulement), Vibrations (activées/coupées), Rappel des gestes, Quitter la partie (deux touchers : « Confirmer : quitter la partie »). En solo, quitter ramène à l'accueil ; en ligne, quitte le salon.
 - **Musique de fond** (depuis la 2.16, objet `MUSIQUE`) : trois thèmes composés par le concepteur avec **Suno** (`assets/musique/winter-realm.mp3`, `winter-realm-1.mp3`, `winter-realm-2.mp3`, environ 8 Mo chacun, lus en continu pendant le téléchargement). Le premier thème est **tiré au hasard** au lancement, puis ils s'**enchaînent les uns après les autres, en boucle**, de l'accueil jusqu'à la fin de la partie. La musique démarre au premier toucher sur la page (les navigateurs bloquent le son avant) ; elle passe par Web Audio (volume 0,4, réglable aussi sur iPhone) ; elle se met en pause quand la page est cachée. Le menu la coupe sans toucher aux bruitages. Un fichier illisible est sauté.
 - **Adversaires** (panneau flottant depuis la 2.3 ; bouton « Adversaires » sous le bandeau, à droite, depuis la 2.15, avec un point de la couleur de chaque adversaire) : le bouton (`#cartesBtn`) ouvre un panneau posé **par-dessus le terrain** (`#chips`), avec les 4 vignettes : mini-carte, vies et revenu (bonus de difficulté compris) de chaque terrain. En 3D, la vignette du terrain regardé montre en or la partie visible.
@@ -855,3 +862,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-19 | 2.29 | **bibliothèque elevenlabs** : toute la bibliothèque sonore (§16) refaite avec ElevenLabs (offre Creator, usage commercial) à la place des modèles locaux, jugés trop pauvres : 371 fichiers, environ 14 000 crédits. Tirs des tours réalistes et médiévaux, jamais stridents (3 à 4 variantes) ; morts et **cris des monstres pendant la marche** ; **cor de guerre** à l'envoi, différent pour le sol, les volants, les spéciaux et les boss ; interface et ambiances refaites. **100 répliques** dark fantasy sarcastiques, avec 3 nouveaux contextes : pose d'une tour (« du travail… »), **niveau maximum** et **vague éliminée** ; nouvelles voix créées pour la Horde (plus grave et bestiale) et les Nains. Moteur : gain au chargement plafonné à ×2. Script `generer-sons.js` : 3 essais au plus, arrêt après 3 échecs de suite. `sim.js` non modifié. |
 | 2026-11-19 | 2.29 | Outillage : **tests 3D allégés** (§12.2) : en 3D, l'avance rapide des tests (`avancer`) ne redessine plus la vue que 4 fois par seconde de jeu (la partie, elle, avance toujours image par image). Le navigateur de test plantait vers 30 s de jeu depuis le paysage de la 2.26, alors que le jeu tourne normalement sur téléphone. Parcours 3D en 1 min au lieu de 5, captures 3D en 1 min 30 au lieu de 10 ; nouvelle variable `WR_GPU=1` pour tester la 3D avec la vraie carte graphique (environ 20 s). **Aucun changement de jeu.** |
 | 2026-11-19 | 2.29 | Outillage : **tests en 3D** (§12) : le parcours automatisé se fait dans le vrai jeu, en 3D. Il réunit l'ancien parcours 2D (interface : menu, paliers, revenu, vente, adversaires…) et l'ancien `parcours-3d.test.js` (supprimé) : 26 vérifications. Un test vérifie le **secours 2D** (3D introuvable : message, passage en 2D, construction possible). Captures et bilan visuel en 3D (`captures.js --2d` pour la 2D). Corrigés en chemin : la version d'avant était extraite sans three.js, modèles ni sons ; three.js puisait dans le même hasard à graine que la simulation (partie différente d'un lancement à l'autre) ; l'alignement de l'horloge était parfois sauté en 3D. Limite : les flocons qui tombent laissent environ 0,1 % de différence entre deux captures identiques (seuil du témoin : 0,05 %). **Aucun changement de jeu.** |
+| 2026-11-19 | 2.30 | **départ façon course** (§2, §8, §9) : l'**or de départ est doublé** (200 au lieu de 100 pour chaque terrain ; réserves internes de l'IA doublées aussi). Les **30 premières secondes** sont la phase « Construis » : **aucun envoi de monstres** pour personne (`GRACE` passe de 25 à 30 s et bloque aussi les humains, code d'erreur `early`). Bannière animée « Construis ! » avec logo et chrono « 30 » en gros, chrono de la phase dans le bandeau, onglets de monstres désactivés, 3-2-1, puis bannière « Envoie et résiste ! » avec logo ; sons synthétisés `cor`, `bip`, `go`. **`sim.js` modifié** (redéploiement automatique du serveur). Tests adaptés (or de départ, envois après 30 s) ; nouveaux tests de la phase « Construis » (simulation et parcours mobile). |
