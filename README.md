@@ -1,8 +1,29 @@
 # Winter Realms — Tower Wars
 
-## 🗺️ Feuille de route — idées d'améliorations
+## 🗺️ Feuille de route
 
 Une idée ? **[➕ Proposer une idée](https://github.com/pompidou-all-stars/winter-realms/issues/new?template=idee.yml)** (formulaire GitHub, marche aussi sur téléphone), ou ajoute une ligne ici dans une PR. Toutes les idées : [onglet Issues, étiquette « idée »](https://github.com/pompidou-all-stars/winter-realms/issues?q=label%3Aid%C3%A9e).
+
+### 🚀 Prochaines étapes (dans l'ordre)
+
+Le plan du concepteur, une fois les chantiers en cours terminés :
+
+1. 🧊 **Refactorisation des modèles 3D**.
+2. 🧭 **Menu de navigation** : lancement d'une partie sur plusieurs écrans successifs.
+3. 🛡️ **Nouvelles races** jouables.
+4. ⚔️ **Gameplay unique par race**.
+5. 🌍 **Version anglaise** (localisation).
+6. 📊 **Analytique** : mesurer comment le jeu est utilisé.
+7. 🌐 **Site web propre** autour du jeu, optimisé pour les moteurs de recherche (SEO) et les moteurs d'IA (GEO).
+8. 🎓 **Tutoriel** au lancement.
+9. 🔑 **Connexion** avec Google, ou création d'un compte.
+10. 🛒 **Boutique** (store).
+11. 📣 **Promotion** : visuels de campagne, agent pour Reddit et jeuxvideo.com.
+12. 💳 **Paiement**.
+
+Ensuite : 💰 **monétisation**.
+
+### 💡 Idées d'améliorations
 
 Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 
@@ -19,7 +40,7 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
 | 💡 | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes. |
 | 💡 | 🧭 Gameplay | **Point de relais** : pouvoir poser un point de passage autour duquel les monstres tournent. |
-| 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
+| 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style (étapes 3 et 4 du plan ci-dessus). |
 | 💡 | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. |
 | 🧭 | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. |
 | 🧭 | ✨ Palier 3 | **Pouvoirs magiques payants** : renforcements sur son propre terrain, ou malédictions à lancer sur le terrain d'un adversaire. |
@@ -69,6 +90,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.31 — équilibrage des tours — 2026-11-19
+- Roadmap: the designer's next steps, in order, at the top of the roadmap (3D model refactoring, multi-screen launch menu, new races, unique gameplay per race, English version, analytics, website with SEO and GEO, tutorial, Google login or account, store, promotion, payment), then monetization. No game change.
 - Roadmap: five new ideas (AI mazes where every tower can shoot, cluttered mobile display, batch upgrades, more compact flying units, waypoint for monsters). No game change.
 - Tooling: the tower test bench now runs on all CPU cores with identical results (a comparison with `main` takes about 3 min instead of 20–25). It stays out of the GitHub checks.
 - Frost towers deal 2 base damage instead of 4 (half as strong); their slow is unchanged, since it is what makes them strong.
