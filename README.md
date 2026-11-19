@@ -68,6 +68,9 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.32 — ia plus stratège — 2026-11-19
+- Tooling: AI arena (`node tests/outils/arene-ia.js`): the current AI plays against the AI of another version (`origin/main` by default) in the same game engine, seats and factions swapped, on all CPU cores; reports points, wins and the gap with its standard error. Not part of the GitHub checks. No game change.
+
 ### 2.31 — équilibrage des tours — 2026-11-19
 - Roadmap: five new ideas (AI mazes where every tower can shoot, cluttered mobile display, batch upgrades, more compact flying units, waypoint for monsters). No game change.
 - Tooling: the tower test bench now runs on all CPU cores with identical results (a comparison with `main` takes about 3 min instead of 20–25). It stays out of the GitHub checks.
