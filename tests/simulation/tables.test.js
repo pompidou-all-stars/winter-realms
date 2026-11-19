@@ -17,7 +17,7 @@ test('Chaque tour et chaque monstre a des statistiques valides (nombres positifs
 /* Vérification indépendante : on recalcule chaque tour à partir des tables de base, avec les formules du code. */
 test('Chaque tour est bien calculée à partir des tables de base (formules recalculées indépendamment)',()=>{
  const PUISSANCE=[1,1.08,.96,1.12,1.18,.92,1.22,1.30,1.16,1.38];
- const RETOUCHE={6:{d:.88,cd:.86,r:1.12},7:{d:1.08,cd:1.12},8:{d:.9},9:{d:1.08,r:1.08}};
+ const RETOUCHE={6:{d:.88,cd:.86,r:1.12},7:{d:1.08,cd:1.12},8:{d:1.5},9:{d:1.08,r:1.08}};
  for(let f=0;f<5;f++)for(let j=0;j<10;j++){const T=S.TW[f*10+j],B=S.BASE_TW[S.ARCH[j]],F=S.FACTION_BALANCE[f],x=RETOUCHE[j]||{};
   const nom=`${T.n} (faction ${f}, emplacement ${j})`;
   assert.equal(T.c,Math.max(10,Math.round(B.c*PUISSANCE[j]*F.cost/5)*5),nom+' : coût');

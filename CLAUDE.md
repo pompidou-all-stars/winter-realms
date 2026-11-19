@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.35)
+# Winter Realms — Tower Wars (Édition 2.36)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -175,7 +175,8 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
   | Racines sylvestres : vitesse retirée | 10 % | 15 % | 20 % | 25 % | 30 % |
   | Racines : durée | 0,72 s | 0,85 s | 1 s | 1,15 s | 1,3 s |
   - **Le froid et les racines s'additionnent** : Givre niveau 5 + racines niveau 5 = −80 %, soit vitesse ×0,2. Le monstre garde deux ralentissements séparés (`gp`/`gt` pour le froid, `rp`/`rt` pour les racines) ; `c.sl` et `c.sf` en sont déduits (`ralentir`).
-  - **Dans une même famille, pas de cumul** : si un monstre est déjà gelé (ou enraciné), c'est l'effet **le plus fort** qui reste, et la durée retenue est la plus longue.
+  - **Givre renforcé** (emplacement 8, « Entrave » : Cristal hivernal, Totem des esprits, Cristal lunaire, Générateur runique, Cristal corrupteur ; depuis la 2.36) : **10 points de ralentissement en plus** à chaque niveau (`GIVRE_BONUS`) : de −30 % (niveau 1) à −60 % (niveau 5), même durée et même zone que le Givre. Avant la 2.36, il ralentissait exactement comme le Givre, pour plus cher. Avec les racines sylvestres niveau 5, la vitesse peut descendre à ×0,1.
+  - **Dans une même famille, pas de cumul** : si un monstre est déjà gelé (ou enraciné), c'est l'effet **le plus fort** qui reste, et la durée retenue est la plus longue. Le Givre et le Givre renforcé sont de la même famille (le froid) : ils ne se cumulent pas.
   - Les racines n'ont pas de zone propre : elles touchent ce que la tour touche déjà (cible, explosion du Canon, cône des Flammes).
 
 ### 4.2 Les 10 emplacements par faction (`ARCH`, `ROLE`)
@@ -191,7 +192,7 @@ Chaque faction a 10 tours. L'emplacement `j` détermine l'archétype, un multipl
 | 5 | Mage | Arcanes | ×0,92 | — |
 | 6 | Archer | Tireur d'élite | ×1,22 | dégâts ×0,88, recharge ×0,86, portée ×1,12 |
 | 7 | Garde | Champion | ×1,30 | dégâts ×1,08, recharge ×1,12 |
-| 8 | Givre | Entrave | ×1,16 | dégâts ×0,9 |
+| 8 | Givre | Entrave | ×1,16 | dégâts ×1,5 (×0,9 avant la 2.36), ralentissement +10 points (`GIVRE_BONUS`, depuis la 2.36) |
 | 9 | Mage | Archimage | ×1,38 | dégâts ×1,08, portée ×1,08 |
 
 Formules : `coût = max(10, arrondi(coût_base × puissance × coût_faction / 5) × 5)`, `dégâts = dégâts_base × puissance × dégâts_faction × retouche`. La portée et la recharge dépendent de la faction et des retouches, **pas** de la puissance.
@@ -253,7 +254,7 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 | 5 | Sanctuaire solaire | Mage | 85 | 49,1 | 1,442 | 34 | 3,52 |
 | 6 | Tour des sentinelles | Archer | 25 | 8,3 | 0,443 | 19 | 3,45 |
 | 7 | Garde du lion | Garde | 40 | 27,2 | 0,634 | 43 | 1,65 |
-| 8 | Cristal hivernal | Givre | 50 | 2 | 0,927 | 2 | 2,75 |
+| 8 | Cristal hivernal | Givre | 50 | 3,4 | 0,927 | 4 | 2,75 |
 | 9 | Arcaniste royal | Mage | 130 | 79,5 | 1,442 | 55 | 3,8 |
 
 #### Horde
@@ -267,7 +268,7 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 | 5 | Chaman des flammes | Mage | 85 | 48,6 | 1,456 | 33 | 2,98 |
 | 6 | Tour des éclaireurs | Archer | 25 | 8,2 | 0,447 | 18 | 2,92 |
 | 7 | Garde-lame | Garde | 40 | 27 | 0,641 | 42 | 1,4 |
-| 8 | Totem des esprits | Givre | 45 | 2 | 0,936 | 2 | 2,33 |
+| 8 | Totem des esprits | Givre | 45 | 3,3 | 0,936 | 4 | 2,33 |
 | 9 | Grand sorcier orc | Mage | 125 | 78,7 | 1,456 | 54 | 3,21 |
 
 #### Sylvestres
@@ -281,7 +282,7 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 | 5 | Cercle druidique | Mage | 85 | 48,6 | 1,428 | 34 | 3,2 |
 | 6 | Nid des faucons | Archer | 25 | 8,2 | 0,439 | 19 | 3,14 |
 | 7 | Dryade protectrice | Garde | 40 | 27 | 0,628 | 43 | 1,5 |
-| 8 | Cristal lunaire | Givre | 45 | 2 | 0,918 | 2 | 2,5 |
+| 8 | Cristal lunaire | Givre | 45 | 3,3 | 0,918 | 4 | 2,5 |
 | 9 | Ancien arcanique | Mage | 125 | 78,7 | 1,428 | 55 | 3,46 |
 
 #### Nains
@@ -295,7 +296,7 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 | 5 | Canon arcanique | Mage | 90 | 54,6 | 1,512 | 36 | 3,26 |
 | 6 | Baliste naine | Archer | 25 | 9,3 | 0,464 | 20 | 3,2 |
 | 7 | Sentinelle d'acier | Garde | 40 | 30,3 | 0,665 | 46 | 1,53 |
-| 8 | Générateur runique | Givre | 50 | 2,3 | 0,972 | 2 | 2,55 |
+| 8 | Générateur runique | Givre | 50 | 3,8 | 0,972 | 4 | 2,55 |
 | 9 | Maître ingénieur | Mage | 135 | 88,5 | 1,512 | 59 | 3,53 |
 
 #### Légion des ombres
@@ -309,7 +310,7 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 | 5 | Nexus du néant | Mage | 85 | 51,1 | 1,414 | 36 | 3,17 |
 | 6 | Œil démoniaque | Archer | 25 | 8,7 | 0,434 | 20 | 3,1 |
 | 7 | Gardien spectral | Garde | 40 | 28,4 | 0,622 | 46 | 1,48 |
-| 8 | Cristal corrupteur | Givre | 45 | 2,1 | 0,909 | 2 | 2,48 |
+| 8 | Cristal corrupteur | Givre | 45 | 3,5 | 0,909 | 4 | 2,48 |
 | 9 | Archimage noir | Mage | 125 | 82,8 | 1,414 | 59 | 3,42 |
 
 ---
@@ -906,6 +907,7 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-19 | 2.33 | **ia plus stratège** : **performances de l'IA** : l'estimation des défenses adverses suit le chemin de case en case (`chaine`) au lieu du tracé exact (`chemin`, environ 4 % plus court), et garde sur chaque tour les points du chemin qu'elle voit. Mesuré sur 5 parties de 10 min (3 IA, pas de 0,05 s) : l'IA coûte en moyenne 0,02 à 0,04 ms par pas (0,01 à 0,03 sur `main`) ; son pire appel passe de 7 à 10 ms à 3 à 5 ms (2 à 3 ms sur `main`). Mêmes décisions. `sim.js` modifié (redéploiement automatique du serveur). |
 | 2026-11-19 | 2.33 | **ia plus stratège** : **plus de tours, moins d'améliorations en milieu de partie** (§8) : tant que son plan n'est pas fini, l'IA améliore par hasard à partir de 12 tours (25 %, puis 50 % à partir de 28 tours) au lieu de 10 tours (35 %, puis 60 % à partir de 24). **Arène** contre l'étape précédente (60 parties par série) : +0,18 (± 0,11) et +0,27 (± 0,13) sur deux séries de graines, −0,05 (± 0,09) en parties longues. Réglages essayés et écartés : paliers et boss plus tôt (aucun effet), seuil d'envoi à 2 ou 5 revenus (aucun effet net), plafond des vagues à 20 000 or (gagnant en parties courtes, −0,52 en parties longues), plus ou moins de part de défense, coefficient `ENC` à 1,2 ou 2, plus d'améliorations (−0,22). `sim.js` modifié (redéploiement automatique du serveur). |
 | 2026-11-19 | 2.34 | **Consigne de construction allégée** (§9) : « Touche encore la case pour construire » s'affiche **entre les deux flèches de rotation**, **une seule fois par partie** (premier aperçu), et la fiche ne répète plus la consigne ensuite. Interface seulement : `sim.js` non modifié. Test du parcours mobile adapté. |
+| 2026-11-19 | 2.36 | **cristal hivernal renforcé** : le **Givre renforcé** (emplacement 8 : Cristal hivernal, Totem des esprits, Cristal lunaire, Générateur runique, Cristal corrupteur) coûtait plus cher que le Givre de base mais faisait exactement la même chose. Dégâts : retouche ×0,9 → **×1,5** (Cristal hivernal 2 → 3,4) ; ralentissement : **+10 points** à chaque niveau (`GIVRE_BONUS` : −30 % à −60 % au lieu de −20 % à −50 %). Toujours **pas de cumul avec le Givre** (même famille, le plus fort l'emporte). Fiche à jour. `sim.js` modifié (redéploiement automatique du serveur). Deux tests ajoutés à `deplacements`, `tables` adapté. Chiffres **à valider par le concepteur**. |
 | 2026-11-19 | 2.35 | **terrain dégagé** : **volants deux fois moins grands** (§15.2) : en 3D, les monstres volants passent de ×0,65 à **×0,5** de la taille des autres monstres (`ECH_VOLANTS`), pour moins cacher le terrain. Le rendu 2D de secours et les vignettes ne changent pas. `rendu3d.js` seul : `sim.js` non modifié (pas de redéploiement du serveur). |
 | 2026-11-19 | 2.35 | **terrain dégagé** : **affichage mobile désencombré** (§9, §15.2), suite de la 2.32 : la **ligne de détails de la fiche tient sur une ligne** (coupée par « … », un toucher la déplie) ; en 3D, quand on choisit une tour posée, un lot ou l'aperçu d'une construction dont la case est cachée par la fiche ou le bandeau, **la vue glisse en douceur pour la montrer au-dessus de la fiche** (`garderVisible`, `amener`). Avant, la fiche d'une tour posée près du bas de l'écran recouvrait la tour. Interface seulement : `sim.js` non modifié (pas de redéploiement du serveur). |
 | 2026-11-19 | 2.35 | **terrain dégagé** : outillage, **tests plus rapides** (§12) : `tout.js` lance les fichiers de test en parallèle (autant que de cœurs moins un, les plus longs d'abord ; `--un-par-un` pour l'ancien fonctionnement), les parties entre IA sont jouées en même temps (`jouerEnParallele`, `worker_threads`, mêmes résultats vérifiés sur les empreintes), et le test « en partie » du labyrinthe a son propre fichier (`labyrinthe-partie`). Mesuré sur 22 cœurs : simulation **24 s → 8 s** (13 s bridé à 4 cœurs, comme sur GitHub), `--complet` **1 min 54 → 29 s**, tout avec le parcours navigateur ≈ 2 min (le parcours 3D en est l'essentiel). Le bilan gameplay rejoue aussi en parallèle les parties du moteur d'avant. Le test « aucune erreur JavaScript » ignore l'icône d'onglet absente que demande Edge (`WR_CANAL=msedge`). **Aucun changement de jeu.** |
