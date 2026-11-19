@@ -82,6 +82,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ### 2.36 — cristal hivernal renforcé — 2026-11-19
 - The reinforced frost tower (slot 8: Cristal hivernal and its equivalents in every faction) cost more than the basic frost tower but did exactly the same thing. It now deals more damage (modifier ×0.9 → ×1.5, Cristal hivernal 2 → 3.4) and slows 10 points more at every level (−30 % to −60 % instead of −20 % to −50 %). It still does not stack with the basic frost tower: the strongest slow wins. `sim.js` changed (server redeployed automatically).
+- Tooling: the maze-generation timing test now runs on its own, after the other tests (`labyrinthe-duree`). Since the parallel tests of 2.35 it shared the CPU with the AI games and failed at random on GitHub. Same thresholds. No game change.
 
 ### 2.35 — terrain dégagé — 2026-11-19
 - Flying monsters are half the size of the other monsters in 3D (×0.5 instead of ×0.65), so they hide less of the field. No rule change.

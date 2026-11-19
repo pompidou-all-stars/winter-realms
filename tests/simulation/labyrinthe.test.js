@@ -26,19 +26,7 @@ test('Givre : 2 à 6 emplacements, répartis tout le long du chemin final',()=>{
   for(let t=0;t<3;t++){const part=P.slice(Math.floor(P.length*t/3),Math.floor(P.length*(t+1)/3));
    assert.ok(gi.some(i=>part.some(j=>Math.hypot(i%C-j%C,(i/C|0)-(j/C|0))<=2.5)),`graine ${g} : tiers ${t} sans Givre`)}}
 });
-/* La découpe est vérifiée de façon certaine (nombre de tranches), la durée seulement comme garde-fou :
-   les machines de GitHub sont plus ou moins chargées, d'où la meilleure de 3 mesures et une marge (révision de la 2.11). */
-test('La génération est découpée en plusieurs tranches courtes (moins de 10 ms par tranche, moins de 150 ms au total ; 150 depuis la 2.25, chemin en 8 directions)',()=>{
- let meilleurMax=Infinity,meilleurTot=Infinity,tranches=0;
- for(let essai=0;essai<3;essai++){
-  const S=charger('actuel',{graine:4});const G=partie(S,{ia:[0,1,1,1],difficulte:2});const b=G.B[1];let tot=0,max=0,M=null,n=0;
-  S.mzStep(G.B[2],Infinity);/* échauffement du moteur JavaScript */
-  while(!M){const t=process.hrtime.bigint();M=S.mzStep(b,600);const d=Number(process.hrtime.bigint()-t)/1e6;tot+=d;max=Math.max(max,d);n++}
-  tranches=n;meilleurMax=Math.min(meilleurMax,max);meilleurTot=Math.min(meilleurTot,tot)}
- assert.ok(tranches>=3,`génération faite en ${tranches} tranche(s) seulement : elle n'est plus découpée`);
- assert.ok(meilleurMax<10,`tranche de ${meilleurMax.toFixed(1)} ms`);assert.ok(meilleurTot<150,`total ${meilleurTot.toFixed(1)} ms`);
-});
-
+/* 2.36 : le test de durée de la génération est dans labyrinthe-duree.test.js, lancé seul par tout.js. */
 /* depuis la 2.6 */
 test('Aucun mur inutile : chaque tour qui ne touche pas le chemin est nécessaire à sa longueur',()=>{
  for(let g=1;g<=6;g++){const {S,M}=plan(g);const w=M.w.slice(),L=S.plen(w),P=S.mzPath(w);
