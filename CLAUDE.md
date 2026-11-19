@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.30)
+# Winter Realms — Tower Wars (Édition 2.31)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -158,9 +158,9 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 | Archétype | Coût | Portée | Dégâts | Recharge | Particularités |
 |---|---|---|---|---|---|
 | Archer | 20 | 2,8 | 8 | 0,5 s | Tir simple, touche le sol et les airs |
-| Canon | 50 | 2,5 | 20 | 1,2 s | Explosion de rayon 1,1 (60 % des dégâts autour), **sol uniquement** |
-| Givre | 40 | 2,5 | 4 | 0,9 s | Explosion de rayon 1,2 à 2 selon le niveau, **ralentit** (voir plus bas), **magique** |
-| Mage | 90 | 3,2 | 45 | 1,4 s | **Magique**, **détecte les invisibles** dans sa portée |
+| Canon | 50 | 2,5 | 20 | 1,2 s | Explosion de rayon 1,1 (60 % des dégâts autour, sans limite de cibles), **sol uniquement** |
+| Givre | 40 | 2,5 | 2 | 0,9 s | Explosion de rayon 1,2 à 2 selon le niveau, **ralentit** (voir plus bas), **magique**. Dégâts 4 → 2 en 2.31 |
+| Mage | 90 | 3,2 | 55 | 1,4 s | **Magique**, **détecte les invisibles** dans sa portée. Dégâts 45 → 55 en 2.31 |
 | Garde | 30 | 1,5 | 20 | 0,55 s | Corps à corps (frappe directe), **sol uniquement** |
 | Flammes | 70 | 2,0 | 3 | 0,12 s | Cône d'environ ±29°, plus tout ce qui est à moins de 0,6 case ; touche les airs |
 
@@ -247,70 +247,70 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge, sans compter
 |---|---|---|---|---|---|---|---|
 | 0 | Tour des archers | Archer | 20 | 7,8 | 0,515 | 15 | 3,08 |
 | 1 | Bastion du chevalier | Garde | 35 | 21 | 0,567 | 37 | 1,65 |
-| 2 | Obélisque de givre | Givre | 40 | 3,7 | 0,927 | 4 | 2,75 |
+| 2 | Obélisque de givre | Givre | 40 | 1,9 | 0,927 | 2 | 2,75 |
 | 3 | Bombarde royale | Canon | 60 | 21,7 | 1,236 | 18 | 2,75 |
 | 4 | Brasier du griffon | Flammes | 85 | 3,4 | 0,124 | 27 | 2,2 |
-| 5 | Sanctuaire solaire | Mage | 85 | 40,2 | 1,442 | 28 | 3,52 |
+| 5 | Sanctuaire solaire | Mage | 85 | 49,1 | 1,442 | 34 | 3,52 |
 | 6 | Tour des sentinelles | Archer | 25 | 8,3 | 0,443 | 19 | 3,45 |
 | 7 | Garde du lion | Garde | 40 | 27,2 | 0,634 | 43 | 1,65 |
-| 8 | Cristal hivernal | Givre | 50 | 4,1 | 0,927 | 4 | 2,75 |
-| 9 | Arcaniste royal | Mage | 130 | 65,1 | 1,442 | 45 | 3,8 |
+| 8 | Cristal hivernal | Givre | 50 | 2 | 0,927 | 2 | 2,75 |
+| 9 | Arcaniste royal | Mage | 130 | 79,5 | 1,442 | 55 | 3,8 |
 
 #### Horde
 | # | Tour | Type | Coût | Dégâts | Recharge | DPS | Portée |
 |---|---|---|---|---|---|---|---|
 | 0 | Tour des chasseurs | Archer | 20 | 7,7 | 0,52 | 15 | 2,6 |
 | 1 | Totem du berserker | Garde | 35 | 20,7 | 0,572 | 36 | 1,4 |
-| 2 | Totem de glace | Givre | 40 | 3,7 | 0,936 | 4 | 2,33 |
+| 2 | Totem de glace | Givre | 40 | 1,8 | 0,936 | 2 | 2,33 |
 | 3 | Canon des clans | Canon | 55 | 21,5 | 1,248 | 17 | 2,33 |
 | 4 | Fourneau de guerre | Flammes | 85 | 3,4 | 0,125 | 27 | 1,86 |
-| 5 | Chaman des flammes | Mage | 85 | 39,7 | 1,456 | 27 | 2,98 |
+| 5 | Chaman des flammes | Mage | 85 | 48,6 | 1,456 | 33 | 2,98 |
 | 6 | Tour des éclaireurs | Archer | 25 | 8,2 | 0,447 | 18 | 2,92 |
 | 7 | Garde-lame | Garde | 40 | 27 | 0,641 | 42 | 1,4 |
-| 8 | Totem des esprits | Givre | 45 | 4 | 0,936 | 4 | 2,33 |
-| 9 | Grand sorcier orc | Mage | 125 | 64,4 | 1,456 | 44 | 3,21 |
+| 8 | Totem des esprits | Givre | 45 | 2 | 0,936 | 2 | 2,33 |
+| 9 | Grand sorcier orc | Mage | 125 | 78,7 | 1,456 | 54 | 3,21 |
 
 #### Sylvestres
 | # | Tour | Type | Coût | Dégâts | Recharge | DPS | Portée |
 |---|---|---|---|---|---|---|---|
 | 0 | Arbre sentinelle | Archer | 20 | 7,7 | 0,51 | 15 | 2,8 |
 | 1 | Gardien des racines | Garde | 30 | 20,7 | 0,561 | 37 | 1,5 |
-| 2 | Pierre de rosée | Givre | 40 | 3,7 | 0,918 | 4 | 2,5 |
+| 2 | Pierre de rosée | Givre | 40 | 1,8 | 0,918 | 2 | 2,5 |
 | 3 | Fleur explosive | Canon | 55 | 21,5 | 1,224 | 18 | 2,5 |
 | 4 | Cœur ardent | Flammes | 85 | 3,4 | 0,122 | 28 | 2 |
-| 5 | Cercle druidique | Mage | 85 | 39,7 | 1,428 | 28 | 3,2 |
+| 5 | Cercle druidique | Mage | 85 | 48,6 | 1,428 | 34 | 3,2 |
 | 6 | Nid des faucons | Archer | 25 | 8,2 | 0,439 | 19 | 3,14 |
 | 7 | Dryade protectrice | Garde | 40 | 27 | 0,628 | 43 | 1,5 |
-| 8 | Cristal lunaire | Givre | 45 | 4 | 0,918 | 4 | 2,5 |
-| 9 | Ancien arcanique | Mage | 125 | 64,4 | 1,428 | 45 | 3,46 |
+| 8 | Cristal lunaire | Givre | 45 | 2 | 0,918 | 2 | 2,5 |
+| 9 | Ancien arcanique | Mage | 125 | 78,7 | 1,428 | 55 | 3,46 |
 
 #### Nains
 | # | Tour | Type | Coût | Dégâts | Recharge | DPS | Portée |
 |---|---|---|---|---|---|---|---|
 | 0 | Tourelle de guet | Archer | 20 | 8,6 | 0,54 | 16 | 2,86 |
 | 1 | Automate garde | Garde | 35 | 23,3 | 0,594 | 39 | 1,53 |
-| 2 | Cryo-forge | Givre | 40 | 4,1 | 0,972 | 4 | 2,55 |
+| 2 | Cryo-forge | Givre | 40 | 2,1 | 0,972 | 2 | 2,55 |
 | 3 | Mortier runique | Canon | 60 | 24,2 | 1,296 | 19 | 2,55 |
 | 4 | Forge incandescente | Flammes | 90 | 3,8 | 0,13 | 29 | 2,04 |
-| 5 | Canon arcanique | Mage | 90 | 44,7 | 1,512 | 30 | 3,26 |
+| 5 | Canon arcanique | Mage | 90 | 54,6 | 1,512 | 36 | 3,26 |
 | 6 | Baliste naine | Archer | 25 | 9,3 | 0,464 | 20 | 3,2 |
 | 7 | Sentinelle d'acier | Garde | 40 | 30,3 | 0,665 | 46 | 1,53 |
-| 8 | Générateur runique | Givre | 50 | 4,5 | 0,972 | 5 | 2,55 |
-| 9 | Maître ingénieur | Mage | 135 | 72,4 | 1,512 | 48 | 3,53 |
+| 8 | Générateur runique | Givre | 50 | 2,3 | 0,972 | 2 | 2,55 |
+| 9 | Maître ingénieur | Mage | 135 | 88,5 | 1,512 | 59 | 3,53 |
 
 #### Légion des ombres
 | # | Tour | Type | Coût | Dégâts | Recharge | DPS | Portée |
 |---|---|---|---|---|---|---|---|
 | 0 | Tour des damnés | Archer | 20 | 8,1 | 0,505 | 16 | 2,77 |
 | 1 | Chevalier funeste | Garde | 35 | 21,8 | 0,556 | 39 | 1,48 |
-| 2 | Obélisque maudit | Givre | 40 | 3,9 | 0,909 | 4 | 2,48 |
+| 2 | Obélisque maudit | Givre | 40 | 1,9 | 0,909 | 2 | 2,48 |
 | 3 | Mortier infernal | Canon | 55 | 22,6 | 1,212 | 19 | 2,48 |
 | 4 | Puits de lave | Flammes | 85 | 3,6 | 0,121 | 30 | 1,98 |
-| 5 | Nexus du néant | Mage | 85 | 41,8 | 1,414 | 30 | 3,17 |
+| 5 | Nexus du néant | Mage | 85 | 51,1 | 1,414 | 36 | 3,17 |
 | 6 | Œil démoniaque | Archer | 25 | 8,7 | 0,434 | 20 | 3,1 |
 | 7 | Gardien spectral | Garde | 40 | 28,4 | 0,622 | 46 | 1,48 |
-| 8 | Cristal corrupteur | Givre | 45 | 4,2 | 0,909 | 5 | 2,48 |
-| 9 | Archimage noir | Mage | 125 | 67,7 | 1,414 | 48 | 3,42 |
+| 8 | Cristal corrupteur | Givre | 45 | 2,1 | 0,909 | 2 | 2,48 |
+| 9 | Archimage noir | Mage | 125 | 82,8 | 1,414 | 59 | 3,42 |
 
 ---
 
@@ -627,6 +627,7 @@ Le Durable Object est déclaré en **SQLite** (`new_sqlite_classes`), le seul ty
 | `node tests/captures.js --2d` | Les mêmes captures avec la 2D de secours, dans `captures/2d/` | ≈ 1 min |
 | `node tests/comparer-visuel.js [version]` | Avant/après visuel seul, en 3D, dans `captures/comparaison/` | ≈ 5 min (WebGL logiciel) |
 | `node tests/outils/audit-doc.js` | Compare les tableaux chiffrés de ce document au code et liste les écarts, sans rien corriger | 1 s |
+| `node tests/outils/banc-tours.js [--avant <réf git>] [--niveaux 1,5] [--coeurs N]` | **Banc d'essai des tours** (§12.2), à lancer à la main pour l'équilibrage (ni dans `tout.js` ni sur GitHub) : rendement de chaque tour (dégâts pour 100 or investis), du niveau 1 au niveau 5, dans 7 vagues types ; avec `--avant`, comparaison avant → après ; `--niveaux 1,5` pour un essai rapide. Réparti sur tous les cœurs du processeur. Détail dans `rapports/banc-tours.md` | ≈ 1 min 30, ≈ 3 min avec `--avant` (sur 22 cœurs) |
 | `python art/outils/generer.py [asset…] [--verifier] [--apercus dossier]` | Génère (ou vérifie) les fichiers 3D à partir des scripts de `art/` ; demande Blender 5.3 (`pip install bpy==5.3.0`) et, dans le cloud, Node.js pour la compression de secours | quelques s par asset |
 
 Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en plus **Playwright** et Chromium, présents dans l'environnement de Claude mais **pas ajoutés au projet**. Sans eux, ces tests sont ignorés avec un message clair.
@@ -641,6 +642,7 @@ Seul **Node.js** (version 22) est nécessaire. Les tests navigateur utilisent en
 - Variable `WR_GPU=1` : les tests 3D utilisent la **vraie carte graphique** de la machine au lieu de SwiftShader : plus rapide (parcours 3D en environ 20 s au lieu d'1 min) et plus proche d'un téléphone. Seulement sur un PC qui a une carte graphique (GitHub et le cloud n'en ont pas) ; les captures avant/après restent comparables tant qu'elles sont prises dans la même séance.
 - `navigateur/parcours.test.js` (refait en 2.15 ; **en 3D depuis la 2.29**, il réunit l'ancien parcours 2D et l'ancien `parcours-3d.test.js`) : le **parcours automatisé** d'un joueur dans le vrai jeu (vue 3D), dans Chromium au format téléphone, en portrait (390 × 844) : accueil sans lien vers la 2D, chargement de WebGL et des modèles, caméra tactique en perspective, faction, difficulté, disposition (terrain plein écran, bandeau, dock, flèches de rotation, plateau dessiné), pas de construction sans tour choisie, choix d'une carte et fiche, construction en deux touchers (tour fantôme et portée, confirmation, déplacement de l'aperçu) et refus, fiche d'une tour posée en touchant son pied (Améliorer, Vendre, ×), envoi (1er toucher : choix, toucher suivant : envoi, compteur ×2) et monstres en 3D chez l'adversaire, paliers, adversaires (lecture seule, bannière), revenu, glisser le doigt pour déplacer la carte sans construire, rotation d'un huitième de tour dans les deux sens, pose exacte dans une vue pivotée, menu (son, musique, gestes, quitter en deux touchers), musique (un des 3 thèmes dès le premier toucher, puis enchaînement en boucle), aucune erreur JavaScript ; en paysage (844 × 390), le message « Tourne ton téléphone » ; **secours 2D** : si la 3D ne se charge pas (`rendu3d.js` rendu introuvable), le jeu le dit, passe en 2D et on peut y construire ; `?rendu=2d` force la 2D. WebGL y tourne en **rendu logiciel SwiftShader** (`lancer({webgl:true})`), sans carte graphique. **Avance rapide allégée** (`avancer`, 2.29) : la partie avance image par image, mais la vue 3D n'est redessinée que 4 fois par seconde de jeu, puis à l'instant exact ; sinon le navigateur de test plantait (« Target crashed ») vers 30 s de jeu depuis le paysage de la 2.26, alors que le jeu tourne normalement sur téléphone. **Un plantage du navigateur de test seul n'est pas un bug du jeu** : le reproduire avec `WR_GPU=1` ou sur un téléphone avant de conclure. Durée : environ 2 min (35 s avec `WR_GPU=1`). **Ce n'est pas une garantie de compatibilité avec tous les téléphones** : Safari sur iPhone, les anciens Android et les vrais écrans tactiles ne sont pas testés.
 - `outils/` : chargement du moteur dans un environnement isolé, hasard à graine, serveur web local, pilotage du navigateur, affichage en français, audit de la documentation.
+- `outils/banc-tours.js` (2.20) : **banc d'essai des tours**, pour l'équilibrage. Une tour seule dans un labyrinthe en serpentin (deux emplacements : dans un mur et dans un virage en épingle), montée du niveau 1 au niveau 5, voit passer 7 vagues types de la 8e minute : groupe de 4 Ogres, Ogre seul, 12 Ogres, 4 Vouivres (volants), 4 Scarabées (blindés), 4 Inquisiteurs (anti-magie) et une **foule** de 40 Ogres d'un coup (comme une vague d'IA). Les monstres sont rendus quasi immortels pour mesurer tous les dégâts infligés. Indice 100 = médiane des 50 tours au niveau 1 dans le même scénario. Limites : le ralentissement du Givre n'aide aucune autre tour, et la Frénésie de la Horde ne se déclenche pas. **En parallèle** (depuis la 2.31) : les mesures sont réparties sur les cœurs du processeur (`worker_threads`, un cœur de moins que la machine, option `--coeurs`), les plus longues (la foule) en premier ; chaque mesure repart de sa propre graine et remet à zéro le compteur des monstres (`regrainer`, ajouté à `tests/outils/moteur.js`), donc le résultat est **identique** sur 1 cœur ou sur 20 (vérifié). Avec les monstres qui s'écartent (2.25), une comparaison `--avant` prenait 20 à 25 min sur un cœur.
 
 ### 12.3 Reproductibilité sans toucher au jeu
 Les tests chargent `sim.js` dans un environnement isolé et y remplacent `Math.random` par un **hasard à graine** (`tests/outils/hasard.js`). Une même graine donne donc toujours la même partie. **Tous les tests utilisent une graine fixe** (1 par défaut, une graine par partie entre IA) : un test ne dépend jamais du vrai hasard, donc il réussit ou échoue toujours de la même façon. Dans le navigateur, le même hasard est injecté avant le chargement de la page, et l'horloge est figée. **Deux suites séparées** (depuis la 2.29) : une pour la simulation (appels venant de `sim.js`), une pour tout le reste (interface, sons, three.js). En 3D, three.js tire un nombre à chaque objet créé et les modèles se chargent en temps réel : avec une suite commune, la partie changeait d'un lancement à l'autre (autres vagues des IA, autre or). **Le jeu publié n'est pas modifié.**
@@ -864,3 +866,9 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-19 | 2.29 | Outillage : **tests en 3D** (§12) : le parcours automatisé se fait dans le vrai jeu, en 3D. Il réunit l'ancien parcours 2D (interface : menu, paliers, revenu, vente, adversaires…) et l'ancien `parcours-3d.test.js` (supprimé) : 26 vérifications. Un test vérifie le **secours 2D** (3D introuvable : message, passage en 2D, construction possible). Captures et bilan visuel en 3D (`captures.js --2d` pour la 2D). Corrigés en chemin : la version d'avant était extraite sans three.js, modèles ni sons ; three.js puisait dans le même hasard à graine que la simulation (partie différente d'un lancement à l'autre) ; l'alignement de l'horloge était parfois sauté en 3D. Limite : les flocons qui tombent laissent environ 0,1 % de différence entre deux captures identiques (seuil du témoin : 0,05 %). **Aucun changement de jeu.** |
 | 2026-11-19 | 2.30 | **départ façon course** (§2, §8, §9) : l'**or de départ est doublé** (200 au lieu de 100 pour chaque terrain ; réserves internes de l'IA doublées aussi). Les **30 premières secondes** sont la phase « Construis » : **aucun envoi de monstres** pour personne (`GRACE` passe de 25 à 30 s et bloque aussi les humains, code d'erreur `early`). Bannière animée « Construis ! » avec logo et chrono « 30 » en gros, chrono de la phase dans le bandeau, onglets de monstres désactivés, 3-2-1, puis bannière « Envoie et résiste ! » avec logo ; sons synthétisés `cor`, `bip`, `go`. **`sim.js` modifié** (redéploiement automatique du serveur). Tests adaptés (or de départ, envois après 30 s) ; nouveaux tests de la phase « Construis » (simulation et parcours mobile). |
 | 2026-11-19 | 2.30 | **Flocons reproductibles** (§12.6, §15.2) : en 3D, la position de chaque flocon qui tombe est calculée à partir du temps (`fairePleuvoir(temps)`), et plus en avançant un peu à chaque image. Même mouvement à l'écran. Deux captures au même instant sont désormais identiques : le témoin de la comparaison visuelle 3D passe de 0,1 % à **0,00 %** et la comparaison redevient fiable. `rendu3d.js` seul (`sim.js` et `index.html` non modifiés). |
+| 2026-11-18 | 2.31 | **équilibrage des tours** : outillage, **banc d'essai des tours** (`tests/outils/banc-tours.js`, §12) : rendement par or investi de chaque tour et de chaque niveau dans 7 vagues types, avec comparaison avant → après. Premier constat : face à une foule (vague d'IA), une Flammes niveau 5 inflige 187 % des PV de 40 Ogres de la 8e minute, contre 19 % pour un Mage niveau 5 au même prix. **Aucun changement de jeu.** |
+| 2026-11-18 | 2.31 | **équilibrage des tours** : Mage (§4.1, §5.1), mesuré avec le banc d'essai : le **Mage** passe de **45 à 55** dégâts de base (+22 %), car il était la tour la moins rentable (indice global 107 au niveau 5, contre 114 à 212 pour les autres). `sim.js` modifié (redéploiement automatique du serveur). Chiffres **à valider par le concepteur**. |
+| 2026-11-18 | 2.31 | **équilibrage des tours** : Givre deux fois moins puissant (§4.1, §5.1), à la demande du concepteur : ses dégâts de base passent de **4 à 2** ; son ralentissement (§4.1, `GIVRE_LV`) ne change pas, car c'est lui qui fait la force de la tour. Indice du banc d'essai : 83 → 43 au niveau 1, 137 → 68 au niveau 5 (le banc ne compte pas l'aide du ralentissement aux autres tours). `sim.js` modifié (redéploiement automatique du serveur). |
+| 2026-11-19 | 2.31 | **équilibrage des tours** : outillage, **banc d'essai en parallèle** (§12) : les mesures sont réparties sur tous les cœurs du processeur, avec des résultats identiques à un calcul sur un seul cœur ; une comparaison avec `main` passe d'environ 20 à 25 min à environ 3 min (essai : 16 s au lieu de 126 s). Options `--coeurs` et `--niveaux`. Le banc reste hors de `tout.js` et de la vérification GitHub. **Aucun changement de jeu.** |
+| 2026-11-19 | 2.31 | **équilibrage des tours** : l'**Archer** et le **Canon** gardent leurs dégâts d'origine (**8** et **20**), à la demande du concepteur, après des essais à 6 et à 12 au cours de cette version. Seuls le Mage (45 → 55) et le Givre (4 → 2) changent par rapport à la 2.30. `sim.js` modifié (redéploiement automatique du serveur). |
+| 2026-11-19 | 2.31 | **équilibrage des tours** : la **Flammes** garde son cône **sans limite de cibles**, à la demande du concepteur. Une limite à 4 puis à 8 monstres par jet avait été essayée au cours de cette version. Mais depuis la 2.25, les monstres s'écartent les uns des autres, donc une foule tient moins dans le cône : contre une foule de 40 monstres, l'indice du banc d'essai (niveau 5) est passé de 459 avant la 2.25 à 181 sur la 2.30, et la limite à 8 ne le ramenait qu'à 153. **Aucun changement de la Flammes par rapport à la 2.30.** |

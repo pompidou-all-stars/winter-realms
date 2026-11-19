@@ -19,7 +19,10 @@ function charger(source='actuel',{graine=1}={}){
  const ctx={module:{exports:{}},Math:M,console};vm.createContext(ctx);
  const expo=INTERNES.map(n=>`try{__I.${n}=${n}}catch(e){}`).join('');
  vm.runInContext(code+`\n;var __I={};${expo};this.__I=__I;`,ctx,{filename:typeof source=='string'?source:'sim.js'});
- return Object.assign({},ctx.module.exports,ctx.__I,{hasard:M.random});
+ /* regrainer(g) : repart d'une graine donnée et remet à zéro le compteur d'identifiants des monstres (UID),
+    pour qu'une mesure donne le même résultat quel que soit l'ordre des mesures (banc d'essai en parallèle) */
+ const regrainer=g=>{M.random=mulberry32(g);try{vm.runInContext('UID=0',ctx)}catch(e){}};
+ return Object.assign({},ctx.module.exports,ctx.__I,{hasard:M.random,regrainer});
 }
 
 /* Partie de test. Par défaut : 4 sièges humains (aucune IA n'agit), utile pour monter une situation précise. */
