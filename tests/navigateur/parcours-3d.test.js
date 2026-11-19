@@ -28,11 +28,11 @@ else test.describe('Parcours mobile en 3D — portrait',()=>{
  });
  test('Construction : après le choix d\'une tour, un premier toucher montre la tour fantôme et sa portée, sans rien construire',async()=>{
   await N.toucherCarte(p,'Tour des archers');await N.toucherCase(p,3,5);await N.avancer(p,50);const e=await N.etat(p),s=(await r3d()).scene;
-  assert.deepEqual(e.tours,[]);assert.equal(e.or,100);assert.deepEqual(e.projet,{x:3,y:5,k:0});assert.equal(s.fantome,true);assert.equal(s.portee,true);
+  assert.deepEqual(e.tours,[]);assert.equal(e.or,200);assert.deepEqual(e.projet,{x:3,y:5,k:0});assert.equal(s.fantome,true);assert.equal(s.portee,true);
  });
  test('Construction : un second toucher sur la même case construit la tour en 3D',async()=>{
   await N.toucherCase(p,3,5);await N.avancer(p,50);const e=await N.etat(p),s=(await r3d()).scene;
-  assert.deepEqual(e.tours,[{x:3,y:5,k:0,lv:1}]);assert.equal(e.or,80);assert.equal(s.tours,1);assert.equal(s.fantome,false);
+  assert.deepEqual(e.tours,[{x:3,y:5,k:0,lv:1}]);assert.equal(e.or,180);assert.equal(s.tours,1);assert.equal(s.fantome,false);
  });
  test('Une pose impossible est refusée avec un message',async()=>{
   await N.toucherCase(p,6,0);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(await p.textContent('#toast'),'Impossible ici : le chemin serait bloqué');
@@ -42,6 +42,7 @@ else test.describe('Parcours mobile en 3D — portrait',()=>{
   await N.toucher(p,'#fiche button:has-text("Améliorer")');e=await N.etat(p);assert.equal(e.tours[0].lv,2);await N.toucher(p,'#fiche .fermer');
  });
  test('Envoyer des monstres : ils apparaissent en 3D chez l\'adversaire, animés',async()=>{
+  await p.evaluate(()=>{G.time=GRACE});await N.avancer(p,100); // 2.30 : fin de la phase « Construis »
   await N.toucher(p,'#tabs button[data-t="n"]');await N.toucherCarte(p,'Sapeur gobelin');await N.toucherCarte(p,'Sapeur gobelin');await N.toucher(p,'#tabs button[data-t="t"]');
   /* les monstres apparaissent en moins de 1,4 s ; l'IA peut les tuer vite : on garde le maximum observé */
   await p.evaluate(()=>setView(1));let max=0;

@@ -30,7 +30,7 @@ test.describe('Parcours mobile — portrait',()=>{
  });
  test('Lancer une partie en Normal : l\'accueil disparaît, l\'horloge tourne, une astuce s\'affiche et aucune fiche',async()=>{
   await N.toucher(p,'#go0');assert.equal(await val(()=>document.getElementById('ov').hidden),true);
-  await N.avancer(p,2100);const e=await N.etat(p);assert.equal(e.horloge,'0:02');assert.deepEqual([e.or,e.revenu,e.vies,e.faction],[100,10,40,2]);
+  await N.avancer(p,2100);const e=await N.etat(p);assert.equal(e.horloge,'0:02');assert.deepEqual([e.or,e.revenu,e.vies,e.faction],[200,10,40,2]);
   assert.equal(await p.isVisible('#astuce'),true);assert.equal(e.fiche,'','sans choix, pas de fiche (2.15)');
  });
  test('Musique (2.16) : un des 3 thèmes démarre dès le premier toucher, puis ils s’enchaînent en boucle',async()=>{
@@ -48,43 +48,53 @@ test.describe('Parcours mobile — portrait',()=>{
   await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[]);assert.equal(e.projet,null);assert.match(e.toast,/Choisis d’abord une tour/);
  });
  test('Choisir une carte de tour (2.15) : la fiche la décrit en clair, rien n\'est construit',async()=>{
-  await N.toucherCarte(p,'Arbre sentinelle');const e=await N.etat(p);assert.equal(e.choix,20);assert.equal(e.or,100);
+  await N.toucherCarte(p,'Arbre sentinelle');const e=await N.etat(p);assert.equal(e.choix,20);assert.equal(e.or,200);
   assert.match(e.fiche,/Arbre sentinelle/);assert.match(e.fiche,/Dégâts\/s/);assert.match(e.fiche,/Portée/);assert.match(e.fiche,/sol et air/);assert.match(e.fiche,/Racines/);assert.match(e.fiche,/deux fois une case/);
   assert.equal(await p.getAttribute('#bar button[aria-label^="Arbre sentinelle,"]','class'),'sel');
   assert.match(await p.textContent('#bar button[aria-label^="Arbre sentinelle,"]'),/^20 or$/,'la carte ne montre que le prix');
  });
  test('Construction : un premier toucher montre un aperçu, sans rien construire',async()=>{
-  await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[]);assert.equal(e.or,100);
+  await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[]);assert.equal(e.or,200);
   assert.deepEqual(e.projet,{x:3,y:5,k:20});assert.match(e.toast,/Touchez encore la case pour construire \(20 or/);
  });
  test('Construction : un second toucher sur la même case construit la tour et débite son prix',async()=>{
-  await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[{x:3,y:5,k:20,lv:1}]);assert.equal(e.or,80);assert.equal(e.projet,null);
+  await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[{x:3,y:5,k:20,lv:1}]);assert.equal(e.or,180);assert.equal(e.projet,null);
  });
  test('Construction : toucher une autre case déplace l\'aperçu, sans construire',async()=>{
-  await N.toucherCase(p,8,5);await N.toucherCase(p,9,5);const e=await N.etat(p);assert.deepEqual(e.projet,{x:9,y:5,k:20});assert.equal(e.tours.length,1);assert.equal(e.or,80);
+  await N.toucherCase(p,8,5);await N.toucherCase(p,9,5);const e=await N.etat(p);assert.deepEqual(e.projet,{x:9,y:5,k:20});assert.equal(e.tours.length,1);assert.equal(e.or,180);
  });
  test('Construction : glisser le doigt sur plusieurs cases ne construit rien',async()=>{
-  await N.glisser(p,[1,12],[5,12]);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(e.or,80);
+  await N.glisser(p,[1,12],[5,12]);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(e.or,180);
  });
  test('Une pose impossible est refusée avec un message',async()=>{
-  await N.toucherCase(p,6,0);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(e.or,80);
+  await N.toucherCase(p,6,0);const e=await N.etat(p);assert.equal(e.tours.length,1);assert.equal(e.or,180);
   assert.equal(await p.textContent('#toast'),'Impossible ici : le chemin serait bloqué');assert.equal(await val(()=>document.getElementById('toast').hidden),false);
  });
  test('Toucher une tour ouvre sa fiche ; Améliorer (après le chantier) puis Vendre fonctionnent',async()=>{
   await N.avancer(p,1500);await N.toucherCase(p,3,5);let e=await N.etat(p);assert.equal(e.panneauOuvert,true);
   assert.match(e.fiche,/niveau 1\/5/);assert.match(e.fiche,/Niveau 2 :/);
   assert.ok(e.boutons.some(b=>b.startsWith('Améliorer'))&&e.boutons.some(b=>b.startsWith('Vendre')));
-  await N.toucher(p,'#fiche button:has-text("Améliorer")');e=await N.etat(p);assert.equal(e.tours[0].lv,2);assert.equal(e.or,50);
-  await N.toucher(p,'#fiche button:has-text("Vendre")');e=await N.etat(p);assert.equal(e.tours.length,0);assert.equal(e.or,85);assert.equal(e.panneauOuvert,false);
+  await N.toucher(p,'#fiche button:has-text("Améliorer")');e=await N.etat(p);assert.equal(e.tours[0].lv,2);assert.equal(e.or,150);
+  await N.toucher(p,'#fiche button:has-text("Vendre")');e=await N.etat(p);assert.equal(e.tours.length,0);assert.equal(e.or,185);assert.equal(e.panneauOuvert,false);
  });
  test('Le × de la fiche annule le choix de la tour',async()=>{
   await N.toucher(p,'#fiche .fermer');const e=await N.etat(p);assert.equal(e.choix,null);assert.equal(e.fiche,'');
  });
+ test('Départ (2.30) : « Construis ! », chrono de 30 s dans le bandeau, onglets de monstres verrouillés, puis « Envoie et résiste ! »',async()=>{
+  const v=()=>p.evaluate(()=>({prep:!document.getElementById('prep').hidden,n:document.getElementById('prepN').textContent,horloge:getComputedStyle(document.getElementById('clock')).display,
+   verrou:[...document.querySelectorAll('#tabs button.mon')].map(b=>b.disabled),annonce:document.getElementById('annonce').hidden?'':document.getElementById('annonce').className,ph:dep.ph,tab}));
+  let s=await v();assert.equal(s.prep,true,'chrono du bandeau');assert.match(s.n,/^0:[0-2]\d$/);assert.equal(s.horloge,'none');assert.deepEqual(s.verrou,[true,true,true]);assert.equal(s.ph,1,'bannière « Construis ! » montrée');
+  await p.evaluate(()=>document.querySelector('#tabs button[data-t="n"]').click());assert.equal((await v()).tab,'t','onglet verrouillé');
+  const or=(await N.etat(p)).or;await p.evaluate(()=>playerSend(0));await N.avancer(p,50);let e=await N.etat(p);assert.equal(e.or,or);assert.match(e.toast,/Construis d’abord/);
+  await p.evaluate(()=>{G.time=GRACE-.01});await N.avancer(p,100);s=await v();
+  assert.equal(s.prep,false);assert.notEqual(s.horloge,'none');assert.deepEqual(s.verrou,[false,false,false]);assert.equal(s.annonce,'envoie');assert.equal(s.ph,2);
+  await N.avancer(p,3000);assert.equal((await v()).annonce,'','bannière refermée');
+ });
  test('Envoyer (2.15) : le 1er toucher choisit le monstre, chaque toucher suivant envoie un groupe',async()=>{
   await N.toucher(p,'#tabs button[data-t="n"]');await N.toucherCarte(p,'Sapeur gobelin');let e=await N.etat(p);
-  assert.equal(e.or,85,'le premier toucher n\'envoie rien');assert.match(e.fiche,/Sapeur gobelin/);assert.match(e.fiche,/Chaque toucher/);
-  await N.toucherCarte(p,'Sapeur gobelin');e=await N.etat(p);assert.equal(e.or,75);assert.equal(e.revenu,11);
-  await N.toucherCarte(p,'Sapeur gobelin');e=await N.etat(p);assert.equal(e.or,65);assert.equal(e.revenu,12);assert.match(e.toast,/^×2 · /,'compteur des envois enchaînés');
+  assert.equal(e.or,185,'le premier toucher n\'envoie rien');assert.match(e.fiche,/Sapeur gobelin/);assert.match(e.fiche,/Chaque toucher/);
+  await N.toucherCarte(p,'Sapeur gobelin');e=await N.etat(p);assert.equal(e.or,175);assert.equal(e.revenu,11);
+  await N.toucherCarte(p,'Sapeur gobelin');e=await N.etat(p);assert.equal(e.or,165);assert.equal(e.revenu,12);assert.match(e.toast,/^×2 · /,'compteur des envois enchaînés');
   await N.toucher(p,'#tabs button[data-t="t"]');
  });
  test('Onglet « Spéciaux » : paliers de monstres ; le palier 2 s’ouvre contre son prix et montre ses monstres',async()=>{
