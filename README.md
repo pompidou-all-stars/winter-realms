@@ -8,16 +8,16 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 
 | Statut | Domaine | Idée |
 |---|---|---|
-| 💡 | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. |
-| 💡 | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». |
+| ✅ | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. *Fait en 2.32 : molette et glisser à la souris.* |
+| ✅ | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». *Fait en 2.32 : plus de bulle au milieu du terrain, fiche réduite pendant l'aperçu.* |
 | 💡 | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
 | 💡 | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
 | 💡 | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
 | 💡 | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
 | 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
-| 💡 | 🏰 Tours | **Améliorer en lot** : un moyen d'améliorer plusieurs tours d'un coup. |
+| ✅ | 🏰 Tours | **Améliorer en lot** : un moyen d'améliorer plusieurs tours d'un coup. *Fait en 2.32 : toucher deux fois une tour choisit jusqu'à 10 tours du même type et du même niveau, montrées en icônes ; un bouton les améliore toutes ; si l'or manque, les icônes de celles qui ne seront pas améliorées rétrécissent.* |
 | 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
-| 💡 | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes. |
+| ✅ | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes. *Fait en 2.32 : ×0,65 en 3D.* |
 | 💡 | 🧭 Gameplay | **Point de relais** : pouvoir poser un point de passage autour duquel les monstres tournent. |
 | 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
 | 💡 | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. |
@@ -79,6 +79,13 @@ On the site, enter a nickname, click **Créer un salon** and share the link (or 
 The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](server/). It is **redeployed automatically** by a GitHub Action whenever a change to `sim.js` or `server/` is merged into `main` (see CLAUDE.md, section 9 bis). Manual fallback: `cd server` then `npx wrangler deploy`.
 
 ## Changelog
+
+### 2.32 — correctifs de la feuille de route — 2026-11-19
+- Mouse scrolling of the tower and monster card bar on PC: the wheel scrolls it horizontally and it can be dragged; the scroll position is kept when a card is chosen.
+- Less clutter on mobile: the "Touchez encore la case" bubble in the middle of the board is gone; while previewing a build, the info card shrinks and shows the instruction instead.
+- Flying monsters are drawn smaller in 3D (×0.65).
+- Batch upgrade: tapping a tower twice selects up to 10 towers of the same type and level (gold frames on the board, a row of icons in the card); one button upgrades them all; when gold is short, the icons of the towers that won't be upgraded shrink.
+- Roadmap updated (these four items are done). Interface only: `sim.js` unchanged (no server redeploy).
 
 ### 2.31 — équilibrage des tours — 2026-11-19
 - Roadmap: the designer's ideas added to the roadmap table (3D model refactoring, multi-screen launch menu, unique gameplay per race, English version, analytics, website with SEO and GEO, launch tutorial, Google login or account, store, promotion campaigns, payment, then monetization). No game change.
