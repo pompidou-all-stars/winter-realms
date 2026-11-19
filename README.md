@@ -9,7 +9,7 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | Statut | Domaine | Idée |
 |---|---|---|
 | 💡 | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. |
-| 💡 | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit. |
+| 💡 | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». |
 | 💡 | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
 | 💡 | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
 | 💡 | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
