@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.28</title>
+<title>Winter Realms — Tower Wars · Édition 2.29</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -417,14 +417,16 @@ const PRIO_SON={win:5,lose:5,out:4,leak:4,warn:3,send:3,income:3,build:2,up:2,se
 function idSon(n,b){if(/^(arrow|canon|frost|mage|slash|flame)$/.test(n))return 'tir-'+n+'-'+facSon(b);
  if(n=='build')return 'chantier-'+facSon(b);if(n=='up')return 'up-'+facSon(b);return n}
 function sfx(n,b){if(!AC||muted)return;const now=performance.now();if(now-(lastS[n]||0)<(n=='flame'?170:70))return;lastS[n]=now;
- if(window.SON&&SON.joue(idSon(n,b),{prio:PRIO_SON[n]||1,ecart:n=='flame'?300:0}))return;
- try{SFX[n]()}catch(e){}}
+ const base=n.split('-')[0];if(window.SON&&SON.joue(idSon(n,b),{prio:PRIO_SON[base]||1,ecart:n=='flame'?300:0}))return;
+ try{SFX[base]()}catch(e){}}
+/* envoi : le cor change selon la catégorie du monstre envoyé (sol, volant, spécial, boss) */
+const CAT_SON={n:'sol',f:'volant',s:'special',x:'boss'},sonEnvoi=k=>'send-'+(CAT_SON[(CR[k]||{}).cat]||'sol');
 /* sons sans équivalent synthétisé (mort d'un monstre précis, construction finie, voix) : fichier seulement */
 function son(id,o){if(AC&&!muted&&window.SON)SON.joue(id,o)}
 function voix(ctx,ecart){if(AC&&!muted&&window.SON&&!NET.spect)SON.voix(facSon(P),ctx,ecart)}
 /* début de partie : préchargement de la faction du joueur et des sons communs, ambiances */
 function debutSons(){if(!window.SON)return;audio();const f=facSon(P),aut=[...new Set(B.map(b=>facSon(b)))];
- SON.precharge(['*-'+f,'voix-'+f+'-*','boom','mort-*','arrivee-*','warn','zap','leak','income','send','sell','nope','tap','ouvre','ferme','out','win','lose']);
+ SON.precharge(['*-'+f,'voix-'+f+'-*','boom','mort-*','cri-*','arrivee-*','send-*','warn','zap','leak','income','sell','nope','tap','ouvre','ferme','out','win','lose']);
  setTimeout(()=>SON.precharge(aut.map(x=>'*-'+x)),4000);
  if(!muted){SON.ambiance('amb-hiver',.35);SON.ambiance('amb-bataille',.14)}}
 function finSons(){if(window.SON){SON.ambiance('amb-hiver',0);SON.ambiance('amb-bataille',0)}}
@@ -790,7 +792,7 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   if(m.t=='lobby'){this.lob=m;$('lnote').textContent='';if(this.playing&&!m.playing){this.playing=false;over=true;$('msg').textContent='Winter Realms'}this.showLobby();return}
   if(m.t=='start'){this.start(m);return}
   if(m.t=='snap'){if(this.playing)this.apply(m);return}
-  if(m.t=='res'){const a=m.a||{};if(m.err){if(!m.q){showErr(m.err,a);if(a.type=='place')P.fx.push({type:'bad',x:a.x+.5,y:a.y+.5,t:.35,d:.35})}}else if(a.type=='send')sfx('send');return}},
+  if(m.t=='res'){const a=m.a||{};if(m.err){if(!m.q){showErr(m.err,a);if(a.type=='place')P.fx.push({type:'bad',x:a.x+.5,y:a.y+.5,t:.35,d:.35})}}else if(a.type=='send')sfx(sonEnvoi(a.k));return}},
  showLobby(){const m=this.lob;if(this.playing)return;$('ov').hidden=false;$('lobby').hidden=false;
   const box=$('lseats');box.textContent='';
   m.seats.forEach((s,i)=>{const d=document.createElement('div'),n=document.createElement('b');d.style.setProperty('--c',['#f2c14e','#e4572e','#4aa3df','#b06ad0'][i]);
@@ -1027,7 +1029,7 @@ function setTab(t){tab=t;pick=null;projet=null;mon=null;document.querySelectorAl
 /* chaque envoi réussi : rebond de la carte, petite vibration, et un compteur ×2, ×3… quand on enchaîne sur le même monstre */
 const rafale={k:-1,n:0,t:0};
 function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(T.t>P.tier){showErr('locked',a);return}if(!NET.on&&P.gold<T.c){showErr('poor',a);return}
- if(doAction(a)!=='')return;sfx('send');vibrer(12);const now=performance.now();if(rafale.k===k&&now-rafale.t<1500)rafale.n++;else{rafale.k=k;rafale.n=1}rafale.t=now;
+ if(doAction(a)!=='')return;sfx(sonEnvoi(k));vibrer(12);const now=performance.now();if(rafale.k===k&&now-rafale.t<1500)rafale.n++;else{rafale.k=k;rafale.n=1}rafale.t=now;
  const c=bar.querySelector('button[data-k="'+k+'"]');if(c){c.classList.remove('tape');void c.offsetWidth;c.classList.add('tape')}
  toast((rafale.n>1?'×'+rafale.n+' · ':'')+GROUP+' × '+T.n+' chez chaque adversaire · +'+T.i+' revenu')}
 
@@ -1152,8 +1154,16 @@ function ecouterSons(){if(!AC||muted||!window.SON)return;const b=VB();
  for(const f of b.fx)if(f.type=='puff'&&!vusFx.has(f)){vusFx.add(f);const fam=COL_SON[f.col];if(fam)son('mort-'+fam,{ecart:90})}
  const nb={};for(const c of b.cr){const g=CR[c.k].g;if(BOSS_SON[g])nb[g]=(nb[g]||0)+1}
  for(const g in BOSS_SON)if((nb[g]||0)>(obsBoss[g]||0))son(BOSS_SON[g],{prio:4,ecart:4000});obsBoss=nb;
- const vu={};for(const t of P.t){const k=t.x+','+t.y;vu[k]=t.b;if(obsChantier[k]>0&&!(t.b>0)){son('fini-'+facSon(P),{prio:3,ecart:400});voix(t.lv>1?'ameliore':'construit',7000)}}
- obsChantier=vu}
+ /* tours du joueur : fin de chantier (bruitage), nouvelle tour (« du travail… »), amélioration (intermédiaire ou maximale) */
+ const vu={},nv={};for(const t of P.t){const k=t.x+','+t.y;vu[k]=t.b;nv[k]=t.lv;if(obsChantier[k]>0&&!(t.b>0))son('fini-'+facSon(P),{prio:3,ecart:400});
+  if(obsNiv){if(!(k in obsNiv))voix('construit',6000);else if(t.lv>obsNiv[k])voix(t.lv>=5?'max':'ameliore',t.lv>=5?0:5000)}}
+ obsChantier=vu;obsNiv=nv;
+ /* vague éliminée : le terrain du joueur a reçu au moins 4 monstres, et il n'en reste plus */
+ const n=P.cr.length;if(n>picVague)picVague=n;if(!n){if(picVague>=4)voix('vague',12000);picVague=0}
+ /* cris des monstres : de temps en temps, un monstre du terrain regardé grogne */
+ const now=performance.now();if(now>prochainCri){prochainCri=now+3500+Math.random()*4500;
+  const vis=b.cr.filter(c=>!c.hid);if(vis.length){const c=vis[Math.floor(Math.random()*vis.length)],fam=FAM_SON[CR[c.k].g];if(fam)son('cri-'+fam,{prio:1,vol:.7,ecart:2500})}}}
+let obsNiv=null,picVague=0,prochainCri=0;
 /* toucher une tour : réplique de sélection ; au 4e toucher rapproché, la tour s'agace */
 let selVoix=[];function voixSelection(){const now=performance.now();selVoix=selVoix.filter(t=>now-t<5000);selVoix.push(now);voix(selVoix.length>=4?'agace':'sel',600)}
 function onLog(l){

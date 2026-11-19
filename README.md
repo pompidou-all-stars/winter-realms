@@ -64,6 +64,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.29 — bibliothèque elevenlabs — 2026-11-19
+- The whole sound library is remade with ElevenLabs (paid plan, commercial use): 371 files. Realistic, medieval, never shrill tower shots; monster deaths and growls while walking; a war horn when sending a wave, different for ground, flying, special and boss monsters; new interface sounds and ambiences.
+- 100 sarcastic dark-fantasy voice lines, with new contexts: placing a tower, maximum level and wave cleared. New voices made for the Horde (deeper, more bestial) and the Dwarves.
+- `sim.js` is unchanged (no server redeploy).
+
 ### 2.28 — mini-cartes d'hiver — 2026-11-19
 - The opponents panel (« Adversaires ») gets winter mini-maps: snow and grid like the 3D view, the monsters' path as a navy dotted line, the portal and a small castle with the player's flag. Towers are small tiles in the colour of their role (green archer, red guard, blue frost, copper cannon, orange flames, purple mage), so you can read an opponent's defence at a glance; monsters are outlined (red on the ground, white in the air). Slightly bigger mini-maps with a silver frame; lives with a heart and income with the gold coin.
 - Interface only (`sim.js` untouched, no server redeploy).
