@@ -1,7 +1,7 @@
 {
  "_lisezmoi": "Généré par art/outils/manifeste-audio.js : ne pas éditer à la main.",
- "fichiers": 230,
- "octets": 4217216,
+ "fichiers": 371,
+ "octets": 10354832,
  "sons": {
   "amb-bataille": [
    "ambiances/amb-bataille-1.mp3"
@@ -11,63 +11,127 @@
   ],
   "arrivee-cyc": [
    "monstres/arrivee-cyc-1.mp3",
-   "monstres/arrivee-cyc-2.mp3"
+   "monstres/arrivee-cyc-2.mp3",
+   "monstres/arrivee-cyc-3.mp3"
   ],
   "arrivee-dragon": [
    "monstres/arrivee-dragon-1.mp3",
-   "monstres/arrivee-dragon-2.mp3"
+   "monstres/arrivee-dragon-2.mp3",
+   "monstres/arrivee-dragon-3.mp3"
   ],
   "arrivee-heros": [
    "monstres/arrivee-heros-1.mp3",
-   "monstres/arrivee-heros-2.mp3"
+   "monstres/arrivee-heros-2.mp3",
+   "monstres/arrivee-heros-3.mp3"
   ],
   "boom": [
    "interface/boom-1.mp3",
    "interface/boom-2.mp3",
-   "interface/boom-3.mp3"
+   "interface/boom-3.mp3",
+   "interface/boom-4.mp3"
   ],
   "chantier-alliance": [
    "construction/chantier-alliance-1.mp3",
-   "construction/chantier-alliance-2.mp3"
+   "construction/chantier-alliance-2.mp3",
+   "construction/chantier-alliance-3.mp3"
   ],
   "chantier-horde": [
    "construction/chantier-horde-1.mp3",
-   "construction/chantier-horde-2.mp3"
+   "construction/chantier-horde-2.mp3",
+   "construction/chantier-horde-3.mp3"
   ],
   "chantier-legion": [
    "construction/chantier-legion-1.mp3",
-   "construction/chantier-legion-2.mp3"
+   "construction/chantier-legion-2.mp3",
+   "construction/chantier-legion-3.mp3"
   ],
   "chantier-nains": [
    "construction/chantier-nains-1.mp3",
-   "construction/chantier-nains-2.mp3"
+   "construction/chantier-nains-2.mp3",
+   "construction/chantier-nains-3.mp3"
   ],
   "chantier-sylvestres": [
    "construction/chantier-sylvestres-1.mp3",
-   "construction/chantier-sylvestres-2.mp3"
+   "construction/chantier-sylvestres-2.mp3",
+   "construction/chantier-sylvestres-3.mp3"
+  ],
+  "cri-bete": [
+   "monstres/cri-bete-1.mp3",
+   "monstres/cri-bete-2.mp3",
+   "monstres/cri-bete-3.mp3"
+  ],
+  "cri-dragon": [
+   "monstres/cri-dragon-1.mp3",
+   "monstres/cri-dragon-2.mp3",
+   "monstres/cri-dragon-3.mp3"
+  ],
+  "cri-geant": [
+   "monstres/cri-geant-1.mp3",
+   "monstres/cri-geant-2.mp3",
+   "monstres/cri-geant-3.mp3"
+  ],
+  "cri-gelee": [
+   "monstres/cri-gelee-1.mp3",
+   "monstres/cri-gelee-2.mp3",
+   "monstres/cri-gelee-3.mp3"
+  ],
+  "cri-gobelin": [
+   "monstres/cri-gobelin-1.mp3",
+   "monstres/cri-gobelin-2.mp3",
+   "monstres/cri-gobelin-3.mp3"
+  ],
+  "cri-heros": [
+   "monstres/cri-heros-1.mp3",
+   "monstres/cri-heros-2.mp3",
+   "monstres/cri-heros-3.mp3"
+  ],
+  "cri-magique": [
+   "monstres/cri-magique-1.mp3",
+   "monstres/cri-magique-2.mp3",
+   "monstres/cri-magique-3.mp3"
+  ],
+  "cri-orc": [
+   "monstres/cri-orc-1.mp3",
+   "monstres/cri-orc-2.mp3",
+   "monstres/cri-orc-3.mp3"
+  ],
+  "cri-pierre": [
+   "monstres/cri-pierre-1.mp3",
+   "monstres/cri-pierre-2.mp3",
+   "monstres/cri-pierre-3.mp3"
+  ],
+  "cri-volant": [
+   "monstres/cri-volant-1.mp3",
+   "monstres/cri-volant-2.mp3",
+   "monstres/cri-volant-3.mp3"
   ],
   "ferme": [
    "interface/ferme-1.mp3"
   ],
   "fini-alliance": [
    "construction/fini-alliance-1.mp3",
-   "construction/fini-alliance-2.mp3"
+   "construction/fini-alliance-2.mp3",
+   "construction/fini-alliance-3.mp3"
   ],
   "fini-horde": [
    "construction/fini-horde-1.mp3",
-   "construction/fini-horde-2.mp3"
+   "construction/fini-horde-2.mp3",
+   "construction/fini-horde-3.mp3"
   ],
   "fini-legion": [
    "construction/fini-legion-1.mp3",
-   "construction/fini-legion-2.mp3"
+   "construction/fini-legion-2.mp3",
+   "construction/fini-legion-3.mp3"
   ],
   "fini-nains": [
    "construction/fini-nains-1.mp3",
-   "construction/fini-nains-2.mp3"
+   "construction/fini-nains-2.mp3",
+   "construction/fini-nains-3.mp3"
   ],
   "fini-sylvestres": [
    "construction/fini-sylvestres-1.mp3",
-   "construction/fini-sylvestres-2.mp3"
+   "construction/fini-sylvestres-2.mp3",
+   "construction/fini-sylvestres-3.mp3"
   ],
   "income": [
    "interface/income-1.mp3",
@@ -84,53 +148,66 @@
   "mort-bete": [
    "monstres/mort-bete-1.mp3",
    "monstres/mort-bete-2.mp3",
-   "monstres/mort-bete-3.mp3"
+   "monstres/mort-bete-3.mp3",
+   "monstres/mort-bete-4.mp3"
   ],
   "mort-dragon": [
    "monstres/mort-dragon-1.mp3",
-   "monstres/mort-dragon-2.mp3"
+   "monstres/mort-dragon-2.mp3",
+   "monstres/mort-dragon-3.mp3",
+   "monstres/mort-dragon-4.mp3"
   ],
   "mort-geant": [
    "monstres/mort-geant-1.mp3",
    "monstres/mort-geant-2.mp3",
-   "monstres/mort-geant-3.mp3"
+   "monstres/mort-geant-3.mp3",
+   "monstres/mort-geant-4.mp3"
   ],
   "mort-gelee": [
    "monstres/mort-gelee-1.mp3",
    "monstres/mort-gelee-2.mp3",
-   "monstres/mort-gelee-3.mp3"
+   "monstres/mort-gelee-3.mp3",
+   "monstres/mort-gelee-4.mp3"
   ],
   "mort-gobelin": [
    "monstres/mort-gobelin-1.mp3",
    "monstres/mort-gobelin-2.mp3",
-   "monstres/mort-gobelin-3.mp3"
+   "monstres/mort-gobelin-3.mp3",
+   "monstres/mort-gobelin-4.mp3"
   ],
   "mort-heros": [
    "monstres/mort-heros-1.mp3",
-   "monstres/mort-heros-2.mp3"
+   "monstres/mort-heros-2.mp3",
+   "monstres/mort-heros-3.mp3",
+   "monstres/mort-heros-4.mp3"
   ],
   "mort-magique": [
    "monstres/mort-magique-1.mp3",
    "monstres/mort-magique-2.mp3",
-   "monstres/mort-magique-3.mp3"
+   "monstres/mort-magique-3.mp3",
+   "monstres/mort-magique-4.mp3"
   ],
   "mort-orc": [
    "monstres/mort-orc-1.mp3",
    "monstres/mort-orc-2.mp3",
-   "monstres/mort-orc-3.mp3"
+   "monstres/mort-orc-3.mp3",
+   "monstres/mort-orc-4.mp3"
   ],
   "mort-pierre": [
    "monstres/mort-pierre-1.mp3",
    "monstres/mort-pierre-2.mp3",
-   "monstres/mort-pierre-3.mp3"
+   "monstres/mort-pierre-3.mp3",
+   "monstres/mort-pierre-4.mp3"
   ],
   "mort-volant": [
    "monstres/mort-volant-1.mp3",
    "monstres/mort-volant-2.mp3",
-   "monstres/mort-volant-3.mp3"
+   "monstres/mort-volant-3.mp3",
+   "monstres/mort-volant-4.mp3"
   ],
   "nope": [
-   "interface/nope-1.mp3"
+   "interface/nope-1.mp3",
+   "interface/nope-2.mp3"
   ],
   "out": [
    "interface/out-1.mp3"
@@ -139,11 +216,28 @@
    "interface/ouvre-1.mp3"
   ],
   "sell": [
-   "interface/sell-1.mp3"
+   "interface/sell-1.mp3",
+   "interface/sell-2.mp3"
   ],
-  "send": [
-   "interface/send-1.mp3",
-   "interface/send-2.mp3"
+  "send-boss": [
+   "interface/send-boss-1.mp3",
+   "interface/send-boss-2.mp3",
+   "interface/send-boss-3.mp3"
+  ],
+  "send-sol": [
+   "interface/send-sol-1.mp3",
+   "interface/send-sol-2.mp3",
+   "interface/send-sol-3.mp3"
+  ],
+  "send-special": [
+   "interface/send-special-1.mp3",
+   "interface/send-special-2.mp3",
+   "interface/send-special-3.mp3"
+  ],
+  "send-volant": [
+   "interface/send-volant-1.mp3",
+   "interface/send-volant-2.mp3",
+   "interface/send-volant-3.mp3"
   ],
   "tap": [
    "interface/tap-1.mp3",
@@ -152,72 +246,85 @@
   "tir-arrow-alliance": [
    "tours/tir-arrow-alliance-1.mp3",
    "tours/tir-arrow-alliance-2.mp3",
-   "tours/tir-arrow-alliance-3.mp3"
+   "tours/tir-arrow-alliance-3.mp3",
+   "tours/tir-arrow-alliance-4.mp3"
   ],
   "tir-arrow-horde": [
    "tours/tir-arrow-horde-1.mp3",
    "tours/tir-arrow-horde-2.mp3",
-   "tours/tir-arrow-horde-3.mp3"
+   "tours/tir-arrow-horde-3.mp3",
+   "tours/tir-arrow-horde-4.mp3"
   ],
   "tir-arrow-legion": [
    "tours/tir-arrow-legion-1.mp3",
    "tours/tir-arrow-legion-2.mp3",
-   "tours/tir-arrow-legion-3.mp3"
+   "tours/tir-arrow-legion-3.mp3",
+   "tours/tir-arrow-legion-4.mp3"
   ],
   "tir-arrow-nains": [
    "tours/tir-arrow-nains-1.mp3",
    "tours/tir-arrow-nains-2.mp3",
-   "tours/tir-arrow-nains-3.mp3"
+   "tours/tir-arrow-nains-3.mp3",
+   "tours/tir-arrow-nains-4.mp3"
   ],
   "tir-arrow-sylvestres": [
    "tours/tir-arrow-sylvestres-1.mp3",
-   "tours/tir-arrow-sylvestres-2.mp3",
-   "tours/tir-arrow-sylvestres-3.mp3"
+   "tours/tir-arrow-sylvestres-2.mp3"
   ],
   "tir-canon-alliance": [
    "tours/tir-canon-alliance-1.mp3",
    "tours/tir-canon-alliance-2.mp3",
-   "tours/tir-canon-alliance-3.mp3"
+   "tours/tir-canon-alliance-3.mp3",
+   "tours/tir-canon-alliance-4.mp3"
   ],
   "tir-canon-horde": [
    "tours/tir-canon-horde-1.mp3",
    "tours/tir-canon-horde-2.mp3",
-   "tours/tir-canon-horde-3.mp3"
+   "tours/tir-canon-horde-3.mp3",
+   "tours/tir-canon-horde-4.mp3"
   ],
   "tir-canon-legion": [
    "tours/tir-canon-legion-1.mp3",
    "tours/tir-canon-legion-2.mp3",
-   "tours/tir-canon-legion-3.mp3"
+   "tours/tir-canon-legion-3.mp3",
+   "tours/tir-canon-legion-4.mp3"
   ],
   "tir-canon-nains": [
    "tours/tir-canon-nains-1.mp3",
    "tours/tir-canon-nains-2.mp3",
-   "tours/tir-canon-nains-3.mp3"
+   "tours/tir-canon-nains-3.mp3",
+   "tours/tir-canon-nains-4.mp3"
   ],
   "tir-canon-sylvestres": [
    "tours/tir-canon-sylvestres-1.mp3",
    "tours/tir-canon-sylvestres-2.mp3",
-   "tours/tir-canon-sylvestres-3.mp3"
+   "tours/tir-canon-sylvestres-3.mp3",
+   "tours/tir-canon-sylvestres-4.mp3"
   ],
   "tir-flame-alliance": [
    "tours/tir-flame-alliance-1.mp3",
-   "tours/tir-flame-alliance-2.mp3"
+   "tours/tir-flame-alliance-2.mp3",
+   "tours/tir-flame-alliance-3.mp3"
   ],
   "tir-flame-horde": [
    "tours/tir-flame-horde-1.mp3",
-   "tours/tir-flame-horde-2.mp3"
+   "tours/tir-flame-horde-2.mp3",
+   "tours/tir-flame-horde-3.mp3"
   ],
   "tir-flame-legion": [
    "tours/tir-flame-legion-1.mp3",
-   "tours/tir-flame-legion-2.mp3"
+   "tours/tir-flame-legion-2.mp3",
+   "tours/tir-flame-legion-3.mp3"
   ],
   "tir-flame-nains": [
    "tours/tir-flame-nains-1.mp3",
-   "tours/tir-flame-nains-2.mp3"
+   "tours/tir-flame-nains-2.mp3",
+   "tours/tir-flame-nains-3.mp3"
   ],
   "tir-flame-sylvestres": [
    "tours/tir-flame-sylvestres-1.mp3",
-   "tours/tir-flame-sylvestres-2.mp3"
+   "tours/tir-flame-sylvestres-2.mp3",
+   "tours/tir-flame-sylvestres-3.mp3"
   ],
   "tir-frost-alliance": [
    "tours/tir-frost-alliance-1.mp3",
@@ -247,177 +354,257 @@
   "tir-mage-alliance": [
    "tours/tir-mage-alliance-1.mp3",
    "tours/tir-mage-alliance-2.mp3",
-   "tours/tir-mage-alliance-3.mp3"
+   "tours/tir-mage-alliance-3.mp3",
+   "tours/tir-mage-alliance-4.mp3"
   ],
   "tir-mage-horde": [
    "tours/tir-mage-horde-1.mp3",
    "tours/tir-mage-horde-2.mp3",
-   "tours/tir-mage-horde-3.mp3"
+   "tours/tir-mage-horde-3.mp3",
+   "tours/tir-mage-horde-4.mp3"
   ],
   "tir-mage-legion": [
    "tours/tir-mage-legion-1.mp3",
    "tours/tir-mage-legion-2.mp3",
-   "tours/tir-mage-legion-3.mp3"
+   "tours/tir-mage-legion-3.mp3",
+   "tours/tir-mage-legion-4.mp3"
   ],
   "tir-mage-nains": [
    "tours/tir-mage-nains-1.mp3",
    "tours/tir-mage-nains-2.mp3",
-   "tours/tir-mage-nains-3.mp3"
+   "tours/tir-mage-nains-3.mp3",
+   "tours/tir-mage-nains-4.mp3"
   ],
   "tir-mage-sylvestres": [
    "tours/tir-mage-sylvestres-1.mp3",
    "tours/tir-mage-sylvestres-2.mp3",
-   "tours/tir-mage-sylvestres-3.mp3"
+   "tours/tir-mage-sylvestres-3.mp3",
+   "tours/tir-mage-sylvestres-4.mp3"
   ],
   "tir-slash-alliance": [
    "tours/tir-slash-alliance-1.mp3",
    "tours/tir-slash-alliance-2.mp3",
-   "tours/tir-slash-alliance-3.mp3"
+   "tours/tir-slash-alliance-3.mp3",
+   "tours/tir-slash-alliance-4.mp3"
   ],
   "tir-slash-horde": [
    "tours/tir-slash-horde-1.mp3",
    "tours/tir-slash-horde-2.mp3",
-   "tours/tir-slash-horde-3.mp3"
+   "tours/tir-slash-horde-3.mp3",
+   "tours/tir-slash-horde-4.mp3"
   ],
   "tir-slash-legion": [
    "tours/tir-slash-legion-1.mp3",
    "tours/tir-slash-legion-2.mp3",
-   "tours/tir-slash-legion-3.mp3"
+   "tours/tir-slash-legion-3.mp3",
+   "tours/tir-slash-legion-4.mp3"
   ],
   "tir-slash-nains": [
    "tours/tir-slash-nains-1.mp3",
    "tours/tir-slash-nains-2.mp3",
-   "tours/tir-slash-nains-3.mp3"
+   "tours/tir-slash-nains-3.mp3",
+   "tours/tir-slash-nains-4.mp3"
   ],
   "tir-slash-sylvestres": [
    "tours/tir-slash-sylvestres-1.mp3",
    "tours/tir-slash-sylvestres-2.mp3",
-   "tours/tir-slash-sylvestres-3.mp3"
+   "tours/tir-slash-sylvestres-3.mp3",
+   "tours/tir-slash-sylvestres-4.mp3"
   ],
   "up-alliance": [
    "construction/up-alliance-1.mp3",
-   "construction/up-alliance-2.mp3"
+   "construction/up-alliance-2.mp3",
+   "construction/up-alliance-3.mp3"
   ],
   "up-horde": [
    "construction/up-horde-1.mp3",
-   "construction/up-horde-2.mp3"
+   "construction/up-horde-2.mp3",
+   "construction/up-horde-3.mp3"
   ],
   "up-legion": [
    "construction/up-legion-1.mp3",
-   "construction/up-legion-2.mp3"
+   "construction/up-legion-2.mp3",
+   "construction/up-legion-3.mp3"
   ],
   "up-nains": [
    "construction/up-nains-1.mp3",
-   "construction/up-nains-2.mp3"
+   "construction/up-nains-2.mp3",
+   "construction/up-nains-3.mp3"
   ],
   "up-sylvestres": [
    "construction/up-sylvestres-1.mp3",
-   "construction/up-sylvestres-2.mp3"
+   "construction/up-sylvestres-2.mp3",
+   "construction/up-sylvestres-3.mp3"
   ],
   "voix-alliance-agace": [
    "voix/alliance/voix-alliance-agace-1.mp3",
-   "voix/alliance/voix-alliance-agace-2.mp3"
+   "voix/alliance/voix-alliance-agace-2.mp3",
+   "voix/alliance/voix-alliance-agace-3.mp3"
   ],
   "voix-alliance-ameliore": [
    "voix/alliance/voix-alliance-ameliore-1.mp3",
-   "voix/alliance/voix-alliance-ameliore-2.mp3"
+   "voix/alliance/voix-alliance-ameliore-2.mp3",
+   "voix/alliance/voix-alliance-ameliore-3.mp3"
   ],
   "voix-alliance-construit": [
    "voix/alliance/voix-alliance-construit-1.mp3",
-   "voix/alliance/voix-alliance-construit-2.mp3"
+   "voix/alliance/voix-alliance-construit-2.mp3",
+   "voix/alliance/voix-alliance-construit-3.mp3"
   ],
   "voix-alliance-impossible": [
    "voix/alliance/voix-alliance-impossible-1.mp3",
    "voix/alliance/voix-alliance-impossible-2.mp3"
+  ],
+  "voix-alliance-max": [
+   "voix/alliance/voix-alliance-max-1.mp3",
+   "voix/alliance/voix-alliance-max-2.mp3",
+   "voix/alliance/voix-alliance-max-3.mp3"
   ],
   "voix-alliance-sel": [
    "voix/alliance/voix-alliance-sel-1.mp3",
    "voix/alliance/voix-alliance-sel-2.mp3",
    "voix/alliance/voix-alliance-sel-3.mp3"
   ],
+  "voix-alliance-vague": [
+   "voix/alliance/voix-alliance-vague-1.mp3",
+   "voix/alliance/voix-alliance-vague-2.mp3",
+   "voix/alliance/voix-alliance-vague-3.mp3"
+  ],
   "voix-horde-agace": [
    "voix/horde/voix-horde-agace-1.mp3",
-   "voix/horde/voix-horde-agace-2.mp3"
+   "voix/horde/voix-horde-agace-2.mp3",
+   "voix/horde/voix-horde-agace-3.mp3"
   ],
   "voix-horde-ameliore": [
    "voix/horde/voix-horde-ameliore-1.mp3",
-   "voix/horde/voix-horde-ameliore-2.mp3"
+   "voix/horde/voix-horde-ameliore-2.mp3",
+   "voix/horde/voix-horde-ameliore-3.mp3"
   ],
   "voix-horde-construit": [
    "voix/horde/voix-horde-construit-1.mp3",
-   "voix/horde/voix-horde-construit-2.mp3"
+   "voix/horde/voix-horde-construit-2.mp3",
+   "voix/horde/voix-horde-construit-3.mp3"
   ],
   "voix-horde-impossible": [
    "voix/horde/voix-horde-impossible-1.mp3",
    "voix/horde/voix-horde-impossible-2.mp3"
+  ],
+  "voix-horde-max": [
+   "voix/horde/voix-horde-max-1.mp3",
+   "voix/horde/voix-horde-max-2.mp3",
+   "voix/horde/voix-horde-max-3.mp3"
   ],
   "voix-horde-sel": [
    "voix/horde/voix-horde-sel-1.mp3",
    "voix/horde/voix-horde-sel-2.mp3",
    "voix/horde/voix-horde-sel-3.mp3"
   ],
+  "voix-horde-vague": [
+   "voix/horde/voix-horde-vague-1.mp3",
+   "voix/horde/voix-horde-vague-2.mp3",
+   "voix/horde/voix-horde-vague-3.mp3"
+  ],
   "voix-legion-agace": [
    "voix/legion/voix-legion-agace-1.mp3",
-   "voix/legion/voix-legion-agace-2.mp3"
+   "voix/legion/voix-legion-agace-2.mp3",
+   "voix/legion/voix-legion-agace-3.mp3"
   ],
   "voix-legion-ameliore": [
    "voix/legion/voix-legion-ameliore-1.mp3",
-   "voix/legion/voix-legion-ameliore-2.mp3"
+   "voix/legion/voix-legion-ameliore-2.mp3",
+   "voix/legion/voix-legion-ameliore-3.mp3"
   ],
   "voix-legion-construit": [
    "voix/legion/voix-legion-construit-1.mp3",
-   "voix/legion/voix-legion-construit-2.mp3"
+   "voix/legion/voix-legion-construit-2.mp3",
+   "voix/legion/voix-legion-construit-3.mp3"
   ],
   "voix-legion-impossible": [
    "voix/legion/voix-legion-impossible-1.mp3",
    "voix/legion/voix-legion-impossible-2.mp3"
+  ],
+  "voix-legion-max": [
+   "voix/legion/voix-legion-max-1.mp3",
+   "voix/legion/voix-legion-max-2.mp3",
+   "voix/legion/voix-legion-max-3.mp3"
   ],
   "voix-legion-sel": [
    "voix/legion/voix-legion-sel-1.mp3",
    "voix/legion/voix-legion-sel-2.mp3",
    "voix/legion/voix-legion-sel-3.mp3"
   ],
+  "voix-legion-vague": [
+   "voix/legion/voix-legion-vague-1.mp3",
+   "voix/legion/voix-legion-vague-2.mp3",
+   "voix/legion/voix-legion-vague-3.mp3"
+  ],
   "voix-nains-agace": [
    "voix/nains/voix-nains-agace-1.mp3",
-   "voix/nains/voix-nains-agace-2.mp3"
+   "voix/nains/voix-nains-agace-2.mp3",
+   "voix/nains/voix-nains-agace-3.mp3"
   ],
   "voix-nains-ameliore": [
    "voix/nains/voix-nains-ameliore-1.mp3",
-   "voix/nains/voix-nains-ameliore-2.mp3"
+   "voix/nains/voix-nains-ameliore-2.mp3",
+   "voix/nains/voix-nains-ameliore-3.mp3"
   ],
   "voix-nains-construit": [
    "voix/nains/voix-nains-construit-1.mp3",
-   "voix/nains/voix-nains-construit-2.mp3"
+   "voix/nains/voix-nains-construit-2.mp3",
+   "voix/nains/voix-nains-construit-3.mp3"
   ],
   "voix-nains-impossible": [
    "voix/nains/voix-nains-impossible-1.mp3",
    "voix/nains/voix-nains-impossible-2.mp3"
+  ],
+  "voix-nains-max": [
+   "voix/nains/voix-nains-max-1.mp3",
+   "voix/nains/voix-nains-max-2.mp3",
+   "voix/nains/voix-nains-max-3.mp3"
   ],
   "voix-nains-sel": [
    "voix/nains/voix-nains-sel-1.mp3",
    "voix/nains/voix-nains-sel-2.mp3",
    "voix/nains/voix-nains-sel-3.mp3"
   ],
+  "voix-nains-vague": [
+   "voix/nains/voix-nains-vague-1.mp3",
+   "voix/nains/voix-nains-vague-2.mp3",
+   "voix/nains/voix-nains-vague-3.mp3"
+  ],
   "voix-sylvestres-agace": [
    "voix/sylvestres/voix-sylvestres-agace-1.mp3",
-   "voix/sylvestres/voix-sylvestres-agace-2.mp3"
+   "voix/sylvestres/voix-sylvestres-agace-2.mp3",
+   "voix/sylvestres/voix-sylvestres-agace-3.mp3"
   ],
   "voix-sylvestres-ameliore": [
    "voix/sylvestres/voix-sylvestres-ameliore-1.mp3",
-   "voix/sylvestres/voix-sylvestres-ameliore-2.mp3"
+   "voix/sylvestres/voix-sylvestres-ameliore-2.mp3",
+   "voix/sylvestres/voix-sylvestres-ameliore-3.mp3"
   ],
   "voix-sylvestres-construit": [
    "voix/sylvestres/voix-sylvestres-construit-1.mp3",
-   "voix/sylvestres/voix-sylvestres-construit-2.mp3"
+   "voix/sylvestres/voix-sylvestres-construit-2.mp3",
+   "voix/sylvestres/voix-sylvestres-construit-3.mp3"
   ],
   "voix-sylvestres-impossible": [
    "voix/sylvestres/voix-sylvestres-impossible-1.mp3",
    "voix/sylvestres/voix-sylvestres-impossible-2.mp3"
   ],
+  "voix-sylvestres-max": [
+   "voix/sylvestres/voix-sylvestres-max-1.mp3",
+   "voix/sylvestres/voix-sylvestres-max-2.mp3",
+   "voix/sylvestres/voix-sylvestres-max-3.mp3"
+  ],
   "voix-sylvestres-sel": [
    "voix/sylvestres/voix-sylvestres-sel-1.mp3",
    "voix/sylvestres/voix-sylvestres-sel-2.mp3",
    "voix/sylvestres/voix-sylvestres-sel-3.mp3"
+  ],
+  "voix-sylvestres-vague": [
+   "voix/sylvestres/voix-sylvestres-vague-1.mp3",
+   "voix/sylvestres/voix-sylvestres-vague-2.mp3",
+   "voix/sylvestres/voix-sylvestres-vague-3.mp3"
   ],
   "warn": [
    "interface/warn-1.mp3",

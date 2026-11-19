@@ -64,6 +64,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.28 — bibliothèque elevenlabs — 2026-11-19
+- The whole sound library is remade with ElevenLabs (paid plan, commercial use): 371 files. Realistic, medieval, never shrill tower shots; monster deaths and growls while walking; a war horn when sending a wave, different for ground, flying, special and boss monsters; new interface sounds and ambiences.
+- 100 sarcastic dark-fantasy voice lines, with new contexts: placing a tower, maximum level and wave cleared. New voices made for the Horde (deeper, more bestial) and the Dwarves.
+- `sim.js` is unchanged (no server redeploy).
+
 ### 2.27 — sons dark fantasy — 2026-11-18
 - Darker, more warlike sound effects: monster death cries and boss arrivals move from cartoon to dark fantasy; tower shots, explosions and sabotage are punchier. 45 prompts rewritten, 124 files regenerated locally. Voices, music and interface sounds are unchanged.
 

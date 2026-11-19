@@ -18,13 +18,13 @@ function init(ctx,dest){
  if(etat=='rien'){etat='charge';
   fetch('assets/audio/manifeste.json').then(r=>r.ok?r.json():null).then(m=>{manif=m&&m.sons?m:null;etat=manif?'pret':'absent'}).catch(()=>{etat='absent'})}}
 
-/* mise à niveau au chargement : crête ramenée à -3 dB (gain plafonné à ×8), silences du début (10 ms gardées)
+/* mise à niveau au chargement : crête ramenée à -3 dB (gain plafonné à ×2 depuis la 2.28 : au-delà, le souffle remontait), silences du début (10 ms gardées)
    et de la fin (50 ms gardées) coupés, pour qu'un son parte au moment de l'action.
    Les ambiances en boucle ne sont pas touchées (la boucle doit rester exacte). */
 function nettoyer(buf,id){if(!buf||id.startsWith('amb-'))return buf;
  const n=buf.length,ch=buf.numberOfChannels,sr=buf.sampleRate;let pk=0,a=n,z=0;const seuil=Math.pow(10,-45/20);
  for(let c=0;c<ch;c++){const d=buf.getChannelData(c);for(let i=0;i<n;i++){const v=Math.abs(d[i]);if(v>pk)pk=v;if(v>seuil){if(i<a)a=i;if(i>z)z=i}}}
- if(pk<1e-4||a>=n)return null;const g=Math.min(8,Math.pow(10,-3/20)/pk),deb=Math.max(0,a-Math.round(sr*.01)),fin=Math.min(n,z+Math.round(sr*.05)+1);
+ if(pk<1e-4||a>=n)return null;const g=Math.min(2,Math.pow(10,-3/20)/pk),deb=Math.max(0,a-Math.round(sr*.01)),fin=Math.min(n,z+Math.round(sr*.05)+1);
  const b=AC.createBuffer(ch,fin-deb,sr);
  for(let c=0;c<ch;c++){const s=buf.getChannelData(c),d=b.getChannelData(c);for(let i=deb;i<fin;i++)d[i-deb]=s[i]*g}
  return b}
