@@ -13,7 +13,7 @@ test('Le plan complet laisse toujours un chemin, bien plus long que la ligne dro
 test('Chaque début de l\'ordre de construction laisse le chemin ouvert, et le chemin s\'allonge avec les tours',()=>{
  const {S,M}=plan(3);const w=new Uint8Array(13*17);let L20=0;
  M.ord.forEach((i,n)=>{w[i]=1;const L=S.plen(w);assert.ok(L>0,`bloqué après ${n+1} tours`);if(n==19)L20=L});
- assert.ok(L20>=24,`après 20 tours, chemin ${L20}`);/* 24 depuis la 2.32 (ordre selon l'exposition, 25,6 pour cette graine) ; 26 avant */
+ assert.ok(L20>=24,`après 20 tours, chemin ${L20}`);/* 24 depuis la 2.33 (ordre selon l'exposition, 25,6 pour cette graine) ; 26 avant */
 });
 test('Deux graines différentes donnent deux labyrinthes différents ; la même graine donne le même',()=>{
  const a=plan(1).M.w.join(''),b=plan(2).M.w.join(''),a2=plan(1).M.w.join('');
@@ -52,7 +52,7 @@ test('Aucun mur inutile : chaque tour qui ne touche pas le chemin est nécessair
   for(const i of M.ord){const x=i%C,y=i/C|0;if(P.some(j=>Math.abs(j%C-x)<=1&&Math.abs((j/C|0)-y)<=1))continue;
    w[i]=0;assert.ok(S.plen(w)<L,`graine ${g} : tour inutile en (${x},${y})`);w[i]=1}}
 });
-/* depuis la 2.32 : ordre de construction selon l'exposition (cases du chemin vues par chaque tour) ; avant : chemin d'au moins 50 cases à 40 tours */
+/* depuis la 2.33 : ordre de construction selon l'exposition (cases du chemin vues par chaque tour) ; avant : chemin d'au moins 50 cases à 40 tours */
 test('Milieu de partie : à 15, 25 et 40 tours du plan, les tours voient le chemin du moment (exposition) et le chemin dépasse 35 cases à 40 tours',()=>{
  const voit=(i,P)=>P.filter(j=>Math.hypot(j%C-i%C,(j/C|0)-(i/C|0))<=2.5).length,expo={15:4,25:5,40:6};
  for(const n of [15,25,40]){let loin=0,cov=0;
@@ -62,7 +62,7 @@ test('Milieu de partie : à 15, 25 et 40 tours du plan, les tours voient le chem
   assert.ok(loin<=.2*n*8,`${n} tours : ${loin} tours sur ${n*8} hors de portée du chemin`);
   assert.ok(cov>=expo[n],`${n} tours : chaque tour voit ${cov.toFixed(1)} cases du chemin en moyenne (au moins ${expo[n]} attendu)`)}
 });
-/* depuis la 2.32 : type des tours ordinaires selon la menace reçue */
+/* depuis la 2.33 : type des tours ordinaires selon la menace reçue */
 test('Répartition : sans menace connue, l\'IA garde le type prévu par son plan ; face à des blindés, un Archer vaut moins par or que face à des monstres ordinaires',()=>{
  const {S,G,b,M}=plan(2);const i=M.ord.find(i=>Math.abs(i%C-6)>2&&M.role[i]==0);assert.ok(i!==undefined);
  assert.equal(S.choixType(b,i,0,10),0,'menace inconnue : type du plan');

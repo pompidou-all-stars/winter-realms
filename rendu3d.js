@@ -20,6 +20,9 @@ import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 export const FOV = 34, ELEV = 44 * Math.PI / 180, COLONNES = 8.4;
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
+/* 2.31 : les volants sont plus compacts (ailes déployées, ils masquaient le terrain et les autres monstres) */
+const ECH_VOLANTS = .65;
+const echMonstre = k => ECH_MONSTRES * (CR[k].fly ? ECH_VOLANTS : 1);
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
 /* couleurs du terrain : mêmes valeurs que art/communs/factions.py (SOL, BIOME) */
 /* thème hiver (2.9) : terrain enneigé (NEIGE ; TEINTE n'est plus utilisée depuis le paysage continu de la 2.26),
@@ -442,6 +445,12 @@ export function creer(J) {
     const m = new THREE.Mesh(G.boite, cadreMat); m.scale.set(sx, .03, sz); m.position.set(x, .02, z); cadreCase.add(m);
   }
   cadreCase.visible = false; scene.add(cadreCase);
+  /* 2.31 : cadres des tours choisies pour une amélioration en lot (un par tour, jusqu'à 10) */
+  const cadresLot = [], lotMat = transp('#ffd95e', .8);
+  function cadreLot(i) {
+    while (cadresLot.length <= i) { const c = cadreCase.clone(true); c.traverse(m => { if (m.isMesh) m.material = lotMat }); c.visible = false; scene.add(c); cadresLot.push(c) }
+    return cadresLot[i];
+  }
   const fantomes = new Map(); let fantome = null;
 
   /* ---------- monstres ---------- */
@@ -449,7 +458,7 @@ export function creer(J) {
   function creerMonstre(c) {
     const g = modele(urlMonstre(c.k)); if (g === undefined) return null;
     const T = CR[c.k];
-    const o = g ? g.scene.clone(true) : repliMonstre(c.k); o.scale.setScalar(ECH_MONSTRES * (g ? echelleModele(c.k) : 1));
+    const o = g ? g.scene.clone(true) : repliMonstre(c.k); o.scale.setScalar(echMonstre(c.k) * (g ? echelleModele(c.k) : 1));
     if (T.inv) o.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true } });
     const r = new THREE.Group(); r.add(o);
     let mixer = null;
@@ -477,7 +486,7 @@ export function creer(J) {
     if (Mo.aura) Mo.aura.material.opacity = .35 + Math.sin(temps * 5) * .15;
     if (Mo.inv) { const op = c.hid ? .3 : .85; Mo.o.traverse(m => { if (m.isMesh) m.material.opacity = op }) }
   }
-  const HAUT = k => (CR[k].fly ? VOL : 0) + .4 * Math.pow(CR[k].z, 1.8) * ECH_MONSTRES + .08;
+  const HAUT = k => (CR[k].fly ? VOL : 0) + .4 * Math.pow(CR[k].z, 1.8) * echMonstre(k) + .08;
 
   /* ---------- projectiles ---------- */
   const projs = new Map();
@@ -574,6 +583,11 @@ export function creer(J) {
       cadreCase.position.set(sel.x + .5, 0, sel.y + .5); cadreMat.color.set(etat.projet && !etat.ok ? '#ff6b5a' : '#ffd95e');
       cadreMat.opacity = etat.projet ? .7 + .25 * Math.sin(temps * 6) : .95;
     }
+    const lt = etat.lot || [];
+    for (let i = 0; i < Math.max(lt.length, cadresLot.length); i++) {
+      const c = cadreLot(i); c.visible = i < lt.length; if (c.visible) c.position.set(lt[i].x + .5, 0, lt[i].y + .5);
+    }
+    lotMat.opacity = .55 + .35 * Math.sin(temps * 5);
     const pk = etat.projet ? etat.projet.k : -1;
     if (fantome && (pk < 0 || fantome.k !== pk)) { scene.remove(fantome.r); fantome = null }
     if (pk >= 0) {

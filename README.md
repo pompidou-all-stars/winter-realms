@@ -8,16 +8,16 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 
 | Statut | Domaine | Idée |
 |---|---|---|
-| 💡 | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. |
-| 💡 | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». |
+| ✅ | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. *Fait en 2.32 : molette et glisser à la souris.* |
+| ✅ | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». *Fait en 2.32 : plus de bulle au milieu du terrain, fiche réduite pendant l'aperçu.* |
 | ✅ | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
 | ✅ | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
 | ✅ | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
 | ✅ | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
 | 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
-| 💡 | 🏰 Tours | **Améliorer en lot** : un moyen d'améliorer plusieurs tours d'un coup. |
+| ✅ | 🏰 Tours | **Améliorer en lot** : un moyen d'améliorer plusieurs tours d'un coup. *Fait en 2.32 : toucher deux fois une tour choisit jusqu'à 10 tours du même type et du même niveau, montrées en icônes ; un bouton les améliore toutes ; si l'or manque, les icônes de celles qui ne seront pas améliorées rétrécissent.* |
 | 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
-| 💡 | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes. |
+| ✅ | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes. *Fait en 2.32 : ×0,65 en 3D.* |
 | 💡 | 🧭 Gameplay | **Point de relais** : pouvoir poser un point de passage autour duquel les monstres tournent. |
 | 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
 | 💡 | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. |
@@ -80,7 +80,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.32 — ia plus stratège — 2026-11-19
+### 2.33 — ia plus stratège — 2026-11-19
 - AI builds more towers and upgrades less while its maze is unfinished (random upgrades from 12 towers at 25 %, 50 % from 28, instead of 10 towers at 35 %, 60 % from 24). Arena: +0.18 and +0.27 on two seed sets, neutral in long games. Other tweaks tried and dropped (earlier tiers and bosses, sending thresholds, a 20,000-gold wave cap, defence share, estimate caution, more upgrades).
 - AI performance: the defence estimate follows the path cell by cell and caches what each tower sees. The AI costs 0.02–0.04 ms per game step on average (0.01–0.03 on `main`); its slowest call drops from 7–10 ms to 3–5 ms (2–3 ms on `main`).
 - AI tower types chosen against the threat it receives: the AI remembers the monsters sent to it and, on the ordinary slots of its maze, builds the type that deals the most damage per gold against them (armour, flying, anti-magic, area, path in range): fewer archers and more guards, cannons and mages against bosses and armoured monsters. Arena: +0.52 points per seat (28 wins out of 42).
@@ -89,6 +89,13 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 - AI end game: once its maze is complete and every tower is at level 5, the AI moves its defence savings (which could no longer be spent) into attacks. Arena: +0.76 points per seat against the previous step (35 wins out of 42).
 - AI mazes where every tower shoots: the AI now builds its maze in an order that keeps each new tower next to the current monster path ("exposure": path cells seen by each tower), instead of only maximising the path length. Around 15–25 towers, towers far from the path drop from 3–4 to 1–2 on average, and each tower sees 10–50 % more path. In the AI arena it beats the previous AI by +0.64 points per seat (29 wins out of 42 games). `sim.js` changed (automatic server redeploy).
 - Tooling: AI arena (`node tests/outils/arene-ia.js`): the current AI plays against the AI of another version (`origin/main` by default) in the same game engine, seats and factions swapped, on all CPU cores; reports points, wins and the gap with its standard error. Not part of the GitHub checks. No game change.
+
+### 2.32 — correctifs de la feuille de route — 2026-11-19
+- Mouse scrolling of the tower and monster card bar on PC: the wheel scrolls it horizontally and it can be dragged; the scroll position is kept when a card is chosen.
+- Less clutter on mobile: the "Touchez encore la case" bubble in the middle of the board is gone; while previewing a build, the info card shrinks and shows the instruction instead.
+- Flying monsters are drawn smaller in 3D (×0.65).
+- Batch upgrade: tapping a tower twice selects up to 10 towers of the same type and level (gold frames on the board, a row of icons in the card); one button upgrades them all; when gold is short, the icons of the towers that won't be upgraded shrink.
+- Roadmap updated (these four items are done). Interface only: `sim.js` unchanged (no server redeploy).
 
 ### 2.31 — équilibrage des tours — 2026-11-19
 - Roadmap: the designer's ideas added to the roadmap table (3D model refactoring, multi-screen launch menu, unique gameplay per race, English version, analytics, website with SEO and GEO, launch tutorial, Google login or account, store, promotion campaigns, payment, then monetization). No game change.

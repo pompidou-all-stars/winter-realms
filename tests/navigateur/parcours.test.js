@@ -67,7 +67,9 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
  });
  test('Construction : un premier toucher montre la tour fantôme et sa portée en 3D, sans rien construire',async()=>{
   await N.toucherCase(p,3,5);await N.avancer(p,50);const e=await N.etat(p),s=(await r3d()).scene;assert.deepEqual(e.tours,[]);assert.equal(e.or,200);
-  assert.deepEqual(e.projet,{x:3,y:5,k:20});assert.match(e.toast,/Touchez encore la case pour construire \(20 or/);assert.equal(s.fantome,true);assert.equal(s.portee,true);
+  assert.deepEqual(e.projet,{x:3,y:5,k:20});assert.equal(e.toast,'','2.31 : plus de bulle au milieu du terrain');
+  assert.match(e.fiche,/Touche encore la case pour construire · 20 or/);assert.doesNotMatch(e.fiche,/Racines/,'2.31 : fiche réduite pendant l’aperçu');
+  assert.equal(await val(()=>document.getElementById('fiche').classList.contains('compacte')),true);assert.equal(s.fantome,true);assert.equal(s.portee,true);
  });
  test('Construction : un second toucher sur la même case construit la tour en 3D et débite son prix',async()=>{
   await N.toucherCase(p,3,5);await N.avancer(p,50);const e=await N.etat(p),s=(await r3d()).scene;
@@ -150,6 +152,26 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   const cible=await caseVisible();assert.ok(cible,'une case visible');
   const avant=(await N.etat(p)).or;await N.construire(p,cible.x,cible.y);
   const e=await N.etat(p);assert.ok(e.tours.some(t=>t.x==cible.x&&t.y==cible.y),'tour posée en ('+cible.x+','+cible.y+')');assert.equal(e.or,avant-20);
+ });
+ test('Amélioration en lot (2.31) : toucher deux fois une tour choisit les tours pareilles, les icônes en trop rétrécissent, un bouton les améliore',async()=>{
+  await p.evaluate(()=>{P.gold+=500});
+  for(let i=0;i<2;i++){const ex=(await N.etat(p)).tours.map(t=>[t.x,t.y]);const c=await caseVisible(ex);assert.ok(c,'une case visible');await N.construire(p,c.x,c.y)}
+  await N.avancer(p,1500);const e0=await N.etat(p),t0=e0.tours.find(t=>t.k==20&&t.lv==1),n=Math.min(10,e0.tours.filter(t=>t.k==20&&t.lv==1).length);assert.ok(n>=3,'au moins 3 tours pareilles : '+n);
+  await N.toucherCase(p,t0.x,t0.y);let e=await N.etat(p);assert.equal(e.panneauOuvert,true);assert.match(e.fiche,/Touche encore la tour/);
+  await N.toucherCase(p,t0.x,t0.y);e=await N.etat(p);
+  assert.match(e.fiche,new RegExp(n+' × Arbre sentinelle'));assert.equal(await p.locator('#fiche .rangee span').count(),n,'une icône par tour');
+  assert.equal(await p.locator('#fiche .rangee span.non').count(),0);
+  const cout=await p.evaluate(()=>lot.c);await p.evaluate(c=>{P.gold=c+1},cout);await N.avancer(p,50);
+  assert.equal(await p.locator('#fiche .rangee span.non').count(),n-1,'les icônes des tours qu’on ne peut pas payer rétrécissent');
+  assert.match(await p.textContent('#fiche .actions button'),new RegExp('Améliorer 1 / '+n));
+  await N.toucher(p,'#fiche .actions button');e=await N.etat(p);
+  assert.equal(e.tours.filter(t=>t.k==20&&t.lv==2).length,1,'une seule tour améliorée');assert.equal(e.or,1);assert.match(e.toast,/1 tour améliorée/);
+  await p.evaluate(()=>{P.gold+=1000});
+ });
+ test('Barre des cartes (2.31) : la molette de la souris la fait défiler',async()=>{
+  await p.evaluate(()=>{bar.scrollLeft=0});const b=await p.locator('#bar').boundingBox();
+  await p.mouse.move(b.x+b.width/2,b.y+b.height/2);await p.mouse.wheel(0,240);await N.avancer(p,100);
+  assert.ok(await p.evaluate(()=>bar.scrollLeft)>100,'la barre a défilé');
  });
  test('Menu (2.15) : son, rappel des gestes, reprendre ; quitter demande une confirmation',async()=>{
   await N.toucher(p,'#menuBtn');assert.equal(await p.isVisible('#menu'),true);

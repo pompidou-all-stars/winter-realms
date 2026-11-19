@@ -337,7 +337,7 @@ function mzStep(A,steps){let M=A.mz;if(M&&M.ok)return M;
  mzChoose(M,LV);mzRoles(A,M);M.ok=1;return M}
 const MZX=new Int8Array(N),MZY=new Int8Array(N);for(let i=0;i<N;i++){MZX[i]=i%C;MZY[i]=i/C|0}
 const near=(i,j,d)=>{const dx=MZX[i]-MZX[j],dy=MZY[i]-MZY[j];return dx*dx+dy*dy<=d*d};
-/* 2.32 : exposition = nombre de cases du chemin que voit chaque tour (rayon MZ_RE, à peu près la portée d'un Archer), additionné sur toutes les tours.
+/* 2.33 : exposition = nombre de cases du chemin que voit chaque tour (rayon MZ_RE, à peu près la portée d'un Archer), additionné sur toutes les tours.
    C'est le temps que les monstres passent à portée des tours : une tour loin du chemin ne compte pas, et un chemin plus long compte pour chaque tour qui le borde.
    VOI : pour chaque case, les cases à moins de MZ_RE (21 au plus), pour un calcul rapide sur la grille. */
 const MZ_RE=2.5,VOI=[],VOH=new Uint8Array(N);
@@ -349,7 +349,7 @@ function mzPrune(c){const w=c.best.slice(),L=plen(w);let n=1,ch=1;
   for(let i=0;i<N;i++)if(w[i]&&!adj[i]){w[i]=0;n++;if(plen(w)==L)ch=1;else w[i]=1}}
  c.w=w;c.cur=w.slice();c.left=[];for(let i=0;i<N;i++)if(w[i])c.left.push(i);c.walls=c.left.slice();c.rev=[];return n}
 /* ordre de construction : on retire une à une, depuis le plan complet, la tour dont le retrait fait perdre le moins d'exposition (à égalité, celle hors du couloir aérien) ;
-   construire dans l'ordre inverse donne, à chaque étape, des tours qui voient le chemin du moment. 2.32 : avant, seule comptait la longueur du chemin,
+   construire dans l'ordre inverse donne, à chaque étape, des tours qui voient le chemin du moment. 2.33 : avant, seule comptait la longueur du chemin,
    et vers 3 min de jeu jusqu'à un tiers des tours de l'IA étaient loin du chemin (elles bouchaient un raccourci sans jamais tirer). */
 const MZ_SMP=24;
 function mzRemove(c,r){const cur=c.cur,left=c.left,E0=expo(cur);let bi=0,bk=INF;
@@ -358,7 +358,7 @@ function mzRemove(c,r){const cur=c.cur,left=c.left,E0=expo(cur);let bi=0,bk=INF;
   const key=(E0-E)+(Math.abs(MZX[i]-6)<=2?.3:0)+r()*.2;if(key<bk){bk=key;bi=k}}
  const i=left[bi];left.splice(bi,1);cur[i]=0;c.rev.push(i);return 2*smp.length+2}
 /* note d'un candidat : exposition par tour après 15, 25, 40 et 60 tours (l'IA en a rarement plus en milieu de partie) et une fois complet
-   (2.32 ; avant : longueur du chemin). pre garde la longueur du chemin à ces étapes. */
+   (2.33 ; avant : longueur du chemin). pre garde la longueur du chemin à ces étapes. */
 const MZ_AT=[15,25,40,60];
 function mzEval(c){c.ord=c.rev.reverse();const w=new Uint8Array(N),Ls=[],Es=[];c.ord.forEach((i,n)=>{w[i]=1;if(MZ_AT.includes(n+1)){Ls.push(plen(w));Es.push(expo(w)/(n+1))}});
  c.L=plen(c.w);const Ef=expo(c.w)/c.ord.length;while(Ls.length<MZ_AT.length){Ls.push(c.L);Es.push(Ef)}
@@ -379,7 +379,7 @@ function mzRoles(A,M){const base=A.classId*10,rg=j=>TW[base+j].r,w=M.w,P=mzPath(
  for(const i of walls)if(role[i]<0){const ax=Math.abs(MZX[i]-6),cc=cov(i,rg(3)),cg=cov(i,Math.max(rg(1),1.45));
   role[i]=ax<=2?(ax<=1&&cov(i,rg(4))>=7?4:0):cc>=12||(cg>=4&&M.r()<.3)?3:cg>=4?1:cc>=8?3:0}
  M.role=role}
-/* 2.32 : menace = PV des monstres reçus, monstre par monstre, avec un oubli progressif (×MEN_OUBLI à chaque action, environ 2 min de demi-vie) */
+/* 2.33 : menace = PV des monstres reçus, monstre par monstre, avec un oubli progressif (×MEN_OUBLI à chaque action, environ 2 min de demi-vie) */
 const MEN_OUBLI=.997,MEN_MIN=200,MAG_MAX=.4;
 function observer(A){const mn=A.menace||(A.menace=new Float64Array(CR.length));for(let k=0;k<mn.length;k++)mn[k]*=MEN_OUBLI;for(const c of A.cr)if(!c._ia){c._ia=1;mn[c.k]+=c.max}}
 /* dégâts par seconde et par or d'une tour k (niveau 1) posée en (x, y), contre la menace reçue : armure, vol, anti-magie, zone, longueur de chemin à portée */
@@ -405,7 +405,7 @@ function aiDefend(A){const M=mzStep(A,INF),time=A.G.time,bud=Math.min(A.dp,A.gol
   const want=j==5&&thr&&!TW[t.k].mg?5:j==2&&cur!=2&&cur!=8&&A.t.filter(o=>o.k-base==2||o.k-base==8).length<1+n*.15?2:-1;if(want<0)continue;
   const k=base+want,mc=TW[k].c-Math.floor(t.inv*.7);if(bud<mc)continue;A.gold-=mc;t.k=k;t.lv=1;t.inv=TW[k].c;t.b=t.bt=buildT(t.inv,A.bm());A.ev.push('build');A.dp-=g0-A.gold;return true}
  const todo=M.ord.filter(i=>!A.g[i/C|0][i%C]);
- /* 2.32 : défense complète (plan construit, toutes les tours au niveau 5) : l'or de défense ne peut plus servir, aiAct le passe à l'attaque */
+ /* 2.33 : défense complète (plan construit, toutes les tours au niveau 5) : l'or de défense ne peut plus servir, aiAct le passe à l'attaque */
  A.plein=!todo.length&&A.t.every(t=>t.lv>=5);
  /* amélioration : la tour qui couvre le plus de chemin (et de couloir aérien, d'autant plus que des volants arrivent) pour son prix */
  if(ups.length&&(!todo.length||(n>=12&&Math.random()<(n>=28?.5:.25)))){const path=pathCells(A),aw=.6*(1+2*fs),val=t=>{const T=TW[t.k],r=rng(t);let c=0;for(const[x,y]of path)if(Math.hypot(x-t.x,y-t.y)<=r)c++;if(!T.gr)for(let y=0;y<R;y++)if(Math.hypot(6-t.x,y-t.y)<=r)c+=aw;
@@ -414,7 +414,7 @@ function aiDefend(A){const M=mzStep(A,INF),time=A.G.time,bud=Math.min(A.dp,A.gol
  /* construction : la prochaine case du plan ; si elle est occupée par un monstre, on essaie les suivantes, mais on n'en saute pas une faute d'or */
  else for(const i of todo.slice(0,4)){const k=mzKind(A,i,n,bud,thr,fs);if(k<0)break;if(A.place(i%C,i/C|0,k)){ok=true;break}}
  A.dp-=g0-A.gold;return ok}
-/* --- 2.32 : ce que chaque adversaire peut encaisser ---
+/* --- 2.33 : ce que chaque adversaire peut encaisser ---
    trajet(b) : points tous les PAS_TR case le long du chemin des monstres au sol, de case en case (chaine : pas le tracé exact en ligne droite de chemin(),
    environ 4 % plus long mais bien moins coûteux), en cache tant que le labyrinthe ne change pas.
    encaisse(b, k, m) : PV qu'une foule du monstre k (PV × m) perd en traversant le terrain b : pour chaque tour, dégâts par seconde contre ce monstre
@@ -448,7 +448,7 @@ function aiAttack(A){const time=A.G.time;let bud=Math.min(A.ap,A.gold),sent=fals
  const fo=A.G.foes(A),m=1+time/200;
  /* dans chaque famille, le monstre le plus cher que la réserve paie, parmi les paliers ouverts */
  const ok=k=>bud>=CR[k].c&&CR[k].t<=A.tier,top=l=>l.filter(ok).pop(),go=k=>{const g=A.gold;if(!A.G.send(A,k))return false;sent=true;bud-=g-A.gold;A.ap-=g-A.gold;return true};
- /* 2.32 : pour chaque famille, combien de monstres passeraient chez chaque adversaire si toute la réserve y allait (encaisse, ×ENC car l'estimation est prudente) ;
+ /* 2.33 : pour chaque famille, combien de monstres passeraient chez chaque adversaire si toute la réserve y allait (encaisse, ×ENC car l'estimation est prudente) ;
     on retient la famille qui fait perdre le plus de vies (avec du hasard : ±VAGUE_HZ selon la difficulté, plus en Normal), avec un bonus si un adversaire serait éliminé.
     Si aucune ne passe, la vague sert l'économie : monstres au sol, ceux qui rapportent le plus de revenu. */
  const cands=[...new Set([NORM,FLY,SPECS,ARMS,MIS,SPLITS,ACCS,STUNS].map(top).filter(k=>k!==undefined))],boss=top(BOSS);
