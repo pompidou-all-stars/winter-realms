@@ -20,7 +20,7 @@ import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 export const FOV = 34, ELEV = 44 * Math.PI / 180, COLONNES = 8.4;
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
-/* 2.32 : les volants sont plus compacts (ailes déployées, ils masquaient le terrain et les autres monstres) ; 2.34 : deux fois moins grands (×0,65 → ×0,5) */
+/* 2.32 : les volants sont plus compacts (ailes déployées, ils masquaient le terrain et les autres monstres) ; 2.35 : deux fois moins grands (×0,65 → ×0,5) */
 const ECH_VOLANTS = .5;
 const echMonstre = k => ECH_MONSTRES * (CR[k].fly ? ECH_VOLANTS : 1);
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
@@ -113,7 +113,7 @@ export function creer(J) {
   /* élan au lâcher (cases par seconde), amorti dans dessiner */
   function lancer(vx, vz) { const n = Math.hypot(vx, vz), m = n > 14 ? 14 / n : 1; V.vx = vx * m; V.vz = vz * m; V.cx = null }
   function viser(x, z) { V.fx = x; V.fz = z; V.vx = V.vz = 0; V.cx = null; borner(); placerCamera() }
-  /* 2.34 : fait glisser la vue, en douceur, pour que le point (x, z) du sol arrive au pixel (px, py) du canevas
+  /* 2.35 : fait glisser la vue, en douceur, pour que le point (x, z) du sol arrive au pixel (px, py) du canevas
      (par exemple une tour choisie qui serait cachée par la fiche). Glisser le doigt ou viser annule le mouvement. */
   function amener(x, z, px, py) {
     const g = sol(px, py); if (!g) return;

@@ -29,7 +29,7 @@ async function lancer({webgl=false}={}){return playwright.chromium.launch({args:
 async function ouvrir(navigateur,url,{format='portrait',graine=12345,police='reelle',echelle=2,bloquer=[]}={}){
  const ctx=await navigateur.newContext({...FORMATS[format],deviceScaleFactor:echelle,isMobile:true,hasTouch:true,locale:'fr-FR',timezoneId:'Europe/Paris',reducedMotion:'no-preference'});
  const page=await ctx.newPage();
- /* 2.34 : on ignore l'icône d'onglet (/favicon.ico) que demande Edge (WR_CANAL=msedge), mais pas le Chromium de Playwright : le jeu n'en a pas */
+ /* 2.35 : on ignore l'icône d'onglet (/favicon.ico) que demande Edge (WR_CANAL=msedge), mais pas le Chromium de Playwright : le jeu n'en a pas */
  const erreurs=[];page.on('pageerror',e=>erreurs.push(e.message));page.on('console',m=>{if(m.type()=='error'&&!/\/favicon\.ico$/.test(m.location().url||''))erreurs.push(m.text())});
  /* aucune connexion vers l'extérieur, sauf la police si demandée (le multijoueur n'est jamais contacté) */
  const origine=new URL(url).origin+'/';

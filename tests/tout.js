@@ -2,9 +2,9 @@
    node tests/tout.js               → simulation (mécaniques + 1 partie entre IA par difficulté) et navigateur
    node tests/tout.js --simulation  → simulation seulement (c'est ce que lance GitHub à chaque Pull Request)
    node tests/tout.js --complet     → ajoute les 15 parties entre IA complètes (5 factions × 3 difficultés)
-   node tests/tout.js --un-par-un   → un fichier de test après l'autre (fonctionnement d'avant la 2.34)
+   node tests/tout.js --un-par-un   → un fichier de test après l'autre (fonctionnement d'avant la 2.35)
    (--rapide est gardé comme synonyme de --simulation)
-   2.34 : les fichiers de test tournent en parallèle (un processus par fichier, autant que de cœurs moins un),
+   2.35 : les fichiers de test tournent en parallèle (un processus par fichier, autant que de cœurs moins un),
    les plus longs en premier ; les parties entre IA sont elles aussi jouées en parallèle (tests/outils/parties.js).
    Code de sortie : 0 si tout passe, 1 sinon. */
 'use strict';

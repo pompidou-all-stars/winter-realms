@@ -51,7 +51,7 @@ async function main(){
   cmp('Constantes',clone({C:S.C,R:S.R,SP:S.SP,EX:S.EX}),clone({C:SA.C,R:SA.R,SP:SA.SP,EX:SA.EX}));cmp('Difficultés',clone(S.DIFF),clone(SA.DIFF))}
  const parties=fs.existsSync(fParties)?fs.readFileSync(fParties,'utf8').trim().split('\n').filter(Boolean).map(l=>JSON.parse(l)):[];
  /* mêmes parties (mêmes graines) jouées avec le moteur d'avant ; inutile si sim.js n'a pas changé */
- /* 2.34 : jouées en parallèle, une par cœur */
+ /* 2.35 : jouées en parallèle, une par cœur */
  const PREF=!codeAvant?[]:memeMoteur?parties:await Promise.all(jouerEnParallele({code:codeAvant},SCENARIOS.filter(sc=>parties.some(p=>p.graine==sc.graine)).map(sc=>({sc}))));
  const audit=auditer(S);
  const jeuIdentique=J.ko.length==0&&memeMoteur;

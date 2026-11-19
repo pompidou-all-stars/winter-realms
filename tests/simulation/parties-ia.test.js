@@ -2,7 +2,7 @@
    Par défaut : une partie par difficulté (3 parties). Mode complet (WR_COMPLET=1, node tests/tout.js --complet) : les 15 (5 factions × 3 difficultés).
    Chaque partie doit se terminer en moins de 30 min de jeu, sans valeur invalide (NaN), avec un vainqueur cohérent.
    Pas de comparaison à une partie enregistrée : un changement d'équilibrage ou d'IA ne fait pas échouer ces tests.
-   2.34 : toutes les parties sont lancées dès le chargement, en parallèle (une par cœur, jouerEnParallele) ; chaque test attend la sienne. */
+   2.35 : toutes les parties sont lancées dès le chargement, en parallèle (une par cœur, jouerEnParallele) ; chaque test attend la sienne. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('fs');
 const {MOTEURS}=require('../outils/moteur');

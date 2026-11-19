@@ -31,7 +31,7 @@ function jouer(source,sc,{surEtape,dureeMax=DUREE_MAX}={}){
   invalide:G.B.some(b=>b.cr.some(c=>!isFinite(c.x)||!isFinite(c.y)||!isFinite(c.hp))||!isFinite(b.gold)),
   controles,final:empreinte(etat(G))};
 }
-/* 2.34 : plusieurs parties en même temps, chacune dans son propre fil (worker_threads), au plus une par cœur moins un.
+/* 2.35 : plusieurs parties en même temps, chacune dans son propre fil (worker_threads), au plus une par cœur moins un.
    travaux : [{sc, opts}] ; renvoie une promesse par travail, dans le même ordre. Chaque partie repart de sa graine dans
    un moteur à elle : les résultats sont identiques à ceux de jouer() appelée l'une après l'autre. */
 const WT=require('worker_threads');

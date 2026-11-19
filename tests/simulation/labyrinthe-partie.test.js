@@ -1,4 +1,4 @@
-/* Labyrinthe de l'IA (2.5), en partie : sorti de labyrinthe.test.js en 2.34 pour tourner en parallèle (c'est le plus long, environ 5 s). */
+/* Labyrinthe de l'IA (2.5), en partie : sorti de labyrinthe.test.js en 2.35 pour tourner en parallèle (c'est le plus long, environ 5 s). */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const {charger,partie,avancer}=require('../outils/moteur');
