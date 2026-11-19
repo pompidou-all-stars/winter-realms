@@ -18,7 +18,7 @@ function init(ctx,dest){
  if(etat=='rien'){etat='charge';
   fetch('assets/audio/manifeste.json').then(r=>r.ok?r.json():null).then(m=>{manif=m&&m.sons?m:null;etat=manif?'pret':'absent'}).catch(()=>{etat='absent'})}}
 
-/* mise à niveau au chargement : crête ramenée à -3 dB (gain plafonné à ×2 depuis la 2.28 : au-delà, le souffle remontait), silences du début (10 ms gardées)
+/* mise à niveau au chargement : crête ramenée à -3 dB (gain plafonné à ×2 depuis la 2.29 : au-delà, le souffle remontait), silences du début (10 ms gardées)
    et de la fin (50 ms gardées) coupés, pour qu'un son parte au moment de l'action.
    Les ambiances en boucle ne sont pas touchées (la boucle doit rester exacte). */
 function nettoyer(buf,id){if(!buf||id.startsWith('amb-'))return buf;
