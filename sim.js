@@ -11,19 +11,19 @@ const BASE_TW=[
    Le froid (Givre) et les racines (Sylvestres) s'additionnent ; deux effets de la même famille ne s'additionnent pas (le plus fort et le plus long l'emportent). */
 const GIVRE_LV={p:[.2,.275,.35,.425,.5],d:[1.5,1.8,2.1,2.4,2.7],r:[1.2,1.4,1.6,1.8,2]},RACINES_LV={p:[.1,.15,.2,.25,.3],d:[.72,.85,1,1.15,1.3]};
 const FACTIONS=[
- {name:'Alliance',icon:'🛡️',color:'#d8b45c',dark:'#59451f',desc:'Portée supérieure et maîtrise des airs ; dégâts directs légèrement plus modestes.', towers:['Tour des archers','Bastion du chevalier','Obélisque de givre','Bombarde royale','Brasier du griffon','Sanctuaire solaire','Tour des sentinelles','Garde du lion','Cristal hivernal','Arcaniste royal']},
- {name:'Horde',icon:'🪓',color:'#78a94b',dark:'#294322',desc:'Assauts agressifs et exécution des ennemis affaiblis ; portée plus courte.', towers:['Tour des chasseurs','Totem du berserker','Totem de glace','Canon des clans','Fourneau de guerre','Chaman des flammes','Tour des éclaireurs','Garde-lame','Totem des esprits','Grand sorcier orc']},
- {name:'Sylvestres',icon:'🌿',color:'#69bd83',dark:'#214b38',desc:'Racines qui ralentissent et contrôlent les vagues ; dégâts bruts plus faibles.', towers:['Arbre sentinelle','Gardien des racines','Pierre de rosée','Fleur explosive','Cœur ardent','Cercle druidique','Nid des faucons','Dryade protectrice','Cristal lunaire','Ancien arcanique']},
- {name:'Nains',icon:'⚒️',color:'#c58b55',dark:'#56351f',desc:'Artillerie perforante contre les blindés ; cadence plus lente et tours coûteuses.', towers:['Tourelle de guet','Automate garde','Cryo-forge','Mortier runique','Forge incandescente','Canon arcanique','Baliste naine','Sentinelle d’acier','Générateur runique','Maître ingénieur']},
- {name:'Légion des ombres',icon:'☠️',color:'#a879c9',dark:'#39204d',desc:'Marque les cibles pour amplifier les frappes suivantes ; profil polyvalent sans extrême.', towers:['Tour des damnés','Chevalier funeste','Obélisque maudit','Mortier infernal','Puits de lave','Nexus du néant','Œil démoniaque','Gardien spectral','Cristal corrupteur','Archimage noir']}
+ {name:'Humains',icon:'🏹',color:'#d8b45c',dark:'#59451f',desc:'Archers, chevaliers et ingénieurs : portée et défense anti-aérienne.',towers:['Archer royal','Chevalier du rempart','Cryomancien','Bombarde impériale','Brasier du griffon','Prêtre solaire','Éclaireur vétéran','Champion du lion','Gardien du givre','Archimage humain']},
+ {name:'Robots',icon:'🤖',color:'#78a9c9',dark:'#203e54',desc:'Automates, drones et artillerie : frappes rapides sur les ennemis affaiblis.',towers:['Drone sentinelle','Automate de mêlée','Cryo-drone','Canon à impulsion','Réacteur incendiaire','Module à plasma','Drone longue portée','Titan mécanique','Émetteur cryogénique','Cerveau quantique']},
+ {name:'Créatures',icon:'🐉',color:'#c77964',dark:'#543025',desc:'Prédateurs, griffons et monstres : contrôle des vagues et attaques sauvages.',towers:['Chasseur épineux','Griffeur sauvage','Souffle de givre','Cracheur acide','Salamandre ardente','Oracle chimérique','Rapace des cimes','Béhémoth gardien','Hurleur polaire','Dragon ancestral']},
+ {name:'Nature',icon:'🌿',color:'#69bd83',dark:'#214b38',desc:'Arbres, dryades et plantes : racines, ralentissements et contrôle.',towers:['Arbre archer','Gardien des racines','Fleur de givre','Graine explosive','Cœur ardent','Druide des clairières','Faucon sylvestre','Ent protecteur','Cristal de rosée','Ancien des forêts']},
+ {name:'Magiques',icon:'🔮',color:'#a879c9',dark:'#39204d',desc:'Mages, runes et esprits : marques mystiques et amplification des dégâts.',towers:['Apprenti arcanique','Lame spectrale','Sceau de glace','Orbe explosif','Flamme astrale','Enchanteur du néant','Œil des arcanes','Gardien éthéré','Cristal de stase','Grand archimage']}
 ];
 const ARCH=[0,4,2,1,5,3,0,4,2,3];
 /* Coefficients volontairement proches en rendement global : chaque avantage a une vraie contrepartie. */
 const FACTION_BALANCE=[
  {cost:1.04,dmg:.97,range:1.10,cd:1.03,airBonus:1.18,tag:'anti-aérien'},
- {cost:1.02,dmg:.96,range:.93,cd:1.04,execute:1.30,tag:'frénésie'},
- {cost:1.00,dmg:.96,range:1.00,cd:1.02,root:1,tag:'racines'},
- {cost:1.07,dmg:1.08,range:1.02,cd:1.08,pierce:.55,tag:'perforant'},
+ {cost:1.02,dmg:.96,range:.93,cd:1.04,execute:1.30,tag:'surcharge'},
+ {cost:1.00,dmg:.96,range:1.00,cd:1.02,execute:1.12,tag:'instinct'},
+ {cost:1.07,dmg:1.08,range:1.02,cd:1.08,root:1,tag:'racines'},
  {cost:1.01,dmg:1.01,range:.99,cd:1.01,mark:1.14,tag:'malédiction'}
 ];
 const ROLE=[
