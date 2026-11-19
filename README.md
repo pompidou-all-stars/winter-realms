@@ -69,6 +69,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ## Changelog
 
 ### 2.32 — ia plus stratège — 2026-11-19
+- AI performance: the defence estimate follows the path cell by cell and caches what each tower sees. The AI costs 0.02–0.04 ms per game step on average (0.01–0.03 on `main`); its slowest call drops from 7–10 ms to 3–5 ms (2–3 ms on `main`).
 - AI tower types chosen against the threat it receives: the AI remembers the monsters sent to it and, on the ordinary slots of its maze, builds the type that deals the most damage per gold against them (armour, flying, anti-magic, area, path in range): fewer archers and more guards, cannons and mages against bosses and armoured monsters. Arena: +0.52 points per seat (28 wins out of 42).
 - Tooling: `--vies` option for the AI arena (long games that reach the end game). Two end-game ideas were tried with it and dropped because they made the AI weaker: rebuilding a level-5 tower as a stronger type, and capping the defence savings. No game change.
 - AI waves aimed at what each opponent cannot absorb: for every monster family the AI estimates how many would get through each opponent's towers (damage while crossing, with armour, flying, anti-magic, invisibility and slows) and sends the family that costs them the most lives, with some randomness (more in Normal than in Brutal); otherwise ground monsters for income. Bosses and armoured monsters, very hard to absorb, come much more often. **The AI becomes much more dangerous: difficulty to be checked by playing.**

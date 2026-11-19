@@ -415,19 +415,22 @@ function aiDefend(A){const M=mzStep(A,INF),time=A.G.time,bud=Math.min(A.dp,A.gol
  else for(const i of todo.slice(0,4)){const k=mzKind(A,i,n,bud,thr,fs);if(k<0)break;if(A.place(i%C,i/C|0,k)){ok=true;break}}
  A.dp-=g0-A.gold;return ok}
 /* --- 2.32 : ce que chaque adversaire peut encaisser ---
-   trajet(b) : points tous les PAS_TR case le long du chemin réel des monstres au sol (en cache tant que le labyrinthe ne change pas).
+   trajet(b) : points tous les PAS_TR case le long du chemin des monstres au sol, de case en case (chaine : pas le tracé exact en ligne droite de chemin(),
+   environ 4 % plus long mais bien moins coûteux), en cache tant que le labyrinthe ne change pas.
    encaisse(b, k, m) : PV qu'une foule du monstre k (PV × m) perd en traversant le terrain b : pour chaque tour, dégâts par seconde contre ce monstre
    (armure, vol, anti-magie, invisibilité, bonus de faction), × temps passé à portée, × nombre de cibles touchées (zone). Une estimation, pas une simulation. */
 const PAS_TR=.5,ZONE=[1,2.5,2,1,1,3],ENC=1.5,VAGUE_HZ=[.4,.25,.1];
-function trajet(b){if(b._trD===b.d)return b._tr;const ch=chemin(b),out=[];
+function trajet(b){if(b._trD===b.d)return b._tr;const ch=chaine(b,SP[0],SP[1],C*R),out=[];
  for(let n=1;n<ch.length;n++){const[a,c]=ch[n-1],[d,e]=ch[n],k=Math.max(1,Math.round(Math.hypot(d-a,e-c)/PAS_TR));for(let q=0;q<k;q++)out.push([a+(d-a)*q/k,c+(e-c)*q/k])}
  b._trD=b.d;return b._tr=out}
 /* profil de défense d'un terrain (en cache tant que ses tours et son chemin ne changent pas) : pour chaque tour active, dégâts d'un coup et longueur
    de chemin à portée (au sol, Lg ; couloir des volants, La) ; part du chemin à portée d'un Mage (détection) et d'un Givre (ralentissement) */
 function profil(b){let h=b.t.length;for(const t of b.t)h=(h*31+t.k*7+t.lv*131+(t.b>0?3:0)+t.x*17+t.y*19)%1e9;if(b._prD===b.d&&b._prH===h)return b._pr;
  const P=trajet(b),act=b.t.filter(t=>!(t.b>0)),tw=[];
- for(const t of act){const r=rng(t);let Lg=0;for(const[x,y]of P)if(Math.hypot(x-t.x,y-t.y)<=r)Lg+=PAS_TR;tw.push({W:TW[t.k],d:dmg(t),Lg,La:air(t,r)})}
- const part=f=>{const ts=act.filter(t=>f(TW[t.k]));let n=0;for(const[x,y]of P)if(ts.some(t=>Math.hypot(x-t.x,y-t.y)<=rng(t)))n++;
+ /* points du chemin à portée de chaque tour, gardés sur la tour tant que le chemin, sa position et sa portée ne changent pas (une amélioration ailleurs ne refait pas tout) */
+ const vus=t=>{const r=rng(t);if(t._vP===P&&t._vR===r)return t._v;const r2=r*r,v=[];for(let n=0;n<P.length;n++){const dx=P[n][0]-t.x,dy=P[n][1]-t.y;if(dx*dx+dy*dy<=r2)v.push(n)}t._vP=P;t._vR=r;return t._v=v};
+ for(const t of act){const r=rng(t);tw.push({W:TW[t.k],d:dmg(t),Lg:vus(t).length*PAS_TR,La:air(t,r)})}
+ const part=f=>{const ts=act.filter(t=>f(TW[t.k])),m=new Uint8Array(P.length);let n=0;for(const t of ts)for(const q of vus(t))if(!m[q]){m[q]=1;n++}
   return[P.length?n/P.length:0,Math.min(1,ts.reduce((s,t)=>s+air(t,rng(t)),0)/16)]};
  b._prD=b.d;b._prH=h;return b._pr={tw,mg:part(W=>W.mg),gel:part(W=>W.fsp)}}
 function encaisse(b,k,m){const T=CR[k],p=profil(b),fly=T.fly?1:0,arm=(T.arm||0)*m;
