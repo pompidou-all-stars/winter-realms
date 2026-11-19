@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.33</title>
+<title>Winter Realms — Tower Wars · Édition 2.34</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -52,6 +52,8 @@ button{font:inherit;color:inherit;cursor:pointer}
 #rotG{left:calc(10px + env(safe-area-inset-left,0px))}
 #rotD{right:calc(10px + env(safe-area-inset-right,0px))}
 body.r2d .fleche{display:none}
+/* 2.34 : consigne de construction, calée entre les deux flèches, une seule fois par partie */
+#aideBat{position:absolute;z-index:5;left:calc(62px + env(safe-area-inset-left,0px));right:calc(62px + env(safe-area-inset-right,0px));bottom:calc(var(--dock) + 10px);height:42px;display:grid;place-items:center;padding:0 8px;border-radius:21px;background:#0b1626e6;border:1px solid var(--gold);color:#ffe597;font-size:12.5px;font-weight:700;line-height:1.15;text-align:center;box-shadow:0 3px 8px #0009;pointer-events:none}
 /* bannière (terrain d'un autre joueur), astuce et message */
 #banner,#toast,#astuce{position:absolute;left:50%;transform:translateX(-50%);z-index:6;text-align:center}
 #banner{bottom:calc(var(--dock) + 60px);height:30px;padding:0 13px;border-radius:15px;white-space:nowrap;color:#fff;font-size:12.5px;font-weight:700;border:1px solid #fff6;box-shadow:0 2px 8px #0008;text-shadow:0 1px 2px #0008}
@@ -355,6 +357,7 @@ body.prep #clock{display:none}
   <div id="chips" hidden></div>
   <button class="fleche" id="rotG" type="button" aria-label="Pivoter la vue vers la gauche"><svg viewBox="0 0 24 24"><path d="M4 4v5h5"/><path d="M4.6 9A8 8 0 1 1 6 16.5"/></svg></button>
   <button class="fleche" id="rotD" type="button" aria-label="Pivoter la vue vers la droite"><svg viewBox="0 0 24 24"><path d="M20 4v5h-5"/><path d="M19.4 9A8 8 0 1 0 18 16.5"/></svg></button>
+  <div id="aideBat" hidden>Touche encore la case pour construire</div>
   <button id="banner" type="button" hidden></button>
   <div id="astuce" hidden></div>
   <div id="toast" hidden></div>
@@ -1062,8 +1065,9 @@ function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textCon
  f.appendChild(ex);
  /* 2.31 : pendant l'aperçu d'une construction, la fiche se réduit (sans la ligne de détails) et porte la consigne,
     à la place de l'ancienne bulle « Touchez encore la case… » posée au milieu du terrain */
- if(mode=='construire'&&projet&&view==me){f.classList.add('compacte');f.appendChild(aideFiche('2×','Touche encore la case pour construire · '+T.c+' or · '+fr(btJ(T.c))+' s'));return}
- if(mode=='construire')f.appendChild(view==me?aideFiche('2×','Touche deux fois une case du terrain pour construire'+(matchMedia('(pointer:fine)').matches?' (Maj + clic : en un seul clic)':'')):aideFiche('↩','Reviens sur ton terrain pour construire'));
+ /* 2.34 : la consigne n'est plus dans la fiche réduite : elle s'affiche entre les flèches (#aideBat), une seule fois par partie */
+ if(mode=='construire'&&projet&&view==me){f.classList.add('compacte');return}
+ if(mode=='construire'&&!(view==me&&aideBat.vue))f.appendChild(view==me?aideFiche('2×','Touche deux fois une case du terrain pour construire'+(matchMedia('(pointer:fine)').matches?' (Maj + clic : en un seul clic)':'')):aideFiche('↩','Reviens sur ton terrain pour construire'));
  if(mode=='tour'&&explore){f.appendChild(aideFiche('🏁','Partie terminée · '+t.inv+' or investis dans cette tour'));return}
  if(mode=='tour'){const a=elt('div','actions'),up=elt('button'),ve=elt('button','vendre','Vendre · +'+Math.floor(t.inv*.7)+' or');up.type=ve.type='button';
   if(t.b>0){up.textContent='Améliorer · en chantier…';up.onclick=()=>showErr('busy')}
@@ -1099,7 +1103,8 @@ function ficheMonstre(k){const f=$('fiche'),T=CR[k];f.textContent='';f.className
  teteFiche(f,ic,T.n,{n:'Sol',f:'Volant',s:'Spécial'}[T.cat]+(T.tag?' · '+T.tag:'')+' · palier '+T.t,[['PV',Math.round(T.hp*(1+time/200)*HPK)],['Vitesse',fr(T.s)],['Revenu','+'+T.i],['Prix',T.c+' or']]);icone3D(ic,'monstre',k,40,40);
  f.appendChild(aideFiche('1×','Chaque toucher sur la carte envoie '+GROUP+' × '+T.n+' à chaque adversaire et augmente ton revenu'))}
 function cacherFiche(){const f=$('fiche');f.hidden=true;f.textContent='';f.dataset.mode=''}
-function render(){const sx=bar.scrollLeft,tb=tab;requestAnimationFrame(()=>{if(tab==tb)bar.scrollLeft=sx});bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!VB().t.includes(pick))pick=null;
+var aideBat={vue:false};
+function render(){if(!projet)$('aideBat').hidden=true;const sx=bar.scrollLeft,tb=tab;requestAnimationFrame(()=>{if(tab==tb)bar.scrollLeft=sx});bar.textContent='';bar.className=tab=='t'?'':'mon';if(pick&&!VB().t.includes(pick))pick=null;
  if(lot&&(pick!==lot.a||!majLot()))lot=null;
  if(lot)ficheLot();else if(pick)remplirFiche('tour',pick.k,pick);else if(tab=='t'&&sel!=null)remplirFiche('construire',sel);else if(tab!='t'&&mon!=null)ficheMonstre(mon);else cacherFiche();
  const pal=$('paliers');pal.hidden=tab=='t';pal.textContent='';
@@ -1158,7 +1163,7 @@ function peutConstruire(x,y,k){const T=TW[k];if(x<0||y<0||x>=C||y>=R||P.g[y][x]|
  if(P.gold<T.c)return 'poor';
  P.g[y][x]=1;const nd=P.dist();P.g[y][x]=0;return nd[SP[1]][SP[0]]>=INF||genant(P,x,y,nd)?'blocked':''}
 function annulerProjet(){if(projet){projet=null;render()}}
-function confirmerConstruction(x,y){const k=projet.k;projet=null;render();
+function confirmerConstruction(x,y){const k=projet.k;projet=null;$('aideBat').hidden=true;render();
  if(NET.on){if(P.gold<TW[k].c){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr('poor');return}NET.act({type:'place',x,y,k},true);return}
  const e2=G.action(me,{type:'place',x,y,k});if(e2){P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(e2)}}
 /* toucher une case du terrain (au relâcher, sans avoir glissé) */
@@ -1176,7 +1181,7 @@ function act(cx,cy,direct){if(explore){const {x,y}=caseSous(cx,cy),tw=VB().t.fin
  if(err){projet=null;P.fx.push({type:'bad',x:x+.5,y:y+.5,t:.35,d:.35});showErr(err);return}
  /* Maj + clic (ordinateur, 2.24) : construit tout de suite, sans aperçu ; la tour reste choisie pour enchaîner */
  if(direct){projet={x,y,k:sel};confirmerConstruction(x,y);return}
- projet={x,y,k:sel};sfx('tap');$('toast').hidden=true;render()}
+ projet={x,y,k:sel};sfx('tap');$('toast').hidden=true;if(!aideBat.vue){aideBat.vue=true;$('aideBat').hidden=false}render()}
 /* Gestes sur le terrain (2.15) :
    - un toucher (relâché sans glisser) sur une case : aperçu, puis un 2e toucher sur la même case : construction ;
    - glisser le doigt (ou la souris, bouton appuyé) : en 3D, déplace la carte comme une appli de cartes (le terrain suit le doigt),
@@ -1316,7 +1321,7 @@ const LOGO_AN={
  construis:'<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="anOr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#9a6b12"/></linearGradient><linearGradient id="anGl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4fbff"/><stop offset="1" stop-color="#8fb6d9"/></linearGradient><linearGradient id="anRg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f07a52"/><stop offset="1" stop-color="#8a2410"/></linearGradient></defs><circle cx="50" cy="50" r="45" fill="#0b1626" stroke="url(#anOr)" stroke-width="7"/><circle cx="50" cy="50" r="36" fill="none" stroke="#9be7ff66" stroke-width="1.5" stroke-dasharray="3 4"/><path d="M30 78V46h3V30h7v6h6v-6h8v6h6v-6h7v16h3v32z" fill="url(#anGl)" stroke="#0b1626" stroke-width="2.5" stroke-linejoin="round"/><path d="M44 78V68a6 6 0 0 1 12 0v10z" fill="#0b1626"/><path d="M47 50h6v8h-6z" fill="#0b1626"/><path d="M30 46h40" stroke="#0b1626" stroke-width="2"/><g transform="rotate(38 64 52)"><rect x="61" y="40" width="7" height="46" rx="2.5" fill="#a0672e" stroke="#0b1626" stroke-width="2.5"/><rect x="50" y="27" width="29" height="15" rx="3" fill="url(#anOr)" stroke="#0b1626" stroke-width="2.5"/><path d="M53 31h23" stroke="#fff8" stroke-width="2" stroke-linecap="round"/></g><path d="M18 22l3 3m0-3l-3 3M80 16l3 3m0-3l-3 3" stroke="#eaf6ff" stroke-width="1.6" stroke-linecap="round"/></svg>',
  envoie:'<svg viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="anOr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff1b8"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#9a6b12"/></linearGradient><linearGradient id="anGl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4fbff"/><stop offset="1" stop-color="#8fb6d9"/></linearGradient><linearGradient id="anRg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f07a52"/><stop offset="1" stop-color="#8a2410"/></linearGradient></defs><circle cx="50" cy="50" r="45" fill="#1a0b10" stroke="url(#anOr)" stroke-width="7"/><g transform="rotate(-42 50 50)"><path d="M50 9l4.5 8v46h-9V17z" fill="url(#anGl)" stroke="#0b1626" stroke-width="2"/><path d="M38 63h24v6H38z" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/><path d="M47 69h6v13h-6z" fill="#6b3a1e" stroke="#0b1626" stroke-width="2"/><circle cx="50" cy="86" r="4" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/></g><g transform="rotate(42 50 50)"><path d="M50 9l4.5 8v46h-9V17z" fill="url(#anGl)" stroke="#0b1626" stroke-width="2"/><path d="M38 63h24v6H38z" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/><path d="M47 69h6v13h-6z" fill="#6b3a1e" stroke="#0b1626" stroke-width="2"/><circle cx="50" cy="86" r="4" fill="url(#anOr)" stroke="#0b1626" stroke-width="2"/></g><path d="M50 30l17 6v13c0 11-7 18-17 23-10-5-17-12-17-23V36z" fill="url(#anRg)" stroke="url(#anOr)" stroke-width="4" stroke-linejoin="round"/><path d="M50 40v20M42 47l16 6M58 47l-16 6" stroke="#ffe8dd" stroke-width="2.6" stroke-linecap="round"/></svg>'};
 let dep={ph:0,n:4,k:''},anT=0;
-function departReset(){dep={ph:0,n:4,k:''};clearTimeout(anT);const a=$('annonce');a.hidden=true;a.textContent=''}
+function departReset(){aideBat.vue=false;$('aideBat').hidden=true;dep={ph:0,n:4,k:''};clearTimeout(anT);const a=$('annonce');a.hidden=true;a.textContent=''}
 function annonce(type,n){const a=$('annonce');clearTimeout(anT);a.textContent='';a.className=type;a.hidden=false;
  if(type=='compte'){a.appendChild(elt('div','an-compte',String(n)));sfx('bip');vibrer(15);anT=setTimeout(()=>{a.hidden=true},900);return}
  const go=type=='envoie',d=go?2700:3000,lg=elt('div','an-logo');a.style.setProperty('--d',d+'ms');lg.innerHTML='<i class="an-rayons"></i>'+LOGO_AN[type];
