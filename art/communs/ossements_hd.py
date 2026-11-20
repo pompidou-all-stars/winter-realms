@@ -22,11 +22,12 @@ def yeux(t, y, z, ecart=.022, r=.006, col=OEIL):
 # ---------------------------------------------------------------- pièces portées (à la hauteur 1)
 def arc_long():
     """Arc d'os et de corne tenu à la verticale dans la main gauche tendue (plan YZ)."""
-    pts = [(-.012, -.3), (.0, -.28), (.035, -.15), (.045, 0), (.035, .15), (0, .28), (-.012, .3), (.018, .15), (.025, 0), (.018, -.15)]
-    a = profil('Arc', O.OS3, 'Main.L', pts, .012, pos=(.12, -.31, .79), rot=(0, 0, math.pi / 2))
-    corde = cone_o('Corde', '#9a9078', 'Main.L', (.12, -.26, .51), .0018, .0018, .56, seg=4)
-    fleche = cone_o('Fleche', '#4a3a2a', 'Main.R', (.12, -.04, .79), .003, .003, .3, rot=(math.pi / 2, 0, 0), seg=4)
-    pointe = cone_o('PointeFleche', O.FER2, 'Main.R', (.12, -.34, .79), .008, 0, .03, rot=(math.pi / 2, 0, 0), seg=4)
+    # 2.40 (retouche) : os clair, plus épais et plus grand, corde et flèche visibles
+    pts = [(-.02, -.34), (.0, -.31), (.05, -.17), (.065, 0), (.05, .17), (0, .31), (-.02, .34), (.026, .17), (.036, 0), (.026, -.17)]
+    a = profil('Arc', O.OS, 'Main.L', pts, .028, pos=(.12, -.31, .79), rot=(0, 0, math.pi / 2))
+    corde = cone_o('Corde', '#d8d0b8', 'Main.L', (.12, -.29, .46), .0035, .0035, .66, seg=4)
+    fleche = cone_o('Fleche', '#5a4a36', 'Main.R', (.12, -.02, .79), .006, .006, .34, rot=(math.pi / 2, 0, 0), seg=4)
+    pointe = cone_o('PointeFleche', '#a8a8b0', 'Main.R', (.12, -.36, .79), .014, 0, .045, rot=(math.pi / 2, 0, 0), seg=4)
     carquois = cone_o('Carquois', '#3a2a22', 'Torse', (.05, .07, .55), .028, .03, .24, rot=(-.25, -.3, 0), seg=8)
     return [a, corde, fleche, pointe, carquois]
 

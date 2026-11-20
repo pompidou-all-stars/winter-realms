@@ -80,11 +80,13 @@ def tabard(J, col=BLEU, liseré=OR):
 
 def arbalete(J):
     m = J['poignet.L']; z = m.z + .02
-    return [cone_o('Fut', CHENE, 'Main.G', (0, -.08, z), .014, .012, .3, rot=(math.pi / 2, 0, 0), seg=6),
-            profil('Arc', FER2, 'Main.G', [(-.13, 0), (-.07, .025), (0, .035), (.07, .025), (.13, 0), (.07, .012), (0, .02), (-.07, .012)], .012,
-                   pos=(0, -.36, z), rot=(math.pi / 2, 0, 0)),
-            cone_o('Corde', '#9a9078', 'Main.G', (-.125, -.36, z + .004), .002, .002, .25, rot=(0, math.pi / 2, 0), seg=4),
-            cone_o('Carreau', '#4a3a2a', 'Main.G', (0, -.2, z + .016), .004, .004, .2, rot=(math.pi / 2, 0, 0), seg=4)]
+    # 2.40 (retouche) : plus épaisse et plus contrastée, pour rester lisible à la taille du jeu
+    return [cone_o('Fut', '#8a6440', 'Main.G', (0, -.06, z), .024, .02, .34, rot=(math.pi / 2, 0, 0), seg=6),
+            profil('Arc', '#a4a6ae', 'Main.G', [(-.18, -.01), (-.1, .03), (0, .05), (.1, .03), (.18, -.01), (.1, .012), (0, .028), (-.1, .012)], .03,
+                   pos=(0, -.38, z), rot=(math.pi / 2, 0, 0)),
+            cone_o('Corde', '#e0d8c0', 'Main.G', (-.172, -.37, z + .004), .004, .004, .344, rot=(0, math.pi / 2, 0), seg=4),
+            cone_o('Carreau', '#3a2a1e', 'Main.G', (0, -.16, z + .03), .008, .008, .26, rot=(math.pi / 2, 0, 0), seg=4),
+            cone_o('PointeCarreau', '#c8ccd4', 'Main.G', (0, -.42, z + .03), .016, 0, .04, rot=(math.pi / 2, 0, 0), seg=4)]
 
 def arbaletrier(nom, H=.36):
     bl, br = P.pose_arbalete(); J = P.joints(bl, br)
@@ -172,23 +174,36 @@ def hallebardiers(nom):
     return finir(r)
 
 def lance_filets(nom):
-    """2 · Lance-filets : affût de chêne sur roues ferrées, tube à ressort de fer, filets lestés enroulés."""
+    """2 · Lance-filets (2.40, retouche) : un filet lesté sèche, déplié sur un râtelier de chêne, derrière une arbalète à
+    tromblon : gueule de bronze évasée hérissée de quatre plombs, prête à projeter le filet replié."""
     c, r, z = debut(nom)
-    for sx in (-1, 1):
-        for sy in (-1, 1):
-            cylindre(f'Roue{sx}{sy}', CHENE2, .07, .07, .025, 10, (sx * .2, sy * .14, z + .07), r, rot=(0, math.pi / 2, 0))
-            anneau(f'Bandage{sx}{sy}', FER, .07, .008, 10, 3, (sx * .2 + sx * .013, sy * .14, z + .07), r, (0, math.pi / 2, 0), metal=.5)
-    boite('Chassis', CHENE, .36, .34, .06, (0, 0, z + .12), .006, r)
-    t = pivot('Tourelle', (0, 0, z + .18), r)
-    boite('Socle', CHENE2, .16, .16, .1, (0, 0, .05), .006, t)
-    cylindre('Tube', FER, .055, .06, .36, 10, (0, .08, .14), t, rot=(math.pi / 2 + .45, 0, 0), metal=.6, rough=.45)
-    for k in range(3): anneau(f'Frette{k}', OR, .064, .009, 10, 3, (0, .08 - k * .11, .14 + k * .05), t, (math.pi / 2 + .45, 0, 0), metal=.5)
+    # râtelier : deux poteaux, une perche, le filet déplié en grille de cordes, plombs au bas
+    for s in (-1, 1):
+        cylindre(f'Poteau{s}', CHENE2, .018, .016, .5, 6, (s * .25, .24, z), r)
+    cylindre('Perche', CHENE, .014, .014, .56, 6, (-.28, .24, z + .48), r, rot=(0, math.pi / 2, 0))
+    for k in range(7):
+        x = -.21 + k * .07
+        cylindre(f'CordeV{k}', '#c2b28c', .005, .005, .36 - (k % 2) * .03, 4, (x, .24, z + .1 + (k % 2) * .03), r)
+        sphere(f'Plomb{k}', FER2, .014, (x, .24, z + .09 + (k % 2) * .03), (1, 1, 1), 6, 4, r, metal=.5)
+    for k in range(5):
+        cylindre(f'CordeH{k}', '#c2b28c', .005, .005, .44, 4, (-.22, .24, z + .14 + k * .075), r, rot=(0, math.pi / 2, 0))
+    # affût à deux roues ferrées
+    for s in (-1, 1):
+        cylindre(f'Roue{s}', CHENE2, .085, .085, .03, 12, (s * .17, -.02, z + .085), r, rot=(0, math.pi / 2, 0))
+        anneau(f'Bandage{s}', FER, .085, .01, 12, 3, (s * .185, -.02, z + .085), r, (0, math.pi / 2, 0), metal=.5)
+    cylindre('Essieu', FER, .014, .014, .36, 6, (-.18, -.02, z + .085), r, rot=(0, math.pi / 2, 0), metal=.5)
+    boite('Fleche', CHENE, .06, .3, .05, (0, .12, z + .06), .006, r, (-.25, 0, 0))
+    t = pivot('Tourelle', (0, -.02, z + .14), r)
+    boite('Berceau', CHENE2, .12, .22, .06, (0, .02, .03), .006, t)
+    # tromblon : fût de bronze qui s'évase en gueule, quatre plombs en croix sur le bord, filet replié qui dépasse
+    cylindre('Fut', '#8a6a3a', .045, .05, .2, 12, (0, .1, .1), t, rot=(math.pi / 2 - .35, 0, 0), metal=.6, rough=.4)
+    cylindre('Gueule', '#9a7a44', .06, .11, .1, 14, (0, -.09, .17), t, rot=(math.pi / 2 - .35, 0, 0), metal=.6, rough=.4)
+    for k in range(3): anneau(f'Frette{k}', FER, .052, .01, 12, 3, (0, .06 - k * .05, .115 + k * .018), t, (math.pi / 2 - .35, 0, 0), metal=.5)
+    sphere('FiletReplie', '#b0a07c', .085, (0, -.16, .2), (1, .5, 1), 10, 6, t)
     for k in range(4):
-        a = k * math.pi / 2
-        sphere(f'Lest{k}', FER2, .02, (math.cos(a) * .04, -.25 + math.sin(a) * .0, .3 + math.sin(a) * .04), (1, 1, 1), 6, 4, t, metal=.5)
-    for k in range(2):
-        sphere(f'Filet{k}', '#7a6a4e', .07, (.13 * (k * 2 - 1), .15, -.01), (1, 1, .55), 9, 5, t)
-        anneau(f'Maille{k}', '#5a4c38', .06, .006, 10, 3, (.13 * (k * 2 - 1), .15, .02), t)
+        a = k * math.pi / 2 + math.pi / 4
+        sphere(f'Lest{k}', FER2, .022, (math.cos(a) * .11, -.2, .2 + math.sin(a) * .1), (1, 1, 1), 7, 5, t, metal=.5)
+        cylindre(f'Bride{k}', '#c2b28c', .004, .004, .1, 4, (math.cos(a) * .05, -.17, .2 + math.sin(a) * .045), t, rot=(0, math.pi / 2, a))
     return finir(r)
 
 def trebuchet(nom):

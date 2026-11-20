@@ -13,7 +13,7 @@ from .neige import enneiger
 
 GRANIT, GRANIT2, NUIT = '#77706a', '#58524d', '#1b1a1c'
 FER, FER2, CUIVRE, LAITON = '#323134', '#4d4b50', '#8a5634', '#9a7c3e'
-RUNE, BRAISE, CHENE = '#ff8a2a', '#ffb050', '#4a3526'
+RUNE, BRAISE, CHENE, CHENE2 = '#ff8a2a', '#ffb050', '#4a3526', '#33251b'
 NAIN, BARBE, BARBE2 = '#b08068', '#8a4a2a', '#c8c0b0'
 SOL = .12
 
@@ -72,10 +72,12 @@ def arbaletrier_nain(nom, H=.32):
     bl, br = P.pose_arbalete('nain'); J = P.joints(bl, br, 'nain')
     m = J['poignet.L']; z = m.z + .02
     p = casque_nain(J) + P.ceinture(J, '#2a1e16', LAITON, 'nain')
-    p += [cone_o('Fut', CHENE, 'Main.G', (0, -.06, z), .02, .018, .32, rot=(math.pi / 2, 0, 0), seg=6),
-          plaque('Chargeur', FER2, 'Main.G', (0, -.2, z + .05), .04, .14, .05),
-          profil('Arc', FER2, 'Main.G', [(-.14, 0), (-.07, .03), (0, .04), (.07, .03), (.14, 0), (.07, .015), (0, .025), (-.07, .015)], .014,
-                 pos=(0, -.36, z), rot=(math.pi / 2, 0, 0)),
+    # 2.40 (retouche) : plus épaisse et plus contrastée (acier clair, chargeur de laiton)
+    p += [cone_o('Fut', '#7a5434', 'Main.G', (0, -.04, z), .028, .024, .36, rot=(math.pi / 2, 0, 0), seg=6),
+          plaque('Chargeur', LAITON, 'Main.G', (0, -.2, z + .06), .05, .16, .06),
+          profil('Arc', '#a4a6ae', 'Main.G', [(-.2, -.01), (-.1, .035), (0, .055), (.1, .035), (.2, -.01), (.1, .014), (0, .03), (-.1, .014)], .034,
+                 pos=(0, -.4, z), rot=(math.pi / 2, 0, 0)),
+          cone_o('Corde', '#e0d8c0', 'Main.G', (-.19, -.39, z + .005), .004, .004, .38, rot=(0, math.pi / 2, 0), seg=4),
           cone_o('Manivelle', LAITON, 'Main.G', (.04, -.14, z + .02), .006, .006, .07, rot=(0, math.pi / 2, 0), seg=4)]
     return P.humain_statue(nom, J, g='nain', pieces=p, H=H, tri=1600, taille=256, peau=NAIN, habit='#4a3a34', habit2='#3a2e2a',
                            cuir='#2a201a', gants='#3a2e26', barbe=BARBE, jupe=.1, relief=P.RELIEF_PEAU)
@@ -219,19 +221,52 @@ def enclume(nom):
     HD.poser(forgeron(nom + '_forgeron'), t, (0, 0, 0), (0, 0, -.5))
     return finir(r)
 
+def mine_runique(nom, parent, pos, r=.05, rot=0.0):
+    """Mine runique : demi-sphère de fer posée sur une semelle, couronne de pointes, rune de forge allumée au sommet."""
+    x, y, z = pos
+    cylindre(nom + 'Semelle', FER, r * 1.1, r * 1.15, r * .25, 10, (x, y, z), parent, metal=.5)
+    sphere(nom + 'Dome', FER2, r, (x, y, z + r * .25), (1, 1, .75), 10, 5, parent, metal=.55, rough=.45)
+    for k in range(6):
+        a = k * math.pi / 3 + rot
+        cone(f'{nom}Pique{k}', LAITON, r * .16, r * .55, 4, (x + math.cos(a) * r * .72, y + math.sin(a) * r * .72, z + r * .5), parent,
+             (math.sin(a) * -.9, math.cos(a) * .9, 0), metal=.6)
+    anneau(nom + 'Cercle', RUNE, r * .45, r * .07, 10, 3, (x, y, z + r * .98), parent, emis=1.6)
+    sphere(nom + 'Rune', BRAISE, r * .2, (x, y, z + r * 1.0), (1, 1, .5), 6, 3, parent, emis=2.2)
+
 def mines(nom):
-    """8 · Champ de mines : caisses de poudre, fourneau de charge, mines runiques en couronne prêtes à être posées."""
+    """8 · Champ de mines (2.40, retouche) : poste de sapeurs. Chèvre de levage en fer qui descend une mine au bout de sa
+    chaîne, chariot chargé de mines, caisses de poudre marquées de la rune, mines déjà posées dans la neige, fanion de
+    danger rouge et jaune."""
     c, r, z = debut(nom)
-    for k, (x, y, s) in enumerate(((-.14, .14, .16), (.06, .18, .13), (-.05, .02, .11))):
-        boite(f'Caisse{k}', CHENE, s, s * .8, s * .7, (x, y, z + s * .35), .006, r, (0, 0, k * .3))
-        boite(f'Cerclage{k}', FER, s * 1.02, s * .82, .012, (x, y, z + s * .35), 0, r, (0, 0, k * .3), metal=.5)
-    for k in range(5):
-        a = k * 2 * math.pi / 5 + .3
-        x, y = math.cos(a) * .25, math.sin(a) * .22 - .05
-        cylindre(f'Mine{k}', FER2, .045, .05, .03, 10, (x, y, z), r, metal=.5)
-        sphere(f'Detonateur{k}', RUNE, .012, (x, y, z + .035), (1, 1, .6), 6, 3, r, emis=1.6)
-    t = pivot('Tourelle', (.15, -.05, z), r)
-    cylindre('Baril', CHENE, .05, .05, .14, 10, (0, 0, 0), t)
+    # chariot de mines
+    boite('Plateau', CHENE, .26, .18, .03, (-.16, .17, z + .08), .004, r)
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            cylindre(f'RoueC{sx}{sy}', CHENE2, .045, .045, .02, 10, (-.16 + sx * .12, .17 + sy * .07, z + .045), r, rot=(0, math.pi / 2, 0))
+    for k in range(3): mine_runique(f'MineChariot{k}', r, (-.24 + k * .08, .17, z + .095), .036, k * .5)
+    # caisses de poudre
+    for k, (x, y, s, a) in enumerate(((.2, .2, .13, .2), (.25, .06, .1, -.3))):
+        boite(f'Caisse{k}', CHENE, s, s * .8, s * .7, (x, y, z + s * .35), .006, r, (0, 0, a))
+        boite(f'Cerclage{k}', FER, s * 1.02, s * .82, .012, (x, y, z + s * .35), 0, r, (0, 0, a), metal=.5)
+        boite(f'Marque{k}', RUNE, s * .3, .004, s * .3, (x + math.sin(a) * s * .41, y - math.cos(a) * s * .41, z + s * .4), 0, r, (0, 0, a), emis=1.2)
+    # mines déjà posées, à demi enfoncées
+    for k, (x, y) in enumerate(((-.22, -.2), (.02, -.27), (.24, -.18))):
+        mine_runique(f'MinePosee{k}', r, (x, y, z - .01), .045, k)
+    # fanion de danger
+    cylindre('Hampe', CHENE2, .008, .008, .36, 5, (-.3, -.04, z), r)
+    prisme('Fanion', '#a8302a', [(0, 0), (.12, -.03), (0, -.07)], .005, (-.3, -.04, z + .35), r)
+    prisme('Bande', '#d8b040', [(0, -.025), (.06, -.035), (0, -.045)], .007, (-.3, -.04, z + .35), r)
+    # chèvre de levage : trépied de fer, flèche qui pivote vers la case visée, mine pendue à sa chaîne
+    for k in range(3):
+        a = k * 2 * math.pi / 3 + .5
+        cylindre(f'Pied{k}', FER2, .014, .012, .55, 6, (.02 + math.cos(a) * .14, .0 + math.sin(a) * .14, z), r,
+                 rot=(math.sin(a) * .26, -math.cos(a) * .26, 0), metal=.5)
+    t = pivot('Tourelle', (.02, 0, z + .5), r)
+    cylindre('Treuil', LAITON, .035, .035, .08, 10, (-.04, .05, 0), t, rot=(0, math.pi / 2, 0), metal=.6)
+    boite('Fleche', FER2, .035, .34, .035, (0, -.12, .03), .004, t, (.15, 0, 0), metal=.5)
+    chaine_y = -.26
+    for k in range(6): anneau(f'Chaine{k}', FER, .012, .004, 6, 3, (0, chaine_y, .03 - k * .03), t, ((k % 2) * math.pi / 2, 0, 0), metal=.6)
+    mine_runique('MinePendue', t, (0, chaine_y, -.24), .048)
     return finir(r)
 
 def grondeterre(nom):

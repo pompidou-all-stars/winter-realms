@@ -78,10 +78,12 @@ def archer_elfe(nom, H=.4, long_arc=False):
     hc = J['tete'] + Vector((0, 0, .06 * .95))
     L = .5 if long_arc else .34
     m = J['poignet.L']
-    pts = [(-.012, -L), (0, -L * .93), (.03, -L * .5), (.04, 0), (.03, L * .5), (0, L * .93), (-.012, L), (.016, L * .5), (.024, 0), (.016, -L * .5)]
-    p = [profil('Arc', ECORCE3, 'Main.G', pts, .012, pos=tuple(m + Vector((0, -.02, .0))), rot=(0, 0, math.pi / 2)),
-         cone_o('Corde', '#c8c0a8', 'Main.G', tuple(m + Vector((0, .0, -L * .95))), .0018, .0018, L * 1.9, seg=4),
-         cone_o('Fleche', ECORCE2, 'Main.R', tuple(J['poignet.R'] + Vector((0, .02, 0))), .003, .003, .38, rot=(math.pi / 2, 0, .0), seg=4),
+    # 2.40 (retouche) : if clair à poignée d'argent, plus épais ; corde et flèche visibles
+    pts = [(-.02, -L), (0, -L * .93), (.045, -L * .5), (.06, 0), (.045, L * .5), (0, L * .93), (-.02, L), (.024, L * .5), (.034, 0), (.024, -L * .5)]
+    p = [profil('Arc', '#9a7a54', 'Main.G', pts, .026, pos=tuple(m + Vector((0, -.02, .0))), rot=(0, 0, math.pi / 2)),
+         plaque('Poignee', ARGENT, 'Main.G', tuple(m + Vector((0, -.05, 0))), .03, .03, .06),
+         cone_o('Corde', '#e6e0cc', 'Main.G', tuple(m + Vector((0, .0, -L * .95))), .0035, .0035, L * 1.9, seg=4),
+         cone_o('Fleche', '#6a5238', 'Main.R', tuple(J['poignet.R'] + Vector((0, .02, 0))), .006, .006, .4, rot=(math.pi / 2, 0, .0), seg=4),
          boule('Capuche', CAPE, 'Tete', tuple(hc + Vector((0, .012, .012))), .07, ech=(1, 1.1, 1.05), seg=12),
          cone_o('PointeCapuche', CAPE, 'Tete', tuple(hc + Vector((0, .06, .03))), .03, .004, .1, rot=(1.9, 0, 0), seg=6),
          cone_o('Carquois', ECORCE2, 'Torse', tuple(J['poitrine'] + Vector((-.06, .1, -.12))), .03, .034, .26, rot=(-.25, .35, 0), seg=8)]
