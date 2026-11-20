@@ -80,6 +80,9 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.39 — style peint — 2026-11-20
+- Common painted style for every 3D model (towers, monsters, portal, castle): toon shading in 4 steps, a cold rim light on the edges and a thin dark outline of constant on-screen width, so silhouettes stand out from the snow on a phone. Applied when models load: no model regenerated. Add `?style=0` to the address to get the previous look. Costs about 1.7× more draw calls (to check on a low-end phone). Rendering only: `sim.js` unchanged.
+
 ### 2.38 — quêtes bonus — 2026-11-19
 - Bonus quests: short challenges drawn at random during the game (first at 1:30, then one every 3 to 4 min), with funny titles. Races (the first to reach the goal wins): "Clicker fou" (place 10 more towers; never drawn when someone has no room left), "Le facteur sonne toujours 4 fois" (be the first to get 4 of your own monsters through to an opponent; every monster now remembers who sent it), "Gonflette" (upgrade a tower to a level above the best current one), "Frozen" (own N frost towers, N above the current best), "Le gros cadeau" (send a boss). Snapshots (best score when time runs out): "Qui a la plus grosse ?" (longest maze), "Picsou" (most gold in the bank), "Pigeons voyageurs" (most gold sent as flyers), "Bling-bling" (most expensive tower), "Mamie Gâteau" (lowest income: a catch-up gift). No race can already be won when it starts. Reward: gold, 8 × the average income (at least 100), shared on a tie.
 - Banner when a quest starts (title, rule, reward), a tracking pill under the top bar (time left, your score and rank, green when you lead; tap it for the rule), and a banner announcing the winner. "Quêtes" column in the end-of-game table.

@@ -140,6 +140,64 @@ export function creer(J) {
   const contre = new THREE.DirectionalLight('#cfe0ff', .8); contre.position.set(C / 2 + 3, 8, -6); contre.target.position.set(C / 2, 0, R / 2);
   scene.add(contre, contre.target);
 
+  /* ---------- style « peint » commun à tous les modèles (2.39) ----------
+     1. ombres en paliers (matériau « toon ») : la lumière du soleil passe par 4 paliers au lieu d'un dégradé ;
+     2. liseré de lumière froide sur les bords tournés à l'opposé de la caméra (rim light) : la silhouette se détache de la neige ;
+     3. contour sombre d'épaisseur constante à l'écran (coque inversée, en pixels) : lisible même à 30 pixels par case.
+     Désactivable avec ?style=0 (comparaison, ou téléphone trop lent). Les pièces lumineuses (« Lueur… ») ne sont pas touchées. */
+  const STYLE = !/[?&]style=0\b/.test(location.search);
+  const PALIERS = (() => { const d = new Uint8Array([90, 160, 215, 255]); const t = new THREE.DataTexture(d, d.length, 1, THREE.RedFormat);
+    t.minFilter = t.magFilter = THREE.NearestFilter; t.generateMipmaps = false; t.needsUpdate = true; return t })();
+  const RIM = {value: new THREE.Color('#d8e9ff').multiplyScalar(.42)};
+  const RESOL = {value: new THREE.Vector2(1, 1)}, LARGEUR = {value: 1.15};   // épaisseur du contour, en pixels CSS
+  const contourMat = new THREE.ShaderMaterial({
+    uniforms: {uRes: RESOL, uLargeur: LARGEUR, uCouleur: {value: new THREE.Color('#1a2233')}},
+    vertexShader: `#include <common>
+#include <skinning_pars_vertex>
+uniform vec2 uRes; uniform float uLargeur;
+void main() {
+#include <beginnormal_vertex>
+#include <skinbase_vertex>
+#include <skinnormal_vertex>
+#include <begin_vertex>
+#include <skinning_vertex>
+#include <project_vertex>
+  vec4 cn = projectionMatrix * vec4(normalize(normalMatrix * objectNormal), 0.0);
+  vec2 d = cn.xy; float l = length(d); if (l > 1e-5) gl_Position.xy += d / l * uLargeur * gl_Position.w * 2.0 / uRes;
+}`,
+    fragmentShader: `uniform vec3 uCouleur; void main() { gl_FragColor = vec4(uCouleur, 1.0); }`,
+    side: THREE.BackSide});
+  const versToon = new Map();
+  function toon(m) {
+    if (versToon.has(m)) return versToon.get(m);
+    const t = new THREE.MeshToonMaterial({name: m.name, color: m.color, map: m.map, normalMap: m.normalMap, normalScale: m.normalScale,
+      vertexColors: m.vertexColors, emissive: m.emissive, emissiveMap: m.emissiveMap, emissiveIntensity: m.emissiveIntensity,
+      transparent: m.transparent, opacity: m.opacity, alphaTest: m.alphaTest, side: m.side, gradientMap: PALIERS});
+    t.onBeforeCompile = s => {
+      s.uniforms.uRim = RIM;
+      s.fragmentShader = 'uniform vec3 uRim;\n' + s.fragmentShader.replace('#include <opaque_fragment>', `{
+  vec3 vd = isOrthographic ? vec3(0.0, 0.0, 1.0) : normalize(vViewPosition);
+  float r = smoothstep(0.55, 0.95, 1.0 - saturate(dot(normal, vd)));
+  outgoingLight += uRim * r * (0.4 + 0.6 * diffuseColor.rgb);
+}
+#include <opaque_fragment>`);
+    };
+    versToon.set(m, t); return t;
+  }
+  function styliser(racine) {
+    const l = []; racine.traverse(o => { if (o.isMesh && !o.userData.contour) l.push(o) });
+    for (const o of l) {
+      if (!o.material || (o.material.name || '').startsWith('Lueur')) continue;
+      o.material = toon(o.material);
+      let c;
+      if (o.isSkinnedMesh) { c = new THREE.SkinnedMesh(o.geometry, contourMat); c.bind(o.skeleton, o.bindMatrix) } else c = new THREE.Mesh(o.geometry, contourMat);
+      c.userData.contour = true; c.castShadow = c.receiveShadow = false; c.frustumCulled = o.frustumCulled; o.add(c);
+    }
+  }
+  /* avant chaque rendu : taille réelle du canevas (en pixels CSS) pour l'épaisseur du contour */
+  const tailleTmp = new THREE.Vector2();
+  function majContour(r) { r.getSize(tailleTmp); RESOL.value.copy(tailleTmp) }
+
   /* ---------- modèles ---------- */
   const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
   const cache = new Map(), prets = new Map();
@@ -152,6 +210,7 @@ export function creer(J) {
         if (m && m.name && m.name.startsWith('Lueur')) { m.emissiveIntensity = 1.6; o.castShadow = false }
         if (m) m.roughness = Math.max(.55, m.roughness);
       });
+      if (STYLE) styliser(g.scene);
       prets.set(url, g); return g;
     }).catch(e => { console.warn('Modèle 3D introuvable : ' + url, e); prets.set(url, null); return null }));
     return cache.get(url);
@@ -406,7 +465,7 @@ export function creer(J) {
   function creerTour(t, fantome) {
     const g = modele(urlTour(t.k)); if (g === undefined) return null;
     const o = g ? g.scene.clone(true) : repliTour(t.k);
-    if (fantome) o.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = .55; m.material.depthWrite = false; m.castShadow = false } });
+    if (fantome) o.traverse(m => { if (m.userData.contour) m.visible = false; else if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = .55; m.material.depthWrite = false; m.castShadow = false } });
     const r = new THREE.Group(); r.add(o);
     const anim = {};
     for (const n of ['Tourelle', 'Cristal', 'Eclats', 'Flamme', 'Anneaux', 'Orbe', 'AnneauFlottant']) anim[n] = o.getObjectByName(n) || null;
@@ -466,7 +525,7 @@ export function creer(J) {
     const g = modele(urlMonstre(c.k)); if (g === undefined) return null;
     const T = CR[c.k];
     const o = g ? g.scene.clone(true) : repliMonstre(c.k); o.scale.setScalar(echMonstre(c.k) * (g ? echelleModele(c.k) : 1));
-    if (T.inv) o.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true } });
+    if (T.inv) o.traverse(m => { if (m.userData.contour) m.visible = false; else if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true } });
     const r = new THREE.Group(); r.add(o);
     let mixer = null;
     if (g && g.animations.length) { mixer = new THREE.AnimationMixer(o); const a = mixer.clipAction(g.animations[0]); a.play(); a.time = (c.ph || 0) % g.animations[0].duration }
@@ -604,7 +663,7 @@ export function creer(J) {
 
     /* caméra : rotation et élan (voir l'en-tête) */
     bougerCamera(dt);
-    renderer.render(scene, cam);
+    majContour(renderer); renderer.render(scene, cam);
   }
   function taille(w, h, dpr) { renderer.setPixelRatio(Math.min(2, dpr)); renderer.setSize(w, h, true) }
   /* point du monde (gx, gz au sol, hauteur h) → pixels du canevas */
@@ -629,7 +688,7 @@ export function creer(J) {
       o.position.sub(ct.applyAxisAngle(new THREE.Vector3(0, 1, 0), -piv.rotation.y)); rv.s.add(piv);
       const dist = rad / Math.sin(rv.c.fov * Math.PI / 360) * (type === 'tour' ? .78 : .72);
       rv.c.aspect = w / h; rv.c.position.set(0, dist * .38, dist * .92); rv.c.lookAt(0, type === 'tour' ? -rad * .05 : 0, 0); rv.c.updateProjectionMatrix();
-      rv.r.setPixelRatio(2); rv.r.setSize(w, h, false); rv.r.render(rv.s, rv.c);
+      rv.r.setPixelRatio(2); rv.r.setSize(w, h, false); majContour(rv.r); rv.r.render(rv.s, rv.c);
       const url = rv.r.domElement.toDataURL('image/png'); rv.s.remove(piv); return url;
     }).catch(e => { console.warn(e); return null });
     vignettes.set(cle, p); return p;
