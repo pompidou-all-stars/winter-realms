@@ -1,4 +1,4 @@
-/* Races asymétriques (2.39) : règles d'équilibrage centrales (CLAUDE.md §5.3), mécaniques propres, états et combos.
+/* Races asymétriques (2.40) : règles d'équilibrage centrales (CLAUDE.md §5.3), mécaniques propres, états et combos.
    Toute nouvelle race (ou retouche) doit passer ces règles ; le banc des races (tests/outils/banc-races.js) vérifie l'équilibre en partie. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');

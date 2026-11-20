@@ -35,7 +35,7 @@ test('Armure : retire un montant fixe par coup mais garde au moins 20 % des dég
  assert.equal(c.arm,5);proche(perte(b,c,10,10),5,'10 dégâts − 5');proche(perte(b,c,3,10),.6,'3 dégâts → plancher de 20 %');
 });
 test('Armure : elle grandit avec le temps comme les PV (× 1 + temps/200)',()=>{const b=terrain();const c=apparaitre(S,b,S.TURT,1.5);assert.equal(c.arm,7.5)});
-/* 2.39 : les anciens bonus de faction (perforant, anti-aérien, frénésie, malédiction) sont remplacés par les mécaniques des races : voir races.test.js */
+/* 2.40 : les anciens bonus de faction (perforant, anti-aérien, frénésie, malédiction) sont remplacés par les mécaniques des races : voir races.test.js */
 test('Trébuchet (zone au sol) : 60 % des dégâts autour, dans son rayon, sol uniquement',()=>{const b=terrain();
  const a=fort(apparaitre(S,b,0)),v=fort(apparaitre(S,b,0)),loin=fort(apparaitre(S,b,0)),vol=fort(apparaitre(S,b,S.FLY[0]));
  for(const [c,x,y] of [[a,6,5],[v,6.5,5.5],[loin,6,7],[vol,6.3,5.2]])Object.assign(c,{x,y,tx:6,ty:5});

@@ -1,4 +1,4 @@
-/* Tables d'équilibrage : forme des tables et cohérence des 50 tours avec leur définition dans RACES (2.39).
+/* Tables d'équilibrage : forme des tables et cohérence des 50 tours avec leur définition dans RACES (2.40).
    Les chiffres eux-mêmes peuvent changer librement (équilibrage) ; les règles d'équilibrage sont vérifiées dans races.test.js. */
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');

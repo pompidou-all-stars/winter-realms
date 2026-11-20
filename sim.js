@@ -8,10 +8,10 @@ const BASE_TW=[
  {n:'Garde',c:30,r:1.5,d:20,cd:.55,me:1,gr:1,col:'#c0392b',s:'slash',tag:'sol'},
  {n:'Flammes',c:70,r:2,d:3,cd:.12,fl:1,col:'#e67e22',s:'flame'}];
 /* ralentissements selon le niveau de la tour (2.18), du niveau 1 au niveau 5. p : part de vitesse retirée, d : durée (s), r : rayon de la zone du Givre (cases).
-   Deux familles : le froid (Givre, Totem des pluies glacées) et les racines ; elles s'additionnent, mais la vitesse ne descend jamais sous SF_MIN (règle d'or n°1, 2.39). */
+   Deux familles : le froid (Givre, Totem des pluies glacées) et les racines ; elles s'additionnent, mais la vitesse ne descend jamais sous SF_MIN (règle d'or n°1, 2.40). */
 const GIVRE_BONUS=.1,SF_MIN=.3;
 const GIVRE_LV={p:[.2,.275,.35,.425,.5],d:[1.5,1.8,2.1,2.4,2.7],r:[1.2,1.4,1.6,1.8,2]},RACINES_LV={p:[.1,.15,.2,.25,.3],d:[.72,.85,1,1.15,1.3]};
-/* ---------- 2.39 : races asymétriques ----------
+/* ---------- 2.40 : races asymétriques ----------
    Chaque race a sa mécanique propre, ses états et ses combos, et 10 tours qui couvrent une grille de rôles commune (ROLES_J).
    L'emplacement j fixe le RÔLE (utilisé par l'IA et par la fiche), pas l'archétype : skin ne sert qu'au dessin 2D et au repli 3D.
    Règles d'équilibrage centrales (voir CLAUDE.md §5 et tests/simulation/races.test.js) :
@@ -132,7 +132,7 @@ const RACES=[
    {n:'Colosse d’os',skin:4,u:1,no:1,c:260,r:3,cd:45,col:{am:15,d:60,t:12},txt:'Ultime, un seul par terrain. Dépense 15 âmes : un colosse d’os remonte le chemin et écrase tout autour de lui.'}]}];
 const FACTIONS=RACES;
 for(const F of RACES)F.towers=F.tours.map(o=>o.n);
-/* ancienne table (avant 2.39), gardée pour compatibilité : l'emplacement j donnait l'archétype */
+/* ancienne table (avant 2.40), gardée pour compatibilité : l'emplacement j donnait l'archétype */
 const ARCH=[0,4,2,1,5,3,0,4,2,3],ROLE=ROLES_J;
 /* estimation des dégâts par seconde (niveau 1, une cible, poison compris) et facteur de zone, pour l'IA et la fiche */
 function estimer(T){const tir=T.no?0:T.d/T.cd,dot=T.dot=(T.pz?Math.min(DOSE_MAX,T.pz/T.cd*4)*T.pv:0)+(T.bu||0)+(T.pe?T.pe*.6:0);
@@ -245,13 +245,13 @@ const HPK=.55,GRACE=30,GROUP=4,
  BUILD_OR=50,BUILD_MIN=.5,BUILD_MAX=8,BUILD_DIFF=[1,1.25,1.5],buildT=(c,m=1)=>Math.min(BUILD_MAX,Math.max(BUILD_MIN,c/BUILD_OR))*m,flyH=k=>CR[k].fly?CR[k].z*.35:0;
 /* vitesse d'un monstre ralenti : le froid et les racines s'additionnent */
 const ralentir=c=>{c.sl=Math.max(c.gt||0,c.rt||0,c.im||0,c.hx||0);c.sf=c.im>0?0:Math.max(SF_MIN,1-(c.gt>0?c.gp:0)-(c.rt>0?c.rp:0))*(c.hx>0?.6:1)};
-/* 2.39 : un volant abattu (filet) compte comme au sol ; cible(T, c) : la tour T peut-elle toucher le monstre c (sol, air, anti-magie) */
+/* 2.40 : un volant abattu (filet) compte comme au sol ; cible(T, c) : la tour T peut-elle toucher le monstre c (sol, air, anti-magie) */
 const vole=c=>CR[c.k].fly&&!(c.ab>0),cible=(T,c)=>!(T.gr&&vole(c))&&!(T.ao&&!CR[c.k].fly)&&!(T.mag&&CR[c.k].mi);
 /* durées des états des races (décomptées à chaque pas) ; etats(c) : les états d'un monstre en bits, pour l'affichage et l'instantané du serveur */
 const ETATS_T=['mk','ma','im','imI','hx','hxI','ab','tw','pt','sgT','bsT','bu','pe','cx'],
  etats=c=>(c.sl>0?1:0)|(c.h?2:0)|(c.hl?4:0)|(c.hid?8:0)|(c.pz>0?16:0)|(c.mk>0?32:0)|(c.ma>0?64:0)|(c.im>0?128:0)|(c.tw>0?256:0)|(c.bs>0?512:0)|(c.bu>0?1024:0)|(c.pe>0?2048:0)|(c.hx>0?4096:0)|(c.ab>0?8192:0)|(c.sgT>0?16384:0),
  SERVITEUR={n:'Mort relevé',d:0},SERVITEUR_PESTE={n:'Mort relevé',d:0,pe:4};
-/* 2.39 : xd, xr = bonus de la tour (Cohésion, auras, Croissance, Chauffe, Rage) ; les Nains (Forge) paient leurs améliorations FORGE × le prix */
+/* 2.40 : xd, xr = bonus de la tour (Cohésion, auras, Croissance, Chauffe, Rage) ; les Nains (Forge) paient leurs améliorations FORGE × le prix */
 const dmg=t=>TW[t.k].d*2**(t.lv-1)*(t.xd||1),rng=t=>TW[t.k].r*(1+.05*(t.lv-1))*(t.xr||1),upCost=t=>Math.round(TW[t.k].c*1.5*2**(t.lv-1)*(TW[t.k].faction==3?FORGE:1)/5)*5,topY=t=>.28+.045*(t.lv-1);
 /* 2.38 : quêtes bonus. Une à la fois, tirées au hasard sans remise : la première à QU_T0 s, puis la suivante QU_PAUSE à QU_PAUSE + 60 s après la fin de la précédente.
    f = 'course' : le premier qui atteint la cible gagne (au plus dur s, sinon personne) ; f = 'photo' : au bout de dur s, le meilleur score gagne (sens -1 : le plus petit).
@@ -262,7 +262,7 @@ const QU_T0=90,QU_PAUSE=180,QU_JOUE=[.5,.75,1],QU_PLACE=20,
  quVivants=G=>G.B.filter(b=>!b.dead),
  quOr=G=>{const a=quVivants(G);return Math.max(100,Math.round(8*a.reduce((s,b)=>s+b.inc,0)/Math.max(1,a.length)/10)*10)},
  givres=b=>b.t.filter(t=>TW[t.k].ctl).length,
- /* 2.39 : or versé en plus du revenu par les tours d'économie (Comptoir marchand d'Aubeval), toutes les 10 s */
+ /* 2.40 : or versé en plus du revenu par les tours d'économie (Comptoir marchand d'Aubeval), toutes les 10 s */
  eco=b=>b.t.reduce((s,t)=>s+(TW[t.k].eco&&!(t.b>0)?TW[t.k].eco*t.lv:0),0),
  lvMax=b=>b.t.reduce((m,t)=>Math.max(m,t.lv),0),
  ciblesGonflette=G=>Math.max(3,1+Math.max(0,...quVivants(G).map(lvMax)));
@@ -340,7 +340,7 @@ class Board{
  revoir(){for(const c of this.cr)if(!CR[c.k].fly)this.viser(c)}
  place(x,y,k){const T=TW[k];
   if(Math.floor(k/10)!==this.classId)return false;
-  /* 2.39 : une seule tour ultime par terrain */
+  /* 2.40 : une seule tour ultime par terrain */
   if(T.u&&this.t.some(t=>TW[t.k].u))return false;
   if(x<0||y<0||x>=C||y>=R||this.gold<T.c||this.g[y][x]||(x==SP[0]&&y==SP[1])||(x==EX[0]&&y==EX[1]))return false;
   this.g[y][x]=1;const nd=this.dist();
@@ -355,7 +355,7 @@ class Board{
   this.fx.push({type:'text',x:t.x+.5,y:t.y,txt:'Niveau '+t.lv,col:'#ffd95e',t:.9,d:.9},{type:'range',x:t.x+.5,y:t.y+.5,r:rng(t),t:.6,d:.6,col:TW[t.k].col});this.ev.push('up');return true}
  /* o : terrain qui envoie (2.38 : chaque monstre retient son envoyeur, pour la quête du facteur) */
  send(k,m,o=-1){for(let i=0;i<GROUP;i++)this.q.push({k,m,o,t:i*.38+Math.random()*.25})}
- /* dégâts d'un coup (2.39 : états et combos des races). L'anti-magie ignore les tours magiques ; l'armure retire un montant fixe (moins si Brisé, rien si Maléfice),
+ /* dégâts d'un coup (2.40 : états et combos des races). L'anti-magie ignore les tours magiques ; l'armure retire un montant fixe (moins si Brisé, rien si Maléfice),
     mais chaque coup garde au moins 20 %. t : tour qui frappe (Fureur, Âmes). Renvoie les dégâts infligés. */
  hit(c,d,T,lv,t){
   if(T.mag&&CR[c.k].mi)return 0;
@@ -406,7 +406,7 @@ class Board{
    if(Math.abs(s)>1e-3)mv.push([c,F,px,py,Math.max(-1,Math.min(1,s))*ESP_V*dt])}
   for(const[c,F,px,py,m]of mv){const nx=Math.max(0,Math.min(C-1,c.x+px*m)),ny=Math.max(0,Math.min(R-1,c.y+py*m));
    if(F||(vue(this.g,c.x,c.y,nx,ny)&&vue(this.g,nx,ny,c.tx,c.ty))){c.x=nx;c.y=ny}}}
- /* 2.39 : bonus des tours (Cohésion, auras, Croissance, Fureur, Chauffe), recalculés tous les 0,25 s. Voisine = une des 8 cases autour. */
+ /* 2.40 : bonus des tours (Cohésion, auras, Croissance, Fureur, Chauffe), recalculés tous les 0,25 s. Voisine = une des 8 cases autour. */
  bonus(){const L=this.t,act=L.filter(t=>!(t.b>0)),cg=this.t.some(t=>!(t.b>0)&&TW[t.k].cgG)?3:1,am=this.am||0;
   for(const t of L){const T=TW[t.k];let coh=0,cad=0,dm=0,rg=0,dose=0,nf=0,crg=1,fu=1,cw=1;
    for(const o of act){if(o===t||Math.abs(o.x-t.x)>1||Math.abs(o.y-t.y)>1)continue;const O=TW[o.k],a=O.au;
@@ -426,7 +426,7 @@ class Board{
      d'où la marge ajoutée au rayon ; la distance exacte est ensuite vérifiée comme avant. */
   const ar=AURA_R+3.4*dt+.01,auG=au.length>GRID_MIN&&(this.ag||(this.ag=new Grid())).fill(au),hlG=hl.length>GRID_MIN&&(this.hg||(this.hg=new Grid())).fill(hl);
   for(const c of this.cr){const T=CR[c.k];c.gt=Math.max(0,(c.gt||0)-dt);c.rt=Math.max(0,(c.rt||0)-dt);
-   /* 2.39 : états des races (durées) et dégâts dans la durée, qui ignorent l'armure (poison deux fois plus rapide sur un immobilisé : Terreau ; peste deux fois plus forte sur un Maudit : Épidémie) */
+   /* 2.40 : états des races (durées) et dégâts dans la durée, qui ignorent l'armure (poison deux fois plus rapide sur un immobilisé : Terreau ; peste deux fois plus forte sur un Maudit : Épidémie) */
    for(const e of ETATS_T)if(c[e]>0)c[e]=Math.max(0,c[e]-dt);
    let dot=0;if(c.pz>0){if(c.pt>0)dot+=c.pz*c.pd*(c.im>0?2:1);else c.pz=0}if(c.sgT>0)dot+=c.sg*c.max;if(c.bu>0)dot+=c.bud;else c.bud=0;if(c.pe>0)dot+=c.ped*(c.ma>0?2:1);else c.ped=0;
    if(!(c.bsT>0))c.bs=0;if(dot)c.hp-=dot*dt;
@@ -435,7 +435,7 @@ class Board{
    c.hid=T.inv&&!mg.some(m=>Math.hypot(c.x-m.x,c.y-m.y)<=rng(m));
    c.hl=c.hp<c.max&&(hlG?hlG.near(c.x,c.y,ar).some(n=>hl[n]!==c&&Math.hypot(hl[n].x-c.x,hl[n].y-c.y)<AURA_R):hl.some(a=>a!==c&&Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));if(c.hl)c.hp=Math.min(c.max,c.hp+c.max*.05*dt);
    if(T.stun){c.cs-=dt;if(c.cs<=0){let bt=null,bd=2.3;for(const t of this.t){const d=Math.hypot(t.x-c.x,t.y-c.y);if(d<bd&&!(t.stun>0)&&!(t.b>0)){bd=d;bt=t}}
-    /* 2.39 : les tours naines (Forge) ne restent étourdies que moitié moins longtemps */
+    /* 2.40 : les tours naines (Forge) ne restent étourdies que moitié moins longtemps */
     if(bt){bt.stun=TW[bt.k].faction==3?1:2;c.cs=3.5;this.fx.push({type:'zap',x:c.x+.5,y:c.y+.3,x2:bt.x+.5,y2:bt.y+.5-topY(bt),t:.3,d:.3});this.ev.push('zap')}else c.cs=.3}}
    let sp=T.s*(c.sl>0?c.sf:1)*(c.h?1.4:1)*(T.acc?Math.min(ACC_MAX,1+ACC*c.age):1)*dt;
    if(T.fly){const dx=EX[0]-c.x,dy=EX[1]-c.y,dd=Math.hypot(dx,dy);if(dd<=sp)c.leak=1;else{c.x+=dx/dd*sp;c.y+=dy/dd*sp}continue}
@@ -453,7 +453,7 @@ class Board{
   const ok=(T,c,t,r)=>!c.hid&&cible(T,c)&&Math.hypot(c.x-t.x,c.y-t.y)<=r&&!(T.rmin&&Math.hypot(c.x-t.x,c.y-t.y)<T.rmin);
   for(const t of this.t){if(t.b>0){t.b-=dt;if(t.b<=0){t.b=0;t.cd=0;this.fx.push({type:'range',x:t.x+.5,y:t.y+.5,r:rng(t),t:.6,d:.6,col:TW[t.k].col})}continue}
    const T=TW[t.k];
-   /* 2.39 : Croissance (Lunebois), Fureur qui retombe, Rage, Chauffe qui refroidit, surchauffe */
+   /* 2.40 : Croissance (Lunebois), Fureur qui retombe, Rage, Chauffe qui refroidit, surchauffe */
    if(T.faction==2)t.age=(t.age||0)+dt*(t.cgr||1);
    if(t.fu>0){t.fuT=(t.fuT||0)-dt;if(t.fuT<=0){t.fu--;t.fuT=2}}if(t.rg>0)t.rg-=dt;t.lf=(t.lf||0)+dt;if(t.ht>0&&t.lf>1)t.ht=Math.max(0,t.ht-.5*dt);if(t.oh>0){t.oh-=dt;continue}
    if(t.stun>0){t.stun-=dt;continue}t.cd-=dt;if(t.sw>0)t.sw-=dt;if(t.cd>0)continue;const r=rng(t),dm=dmg(t),cdx=T.cd/(t.xc||1);
@@ -490,7 +490,7 @@ class Board{
    const dx=p.tx-p.x,dy=p.ty-p.y,dd=Math.hypot(dx,dy),m=T.ps*dt;
    if(dd<=m){p.hit=1;this.impact(p)}else{p.x+=dx/dd*m;p.y+=dy/dd*m;p.a=Math.atan2(dy,dx)}}
   this.pr=this.pr.filter(p=>!p.hit);
-  /* 2.39 : mines (Hautroc) et morts relevés (Ossements) */
+  /* 2.40 : mines (Hautroc) et morts relevés (Ossements) */
   if(this.mi&&this.mi.length){this.mi=this.mi.filter(m=>this.t.includes(m.t));for(const m of this.mi){const T=TW[m.t.k];if(!voisins(m.x,m.y,.6).some(c=>!c.hid&&!vole(c)&&Math.hypot(c.x-m.x,c.y-m.y)<.5))continue;
     m.go=1;for(const c of voisins(m.x,m.y,1.1))if(!c.hid&&!vole(c)&&Math.hypot(c.x-m.x,c.y-m.y)<1.1)this.hit(c,m.d,T,m.lv,m.t);this.fx.push({type:'boom',x:m.x+.5,y:m.y+.5,r:1.1,t:.35,d:.35,col:'#ffb347'});this.ev.push('boom')}
    this.mi=this.mi.filter(m=>!m.go)}
@@ -507,7 +507,7 @@ class Board{
     if(CR[c.k].split){const m=c.max/CR[c.k].hp,K=CR[c.k].kid;for(let i=0;i<2;i++)kids.push({id:++UID,k:K,o:c.o,x:c.x,y:c.y,tx:c.tx,ty:c.ty,hp:CR[K].hp*m,max:CR[K].hp*m,sl:0,sf:1,gp:0,gt:0,rp:0,rt:0,f:c.f,ph:Math.random()*6,ox:(i-.5)*.3,oy:(Math.random()-.5)*.2,arm:0,cs:9})}}}
   this.cr=this.cr.filter(c=>!c.dead&&!c.leak).concat(kids);
   for(const f of this.fx){f.t-=dt;if(f.vx!==undefined){f.x+=f.vx*dt;f.y+=f.vy*dt}}this.fx=this.fx.filter(f=>f.t>0)}
- /* 2.39 : ce que la mort d'un monstre déclenche selon la race du terrain (Fureur, Spores, Âmes, morts relevés) */
+ /* 2.40 : ce que la mort d'un monstre déclenche selon la race du terrain (Fureur, Spores, Âmes, morts relevés) */
  mourir(c,me){const lt=c.lt&&this.t.includes(c.lt)?c.lt:null,LT=lt&&TW[lt.k];
   if(LT&&LT.faction==1){const g=(LT.fu2?2:1)*(lt.fm||1),av=lt.fu||0;lt.fu=Math.min(FUREUR_MAX,av+g);lt.fuT=2;if(lt.fu>=FUREUR_MAX&&av<FUREUR_MAX&&!(lt.rg>0)){lt.rg=3;this.combo({x:lt.x,y:lt.y,k:0},'RAGE !','#ff6a4a')}
    if(LT.fuG)for(const t of this.t)if(TW[t.k].faction==1&&t!==lt){t.fu=Math.min(FUREUR_MAX,(t.fu||0)+1);t.fuT=2}}
@@ -621,7 +621,7 @@ function observer(A){const mn=A.menace||(A.menace=new Float64Array(CR.length));f
 /* dégâts par seconde et par or d'une tour k (niveau 1) posée en (x, y), contre la menace reçue : armure, vol, anti-magie, zone, longueur de chemin à portée */
 function contreMenace(A,k,x,y){const W=TW[k],mn=A.menace,m=1+A.G.time/200,P=trajet(A),r=W.r;let Lg=0;for(const[a,b]of P)if(Math.hypot(a-x,b-y)<=r)Lg+=PAS_TR;const La=air({x,y},r);let v=0,tot=0;
  for(let q=0;q<mn.length;q++){const w=mn[q];if(!w)continue;tot+=w;const T=CR[q];if((T.fly&&W.gr)||(!T.fly&&W.ao)||(T.mi&&W.mag))continue;const mu=T.fly?W.air:W.sol;let d=(W.no?0:W.d)*mu;const ar=(T.arm||0)*m;if(ar&&!(W.pierce>=1))d=Math.max(d*.2,d-ar*(1-(W.pierce||0)));
-  /* 2.39 : le poison, la brûlure et la peste ignorent l'armure */
+  /* 2.40 : le poison, la brûlure et la peste ignorent l'armure */
   v+=w*(d+W.dot*mu*W.cd)*(T.fly?La:Lg)}return tot?v/tot/W.cd*W.zf/W.c:0}
 /* emplacements ordinaires (Archer, Garde, Canon, Flammes du plan) : une fois la menace connue, le type qui fait le plus de dégâts par or contre elle sur cette case ;
    le type prévu par le plan garde un petit avantage (×1,15) ; pas de tour au sol seulement dans le couloir des volants, Mages au plus MAG_MAX des tours */
@@ -631,10 +631,10 @@ function choixType(A,i,j,n){const mn=A.menace;if(!mn||mn.reduce((a,b)=>a+b,0)<ME
 /* tour à poser sur la case i du plan selon la situation (-1 : attendre d'avoir l'or) */
 function mzKind(A,i,n,bud,thr,fs){const M=A.mz,base=A.classId*10,x=i%C,cnt=js=>A.t.filter(t=>js.includes(t.k-base)).length;let j=M.role[i];
  if(j==5&&!thr)j=0;if(j!=2&&j!=5)j=choixType(A,i,j,n);if(j==2&&cnt([2])>=1+n*.15)j=0;if((j==1||j==3)&&fs>.35&&Math.abs(x-6)<=3)j=0;
- /* 2.39 : l’anti-aérien dédié (emplacement 4) attend que des volants arrivent */
+ /* 2.40 : l’anti-aérien dédié (emplacement 4) attend que des volants arrivent */
  if(j==4&&fs<.15)j=0;
  if(n<5&&TW[base+j].c>bud)j=0;
- /* 2.39 : version renforcée propre à chaque race (RACES[…].up), une fois sur deux à partir de 8 tours */
+ /* 2.40 : version renforcée propre à chaque race (RACES[…].up), une fois sur deux à partir de 8 tours */
  const e=RACES[A.classId].up[j];if(e!==undefined&&n>=8&&bud>=TW[base+e].c&&Math.random()<.5)j=e;
  return TW[base+j].c<=bud?base+j:-1}
 /* Chaque pièce gagnée est répartie entre deux bourses, défense et attaque, selon la pression subie (pen = jusqu'où les monstres avancent chez elle). */
@@ -655,7 +655,7 @@ function aiDefendre(A){const M=mzStep(A,INF),time=A.G.time,qj=quJ(A),bud=['click
   const fz=qj=='frozen'&&!todo.length&&!TW[t.k].mg;
   const want=j==5&&thr&&!TW[t.k].mg?5:(j==2||fz)&&cur!=2&&(fz||A.t.filter(o=>o.k-base==2).length<1+n*.15)?2:-1;if(want<0)continue;
   if(transformer(A,t,base+want,bud)){A.dp-=g0-A.gold;return true}}
- /* 2.39 : soutien (emplacement 7) sur la case qui a le plus de voisines, environ une tour sur 12 ; ultime (emplacement 9) après 7:00, sur la tour qui voit le plus de chemin */
+ /* 2.40 : soutien (emplacement 7) sur la case qui a le plus de voisines, environ une tour sur 12 ; ultime (emplacement 9) après 7:00, sur la tour qui voit le plus de chemin */
  const libres=A.t.filter(t=>t.lv<=2&&!(t.b>0)&&[0,1,3].includes(t.k-base));
  if(n>=14&&libres.length&&A.t.filter(o=>o.k-base==7).length<Math.floor(n/12)){const vois=t=>A.t.filter(o=>o!==t&&Math.abs(o.x-t.x)<=1&&Math.abs(o.y-t.y)<=1).length;const t=libres.sort((a,b)=>vois(b)-vois(a))[0];if(transformer(A,t,base+7,bud)){A.dp-=g0-A.gold;return true}}
  if(time>420&&libres.length&&!A.t.some(o=>TW[o.k].u)&&bud>=TW[base+9].c*.8){const P=trajet(A),vu=t=>P.filter(([a,b])=>Math.hypot(a-t.x,b-t.y)<=TW[base+9].r).length;const t=libres.sort((a,b)=>vu(b)-vu(a))[0];if(transformer(A,t,base+9,bud)){A.dp-=g0-A.gold;return true}}
@@ -745,7 +745,7 @@ class Game{
  unlock(b){const c=PAL_C[b.tier];if(c===undefined||b.gold<c)return false;b.gold-=c;b.tier++;b.ev.push('up');return true}
  /* un envoi part chez tous les adversaires encore en jeu */
  send(from,k){const T=CR[k];if(this.time<GRACE||from.gold<T.c||T.t>from.tier)return false;from.gold-=T.c;from.inc+=T.i;from.st.env++;from.st.envOr+=T.c;if(T.fly)from.st.vol+=T.c;if(T.hero)from.st.boss++;for(const b of this.foes(from))b.send(k,1+this.time/200,from.i);return true}
- /* action d'un joueur humain : renvoie '' si accepté, sinon un code d'erreur (poor, blocked, unique, locked, max, busy, early, over, bad ; unique = deuxième tour ultime, 2.39) ; early = envoi pendant la phase « Construis » (2.30) */
+ /* action d'un joueur humain : renvoie '' si accepté, sinon un code d'erreur (poor, blocked, unique, locked, max, busy, early, over, bad ; unique = deuxième tour ultime, 2.40) ; early = envoi pendant la phase « Construis » (2.30) */
  action(i,a){const b=this.B[i];if(!b||b.dead||b.ai||this.over||!a)return 'over';
   const x=a.x|0,y=a.y|0,k=a.k|0;
   if(a.type=='place'){const T=TW[k];if(!T)return 'bad';if(b.place(x,y,k))return '';return b.gold<T.c?'poor':T.u&&b.t.some(t=>TW[t.k].u)?'unique':'blocked'}

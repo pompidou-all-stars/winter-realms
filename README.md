@@ -80,12 +80,15 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.39 — races asymétriques — 2026-11-20
+### 2.40 — races asymétriques — 2026-11-20
 - The 5 factions become 5 asymmetric races with 10 different towers each, their own mechanic, status effects and combos: Royaume d'Aubeval (cohesion, judgement seal, nets that ground flyers, trading post), Clans de l'Orage Blanc (fury and rage, chain lightning, soaked and conduction, hex, bleeding), Elfes de Lunebois (stacking poison and bloom, roots, growth, spores), Nains de Hautroc (forge, heat and overheat, armour break, mines), Cour des Ossements (souls, raised dead, plague and epidemic, curses, reaper).
 - 10 roles per race (base, close range, control, area, dedicated anti-air, detection, signature, support, anti-boss, ultimate — one ultimate per field).
 - Central balancing rules (effective power, 30-point radar profile, mandatory coverage, caps) checked by a new test file, and a race bench (`tests/outils/banc-races.js`): every race scores between 1.29 and 1.67 points per game (1.5 = even).
-- Home screen: race choice and a race sheet (description, towers, combos). In game: richer tower sheet, status pips on monsters, combo texts, souls counter, lightning, mines and raised dead in 2D and 3D. 3D models are still the old faction ones (redesign to come).
+- Home screen: race choice and a race sheet (description, towers, combos). In game: richer tower sheet, status pips on monsters, combo texts, souls counter, lightning, mines and raised dead in 2D and 3D. New 3D models for all 50 towers in a darker, “grimdark” art direction: soldiers, creatures, siege engines and totems sculpted with the organic-monster process (painted texture and baked relief), not all towers are towers. Tower budget raised to 9,000 triangles and 300 KB (to be confirmed).
 - `sim.js` and `server/` changed (the server redeploys automatically).
+
+### 2.39 — style peint — 2026-11-20
+- Common painted style for every 3D model (towers, monsters, portal, castle): toon shading in 4 steps, a cold rim light on the edges and a thin dark outline of constant on-screen width, so silhouettes stand out from the snow on a phone. Applied when models load: no model regenerated. Add `?style=0` to the address to get the previous look. Costs about 1.7× more draw calls (to check on a low-end phone). Rendering only: `sim.js` unchanged.
 
 ### 2.38 — quêtes bonus — 2026-11-19
 - Bonus quests: short challenges drawn at random during the game (first at 1:30, then one every 3 to 4 min), with funny titles. Races (the first to reach the goal wins): "Clicker fou" (place 10 more towers; never drawn when someone has no room left), "Le facteur sonne toujours 4 fois" (be the first to get 4 of your own monsters through to an opponent; every monster now remembers who sent it), "Gonflette" (upgrade a tower to a level above the best current one), "Frozen" (own N frost towers, N above the current best), "Le gros cadeau" (send a boss). Snapshots (best score when time runs out): "Qui a la plus grosse ?" (longest maze), "Picsou" (most gold in the bank), "Pigeons voyageurs" (most gold sent as flyers), "Bling-bling" (most expensive tower), "Mamie Gâteau" (lowest income: a catch-up gift). No race can already be won when it starts. Reward: gold, 8 × the average income (at least 100), shared on a tie.

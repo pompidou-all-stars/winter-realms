@@ -45,7 +45,7 @@ test('Milieu de partie : à 15, 25 et 40 tours du plan, les tours voient le chem
 });
 /* depuis la 2.33 : type des tours ordinaires selon la menace reçue */
 test('Répartition : sans menace connue, l\'IA garde le type prévu par son plan ; face à des blindés, un Archer vaut moins par or que face à des monstres ordinaires',()=>{
- /* 2.39 : Hautroc (sans poison, qui ignore l'armure) */
+ /* 2.40 : Hautroc (sans poison, qui ignore l'armure) */
  const S=charger('actuel',{graine:2}),G=partie(S,{ia:[0,1,1,1],factions:[0,3,1,2]}),b=G.B[1],M=S.mzStep(b,Infinity);const i=M.ord.find(i=>Math.abs(i%C-6)>2&&M.role[i]==0);assert.ok(i!==undefined);
  assert.equal(S.choixType(b,i,0,10),0,'menace inconnue : type du plan');
  const base=b.classId*10,x=i%C,y=i/C|0;G.time=300;b.gold=1e7;for(const j of M.ord)b.place(j%C,j/C|0,base);

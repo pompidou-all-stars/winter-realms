@@ -48,7 +48,7 @@ test('Espacement dans un couloir d\'une case : on ne sort jamais du couloir et p
 test('Vitesse ralentie : déplacement = vitesse × facteur × temps',()=>{const b=terrain();const c=apparaitre(S,b,0);
  c.gt=10;c.gp=.5;b.update(.5);proche(c.y,1.6*.5*.5,'position');
 });
-/* 2.39 : le froid vient du Totem des pluies glacées (Clans de l'Orage Blanc, emplacement 2) ; GIVRE_LV règle toujours son effet */
+/* 2.40 : le froid vient du Totem des pluies glacées (Clans de l'Orage Blanc, emplacement 2) ; GIVRE_LV règle toujours son effet */
 const GV=12,orage=()=>{const b=partie(S,{factions:[1,0,2,3]}).B[0];b.gold=1e6;return b};
 test('Froid (Totem des pluies glacées) : de −20 % (niveau 1) à −50 % (niveau 5), pendant 1,5 s à 2,7 s',()=>{const b=terrain(),T=S.TW[GV];
  const att=[[.8,1.5],[.725,1.8],[.65,2.1],[.575,2.4],[.5,2.7]];

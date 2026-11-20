@@ -1,4 +1,4 @@
-/* Banc des races (2.39) : les 5 races s'affrontent, jouées par la même IA, pour vérifier qu'aucune ne domine ni ne s'effondre.
+/* Banc des races (2.40) : les 5 races s'affrontent, jouées par la même IA, pour vérifier qu'aucune ne domine ni ne s'effondre.
    Ne modifie pas le jeu : charge sim.js dans un environnement isolé (graine fixe), comme les tests.
    Outil à lancer à la main après un changement d'équilibrage des races : il ne fait pas partie de tests/tout.js ni de la vérification GitHub.
 
