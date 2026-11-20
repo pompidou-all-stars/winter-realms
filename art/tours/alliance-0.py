@@ -1,10 +1,9 @@
-"""Alliance — Tour des archers (emplacement 0 : Archer · tir rapide).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['alliance']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Royaume d’Aubeval — Tour d’arbalétriers (emplacement 0 : tir de base).
+Forme : communs/aubeval_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.aubeval_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Tour des archers"}
+INFOS = {'categorie': 'tour', 'titre': "Tour d’arbalétriers"}
 
 def construire(ctx):
-    preparer(tour('alliance', 0))
+    preparer(tour(0))

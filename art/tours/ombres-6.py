@@ -1,10 +1,9 @@
-"""Légion des ombres — Œil démoniaque (emplacement 6 : Archer · tireur d'élite).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['ombres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Cour des Ossements — Nécromancien (emplacement 6 : signature).
+Forme : communs/ossements_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.ossements_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Œil démoniaque"}
+INFOS = {'categorie': 'tour', 'titre': "Nécromancien"}
 
 def construire(ctx):
-    preparer(tour('ombres', 6))
+    preparer(tour(6))

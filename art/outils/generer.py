@@ -133,6 +133,7 @@ def generer(bpy, id_, dossier, jeu, apercus=None):
     bpy.ops.export_scene.gltf(filepath=fichier, export_format='GLB', use_selection=True, export_apply=True,
                               export_cameras=False, export_lights=False,
                               export_animations=animee, export_animation_mode='NLA_TRACKS', export_force_sampling=True,
+                              export_image_format='WEBP', export_image_quality=85,   # 2.40 : textures peintes des créatures en WebP
                               export_meshopt_compression_enable=True)
     compresser_si_besoin(fichier)
     if apercus:

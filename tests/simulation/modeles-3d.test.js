@@ -18,8 +18,10 @@ test('Les monstres sont animés : « vol » pour les volants, « marche » pour 
  for(const g of new Set(S.CR.map(c=>c.g))){const T=S.CR.find(c=>c.g==g),noms=(lireGLB(path.join(D,'monstres',`${g}.glb`)).animations||[]).map(a=>a.name);
   assert.ok(noms.includes(T.fly?'vol':'marche'),`${g} : animations ${noms.join(', ')||'aucune'}`)}
 });
-test('Les tours qui visent (archer, garde, canon, mage) ont une pièce « Tourelle »',()=>{
- for(const F of FAC)for(const j of [0,1,3,5,6,7,9])assert.ok(lireGLB(path.join(D,'tours',`${F}-${j}.glb`)).nodes.some(n=>n.name==='Tourelle'),`${F}-${j} sans Tourelle`);
+/* 2.40 : les tours qui tirent sur une cible (ni soutien « no », ni impulsion « pu », ni mines « mn ») ont une pièce qui la suit */
+test('Les tours qui visent une cible ont une pièce « Tourelle »',()=>{
+ S.TW.forEach((T,i)=>{if(T.no||T.pu===0||T.mn)return;const F=FAC[Math.floor(i/10)],j=i%10;
+  assert.ok(lireGLB(path.join(D,'tours',`${F}-${j}.glb`)).nodes.some(n=>n.name==='Tourelle'),`${F}-${j} sans Tourelle`)});
 });
 test('Les modèles du jeu sont compressés (meshopt) et leurs couleurs sont dans les sommets (matériau « Peint »)',()=>{
  for(const sous of ['tours','monstres','decor'])for(const f of fs.readdirSync(path.join(D,sous)).filter(f=>f.endsWith('.glb'))){const g=lireGLB(path.join(D,sous,f));

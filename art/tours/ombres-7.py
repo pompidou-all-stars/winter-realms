@@ -1,10 +1,9 @@
-"""Légion des ombres — Gardien spectral (emplacement 7 : Garde · champion).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['ombres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Cour des Ossements — Puits des âmes (emplacement 7 : soutien).
+Forme : communs/ossements_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.ossements_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Gardien spectral"}
+INFOS = {'categorie': 'tour', 'titre': "Puits des âmes"}
 
 def construire(ctx):
-    preparer(tour('ombres', 7))
+    preparer(tour(7))

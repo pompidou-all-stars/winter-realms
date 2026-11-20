@@ -8,7 +8,7 @@
    "fichier": "assets/3d/decor/chateau.glb",
    "triangles": 1470,
    "octets": 42848,
-   "empreinte_source": "c8cf528e286cdc3e802f82e0938a1d9d84ecba563fb95d9ad9e9ddbee9bae3f8",
+   "empreinte_source": "dda44adaed6ecd577a9085c399faaf0cd46c743feeae3f8dd4482cdcabe52dba",
    "blender": "5.3"
   },
   "decor/portail": {
@@ -17,8 +17,8 @@
    "titre": "Portail d'apparition",
    "fichier": "assets/3d/decor/portail.glb",
    "triangles": 602,
-   "octets": 19700,
-   "empreinte_source": "bf2c726e988c4c737acca1da66177ff15acd7ffc597f9fdbb1725bc11c5ed02d",
+   "octets": 19692,
+   "empreinte_source": "cb26d15d34ce9391feac5d5c08239118c699522d388bb54bfff96c18dbbcb3a8",
    "blender": "5.3"
   },
   "exemples/caisse": {
@@ -28,7 +28,7 @@
    "fichier": "assets/3d/exemples/caisse.glb",
    "triangles": 404,
    "octets": 10292,
-   "empreinte_source": "afd97fd8d2123eb58d282246415ffa1c577edf9868284bb569f273d4fa67a0cf",
+   "empreinte_source": "a375249cfb87a6e8d0019e64ed2d223076c955a58fb7f0dae0c574f5382fb5b6",
    "blender": "5.3"
   },
   "monstres/assassin": {
@@ -37,8 +37,8 @@
    "titre": "Assassin des ombres",
    "fichier": "assets/3d/monstres/assassin.glb",
    "triangles": 2050,
-   "octets": 62080,
-   "empreinte_source": "99f48b9c0f93cfad924e6753bc8f652d5eb80e7a587369dc697a898cdbea0c3a",
+   "octets": 62072,
+   "empreinte_source": "d072ddbaf632b58b8252ed12f05f162dec15f2dc1944232e55005f741daf8d04",
    "blender": "5.3"
   },
   "monstres/automaton": {
@@ -47,8 +47,8 @@
    "titre": "Automate blindé",
    "fichier": "assets/3d/monstres/automaton.glb",
    "triangles": 2244,
-   "octets": 61208,
-   "empreinte_source": "d3e18021bbe0d86c90918b49f79dd226a7888f7024a2cc93c1221c0830ab4bec",
+   "octets": 61252,
+   "empreinte_source": "4cbe3c9c83b898650b52a884738f8f56b25e549b2714398680048c70bb36f729",
    "blender": "5.3"
   },
   "monstres/bat": {
@@ -57,8 +57,8 @@
    "titre": "Chauve-souris",
    "fichier": "assets/3d/monstres/bat.glb",
    "triangles": 432,
-   "octets": 17132,
-   "empreinte_source": "8c96b3bed3dfae4a919f02f93aa06ebed3948c881fd2d9b98d7f27b65c7385e0",
+   "octets": 17112,
+   "empreinte_source": "c31be9c002e2856e3d55dd9f781575d9cbf239b1fcd16b014dfc4f15b243bd9c",
    "blender": "5.3"
   },
   "monstres/bear": {
@@ -67,8 +67,8 @@
    "titre": "Ours de guerre",
    "fichier": "assets/3d/monstres/bear.glb",
    "triangles": 1538,
-   "octets": 49288,
-   "empreinte_source": "3693242e2d25241b9183151d414de6f1c96690d5f98194a843e9da53d5313200",
+   "octets": 49284,
+   "empreinte_source": "5a7ef4115c3219dd2f90c3363988dc70be76342ac2a2c7425362352ca44c77b4",
    "blender": "5.3"
   },
   "monstres/beetle": {
@@ -77,8 +77,8 @@
    "titre": "Scarabée cuirassé",
    "fichier": "assets/3d/monstres/beetle.glb",
    "triangles": 1388,
-   "octets": 43304,
-   "empreinte_source": "0dea267c5769c44cba8c0b9d1ce46f7cb0765bc6c8ef31be69210128224a0cca",
+   "octets": 42840,
+   "empreinte_source": "b377e4e093b870cba4cd08079fe92ce975e4ba09181b41ef9c1851fcdc61b565",
    "blender": "5.3"
   },
   "monstres/behemoth": {
@@ -87,8 +87,8 @@
    "titre": "Béhémoth",
    "fichier": "assets/3d/monstres/behemoth.glb",
    "triangles": 1264,
-   "octets": 38600,
-   "empreinte_source": "9ee2ed2aa73dde05a6a67f3326a97487d2bd0a769f12bd9bb60a96b567efc384",
+   "octets": 39724,
+   "empreinte_source": "22d02f7c8ad62ae2aa04d2ab157ba7987b92e8c184d5f74dfbf2fd508a15bb30",
    "blender": "5.3"
   },
   "monstres/bloodpriest": {
@@ -97,8 +97,8 @@
    "titre": "Grande prêtresse de sang",
    "fichier": "assets/3d/monstres/bloodpriest.glb",
    "triangles": 2210,
-   "octets": 64164,
-   "empreinte_source": "7a98a880180bd4c89a63de1ac2fb97eae1feb7eb6d6af53f847581a17342c586",
+   "octets": 64168,
+   "empreinte_source": "7906317dbc391d4be859249ee332e5ed0a52746325eb097fc001583d62b94e45",
    "blender": "5.3"
   },
   "monstres/boar": {
@@ -107,8 +107,8 @@
    "titre": "Sanglier de guerre",
    "fichier": "assets/3d/monstres/boar.glb",
    "triangles": 1404,
-   "octets": 41632,
-   "empreinte_source": "8b8ffc8a9706034e5cb57e8741d46f226d32e417017b942fc2da858fa0ce52fb",
+   "octets": 41580,
+   "empreinte_source": "f955c0097ef46e200044a24e618c4495e3d4a91ae30cba5a08381160fa8a8213",
    "blender": "5.3"
   },
   "monstres/breaker": {
@@ -118,7 +118,7 @@
    "fichier": "assets/3d/monstres/breaker.glb",
    "triangles": 2420,
    "octets": 71424,
-   "empreinte_source": "3c783345bf14a825bdcf2267b1c5091956e6ad34e0c6ea42f9ab651ebd276da7",
+   "empreinte_source": "4c0d8e279eef42b1d3b8bdd2f6d14309f4710a147c43e7f2aff89767714b25af",
    "blender": "5.3"
   },
   "monstres/centaur": {
@@ -127,8 +127,8 @@
    "titre": "Centaure messager",
    "fichier": "assets/3d/monstres/centaur.glb",
    "triangles": 1498,
-   "octets": 48724,
-   "empreinte_source": "651ba142d91aa6b05a5456690ccc2cfe6ee06a8c7b25c2d20b8826a24a4e2215",
+   "octets": 48780,
+   "empreinte_source": "b835085deac4a62ba35ba5be25dfade9ff00ca52157da3b480b5a2a705c25b83",
    "blender": "5.3"
   },
   "monstres/chaman": {
@@ -137,8 +137,8 @@
    "titre": "Chaman de guerre",
    "fichier": "assets/3d/monstres/chaman.glb",
    "triangles": 1770,
-   "octets": 57360,
-   "empreinte_source": "b05d611cef694a0e324a151c58db27066777d14fe1d7ee329d0e9f4a004e803d",
+   "octets": 57356,
+   "empreinte_source": "b71ad046e749564560e3dac5e3d27b17a4713ddb79a3bf6835052a6458209878",
    "blender": "5.3"
   },
   "monstres/chimera": {
@@ -147,8 +147,8 @@
    "titre": "Chimère",
    "fichier": "assets/3d/monstres/chimera.glb",
    "triangles": 1762,
-   "octets": 48160,
-   "empreinte_source": "80cf51492e3430b70aa428242245813e4c162c9b547828ae079dd534f1a80406",
+   "octets": 48136,
+   "empreinte_source": "430af52f24f643ae26a3733bb4a49ffe7f99ef7f2df44cbc30c29308e55bd23d",
    "blender": "5.3"
   },
   "monstres/colossus": {
@@ -157,8 +157,8 @@
    "titre": "Colosse de pierre",
    "fichier": "assets/3d/monstres/colossus.glb",
    "triangles": 2014,
-   "octets": 57404,
-   "empreinte_source": "382bceef5fe953583353004d441e5efe9b4d6c436b1839b62ceb9334871d378c",
+   "octets": 57268,
+   "empreinte_source": "f68c7d62428756f1c8aba27ed783a4cfde33a53007211e40c41e52b5daf782c4",
    "blender": "5.3"
   },
   "monstres/cyc": {
@@ -167,8 +167,8 @@
    "titre": "Cyclope des cendres",
    "fichier": "assets/3d/monstres/cyc.glb",
    "triangles": 2024,
-   "octets": 58136,
-   "empreinte_source": "a913814594046b9ac7ee13492b229f2a766c5f3dd930d69aa4a9361c40a88368",
+   "octets": 58164,
+   "empreinte_source": "0941cfb48342edb56fcd2010c81b238b2133e2f6db350225c0174ab057f68d5f",
    "blender": "5.3"
   },
   "monstres/demon": {
@@ -177,8 +177,8 @@
    "titre": "Démon des abysses",
    "fichier": "assets/3d/monstres/demon.glb",
    "triangles": 1842,
-   "octets": 65164,
-   "empreinte_source": "435b7a80c2387951ff23733a857b06c3e88be667ab89ef4b2691dea61301a795",
+   "octets": 65168,
+   "empreinte_source": "c20e25d6b624c9ccf7ed7e055e5622d68b190e9bb908d793c1deae2b3f6c8356",
    "blender": "5.3"
   },
   "monstres/dragon": {
@@ -187,8 +187,8 @@
    "titre": "Dragon ancien",
    "fichier": "assets/3d/monstres/dragon.glb",
    "triangles": 918,
-   "octets": 30304,
-   "empreinte_source": "65fe25c115b00bc57c65b8a32bacee83736399c455315265ef56122e3b81fbeb",
+   "octets": 30296,
+   "empreinte_source": "714cc0cc9cc1007b3885f67867039aec9c3f474bf7eec78231dfa798f8a5bf04",
    "blender": "5.3"
   },
   "monstres/dragonturtle": {
@@ -197,8 +197,8 @@
    "titre": "Tortue-dragon",
    "fichier": "assets/3d/monstres/dragonturtle.glb",
    "triangles": 1444,
-   "octets": 43216,
-   "empreinte_source": "dc08f9ac71bb425fb2c8ba66988952651f492063f9c146e771c8bd89c5fd026a",
+   "octets": 43220,
+   "empreinte_source": "01d8895f6a16a30c1c10cfa31854c2b1b74028eacbc9bb6939a9a70723b76038",
    "blender": "5.3"
   },
   "monstres/druid": {
@@ -207,8 +207,8 @@
    "titre": "Druidesse",
    "fichier": "assets/3d/monstres/druid.glb",
    "triangles": 1830,
-   "octets": 58220,
-   "empreinte_source": "9e5fccccacbf14dad14d81dbf3e4372bb42d87aed362aef6e8db16c9c607652e",
+   "octets": 58252,
+   "empreinte_source": "f0f7124afa207f390be4c7e546d218c51e608fcf6ea9f9224b1022cbf99fec46",
    "blender": "5.3"
   },
   "monstres/drummer": {
@@ -217,8 +217,8 @@
    "titre": "Tambour de guerre",
    "fichier": "assets/3d/monstres/drummer.glb",
    "triangles": 2112,
-   "octets": 65112,
-   "empreinte_source": "71f8f9b674b40db3651466c1155d1a6dd6e546105662d63dd3a9862ea4577c79",
+   "octets": 65108,
+   "empreinte_source": "ac43602efe198256d84c99332d7214cf427dc783727879165d8d46b30fb2ddf5",
    "blender": "5.3"
   },
   "monstres/engineer": {
@@ -227,8 +227,8 @@
    "titre": "Ingénieur nain renégat",
    "fichier": "assets/3d/monstres/engineer.glb",
    "triangles": 2838,
-   "octets": 75776,
-   "empreinte_source": "c753dc5b46a20200df59b7ec64a17f90e766b674eb0228f8e2bd8ee8ab6192d2",
+   "octets": 74628,
+   "empreinte_source": "d7baa0a0a0968bc6c7419d4803c4aa789352dddeeba1a389a82963e3fa56e47b",
    "blender": "5.3"
   },
   "monstres/fireel": {
@@ -237,8 +237,8 @@
    "titre": "Élémentaire de feu",
    "fichier": "assets/3d/monstres/fireel.glb",
    "triangles": 626,
-   "octets": 22904,
-   "empreinte_source": "d8deba1e2d6a2fd06b16712753f8905dea2a9483ac1d7b43a2bc8896bf6ebc6b",
+   "octets": 23012,
+   "empreinte_source": "bc4a3d753f4eb55ab0c8a459acacca601579416c2188c219c360851440414be7",
    "blender": "5.3"
   },
   "monstres/gargoyle": {
@@ -247,8 +247,8 @@
    "titre": "Gargouille",
    "fichier": "assets/3d/monstres/gargoyle.glb",
    "triangles": 1684,
-   "octets": 57792,
-   "empreinte_source": "32b30eed58d580b4214179598b22a8eb6d9da309a95215c4d7d6aa6a419a287f",
+   "octets": 57788,
+   "empreinte_source": "ae8273006b1eb9802b404da92f52aec0999b05313e5f5009c33c0692c49a5331",
    "blender": "5.3"
   },
   "monstres/giant": {
@@ -257,8 +257,8 @@
    "titre": "Géant du givre",
    "fichier": "assets/3d/monstres/giant.glb",
    "triangles": 2194,
-   "octets": 69224,
-   "empreinte_source": "ff4045ef8f2fc05c7eb118b057fc4c19a6c78df1d80d56f61af0b0fd7e081c82",
+   "octets": 69252,
+   "empreinte_source": "b886d8483bd01ada2edbbf6cbbab120c39f6176c575873db8fb2da378497aa06",
    "blender": "5.3"
   },
   "monstres/gnoll": {
@@ -267,8 +267,8 @@
    "titre": "Gnoll",
    "fichier": "assets/3d/monstres/gnoll.glb",
    "triangles": 1898,
-   "octets": 58404,
-   "empreinte_source": "57661f54c130420c7f2a242a5b1c2f3d92b5c56c5fc9d307e0006f592b2874a0",
+   "octets": 59296,
+   "empreinte_source": "e6ae5a3c79e675181769e562008bcb6d0129f23913cd7746bb6d82d499267bd2",
    "blender": "5.3"
   },
   "monstres/gob": {
@@ -277,8 +277,8 @@
    "titre": "Sapeur gobelin",
    "fichier": "assets/3d/monstres/gob.glb",
    "triangles": 1668,
-   "octets": 56192,
-   "empreinte_source": "3ce145af7e9af41c800b366960c689e9d5369837d10d574750248de270e474a6",
+   "octets": 56108,
+   "empreinte_source": "41eeb67442d81e3a736da66e4c5e2282a6518fd8e9db00a74b6adf12b799f6c9",
    "blender": "5.3"
   },
   "monstres/gobking": {
@@ -287,8 +287,8 @@
    "titre": "Roi gobelin",
    "fichier": "assets/3d/monstres/gobking.glb",
    "triangles": 2528,
-   "octets": 70244,
-   "empreinte_source": "81eb2a8f60ffe4fba6bcb57790a5bd75f27b8fd6a840ca6c1b691b18c121d0ce",
+   "octets": 70204,
+   "empreinte_source": "49db709ebb5b262cc3b79d8b8a3c29653c8a14c6514023d7201ff25def4d8527",
    "blender": "5.3"
   },
   "monstres/golem": {
@@ -297,8 +297,8 @@
    "titre": "Golem runique",
    "fichier": "assets/3d/monstres/golem.glb",
    "triangles": 1848,
-   "octets": 53840,
-   "empreinte_source": "e7ac90a96f4494ce7a82ba08ed91c6da123a561c93ba0cae6df07c36de431e00",
+   "octets": 52872,
+   "empreinte_source": "8733e75a25c0b6d50eca2f3d182f1523beccd5803d813df54edc2cca6084e6d5",
    "blender": "5.3"
   },
   "monstres/griffon": {
@@ -307,8 +307,8 @@
    "titre": "Griffon corrompu",
    "fichier": "assets/3d/monstres/griffon.glb",
    "triangles": 690,
-   "octets": 26396,
-   "empreinte_source": "4ca68eb86fdbde84ed5f83c2a92d28af2e4845e2577da3f5c78705c73781c45c",
+   "octets": 26376,
+   "empreinte_source": "1f49e8af029ca10ac92aa5ff5f7495d9295ff3242fa29b5ff9c926c7af98d3f3",
    "blender": "5.3"
   },
   "monstres/harpy": {
@@ -317,8 +317,8 @@
    "titre": "Harpie",
    "fichier": "assets/3d/monstres/harpy.glb",
    "triangles": 642,
-   "octets": 22812,
-   "empreinte_source": "fa607b59475a9513a9c2e2c91c95161b0d11237284b278ddf62083ffda9fbbdf",
+   "octets": 22848,
+   "empreinte_source": "49f935604a4f690337c7efe33d73a220211c9f1b616bd7c562e524277f53fcbc",
    "blender": "5.3"
   },
   "monstres/healer": {
@@ -327,8 +327,8 @@
    "titre": "Prêtresse",
    "fichier": "assets/3d/monstres/healer.glb",
    "triangles": 1670,
-   "octets": 55700,
-   "empreinte_source": "73552d166e6a682a540ddb5d849fe15acddd20c0db935fd667647df58c0c3b32",
+   "octets": 55560,
+   "empreinte_source": "431dea9f8f9d81d6be60bc24fc0d97240d034e9dfaa2eaea5c5d390078c6dee0",
    "blender": "5.3"
   },
   "monstres/herald": {
@@ -337,8 +337,8 @@
    "titre": "Héraut de guerre",
    "fichier": "assets/3d/monstres/herald.glb",
    "triangles": 2456,
-   "octets": 66420,
-   "empreinte_source": "38de0b0cb82a86a434a424aa24631591fc426a0809ac5988306ddd7af1fb3341",
+   "octets": 66536,
+   "empreinte_source": "8347429583aec9b15b7e2f29dab95964c3ac8fbee57245fe617680dca575c48c",
    "blender": "5.3"
   },
   "monstres/hero": {
@@ -347,8 +347,8 @@
    "titre": "Azh’Khar, seigneur des lames",
    "fichier": "assets/3d/monstres/hero.glb",
    "triangles": 2182,
-   "octets": 69120,
-   "empreinte_source": "5644b6c604d4ecd07ca739f7a0dceb189156a7d4edc2dd3a8623d46e7859c1c5",
+   "octets": 68980,
+   "empreinte_source": "fe397c1191a2e1e1e37fc4af87f0b5ba20e1c43a10733d6a5ad6f1e325ade255",
    "blender": "5.3"
   },
   "monstres/hydra": {
@@ -357,8 +357,8 @@
    "titre": "Hydre",
    "fichier": "assets/3d/monstres/hydra.glb",
    "triangles": 1576,
-   "octets": 55872,
-   "empreinte_source": "a66cc78b6b4f548d227979aae1f64e849ca99529f04de1b6ef44ee53bb385679",
+   "octets": 55900,
+   "empreinte_source": "1767782c669a93684cc723e76b9ec1d67db70c3635c94532e50f65f05e824308",
    "blender": "5.3"
   },
   "monstres/imp": {
@@ -367,8 +367,8 @@
    "titre": "Lutin des glaces",
    "fichier": "assets/3d/monstres/imp.glb",
    "triangles": 1428,
-   "octets": 54620,
-   "empreinte_source": "8be52ad1ebf39fcc752381bd2dd980f7601c0c31bb3951332dc3b27c1b4f6904",
+   "octets": 54616,
+   "empreinte_source": "7b871416383b7d1c8f00fb737650c2822a639dffd5f4e7254d0a4ee1fbf7005a",
    "blender": "5.3"
   },
   "monstres/inquisitor": {
@@ -377,8 +377,8 @@
    "titre": "Inquisiteur",
    "fichier": "assets/3d/monstres/inquisitor.glb",
    "triangles": 2456,
-   "octets": 70796,
-   "empreinte_source": "dc804e7ac0023ce61c0ce3102160c1814935076e49b6e5fa83f3eaa8bbc192d4",
+   "octets": 70812,
+   "empreinte_source": "11cfb1be8cd016d29ec55259ba6dba6608759f159aab3dbf5e27ad7657ae759f",
    "blender": "5.3"
   },
   "monstres/juggernaut": {
@@ -387,8 +387,8 @@
    "titre": "Mastodonte de fer",
    "fichier": "assets/3d/monstres/juggernaut.glb",
    "triangles": 996,
-   "octets": 30024,
-   "empreinte_source": "2a082487a3ca96752353c9ddcc16e6cc02e389f8589894eb14deb3540e2f3680",
+   "octets": 30112,
+   "empreinte_source": "3b058f3d6a05258d0256fe62ea0901b57271c2d351f6f6e8265c815caa56a057",
    "blender": "5.3"
   },
   "monstres/knight": {
@@ -397,8 +397,8 @@
    "titre": "Chevalier noir",
    "fichier": "assets/3d/monstres/knight.glb",
    "triangles": 2184,
-   "octets": 65976,
-   "empreinte_source": "da5f09b24a147e1a822a2383e1ffb1c3e035f99b97c33cfaade85892fd9521b4",
+   "octets": 65772,
+   "empreinte_source": "581f693094b614b88d823a522d1d796a8bbc42ca6213b16413e8ae11afd8603a",
    "blender": "5.3"
   },
   "monstres/kobold": {
@@ -407,8 +407,8 @@
    "titre": "Kobold",
    "fichier": "assets/3d/monstres/kobold.glb",
    "triangles": 1548,
-   "octets": 57812,
-   "empreinte_source": "679d340e6fc76e1049d87fdd461f177867943ef250cd9c3dd18bda6f9e82f43e",
+   "octets": 57764,
+   "empreinte_source": "8a6b13b11a5fecd077601318772cd3e61c0aa41036cbeeff51d66c4acdf91043",
    "blender": "5.3"
   },
   "monstres/lavagolem": {
@@ -417,8 +417,8 @@
    "titre": "Golem de lave",
    "fichier": "assets/3d/monstres/lavagolem.glb",
    "triangles": 1956,
-   "octets": 56088,
-   "empreinte_source": "c4ff7059f9889b961a5e677bbbd05dcd705472acbfda788f4c2cdb312b237ef0",
+   "octets": 56024,
+   "empreinte_source": "89398ae1a7cbec1841d8c9c0f6861e0c4569d9e88c2fb5c59446e82373c4741e",
    "blender": "5.3"
   },
   "monstres/lich": {
@@ -427,8 +427,8 @@
    "titre": "Roi-liche",
    "fichier": "assets/3d/monstres/lich.glb",
    "triangles": 2390,
-   "octets": 67036,
-   "empreinte_source": "e68da15f135385ccdc87e9a30aae1bafd30b05f3b2513190c0fcee583e2cde92",
+   "octets": 67068,
+   "empreinte_source": "1c813a1ac5b76b9c9def4822f7807e5252af982371f342fb36c422254fb2382d",
    "blender": "5.3"
   },
   "monstres/lizard": {
@@ -437,8 +437,8 @@
    "titre": "Homme-lézard",
    "fichier": "assets/3d/monstres/lizard.glb",
    "triangles": 1788,
-   "octets": 59212,
-   "empreinte_source": "3cf6fee09cc09f34b6e7a5b40601987e498d25c94c484ccaf532adebf5425194",
+   "octets": 59136,
+   "empreinte_source": "90573bfac1946bd5d7234d09b687d28af12fb4485065c17d5527d10967116170",
    "blender": "5.3"
   },
   "monstres/mammoth": {
@@ -447,8 +447,8 @@
    "titre": "Mammouth de guerre",
    "fichier": "assets/3d/monstres/mammoth.glb",
    "triangles": 1762,
-   "octets": 54780,
-   "empreinte_source": "47b7488f40a9acd54a875758e8d9b4e0acb7fbb786a57bdfdaa4db26d9c3079c",
+   "octets": 54736,
+   "empreinte_source": "74438f5cb66f6aa7b97b629dc347877f102e403cd6f699b298cd3174f4d76d26",
    "blender": "5.3"
   },
   "monstres/manaeater": {
@@ -457,8 +457,8 @@
    "titre": "Dévoreur de mana",
    "fichier": "assets/3d/monstres/manaeater.glb",
    "triangles": 880,
-   "octets": 20672,
-   "empreinte_source": "1b1dca863de1dbda28ff0587c0badc5131eef86d6ffb5e0128798705c40f54c7",
+   "octets": 20952,
+   "empreinte_source": "6ae9d4e7ea8ce2db512cdb2e6e3d7514a9d9a724c0ddf0dc794e6e262ac6b4d4",
    "blender": "5.3"
   },
   "monstres/manticore": {
@@ -467,8 +467,8 @@
    "titre": "Manticore",
    "fichier": "assets/3d/monstres/manticore.glb",
    "triangles": 950,
-   "octets": 33292,
-   "empreinte_source": "fe44074f485379b54be6a2e37d121bc2f9a270601596a4f8b2dc5708dfb11e14",
+   "octets": 33200,
+   "empreinte_source": "d3c14a61ef834c9907b5b021efdb32e3db0aa8bebae0ed127b7991ddb1d65abd",
    "blender": "5.3"
   },
   "monstres/minotaur": {
@@ -477,8 +477,8 @@
    "titre": "Minotaure",
    "fichier": "assets/3d/monstres/minotaur.glb",
    "triangles": 2112,
-   "octets": 60248,
-   "empreinte_source": "aeb4db3cb1ba1615a0dda729aac5d173f6fd11758aaea74fc1205eece327f45e",
+   "octets": 60276,
+   "empreinte_source": "f9f77ab3defa62f6e3dfbac34d0b4be66048c9e1d26f0758a79e33a020e756e2",
    "blender": "5.3"
   },
   "monstres/mudgolem": {
@@ -487,8 +487,8 @@
    "titre": "Golem de boue",
    "fichier": "assets/3d/monstres/mudgolem.glb",
    "triangles": 936,
-   "octets": 20192,
-   "empreinte_source": "2596d55701b16d42c0e96e286fddc2e612feababb4052526ce00faaacca8e67a",
+   "octets": 20176,
+   "empreinte_source": "6381e7bba825b8bdc461ae3c3a4e81e1dab70887c05733cf2f17288d83bdbad7",
    "blender": "5.3"
   },
   "monstres/myco": {
@@ -497,8 +497,8 @@
    "titre": "Myconide",
    "fichier": "assets/3d/monstres/myco.glb",
    "triangles": 896,
-   "octets": 29736,
-   "empreinte_source": "098a175cb68e34732db50ee12592451dc1a167dd627046278831c1013e8605af",
+   "octets": 29728,
+   "empreinte_source": "4a3ddfdd03228efbce8b5e08f7340dd18dfadf1affbe7efb2661f33c13226c6a",
    "blender": "5.3"
   },
   "monstres/nightmare": {
@@ -507,8 +507,8 @@
    "titre": "Destrier de cauchemar",
    "fichier": "assets/3d/monstres/nightmare.glb",
    "triangles": 1238,
-   "octets": 49576,
-   "empreinte_source": "efc1b674834fe037bdfd41cabf0af802cf011761e26f3cd30e5bca7a4560520b",
+   "octets": 49200,
+   "empreinte_source": "5504739ab22ffc7d32815fdee80b8c439eaf15b5d9cb3daa5c3a9b0a46ecd568",
    "blender": "5.3"
   },
   "monstres/ogre": {
@@ -517,8 +517,8 @@
    "titre": "Ogre",
    "fichier": "assets/3d/monstres/ogre.glb",
    "triangles": 2282,
-   "octets": 62472,
-   "empreinte_source": "cb01f9fe6f64868a2dc1817c1fde6bd7103541c167db54917bb598943e9ff42e",
+   "octets": 62444,
+   "empreinte_source": "5d5624df09befb6d52a24ab66b2476447ff13c9622e15929e48d75d66caf2495",
    "blender": "5.3"
   },
   "monstres/orc": {
@@ -527,8 +527,8 @@
    "titre": "Brute orc",
    "fichier": "assets/3d/monstres/orc.glb",
    "triangles": 2192,
-   "octets": 63888,
-   "empreinte_source": "c1c21d5a2b7ddb811f2baa012189c541ba0dc62385be21f80511f706cc149736",
+   "octets": 63884,
+   "empreinte_source": "6d9937c6ec6aa99af4db59cff2bd157e8334a925a50e5bd170e3b3b18676599e",
    "blender": "5.3"
   },
   "monstres/phoenix": {
@@ -537,8 +537,8 @@
    "titre": "Phénix de givre",
    "fichier": "assets/3d/monstres/phoenix.glb",
    "triangles": 642,
-   "octets": 26036,
-   "empreinte_source": "e86c0ea063a54737bc6124d02f37ea6dc4bf6341d8d63036f366914205019fa6",
+   "octets": 26144,
+   "empreinte_source": "010ba44ce6d440531cff31dc07e89f4f54fabf692c4981b9adc89eb0c64d8e2f",
    "blender": "5.3"
   },
   "monstres/raider": {
@@ -547,8 +547,8 @@
    "titre": "Maraudeur",
    "fichier": "assets/3d/monstres/raider.glb",
    "triangles": 2034,
-   "octets": 57500,
-   "empreinte_source": "d4c208c6a7b1f41cc934dedf88f65096d4f9455e73d6001d6dedc0e6b6aa1252",
+   "octets": 58348,
+   "empreinte_source": "93cc56cd7b2e6e8d68e3152972d91620094b959207e4d59a952d967fe16f47b4",
    "blender": "5.3"
   },
   "monstres/rat": {
@@ -557,8 +557,8 @@
    "titre": "Rat des neiges",
    "fichier": "assets/3d/monstres/rat.glb",
    "triangles": 1020,
-   "octets": 35220,
-   "empreinte_source": "5aba3295e434cdbd34dfcf1ca3832f5022c99e7d258d4e626caf26f71fc8367c",
+   "octets": 35240,
+   "empreinte_source": "366eed5dc3e9b2b5d46f02f533cc7609b530b57f0f82b5ed92529afbd9c45861",
    "blender": "5.3"
   },
   "monstres/reaper": {
@@ -567,8 +567,8 @@
    "titre": "Faucheuse",
    "fichier": "assets/3d/monstres/reaper.glb",
    "triangles": 478,
-   "octets": 21960,
-   "empreinte_source": "a7fb6613f97d06c51698d5c6005d40e9868ac7130002368035096b42443041fd",
+   "octets": 21948,
+   "empreinte_source": "e29279e40febb13a2b1e61dd4b43e1d7f89f667f8218005dcc49d880f763f7d4",
    "blender": "5.3"
   },
   "monstres/rhino": {
@@ -577,8 +577,8 @@
    "titre": "Rhinocéros de guerre",
    "fichier": "assets/3d/monstres/rhino.glb",
    "triangles": 1450,
-   "octets": 41676,
-   "empreinte_source": "020bffb3b6318759b1b083cd0f30dc6f8b4253f7dc62c44636cd5706f4fb90f4",
+   "octets": 42144,
+   "empreinte_source": "d996e92a575ee0c4827a5ee685dbc7df0bdeec3fdb5529cc58625f2fbe5dab9d",
    "blender": "5.3"
   },
   "monstres/roc": {
@@ -587,8 +587,8 @@
    "titre": "Oiseau-roc",
    "fichier": "assets/3d/monstres/roc.glb",
    "triangles": 616,
-   "octets": 21148,
-   "empreinte_source": "9c4fbe969e04e3c66a7ddce6c8a11c7adc04c6d8c208b4d360571a1160a53e93",
+   "octets": 21076,
+   "empreinte_source": "ed672bdea0c88dff6ccb83ff8994a2d69fcd273a1e729568ae4a319b19bbc488",
    "blender": "5.3"
   },
   "monstres/sapper": {
@@ -597,8 +597,8 @@
    "titre": "Saboteur gobelin",
    "fichier": "assets/3d/monstres/sapper.glb",
    "triangles": 1984,
-   "octets": 61032,
-   "empreinte_source": "6c634778a4c761706e1aa10c9662953925b027eaaa41d30f98bda5ca98db3340",
+   "octets": 61092,
+   "empreinte_source": "78322a9f8dba5e2846a07b8b89c298dbdcf1436b4b8769cedbb4a6706710bd95",
    "blender": "5.3"
   },
   "monstres/skel": {
@@ -607,8 +607,8 @@
    "titre": "Squelette du givre",
    "fichier": "assets/3d/monstres/skel.glb",
    "triangles": 2084,
-   "octets": 61428,
-   "empreinte_source": "b3da0d4a2fa3d98118b11d2011d032e4ae9fb0f56d867d0205669ddcc5bf7286",
+   "octets": 61544,
+   "empreinte_source": "174cf9d24b7573cb385f5357d5c435fd112ad3a23dc62c8e201ef5346e3104c1",
    "blender": "5.3"
   },
   "monstres/slime": {
@@ -617,8 +617,8 @@
    "titre": "Gelée mutante",
    "fichier": "assets/3d/monstres/slime.glb",
    "triangles": 744,
-   "octets": 15784,
-   "empreinte_source": "c4b38868b4b26c82e42559ca4d322d7e1b768024659977e0f718cf002c6698f0",
+   "octets": 15780,
+   "empreinte_source": "edd50bb2577101e8dbaa50f9dd7ddfef03d6e57ab641e5cc9b404a0077ab22f3",
    "blender": "5.3"
   },
   "monstres/spectre": {
@@ -627,8 +627,8 @@
    "titre": "Spectre",
    "fichier": "assets/3d/monstres/spectre.glb",
    "triangles": 522,
-   "octets": 20836,
-   "empreinte_source": "bbbd251300aa075bced749f05c3d2cb3cf5831278de0fff5160806291218d532",
+   "octets": 20828,
+   "empreinte_source": "0477f8fb04de44c9c81b41e8254adfdee208dce9349f27e2e45da02d36926778",
    "blender": "5.3"
   },
   "monstres/thunder": {
@@ -637,8 +637,8 @@
    "titre": "Golem du tonnerre",
    "fichier": "assets/3d/monstres/thunder.glb",
    "triangles": 1916,
-   "octets": 66708,
-   "empreinte_source": "6a0faeef0b143308e4463df5e477e72a4a0ac937eb3431d94fdf6889791afd3d",
+   "octets": 66508,
+   "empreinte_source": "b5bbae4d0eb655fff5ef6c97baca590532af6dcd92acf4215cf4b5be4c2486da",
    "blender": "5.3"
   },
   "monstres/treant": {
@@ -647,8 +647,8 @@
    "titre": "Sylvain corrompu",
    "fichier": "assets/3d/monstres/treant.glb",
    "triangles": 2190,
-   "octets": 66508,
-   "empreinte_source": "2412be2970cf69053a21a8adb88206e025eaa1547898ae7bad24155475697d5b",
+   "octets": 65336,
+   "empreinte_source": "0166f471edf8bba37bc252ad8565d2c7b1d5800afe633f949a5399b80ad92de2",
    "blender": "5.3"
   },
   "monstres/troll": {
@@ -657,8 +657,8 @@
    "titre": "Troll des glaces",
    "fichier": "assets/3d/monstres/troll.glb",
    "triangles": 1832,
-   "octets": 57436,
-   "empreinte_source": "f5e3ed7c313252c17c99de5d599ee2782d9bd3567e5343694059e2130209e4cd",
+   "octets": 57440,
+   "empreinte_source": "f13a324a9ee23a527c0441dd9493f3a1b5e8922fb2833d3fcaa88a5b7a91b1ae",
    "blender": "5.3"
   },
   "monstres/turtle": {
@@ -667,8 +667,8 @@
    "titre": "Tortue",
    "fichier": "assets/3d/monstres/turtle.glb",
    "triangles": 1526,
-   "octets": 43356,
-   "empreinte_source": "0fc2e3608892de488a2915dcbb6feece0d9052c8913b2b3d9a708cb6e5014773",
+   "octets": 42836,
+   "empreinte_source": "c3955c8db4a8269aa155c435841ad32c76ee4d604c235485c78c144422312436",
    "blender": "5.3"
   },
   "monstres/warlord": {
@@ -677,8 +677,8 @@
    "titre": "Seigneur de guerre orc",
    "fichier": "assets/3d/monstres/warlord.glb",
    "triangles": 2428,
-   "octets": 67832,
-   "empreinte_source": "f18fa798798f12d333fbdc6945a173441bb34d9df89bc3756a172b08bb1bf480",
+   "octets": 67808,
+   "empreinte_source": "dcc5c5574e8b0bf2a787ec3d41e8702f5ad9dbc831a8f3206fb0b1c5e5bf2529",
    "blender": "5.3"
   },
   "monstres/wasp": {
@@ -687,8 +687,8 @@
    "titre": "Guêpe des glaces",
    "fichier": "assets/3d/monstres/wasp.glb",
    "triangles": 794,
-   "octets": 25320,
-   "empreinte_source": "3d36755efedc1ac7509c3b4495f102a8be4401989a21dc130dc1c0eed2a4c66c",
+   "octets": 25316,
+   "empreinte_source": "f29d813117c9fd1a82ea544a821cb10954458f41f25a4ebfc4e7320943e2d5e2",
    "blender": "5.3"
   },
   "monstres/wendigo": {
@@ -697,8 +697,8 @@
    "titre": "Wendigo",
    "fichier": "assets/3d/monstres/wendigo.glb",
    "triangles": 1710,
-   "octets": 62780,
-   "empreinte_source": "c9bd4fbf43dcc2588ea7a567d9d7b9a2ed0739b3dd28c21091c89db31249d917",
+   "octets": 62768,
+   "empreinte_source": "2db07e200bad79bcd92b47434dfb5bfbb0ad9ae35c07cb82a7791e0bf8ae2ccf",
    "blender": "5.3"
   },
   "monstres/werewolf": {
@@ -707,8 +707,8 @@
    "titre": "Loup-garou",
    "fichier": "assets/3d/monstres/werewolf.glb",
    "triangles": 1678,
-   "octets": 58976,
-   "empreinte_source": "5b535f3ca32d85c931a1ac0414e323b166db35dbe261cc176879a02d2963375c",
+   "octets": 58940,
+   "empreinte_source": "783f4e97f8c7b319193d635cc27b47c291eb0d39f89dd1b920ba27269dfee19e",
    "blender": "5.3"
   },
   "monstres/wolf": {
@@ -717,8 +717,8 @@
    "titre": "Warg",
    "fichier": "assets/3d/monstres/wolf.glb",
    "triangles": 1094,
-   "octets": 36868,
-   "empreinte_source": "854adb4fdbe71a2516e9286887424d3068a724415afcc1684f58a128bf116647",
+   "octets": 36360,
+   "empreinte_source": "36614a47d5b054a4ff522ee85b0ccf7313cad9916726e8160a35b6f80a86a9d0",
    "blender": "5.3"
   },
   "monstres/wyrm": {
@@ -727,8 +727,8 @@
    "titre": "Ver des neiges",
    "fichier": "assets/3d/monstres/wyrm.glb",
    "triangles": 1056,
-   "octets": 24768,
-   "empreinte_source": "bae0adc2a81963addc49f62ff057994c70d3fa446eb97bc314d209631ef59e19",
+   "octets": 24740,
+   "empreinte_source": "eab1b1dd8fad19bb78c49be993332327ee6f6c4081bb265d082d6f7d970c0ff9",
    "blender": "5.3"
   },
   "monstres/wyvern": {
@@ -737,8 +737,8 @@
    "titre": "Vouivre",
    "fichier": "assets/3d/monstres/wyvern.glb",
    "triangles": 650,
-   "octets": 26084,
-   "empreinte_source": "30a86508c0357310be544a18ba94e6ac3119cd6a73304335724df285451595f2",
+   "octets": 26092,
+   "empreinte_source": "a9998e280f3d5c66c68f0dd09aabc8037077caa6b9d610a40bf0425ad765b032",
    "blender": "5.3"
   },
   "monstres/yeti": {
@@ -747,238 +747,238 @@
    "titre": "Yéti",
    "fichier": "assets/3d/monstres/yeti.glb",
    "triangles": 2084,
-   "octets": 62932,
-   "empreinte_source": "7b8fb81842fb23f61ce41de5bf91ad21ff9a77e3eda7fc2a2fca3a3d0dd3e52b",
+   "octets": 62164,
+   "empreinte_source": "966b5fea4ce3737a31b3c48259050d37c276a15a5dc54183ad99e0357876337b",
    "blender": "5.3"
   },
   "tours/alliance-0": {
    "id": "tours/alliance-0",
    "categorie": "tour",
-   "titre": "Tour des archers",
+   "titre": "Tour d’arbalétriers",
    "fichier": "assets/3d/tours/alliance-0.glb",
-   "triangles": 2990,
-   "octets": 82284,
-   "empreinte_source": "c282eab056a487c0de44afcec4c8207ea88798590e558d9b40c79a701facacfe",
+   "triangles": 8548,
+   "octets": 265924,
+   "empreinte_source": "ae0fd78adc2e109329b8036952ae410410ff85adab30a8acac4535b6997381c8",
    "blender": "5.3"
   },
   "tours/alliance-1": {
    "id": "tours/alliance-1",
    "categorie": "tour",
-   "titre": "Bastion du chevalier",
+   "titre": "Poste de hallebardiers",
    "fichier": "assets/3d/tours/alliance-1.glb",
-   "triangles": 1972,
-   "octets": 55816,
-   "empreinte_source": "8e5833363ebde412b1f1ba3f16a70555bcc2e6cbecd11a041f470fffc6e9f593",
+   "triangles": 6262,
+   "octets": 240292,
+   "empreinte_source": "7a249320d0fb3a70c3e7b1ebdd8c769cd1543991d6f9c9a1bfbd1248ae2e1b28",
    "blender": "5.3"
   },
   "tours/alliance-2": {
    "id": "tours/alliance-2",
    "categorie": "tour",
-   "titre": "Obélisque de givre",
+   "titre": "Lance-filets",
    "fichier": "assets/3d/tours/alliance-2.glb",
-   "triangles": 648,
-   "octets": 21416,
-   "empreinte_source": "e84cc9457f7b94b11018c3db2a84ff824267d272df1d42b3f063c342e9f46d0f",
+   "triangles": 4036,
+   "octets": 123072,
+   "empreinte_source": "a81fa2d4178c5970040b2d9a72615b48cd05fd07665d3be5a7422d58b425281c",
    "blender": "5.3"
   },
   "tours/alliance-3": {
    "id": "tours/alliance-3",
    "categorie": "tour",
-   "titre": "Bombarde royale",
+   "titre": "Trébuchet",
    "fichier": "assets/3d/tours/alliance-3.glb",
-   "triangles": 1412,
-   "octets": 36396,
-   "empreinte_source": "48b9bdffd0b873efff959cbdf349f5ee957c9b1f6a5556be8930f304279cd2df",
+   "triangles": 3526,
+   "octets": 114700,
+   "empreinte_source": "4734ad1004369efb80413467ab633ea259cfa8df48b8e6d60216723d707c8530",
    "blender": "5.3"
   },
   "tours/alliance-4": {
    "id": "tours/alliance-4",
    "categorie": "tour",
-   "titre": "Brasier du griffon",
+   "titre": "Baliste céleste",
    "fichier": "assets/3d/tours/alliance-4.glb",
-   "triangles": 974,
-   "octets": 29212,
-   "empreinte_source": "ba379f6b98490a200ed4fbdc657a07e1323a7eb8d53c7173e69cd70f74087c6d",
+   "triangles": 3976,
+   "octets": 131116,
+   "empreinte_source": "b01e0a86a5a61d00f958488e540ec85165942a19429d01e71086cda43995348f",
    "blender": "5.3"
   },
   "tours/alliance-5": {
    "id": "tours/alliance-5",
    "categorie": "tour",
-   "titre": "Sanctuaire solaire",
+   "titre": "Chapelle du guet",
    "fichier": "assets/3d/tours/alliance-5.glb",
-   "triangles": 2452,
-   "octets": 70920,
-   "empreinte_source": "ad2a4b75b275916c016760f71a6c4b4134d606509d7e48ac5cf0d8c217d14566",
+   "triangles": 3762,
+   "octets": 117120,
+   "empreinte_source": "3d5587d342e758238b13e597bd1324c630a7312afa308a0b04fb392b998f15b4",
    "blender": "5.3"
   },
   "tours/alliance-6": {
    "id": "tours/alliance-6",
    "categorie": "tour",
-   "titre": "Tour des sentinelles",
+   "titre": "Comptoir marchand",
    "fichier": "assets/3d/tours/alliance-6.glb",
-   "triangles": 2652,
-   "octets": 75504,
-   "empreinte_source": "db64bbab9d04369f4f17bb2d713ed5c9f4b6950c0740ba84843b9406497c253a",
+   "triangles": 4322,
+   "octets": 138656,
+   "empreinte_source": "7f1282abe76eb6dd3517e372999c21fab679c18a09d21ebf92d1c200816c2fd5",
    "blender": "5.3"
   },
   "tours/alliance-7": {
    "id": "tours/alliance-7",
    "categorie": "tour",
-   "titre": "Garde du lion",
+   "titre": "Étendard royal",
    "fichier": "assets/3d/tours/alliance-7.glb",
-   "triangles": 2990,
-   "octets": 75668,
-   "empreinte_source": "9cebed1cd99dbc8825af0c63b4a63a63770fce7276cdd4b2c1c6d70676a0c46f",
+   "triangles": 3560,
+   "octets": 116600,
+   "empreinte_source": "180cd5ed0c999602cc3d9e87aa978621298e49cf1f9c5e513c311cc2ec537795",
    "blender": "5.3"
   },
   "tours/alliance-8": {
    "id": "tours/alliance-8",
    "categorie": "tour",
-   "titre": "Cristal hivernal",
+   "titre": "Inquisiteur",
    "fichier": "assets/3d/tours/alliance-8.glb",
-   "triangles": 690,
-   "octets": 24504,
-   "empreinte_source": "4f8074adc9f188bc581bd4c1bb979e0631cfc5c9bb7d7e30708426cba29d09b5",
+   "triangles": 7086,
+   "octets": 250840,
+   "empreinte_source": "d48a9d0e5e38c26758e0befc7cf7ebfd7af6edf009a80bd004475cd977c33153",
    "blender": "5.3"
   },
   "tours/alliance-9": {
    "id": "tours/alliance-9",
    "categorie": "tour",
-   "titre": "Arcaniste royal",
+   "titre": "Rayon de l’Aube",
    "fichier": "assets/3d/tours/alliance-9.glb",
-   "triangles": 2964,
-   "octets": 81592,
-   "empreinte_source": "973c1bcc67d8cb6d27a7375de8d2875c317eb592aea4454c94c0b4d6ec6b3b00",
+   "triangles": 4118,
+   "octets": 132488,
+   "empreinte_source": "84e281661ab5b408eb5357dbc41e4e4e56b2d78fbe22e9626f5a65f62e269833",
    "blender": "5.3"
   },
   "tours/horde-0": {
    "id": "tours/horde-0",
    "categorie": "tour",
-   "titre": "Tour des chasseurs",
+   "titre": "Lanceurs de haches",
    "fichier": "assets/3d/tours/horde-0.glb",
-   "triangles": 2651,
-   "octets": 87952,
-   "empreinte_source": "4c7385e511aa1a9e57f6e621fe57bdddf0b4266d303a233caa8edd6ed64b0671",
+   "triangles": 4714,
+   "octets": 145780,
+   "empreinte_source": "25837c5f1d792d5a69df38f98b61f43fbf7869bd02bd644e7dcfe379ac4a035e",
    "blender": "5.3"
   },
   "tours/horde-1": {
    "id": "tours/horde-1",
    "categorie": "tour",
-   "titre": "Totem du berserker",
+   "titre": "Hutte du berserker",
    "fichier": "assets/3d/tours/horde-1.glb",
-   "triangles": 1763,
-   "octets": 55648,
-   "empreinte_source": "a9e77a3014c47b8db578154ec6038356cf58bcaa0921984d3005ec42646db66a",
+   "triangles": 4908,
+   "octets": 196244,
+   "empreinte_source": "254feb4e68de1d1b247e48649a2b679995cdcea94767ccd5614e7de6c6b2c579",
    "blender": "5.3"
   },
   "tours/horde-2": {
    "id": "tours/horde-2",
    "categorie": "tour",
-   "titre": "Totem de glace",
+   "titre": "Totem des pluies glacées",
    "fichier": "assets/3d/tours/horde-2.glb",
-   "triangles": 613,
-   "octets": 21344,
-   "empreinte_source": "99d18ff4a43cf986ab21d2f0d09e3b5446a9a5c5cc613d908e3e0945b91b3a8e",
+   "triangles": 2504,
+   "octets": 69412,
+   "empreinte_source": "a9d13f1ca8f1c3daef6856ada71c338699ead5253bcb7a7cc6db8787fce7c769",
    "blender": "5.3"
   },
   "tours/horde-3": {
    "id": "tours/horde-3",
    "categorie": "tour",
-   "titre": "Canon des clans",
+   "titre": "Catapulte à rochers",
    "fichier": "assets/3d/tours/horde-3.glb",
-   "triangles": 1331,
-   "octets": 35388,
-   "empreinte_source": "2a24d77621383c097c4be3fd34dd313c69b75a1b9f2d1c20098c69a00ddb220f",
+   "triangles": 1992,
+   "octets": 55524,
+   "empreinte_source": "5d94ab5f7d605ba090d12167998145f238ab74480eae1dcc4ae63399228b644a",
    "blender": "5.3"
   },
   "tours/horde-4": {
    "id": "tours/horde-4",
    "categorie": "tour",
-   "titre": "Fourneau de guerre",
+   "titre": "Aire des aigles-tempête",
    "fichier": "assets/3d/tours/horde-4.glb",
-   "triangles": 903,
-   "octets": 28404,
-   "empreinte_source": "6b11acbef7be93f35ed386ba1428da9406f3399892a91adeb4d67ab82c5d05bf",
+   "triangles": 4302,
+   "octets": 160264,
+   "empreinte_source": "63625fe9ab8d47e143b8bdf71d734f57b21b0b84bc614f3a5798914c5cb2c176",
    "blender": "5.3"
   },
   "tours/horde-5": {
    "id": "tours/horde-5",
    "categorie": "tour",
-   "titre": "Chaman des flammes",
+   "titre": "Hutte du chaman des esprits",
    "fichier": "assets/3d/tours/horde-5.glb",
-   "triangles": 2529,
-   "octets": 78316,
-   "empreinte_source": "3e9ea08cd38996c0fe3de157dadeca2e08fca29a57c0ba0884753b73bb7fe5ce",
+   "triangles": 4878,
+   "octets": 185388,
+   "empreinte_source": "2262cbf2e728ede4f35348c403bcfd628eb7f3300a37afa84cbcadfb850e8c88",
    "blender": "5.3"
   },
   "tours/horde-6": {
    "id": "tours/horde-6",
    "categorie": "tour",
-   "titre": "Tour des éclaireurs",
+   "titre": "Totem de foudre",
    "fichier": "assets/3d/tours/horde-6.glb",
-   "triangles": 2533,
-   "octets": 82752,
-   "empreinte_source": "847032158f8a6803f15e5174d903e2886c9136d9f4e867d968ccddef4bb7bd69",
+   "triangles": 1876,
+   "octets": 58916,
+   "empreinte_source": "dfc7388ac9c11164f838e5c9418b57b62fe9f00f87d3b97dc6296217a6e0e830",
    "blender": "5.3"
   },
   "tours/horde-7": {
    "id": "tours/horde-7",
    "categorie": "tour",
-   "titre": "Garde-lame",
+   "titre": "Grands tambours de guerre",
    "fichier": "assets/3d/tours/horde-7.glb",
-   "triangles": 2990,
-   "octets": 79196,
-   "empreinte_source": "80b2de077f6203a4bc7341768e8efb914f3abbdb613409fc6cf4a9d048bd915e",
+   "triangles": 2646,
+   "octets": 78416,
+   "empreinte_source": "5f94f565011bbe550cecc4d0ce9eaf8740302dacef4be178de2c8f36b33eb56d",
    "blender": "5.3"
   },
   "tours/horde-8": {
    "id": "tours/horde-8",
    "categorie": "tour",
-   "titre": "Totem des esprits",
+   "titre": "Totem de sang",
    "fichier": "assets/3d/tours/horde-8.glb",
-   "triangles": 655,
-   "octets": 24044,
-   "empreinte_source": "dc143f58fe41b56afcaf6bc22a36a343ecb7bd4b63c70d9d00034194868ea6b7",
+   "triangles": 2309,
+   "octets": 63288,
+   "empreinte_source": "760317cce3e65f84e50329c4b65914d68eb85eeefe4df6f18b9651cb324f9ff6",
    "blender": "5.3"
   },
   "tours/horde-9": {
    "id": "tours/horde-9",
    "categorie": "tour",
-   "titre": "Grand sorcier orc",
+   "titre": "Cœur de l’Orage",
    "fichier": "assets/3d/tours/horde-9.glb",
-   "triangles": 2990,
-   "octets": 87632,
-   "empreinte_source": "b29c58a5475712aff257c5577e201ca85ce5ec25bf7b8ed1157c62c5892e3b49",
+   "triangles": 2346,
+   "octets": 66804,
+   "empreinte_source": "dec5b3d654fe02fb7b48dea154f6cb32d37fdb4eed946b99b5ef9a677542d3a3",
    "blender": "5.3"
   },
   "tours/nains-0": {
    "id": "tours/nains-0",
    "categorie": "tour",
-   "titre": "Tourelle de guet",
+   "titre": "Arbalète à répétition",
    "fichier": "assets/3d/tours/nains-0.glb",
-   "triangles": 2842,
-   "octets": 77668,
-   "empreinte_source": "414b9a2806a7f41fbe0b7d2dcf34c615cf949615331d1ad000d69446da38e8a7",
+   "triangles": 5344,
+   "octets": 181632,
+   "empreinte_source": "4592527b6e360c88eb3001bd5c600d6500c53554eda7faa1fb785fdfe3217d0a",
    "blender": "5.3"
   },
   "tours/nains-1": {
    "id": "tours/nains-1",
    "categorie": "tour",
-   "titre": "Automate garde",
+   "titre": "Marteau-pilon",
    "fichier": "assets/3d/tours/nains-1.glb",
-   "triangles": 1914,
-   "octets": 55092,
-   "empreinte_source": "ba549f85bb807472014268b91ff8ddf047de5ab2f5545b1f1617b2be3faa6742",
+   "triangles": 3092,
+   "octets": 104688,
+   "empreinte_source": "1b2f33f93694f5ed501ab59dcbf07eb2f5a88234de4d5583e1b88239f39feab2",
    "blender": "5.3"
   },
   "tours/nains-2": {
    "id": "tours/nains-2",
    "categorie": "tour",
-   "titre": "Cryo-forge",
+   "titre": "Baliste perce-plaque",
    "fichier": "assets/3d/tours/nains-2.glb",
-   "triangles": 680,
-   "octets": 22436,
-   "empreinte_source": "089e86edddf68655c88b85ae3800c3e055763bb318280f327dd856fa4da9d898",
+   "triangles": 2904,
+   "octets": 96132,
+   "empreinte_source": "a74b5a75e32b6533e6d00f8521231c023a21d9d1b9d2a947b672afe9df44ab2d",
    "blender": "5.3"
   },
   "tours/nains-3": {
@@ -986,269 +986,269 @@
    "categorie": "tour",
    "titre": "Mortier runique",
    "fichier": "assets/3d/tours/nains-3.glb",
-   "triangles": 1260,
-   "octets": 33420,
-   "empreinte_source": "ebc522e0ba99f27d7f13e801e0be3232f3b6849e312545a28e4e4c27310f7e5c",
+   "triangles": 3002,
+   "octets": 92920,
+   "empreinte_source": "89a2817930bcd76ba9db69b0b03d260a3b795d9624db02cd7e8206e8ab7df2ba",
    "blender": "5.3"
   },
   "tours/nains-4": {
    "id": "tours/nains-4",
    "categorie": "tour",
-   "titre": "Forge incandescente",
+   "titre": "Canon antiaérien à éclats",
    "fichier": "assets/3d/tours/nains-4.glb",
-   "triangles": 820,
-   "octets": 27564,
-   "empreinte_source": "2dddada1d379f6bd5ef540f2ff1e01b9c617a7bc007ed11dbf8bb55b233c1dd1",
+   "triangles": 3058,
+   "octets": 100028,
+   "empreinte_source": "b092bfcb91c4e9ab357ae17c3ff114a0270b8bb4d87a15d344558b5f2af5e40c",
    "blender": "5.3"
   },
   "tours/nains-5": {
    "id": "tours/nains-5",
    "categorie": "tour",
-   "titre": "Canon arcanique",
+   "titre": "Phare runique",
    "fichier": "assets/3d/tours/nains-5.glb",
-   "triangles": 2490,
-   "octets": 70660,
-   "empreinte_source": "2c2a589388d9c6d51b29696516fb463528be182eb20578e1c86435353fbdaa71",
+   "triangles": 2940,
+   "octets": 96364,
+   "empreinte_source": "b640619988230dda910f7ae16a6b59912b5fd7cda98af343f9b9081a1acf7719",
    "blender": "5.3"
   },
   "tours/nains-6": {
    "id": "tours/nains-6",
    "categorie": "tour",
-   "titre": "Baliste naine",
+   "titre": "Gueule de forge",
    "fichier": "assets/3d/tours/nains-6.glb",
-   "triangles": 2556,
-   "octets": 70540,
-   "empreinte_source": "cb5cfc2fce80b85b3ea8defb5e50159a70fdc47fb60e5dfcee91e0aa7d87c4eb",
+   "triangles": 2892,
+   "octets": 93892,
+   "empreinte_source": "79d3a3edec2f6aa9cf3bdcd652a5f177bf4bd06b2a7e624d398de0713ea05a69",
    "blender": "5.3"
   },
   "tours/nains-7": {
    "id": "tours/nains-7",
    "categorie": "tour",
-   "titre": "Sentinelle d’acier",
+   "titre": "Enclume runique",
    "fichier": "assets/3d/tours/nains-7.glb",
-   "triangles": 2848,
-   "octets": 76152,
-   "empreinte_source": "0aac920c41309d3fecc37c37e540f00bde3406f1ddf5fc7763f5b727d65a8a08",
+   "triangles": 4935,
+   "octets": 204160,
+   "empreinte_source": "1d0572af88d7c886feffa79e6ca2c1dd300238980a86c776b75927190c8ea858",
    "blender": "5.3"
   },
   "tours/nains-8": {
    "id": "tours/nains-8",
    "categorie": "tour",
-   "titre": "Générateur runique",
+   "titre": "Champ de mines",
    "fichier": "assets/3d/tours/nains-8.glb",
-   "triangles": 722,
-   "octets": 25104,
-   "empreinte_source": "58d9a9c866d2f48aed4915dbb061f5ea0df9ef53f4a6613f034ab12934eaf1a8",
+   "triangles": 2878,
+   "octets": 96804,
+   "empreinte_source": "b1cfb22adc5299aa7acfe83c84ba237d54e49baf5f5f1e14b18bcc9d75f33db3",
    "blender": "5.3"
   },
   "tours/nains-9": {
    "id": "tours/nains-9",
    "categorie": "tour",
-   "titre": "Maître ingénieur",
+   "titre": "Grondeterre",
    "fichier": "assets/3d/tours/nains-9.glb",
-   "triangles": 2990,
-   "octets": 81872,
-   "empreinte_source": "6c4228d1dfa41c820eca12edc9d00b971e51be18e1d89ef2640de84d504f5f7a",
+   "triangles": 3270,
+   "octets": 97656,
+   "empreinte_source": "1a65b1af5898097ae316ba9a91daab6a3c551ebf2d7526743c25d2154ef2f651",
    "blender": "5.3"
   },
   "tours/ombres-0": {
    "id": "tours/ombres-0",
    "categorie": "tour",
-   "titre": "Tour des damnés",
+   "titre": "Tour des archers squelettes",
    "fichier": "assets/3d/tours/ombres-0.glb",
-   "triangles": 1742,
-   "octets": 60084,
-   "empreinte_source": "fe0c51372ea76e63a2c1145c90981b6da5e569a095f341ea09e4dd76926ec902",
+   "triangles": 6212,
+   "octets": 208220,
+   "empreinte_source": "6e40dfb1e0a66e0d472908c7d546562baa7a2055f1d44cd8872a8f9a2f4ba83a",
    "blender": "5.3"
   },
   "tours/ombres-1": {
    "id": "tours/ombres-1",
    "categorie": "tour",
-   "titre": "Chevalier funeste",
+   "titre": "Ossuaire",
    "fichier": "assets/3d/tours/ombres-1.glb",
-   "triangles": 1532,
-   "octets": 50084,
-   "empreinte_source": "27a0954859d08bb001e9d03fe41370fab61cf16d347029f6eede56f0ff6c1b05",
+   "triangles": 5494,
+   "octets": 266928,
+   "empreinte_source": "57f2d2d7c45c2ee48fd93f7cd61918640052d1c5b32143fa46ea5e7aa0bee870",
    "blender": "5.3"
   },
   "tours/ombres-2": {
    "id": "tours/ombres-2",
    "categorie": "tour",
-   "titre": "Obélisque maudit",
+   "titre": "Obélisque de malédiction",
    "fichier": "assets/3d/tours/ombres-2.glb",
-   "triangles": 526,
-   "octets": 18968,
-   "empreinte_source": "00213ee7554ba74f2d6a1974f731e3218adf2df13112fbd12f8b8701976469a0",
+   "triangles": 3314,
+   "octets": 112816,
+   "empreinte_source": "f40bab1b1f28f1c6d9284b9194c3371c9230d6f8e614fb5bf857878558f048de",
    "blender": "5.3"
   },
   "tours/ombres-3": {
    "id": "tours/ombres-3",
    "categorie": "tour",
-   "titre": "Mortier infernal",
+   "titre": "Autel de peste",
    "fichier": "assets/3d/tours/ombres-3.glb",
-   "triangles": 1394,
-   "octets": 36476,
-   "empreinte_source": "f34f9b9ac0587ae853b422cd9e9c55cc55643fa677ccc3dcf16fbeaec3d917e1",
+   "triangles": 4008,
+   "octets": 134436,
+   "empreinte_source": "528aa6be5b3e6d51ccc429c456c31967e9fb3bd799550d1c1c1abaf0fdae5953",
    "blender": "5.3"
   },
   "tours/ombres-4": {
    "id": "tours/ombres-4",
    "categorie": "tour",
-   "titre": "Puits de lave",
+   "titre": "Perchoir des gargouilles",
    "fichier": "assets/3d/tours/ombres-4.glb",
-   "triangles": 803,
-   "octets": 28280,
-   "empreinte_source": "7902fa92f0420c3bb833872a30aa86432f8974f9ee8886decf3c46d2fea94fb7",
+   "triangles": 5450,
+   "octets": 207720,
+   "empreinte_source": "c8ff2fbfec6ca58018bd90d8b4b1c761f1fffcce6587a82d5ae19e2d55fbc175",
    "blender": "5.3"
   },
   "tours/ombres-5": {
    "id": "tours/ombres-5",
    "categorie": "tour",
-   "titre": "Nexus du néant",
+   "titre": "Œil du Voile",
    "fichier": "assets/3d/tours/ombres-5.glb",
-   "triangles": 1961,
-   "octets": 60688,
-   "empreinte_source": "1bcf88fee8920575109c11a5fb7c70945f837ea139c952910a0fecb96d5dc44a",
+   "triangles": 5902,
+   "octets": 244320,
+   "empreinte_source": "0bd32896ea6dc814422666d8f812108a968ae1c9b7a201427a799b00afb738d8",
    "blender": "5.3"
   },
   "tours/ombres-6": {
    "id": "tours/ombres-6",
    "categorie": "tour",
-   "titre": "Œil démoniaque",
+   "titre": "Nécromancien",
    "fichier": "assets/3d/tours/ombres-6.glb",
-   "triangles": 1680,
-   "octets": 55804,
-   "empreinte_source": "b29803693027195903bac705d2a5f838dea62e83cdcd24f77be4f5e829c9dadb",
+   "triangles": 6032,
+   "octets": 196384,
+   "empreinte_source": "38c180a62b4dff554bdefbdbcd0d3901c30f9967ea42937c05c4765c830f2741",
    "blender": "5.3"
   },
   "tours/ombres-7": {
    "id": "tours/ombres-7",
    "categorie": "tour",
-   "titre": "Gardien spectral",
+   "titre": "Puits des âmes",
    "fichier": "assets/3d/tours/ombres-7.glb",
-   "triangles": 2674,
-   "octets": 73224,
-   "empreinte_source": "716b0e2837074c5c71638e63548e6e726c2c1acad7a374ed5d038a39c417abc4",
+   "triangles": 4550,
+   "octets": 155056,
+   "empreinte_source": "edc46c7184c51426b5aff01739ee45a8b455ed0cdaa50189f9bf4202ec7212e0",
    "blender": "5.3"
   },
   "tours/ombres-8": {
    "id": "tours/ombres-8",
    "categorie": "tour",
-   "titre": "Cristal corrupteur",
+   "titre": "Faucheuse",
    "fichier": "assets/3d/tours/ombres-8.glb",
-   "triangles": 568,
-   "octets": 21788,
-   "empreinte_source": "d17351bc758cb2f2fc54e9535a854dcea5abe7510fefb3713aba472357e532ba",
+   "triangles": 3749,
+   "octets": 111508,
+   "empreinte_source": "eaeb5d4c6c2b8728c8c94fb7b664f0483164bc8ae5a62bb3e822052af51a145e",
    "blender": "5.3"
   },
   "tours/ombres-9": {
    "id": "tours/ombres-9",
    "categorie": "tour",
-   "titre": "Archimage noir",
+   "titre": "Colosse d’os",
    "fichier": "assets/3d/tours/ombres-9.glb",
-   "triangles": 2473,
-   "octets": 70780,
-   "empreinte_source": "58d0f9854d9c908ee76a785cb047521f77cca612b1a1c6b83b038be84b70041f",
+   "triangles": 5196,
+   "octets": 261660,
+   "empreinte_source": "122e18f02ad841ffe073eb702f2e8331f8f67a8f9991f4c0cda07f954b9f538c",
    "blender": "5.3"
   },
   "tours/sylvestres-0": {
    "id": "tours/sylvestres-0",
    "categorie": "tour",
-   "titre": "Arbre sentinelle",
+   "titre": "Archers sylvains",
    "fichier": "assets/3d/tours/sylvestres-0.glb",
-   "triangles": 2961,
-   "octets": 80052,
-   "empreinte_source": "3a6dd42e70a90bbf6c0e154a4139c452a5c123052f929598c79d6138a7ae59b6",
+   "triangles": 5020,
+   "octets": 174796,
+   "empreinte_source": "24eafbf8f25cce769ee4ceaed7485e9d57da09d4157f4a694b43b62b69162de2",
    "blender": "5.3"
   },
   "tours/sylvestres-1": {
    "id": "tours/sylvestres-1",
    "categorie": "tour",
-   "titre": "Gardien des racines",
+   "titre": "Haie de ronces",
    "fichier": "assets/3d/tours/sylvestres-1.glb",
-   "triangles": 1733,
-   "octets": 53112,
-   "empreinte_source": "eaa1d3684eddd3727f833be3d3a3a1202da1453d1a7875454a53973742821f71",
+   "triangles": 4846,
+   "octets": 181000,
+   "empreinte_source": "60f0e83bb991d5dddfa1af86ee5483b0f30ede8e79134b721c7bdb0528b5c86c",
    "blender": "5.3"
   },
   "tours/sylvestres-2": {
    "id": "tours/sylvestres-2",
    "categorie": "tour",
-   "titre": "Pierre de rosée",
+   "titre": "Gardien enracineur",
    "fichier": "assets/3d/tours/sylvestres-2.glb",
-   "triangles": 727,
-   "octets": 22460,
-   "empreinte_source": "be3a72796f529b80855ed9cb604c9c6061dbc40c2a4d073b7aa6cca5fe4911dd",
+   "triangles": 3731,
+   "octets": 145840,
+   "empreinte_source": "89ad44f6716785f1a023a99af211be4700dfd4bad327dd3b9a555f0a842265b0",
    "blender": "5.3"
   },
   "tours/sylvestres-3": {
    "id": "tours/sylvestres-3",
    "categorie": "tour",
-   "titre": "Fleur explosive",
+   "titre": "Fleur de venin",
    "fichier": "assets/3d/tours/sylvestres-3.glb",
-   "triangles": 1091,
-   "octets": 25324,
-   "empreinte_source": "87621d4a3208f8d4e3dece036e3079f8bb3dcb42cff4dafe2deff72453f3b172",
+   "triangles": 3562,
+   "octets": 112764,
+   "empreinte_source": "3aa364860a46cd2b1723846d0d9ca43ae6f19aad13c1b77e2a1d645c2c5733b4",
    "blender": "5.3"
   },
   "tours/sylvestres-4": {
    "id": "tours/sylvestres-4",
    "categorie": "tour",
-   "titre": "Cœur ardent",
+   "titre": "Nid des chouettes des neiges",
    "fichier": "assets/3d/tours/sylvestres-4.glb",
-   "triangles": 900,
-   "octets": 28144,
-   "empreinte_source": "5db36a813db6789e261fb3baad5de5d85084a41c79fbbd850e1686b90a3eb4de",
+   "triangles": 4354,
+   "octets": 154620,
+   "empreinte_source": "6251966ffcb3140dcc5dc102ab3c62212e8db8a117658c7dc3046d6177e1950f",
    "blender": "5.3"
   },
   "tours/sylvestres-5": {
    "id": "tours/sylvestres-5",
    "categorie": "tour",
-   "titre": "Cercle druidique",
+   "titre": "Puits de lune",
    "fichier": "assets/3d/tours/sylvestres-5.glb",
-   "triangles": 2345,
-   "octets": 68508,
-   "empreinte_source": "a0bc2c146f8cbb09835f7dbceaf0c1378972176fe7f080aa74dd2a97d4590282",
+   "triangles": 1704,
+   "octets": 60448,
+   "empreinte_source": "e23042b36a4418cde61984a6dfe66dcf76b02bf87764c0273ddceb457b7bbac5",
    "blender": "5.3"
   },
   "tours/sylvestres-6": {
    "id": "tours/sylvestres-6",
    "categorie": "tour",
-   "titre": "Nid des faucons",
+   "titre": "Cercle de Floraison",
    "fichier": "assets/3d/tours/sylvestres-6.glb",
-   "triangles": 2219,
-   "octets": 65580,
-   "empreinte_source": "3487eb3b7f5c0bb2621192f7ce803ad115ce284b8589a8eaf90b20bb264c723f",
+   "triangles": 1731,
+   "octets": 47900,
+   "empreinte_source": "ea3b255104f53173b5695d6fc3a9b21866a8eddab0b5590db3a7a47f80bc89c8",
    "blender": "5.3"
   },
   "tours/sylvestres-7": {
    "id": "tours/sylvestres-7",
    "categorie": "tour",
-   "titre": "Dryade protectrice",
+   "titre": "Bosquet ancien",
    "fichier": "assets/3d/tours/sylvestres-7.glb",
-   "triangles": 2667,
-   "octets": 70188,
-   "empreinte_source": "fffdc9649637f46005d9b7b4639dc4212746d7229b7c5ad947110120e99e26e1",
+   "triangles": 1772,
+   "octets": 58152,
+   "empreinte_source": "9d3d6271bd8cecc26aeaa2ddb788d2a2999dc2d8c2119511d7cc7967af1a96ad",
    "blender": "5.3"
   },
   "tours/sylvestres-8": {
    "id": "tours/sylvestres-8",
    "categorie": "tour",
-   "titre": "Cristal lunaire",
+   "titre": "Tireur des cimes",
    "fichier": "assets/3d/tours/sylvestres-8.glb",
-   "triangles": 769,
-   "octets": 25392,
-   "empreinte_source": "20d924ac63e5cd54649ac196d863588d6b716a49088a47b42d1b35297701c3a5",
+   "triangles": 4814,
+   "octets": 201836,
+   "empreinte_source": "d0d9ac0d6c1aa3ac75ef88c8954792b13a2dc7feb4738b08b776d42383a474a7",
    "blender": "5.3"
   },
   "tours/sylvestres-9": {
    "id": "tours/sylvestres-9",
    "categorie": "tour",
-   "titre": "Ancien arcanique",
+   "titre": "Arbre-Mère",
    "fichier": "assets/3d/tours/sylvestres-9.glb",
-   "triangles": 2855,
-   "octets": 79060,
-   "empreinte_source": "972b2de592f70cde427b35566462362022e5f11eb813860fe14e4c4e85cac974",
+   "triangles": 4866,
+   "octets": 157824,
+   "empreinte_source": "479b54e3fc3da8169f4b165e4b2f6e7341ed3a35b52db0fcd8261076956c9376",
    "blender": "5.3"
   }
  }

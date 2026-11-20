@@ -1,10 +1,9 @@
-"""Alliance — Arcaniste royal (emplacement 9 : Mage · archimage).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['alliance']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Royaume d’Aubeval — Rayon de l’Aube (emplacement 9 : ultime).
+Forme : communs/aubeval_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.aubeval_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Arcaniste royal"}
+INFOS = {'categorie': 'tour', 'titre': "Rayon de l’Aube"}
 
 def construire(ctx):
-    preparer(tour('alliance', 9))
+    preparer(tour(9))
