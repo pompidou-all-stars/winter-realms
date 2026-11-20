@@ -525,9 +525,10 @@ export function creer(J) {
       case 'slash': o = new THREE.Mesh(G.tranche, transp('#ffffff', .9)); break;
       case 'bad': { o = new THREE.Mesh(G.boite, transp('#ff4d3d', .6)); o.scale.set(1, .02, 1); break }
       case 'zap': {
-        const pts = []; const a = new THREE.Vector3(f.x, .3, f.y), b = new THREE.Vector3(f.x2, 1.1, f.y2 + .4);
-        for (let i = 0; i <= 5; i++) { const p = a.clone().lerp(b, i / 5); if (i && i < 5) { p.x += (i % 2 ? 1 : -1) * .1; p.z += (i % 2 ? -.06 : .06) } pts.push(p) }
-        o = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: '#ffe45e', transparent: true})); break;
+        /* 2.39 : couleur (f.col), trait droit (f.ln : tir en ligne, rayon), éclair tombé du ciel (f.ciel) */
+        const pts = []; const a = f.ciel ? new THREE.Vector3(f.x2, 3.2, f.y2) : new THREE.Vector3(f.x, f.ln ? .7 : .3, f.y), b = new THREE.Vector3(f.x2, f.ciel ? .3 : f.ln ? .45 : 1.1, f.y2 + (f.ln || f.ciel ? 0 : .4));
+        for (let i = 0; i <= 5; i++) { const p = a.clone().lerp(b, i / 5); if (i && i < 5 && !f.ln) { p.x += (i % 2 ? 1 : -1) * .1; p.z += (i % 2 ? -.06 : .06) } pts.push(p) }
+        o = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: f.col || '#ffe45e', transparent: true})); break;
       }
       default: return null;
     }
@@ -563,8 +564,12 @@ export function creer(J) {
 
   /* ---------- image ---------- */
   let terrain = null, dernier = 0;
+  /* 2.39 : morts relevés par la Cour des Ossements (modèle du Squelette du givre, Colosse de pierre pour le Colosse d'os) et mines de Hautroc */
+  const allies = new Map(), mines = new Map(), matMine = transp('#ff9a3d', .85);
+  const SQ = CR.findIndex(T => T.g == 'skel'), CO = CR.findIndex(T => T.g == 'colossus');
+  function creerMine() { const r = new THREE.Group(), d = new THREE.Mesh(G.disque, matMine); d.scale.setScalar(.22); r.add(d); const c = new THREE.Mesh(G.octa, mat('#ffb347', {emissive: '#ff6a1a', emissiveIntensity: .8})); c.scale.setScalar(.07); c.position.y = .08; r.add(c); r.renderOrder = 2; scene.add(r); return {r, c} }
   function vider() {
-    for (const m of [tours, monstres, projs, effets]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
+    for (const m of [tours, monstres, projs, effets, allies, mines]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
   }
   function dessiner(b, temps, etat) {
     const dt = dernier ? Math.min(.1, Math.max(0, temps - dernier)) : 0; dernier = temps;
@@ -578,6 +583,9 @@ export function creer(J) {
       (T, t) => majTour(T, t, temps), retirerGroupe);
     synchro(monstres, b.cr, c => c.id, c => { const Mo = creerMonstre(c); if (Mo) scene.add(Mo.r); return Mo }, (Mo, c) => majMonstre(Mo, c, dt, temps), retirerGroupe);
     synchro(projs, b.pr, p => p.id, creerProj, majProj, retirerGroupe);
+    synchro(allies, (b.al || []).map((a, i) => ({id: 'a' + (a.id ?? i) + (a.g ? 'g' : ''), k: a.g ? CO : SQ, x: a.x, y: a.y, f: a.f || 1, ox: 0, oy: 0, sl: 0, ph: 0, hp: 1, max: 1})), c => c.id,
+      c => { const Mo = creerMonstre(c); if (Mo) { if (c.k === CO) Mo.r.scale.setScalar(.75); scene.add(Mo.r) } return Mo }, (Mo, c) => majMonstre(Mo, c, dt, temps), retirerGroupe);
+    synchro(mines, b.mi || [], m => m.id ?? (m.x + ',' + m.y), creerMine, (o, m) => { o.r.position.set(m.x + .5, .03, m.y + .5); o.c.rotation.y = temps * 2; o.c.position.y = .08 + Math.sin(temps * 4) * .02 }, retirerGroupe);
     synchro(effets, b.fx, f => f, creerEffet, majEffet, o => scene.remove(o));
 
     /* sélection : tour touchée ou projet de construction */

@@ -48,47 +48,35 @@ test('Espacement dans un couloir d\'une case : on ne sort jamais du couloir et p
 test('Vitesse ralentie : déplacement = vitesse × facteur × temps',()=>{const b=terrain();const c=apparaitre(S,b,0);
  c.gt=10;c.gp=.5;b.update(.5);proche(c.y,1.6*.5*.5,'position');
 });
-test('Givre : de −20 % (niveau 1) à −50 % (niveau 5), pendant 1,5 s à 2,7 s',()=>{const b=terrain(),T=S.TW[2];
+/* 2.39 : le froid vient du Totem des pluies glacées (Clans de l'Orage Blanc, emplacement 2) ; GIVRE_LV règle toujours son effet */
+const GV=12,orage=()=>{const b=partie(S,{factions:[1,0,2,3]}).B[0];b.gold=1e6;return b};
+test('Froid (Totem des pluies glacées) : de −20 % (niveau 1) à −50 % (niveau 5), pendant 1,5 s à 2,7 s',()=>{const b=terrain(),T=S.TW[GV];
  const att=[[.8,1.5],[.725,1.8],[.65,2.1],[.575,2.4],[.5,2.7]];
  for(let lv=1;lv<=5;lv++){const c=apparaitre(S,b,3);b.hit(c,0,T,lv);proche(c.sf,att[lv-1][0],'vitesse niveau '+lv);proche(c.sl,att[lv-1][1],'durée niveau '+lv)}
 });
-test('Cristal hivernal (Givre renforcé, emplacement 8) : 10 points de ralentissement de plus que le Givre, à chaque niveau',()=>{const b=terrain(),T=S.TW[8];
- for(let lv=1;lv<=5;lv++){const c=apparaitre(S,b,3);b.hit(c,0,T,lv);proche(c.sf,1-S.GIVRE_LV.p[lv-1]-S.GIVRE_BONUS,'niveau '+lv);proche(c.sl,S.GIVRE_LV.d[lv-1],'durée niveau '+lv)}
- assert.ok(T.d>S.TW[2].d*1.5,'plus de dégâts que l’Obélisque de givre');
+test('Froid : deux coups ne s’additionnent pas, le plus fort et le plus long l’emportent',()=>{const b=terrain();const c=apparaitre(S,b,3);
+ b.hit(c,0,S.TW[GV],5);b.hit(c,0,S.TW[GV],1);proche(c.sf,.5,'deux coups');proche(c.sl,2.7,'durée');
 });
-test('Cristal hivernal et Givre ne se cumulent pas : le plus fort l’emporte, dans les deux sens',()=>{const b=terrain();
- let c=apparaitre(S,b,3);b.hit(c,0,S.TW[2],1);b.hit(c,0,S.TW[8],1);proche(c.sf,.7,'Givre puis Cristal');
- c=apparaitre(S,b,3);b.hit(c,0,S.TW[8],1);b.hit(c,0,S.TW[2],5);proche(c.sf,.5,'Givre niveau 5 plus fort');
- c=apparaitre(S,b,3);b.hit(c,0,S.TW[8],5);b.hit(c,0,S.TW[2],5);proche(c.sf,.4,'Cristal niveau 5 garde son effet');
-});
-test('Givre : la zone d’effet passe de 1,2 case (niveau 1) à 2 cases (niveau 5)',()=>{
+test('Froid : la zone d’effet passe de 1,2 case (niveau 1) à 2 cases (niveau 5)',()=>{
  for(const [lv,ralenti] of [[1,false],[5,true]]){const b=terrain();const a=apparaitre(S,b,0),v=apparaitre(S,b,0);a.hp=a.max=v.hp=v.max=1e9;
   Object.assign(a,{x:6,y:5,tx:6,ty:5});Object.assign(v,{x:6,y:6.8,tx:6,ty:7});
-  b.impact({k:2,tg:a,d:1,tx:a.x+.5,ty:a.y+.5,lv});assert.ok(a.sl>0,'cible');assert.equal(v.sl>0,ralenti,'voisin à 1,8 case, niveau '+lv);
+  b.impact({k:GV,tg:a,d:1,tx:a.x+.5,ty:a.y+.5,lv});assert.ok(a.sl>0,'cible');assert.equal(v.sl>0,ralenti,'voisin à 1,8 case, niveau '+lv);
   const z=b.fx.find(f=>f.type=='boom');proche(z.r,S.GIVRE_LV.r[lv-1],'rayon affiché')}
 });
-test('Givre : le ralentissement vient du niveau de la tour qui tire',()=>{const G=partie(S),b=G.B[0];b.gold=1e6;
- b.place(5,3,2);const t=b.t[0];pret(b);for(let i=0;i<4;i++){b.upgrade(t);pret(b)}const c=apparaitre(S,b,3);c.hp=c.max=1e9;
+test('Froid : le ralentissement vient du niveau de la tour qui tire',()=>{const b=orage();
+ b.place(5,3,GV);const t=b.t[0];pret(b);for(let i=0;i<4;i++){b.upgrade(t);pret(b)}const c=apparaitre(S,b,3);c.hp=c.max=1e9;
  avancerTerrain(b,3);assert.ok(c.sl>0);proche(c.sf,.5,'niveau 5');
 });
-test('Racines sylvestres : toutes leurs tours ralentissent, de −10 % pendant 0,72 s (niveau 1) à −30 % pendant 1,3 s (niveau 5)',()=>{const b=terrain([2,0,1,3]);
- for(const k of [20,21,23,24,25,26,27,29]){const c=apparaitre(S,b,3);b.hit(c,1,S.TW[k],1);proche(c.sf,.9,S.TW[k].n);proche(c.sl,.72,S.TW[k].n);
-  const c5=apparaitre(S,b,3);b.hit(c5,1,S.TW[k],5);proche(c5.sf,.7,S.TW[k].n+' niv. 5');proche(c5.sl,1.3,S.TW[k].n+' niv. 5')}
+test('Plancher (règle d’or n°1) : les ralentissements cumulés ne descendent jamais sous ×0,3',()=>{const b=terrain();const c=apparaitre(S,b,3);
+ Object.assign(c,{gp:.5,gt:5,rp:.4,rt:5});b.update(0);proche(c.sf,S.SF_MIN,'froid + racines');assert.equal(S.SF_MIN,.3);
 });
-test('Le froid et les racines s’additionnent : Givre niveau 5 + racines niveau 5 = vitesse ×0,2',()=>{const b=terrain([2,0,1,3]);const c=apparaitre(S,b,3);
- b.hit(c,0,S.TW[22],5);b.hit(c,0,S.TW[20],5);proche(c.sf,.2,'cumul');
- b.update(1.4);proche(c.sf,.5,'racines finies, le froid reste');b.update(1.4);assert.equal(c.sl,0);proche(c.sf,1,'plus de ralentissement');
+test('Immobilisation : le monstre s’arrête, puis il est immunisé un moment (rendement décroissant) ; un boss moitié moins longtemps',()=>{const b=terrain(),T=S.TW[2];
+ const c=apparaitre(S,b,3);c.hp=c.max=1e9;b.hit(c,0,T,1);proche(c.im,T.im,'durée');assert.equal(c.sf,0);const y=c.y;b.update(.5);proche(c.y,y,'immobile');
+ b.update(.4);assert.equal(c.im,0);b.hit(c,0,T,1);assert.equal(c.im,0,'immunisé juste après');b.update(2);b.hit(c,0,T,1);proche(c.im,T.im,'de nouveau sensible');
+ const k=S.BOSS[0],h=apparaitre(S,b,k);h.hp=h.max=1e9;b.hit(h,0,T,1);proche(h.im,T.im/2,'boss : moitié');
 });
-test('Deux effets de la même famille ne s’additionnent pas : le plus fort et le plus long l’emportent',()=>{const b=terrain([2,0,1,3]);const c=apparaitre(S,b,3);
- b.hit(c,0,S.TW[22],5);b.hit(c,0,S.TW[22],1);proche(c.sf,.5,'deux Givre');proche(c.sl,2.7,'durée');
- b.hit(c,0,S.TW[20],1);b.hit(c,0,S.TW[20],3);proche(c.sf,.5-.2,'racines niv. 3 l’emportent sur niv. 1');
- b.hit(c,0,S.TW[20],1);proche(c.sf,.3,'des racines plus faibles n’écrasent pas les plus fortes');
-});
-test('Les autres factions ne ralentissent qu’avec le Givre',()=>{const b=terrain();
- for(const f of [0,1,3,4])for(const j of [0,1,3,4,5,6,7,9]){const c=apparaitre(S,b,3);b.hit(c,1,S.TW[f*10+j],1);assert.equal(c.sl,0,S.TW[f*10+j].n)}
-});
-test('Garde et Flammes sylvestres : le monstre continue d\'avancer normalement (pas de vitesse invalide)',()=>{const b=terrain([2,0,1,3]);
- for(const k of [21,24]){const c=apparaitre(S,b,3);b.hit(c,1,S.TW[k]);const y=c.y;b.update(.5);assert.ok(Number.isFinite(c.y)&&c.y>y,S.TW[k].n)}
+test('Aucun ralentissement en dehors des tours de froid et d’immobilisation (pas de vitesse invalide)',()=>{const b=terrain();
+ for(const T of S.TW){if(T.fsp||T.im||T.hx)continue;const c=apparaitre(S,b,3);c.hp=c.max=1e9;b.hit(c,1,T,1);assert.equal(c.sl,0,T.n);const y=c.y;b.update(.5);assert.ok(Number.isFinite(c.y)&&c.y>y,T.n)}
 });
 test('Hâte du Chaman : les alliés proches vont 1,4 fois plus vite, pas le Chaman lui-même',()=>{const b=terrain();
  const ch=apparaitre(S,b,S.AURA),g=apparaitre(S,b,0);b.update(.1);

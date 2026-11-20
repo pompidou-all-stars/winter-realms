@@ -26,8 +26,8 @@ test('Canon et Garde ne touchent pas les volants',()=>{for(const k of [1,3]){con
 test('Archer et Flammes touchent les volants',()=>{for(const k of [0,4]){const b=terrain();b.place(5,4,k);
  const c=fort(apparaitre(S,b,S.FLY[0]));avancerTerrain(b,3);assert.ok(c.hp<c.max,S.TW[k].n)}
 });
-test('Anti-magie : Givre et Mage n\'ont aucun effet sur le Briseur de runes, et ne le ciblent pas',()=>{const b=terrain();
- const c=apparaitre(S,b,S.BRK);for(const k of [2,5,8,9])assert.equal(perte(b,c,50,k,1),0,S.TW[k].n);assert.equal(c.sl,0);
+test('Anti-magie : les tours magiques n\'ont aucun effet sur le Briseur de runes, et ne le ciblent pas',()=>{const b=terrain();
+ const c=apparaitre(S,b,S.BRK);for(const k of S.TW.map((T,k)=>k).filter(k=>S.TW[k].mag))assert.equal(perte(b,c,50,k,1),0,S.TW[k].n);assert.equal(c.sl,0);
  assert.ok(perte(b,c,1,0)>0,'un Archer le touche');
  const b2=terrain();b2.place(5,2,5);pret(b2);fort(apparaitre(S,b2,S.BRK));b2.update(.01);assert.equal(b2.pr.length,0);
 });
@@ -35,22 +35,8 @@ test('Armure : retire un montant fixe par coup mais garde au moins 20 % des dég
  assert.equal(c.arm,5);proche(perte(b,c,10,10),5,'10 dégâts − 5');proche(perte(b,c,3,10),.6,'3 dégâts → plancher de 20 %');
 });
 test('Armure : elle grandit avec le temps comme les PV (× 1 + temps/200)',()=>{const b=terrain();const c=apparaitre(S,b,S.TURT,1.5);assert.equal(c.arm,7.5)});
-test('Nains (perforant) : ignorent 55 % de l\'armure',()=>{const b=terrain(3);const c=fort(apparaitre(S,b,S.TURT));
- proche(perte(b,c,10,30),10-5*(1-.55),'armure réduite');
-});
-test('Alliance (anti-aérien) : +18 % de dégâts contre les volants seulement',()=>{const b=terrain(0);
- proche(perte(b,fort(apparaitre(S,b,S.FLY[0])),10,0),11.8,'volant');proche(perte(b,fort(apparaitre(S,b,0)),10,0),10,'sol');
- proche(perte(b,fort(apparaitre(S,b,S.FLY[0])),10,10),10,'archer de la Horde sur volant');
-});
-test('Horde (frénésie) : +30 % sur les cibles à moins de 35 % de PV',()=>{const b=terrain(1);const c=fort(apparaitre(S,b,0));
- proche(perte(b,c,10,10),10,'cible en forme');c.hp=c.max*.34;proche(perte(b,c,10,10),13,'cible affaiblie');
- c.hp=c.max*.35;proche(perte(b,c,10,10),10,'exactement 35 % : pas de bonus');
-});
-test('Légion (malédiction) : marque 1,35 s, chaque coup suivant fait +14 %',()=>{const b=terrain(4);const c=fort(apparaitre(S,b,0));
- proche(perte(b,c,10,40),10,'premier coup');assert.equal(c.mark,1.35);proche(perte(b,c,10,40),11.4,'coup suivant');
- b.update(1.4);assert.equal(c.mark,0);proche(perte(b,c,10,40),10,'marque expirée');
-});
-test('Canon : explosion de rayon 1,1, 60 % des dégâts autour, sol uniquement',()=>{const b=terrain();
+/* 2.39 : les anciens bonus de faction (perforant, anti-aérien, frénésie, malédiction) sont remplacés par les mécaniques des races : voir races.test.js */
+test('Trébuchet (zone au sol) : 60 % des dégâts autour, dans son rayon, sol uniquement',()=>{const b=terrain();
  const a=fort(apparaitre(S,b,0)),v=fort(apparaitre(S,b,0)),loin=fort(apparaitre(S,b,0)),vol=fort(apparaitre(S,b,S.FLY[0]));
  for(const [c,x,y] of [[a,6,5],[v,6.5,5.5],[loin,6,7],[vol,6.3,5.2]])Object.assign(c,{x,y,tx:6,ty:5});
  const hp=[a,v,loin,vol].map(c=>c.hp);b.impact({k:3,tg:a,d:10,tx:a.x+.5,ty:a.y+.5,lv:1});
@@ -74,5 +60,5 @@ test('Prêtresse : soigne de 5 % des PV max par seconde les alliés proches, pas
  proche(g.hp,g.max/2+g.max*.05*.1,'allié soigné',1e-6);assert.equal(p.hp,p.max/2,'la prêtresse seule n\'est pas soignée');
 });
 test('Garde : frappe directe au corps à corps, sans projectile',()=>{const b=terrain();b.place(5,1,1);pret(b);const c=fort(apparaitre(S,b,TROLL));
- avancerTerrain(b,.6);assert.ok(c.hp<c.max);assert.equal(b.pr.length,0);
+ avancerTerrain(b,.7);assert.ok(c.hp<c.max);assert.equal(b.pr.length,0);
 });
