@@ -1,23 +1,13 @@
-"""Troll des glaces (CR troll) : grand troll bleu dégingandé et voûté, long nez, iroquoise, défenses,
-pagne de fourrure et gourdin hérissé de glace."""
-from communs.outils import collection, dans, pivot, peindre
-from communs.personnages import humanoide, gourdin
-from communs.animations import marche
-from communs.echelles import hauteur
-from communs.export_jeu import preparer
-
+"""Troll des glaces (palier 1, sol) — kit 2.40 : grand troll bleu-vert voûté, bras immenses, défenses, crête rousse, gourdin."""
+from communs.creatures import *
 INFOS = {'categorie': 'monstre', 'titre': "Troll des glaces"}
 
-def fabriquer():
-    c = collection('troll_glaces'); dans(c)
-    r = pivot('troll_glaces'); H = hauteur('troll')
-    humanoide(r, dict(peau='#4fa3b0', peau2='#74c4cf', tissu='#e8f0f2', torse='#4fa3b0', cuir='#6b4a2f', botte='#3f7f81',
-                      carrure=.95, tete=.12, jambes=.4, voute=.35, nez=('long', .42), defenses=1, oreilles=.6, sourcils=1,
-                      yeux='#ffe45e', cheveux='iroquoise', epaulieres='cuir',
-                      arme=lambda p, HH: gourdin(p, HH, '#8a6a4a')), H)
-    peindre(r)
-    marche(r, duree=.85, ampl_jambe=.5, ampl_bras=.5, rebond=H * .04, roulis=.1)
-    return r
+def pieces(K):
+    t = K.j('tete')
+    return (defenses(K, taille=1.4) + arme(K, 'gourdin', taille=1.2, manche='#5a4a3a') + ceinture(K, pagne='#cfd8e2', boucle=None) +
+            collier_crocs(K) + [corne(f'Crete{k}', '#d8642a', 'Tete', (0, t.y + .02 + .03 * k, t.z + .15 - .02 * k), .025, .1, .8,
+                                      rot=(-.4, 0, 0), seg=5, n=3) for k in range(4)])
 
 def construire(ctx):
-    preparer(fabriquer())
+    bipede('troll', dict(z=1.1, peau=('#57aeb0', '#74c4c4', '#3f8a8c'), bas='#7a6a5a', botte='#3f8a8c', tete='orc', tete_r=.9,
+                         carrure=1.1, bras=1.35, voute=.85, jambes=.4, muscle=.7, oeil='#ffd23a', pieces=pieces))

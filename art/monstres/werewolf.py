@@ -1,32 +1,15 @@
-"""Loup-garou (palier 2, sol) : homme-loup massif et voûté, fourrure gris-brun, long museau, grandes
-oreilles, crocs, griffes, pantalon déchiré, yeux jaunes. Clé CR « werewolf »."""
-import math
-from communs.outils import collection, dans, pivot, peindre, sphere, cone, cylindre, boite, prisme, anneau, descendants
-from communs.personnages import humanoide, epee, hache, marteau, gourdin, baton, bouclier, lame_courbe, bombe
-from communs.animations import marche
-from communs.export_jeu import preparer
-
-# taille selon le facteur z proposé pour CR (même formule que communs/echelles.py) ; voir PALIERS.md
-Z = 1.15
-def hauteur(): return .40 * Z ** 1.8
-def piece(r, nom): return next(o for o in descendants(r) if o.name.split('.')[0] == nom)
-
+"""Loup-garou (palier 2, sol) — kit 2.40 : bête-loup dressée, voûtée, griffes immenses, fourrure grise hérissée, haillons."""
+from communs.creatures import *
 INFOS = {'categorie': 'monstre', 'titre': "Loup-garou"}
 
-def fabriquer():
-    c = collection('loup_garou'); dans(c)
-    r = pivot('loup_garou'); H = hauteur()
-    humanoide(r, dict(peau='#6f6458', peau2='#8a7f72', tissu='#3a4a6a', torse='#7d7266', cuir='#4a3f36', botte='#5a5046',
-                      carrure=1.25, tete=.12, jambes=.34, voute=.45, nez=('long', .55), oreilles=.8, sourcils=1, defenses=1,
-                      yeux='#ffd34d', cheveux='iroquoise'), H)
-    for o in list(c.objects):
-        if o.name.startswith('Poing'):
-            for k in (-1, 0, 1): cone(f'Griffe{o.name}{k}', '#f4efe0', H * .012, H * .05, 4, (k * H * .02, -H * .03, -H * .04), o, (math.pi, 0, 0))
-    B = piece(r, 'Buste')
-    sphere('Poitrail', '#a39a8e', H * .1, (0, -H * .12, H * .22), (1.2, .5, 1), 8, 5, B)
-    peindre(r)
-    marche(r, duree=.6, ampl_jambe=.6, ampl_bras=.6, rebond=H * .05, roulis=.12)
-    return r
+def pieces(K):
+    w, p = K.j('poignet.L'), K.j('poitrine')
+    return ([corne(f'Griffe{k}.{n}', OS_, f'Main.{n}', (s * w.x + s * .022 * (k - 1), w.y - .04, w.z - .09), .012, .08, .5, rot=(math.pi - .3, 0, 0), seg=4, n=2)
+             for s, n in ((1, 'L'), (-1, 'R')) for k in range(3)] +
+            [corne(f'Hirsute{k}', '#4a4038', 'Torse', (x, .13, p.z + .1), .035, .11, .8, rot=(-.6, x * 3, 0), seg=5, n=3) for k, x in enumerate((-.08, 0, .08))] +
+            ceinture(K, col='#3a3028', boucle=None, pagne='#5a4a3a'))
 
 def construire(ctx):
-    preparer(fabriquer())
+    bipede('loup_garou', dict(z=1.1, peau=('#6f6458', '#8f8478', '#4f463e'), bas='#6f6458', botte='#3a332c', tete='loup', tete_r=1.15,
+                              voute=.85, jambes=.4, carrure=1.2, bras=1.25, muscle=.9, relief=RELIEF_POIL, queue=('#5a5048', .9),
+                              oeil='#ffd23a', pieces=pieces))

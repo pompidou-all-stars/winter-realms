@@ -29,13 +29,13 @@ const MIN=8*60,M=1+MIN/200;/* monstres de la 8e minute : armure × 3,4 (comme le
 const POSS=[{id:'mur',p:[6,7]},{id:'virage',p:[1,7]}],DT=1/60;/* pas de 1/60 s, comme le navigateur (le serveur multijoueur avance par 0,05 s) */
 /* scénarios : nom, clé du monstre, nombre de groupes de 4 (ou 1 monstre seul) */
 const SCEN=S=>{const k=n=>S.CR.findIndex(T=>T.n==n);return [
- {id:'sol4',nom:'Groupe au sol (4 Ogres)',k:k('Ogre'),g:1},
- {id:'sol1',nom:'Monstre seul (1 Ogre)',k:k('Ogre'),seul:1},
- {id:'vague',nom:'Grosse vague (12 Ogres)',k:k('Ogre'),g:3},
- {id:'air',nom:'Volants (4 Vouivres)',k:k('Vouivre'),g:1},
- {id:'blinde',nom:'Blindés (4 Scarabées, armure 41)',k:k('Scarabée cuirassé'),g:1},
- {id:'antimag',nom:'Anti-magie (4 Inquisiteurs)',k:k('Inquisiteur'),g:1},
- {id:'foule',nom:'Foule (40 Ogres d\'un coup, comme une vague d\'IA)',k:k('Ogre'),g:10,ensemble:1}]};
+ {id:'sol4',nom:'Groupe au sol (4 Minotaures)',k:k('Minotaure'),g:1},
+ {id:'sol1',nom:'Monstre seul (1 Minotaure)',k:k('Minotaure'),seul:1},
+ {id:'vague',nom:'Grosse vague (12 Minotaures)',k:k('Minotaure'),g:3},
+ {id:'air',nom:'Volants (4 Oculus abyssaux)',k:k('Oculus abyssal'),g:1},
+ {id:'blinde',nom:'Blindés (4 Stégosaures, armure 41)',k:k('Stégosaure de guerre'),g:1},
+ {id:'antimag',nom:"Anti-magie (4 Taureaux d'airain)",k:k("Taureau d'airain"),g:1},
+ {id:'foule',nom:'Foule (40 Minotaures d\'un coup, comme une vague d\'IA)',k:k('Minotaure'),g:10,ensemble:1}]};
 
 function terrain(S,faction,P){
  const b=new S.Board(0,'banc','#fff',0,faction);b.gold=1e9;

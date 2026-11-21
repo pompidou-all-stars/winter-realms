@@ -1,33 +1,25 @@
-"""Hydre (palier 3, magique : se divise) : reptile vert-bleu trapu à trois longs cous et trois têtes
-crêtées ; à sa mort, elle se sépare en têtes rampantes. Clé CR « hydra »."""
-import math
-from communs.outils import collection, dans, pivot, peindre, sphere, cone, cylindre, boite, prisme, anneau, descendants
-from communs.betes import quadrupede, yeux_bete
-from communs.animations import trot
-from communs.export_jeu import preparer
-
-# taille selon le facteur z proposé pour CR (même formule que communs/echelles.py) ; voir PALIERS.md
-Z = 1.45
-def hauteur(): return .40 * Z ** 1.8
-def piece(r, nom): return next(o for o in descendants(r) if o.name.split('.')[0] == nom)
-
+"""Hydre (palier 3, spécial, se divise) — kit 2.40 : grand reptile vert-bleu à cinq cous et cinq têtes, crêtes, ventre clair
+(mythologie grecque). Les têtes nées de la division utilisent ce modèle réduit."""
+from communs.creatures import *
 INFOS = {'categorie': 'monstre', 'titre': "Hydre"}
+P = ('#2f7a6a', '#4a9a88', '#c8d0a0')
 
-def fabriquer():
-    c = collection('hydre'); dans(c)
-    r = pivot('hydre'); H = hauteur()
-    corps = quadrupede(r, dict(poil='#2f7a6a', poil2='#3f9a7a', ventre='#cfe08a', patte='#1f5a4a', yeux='#ffd34d',
-                               museau='tortue', tete=.05, queue='#2f7a6a', largeur=.25, pattes=.3, epaisseur=.28, lqueue=.4), H * .55, H * 1.1)
-    for k, a in enumerate((-.5, 0, .5)):
-        cou = pivot(f'Cou{k}', (math.sin(a) * H * .12, -H * .35, H * .12), corps); cou.rotation_euler = (-.5, a, 0)
-        cylindre(f'CouCyl{k}', '#2f7a6a', H * .07, H * .05, H * .45, 8, (0, 0, 0), cou, lisse=True)
-        T = pivot(f'TeteH{k}', (0, 0, H * .47), cou); T.rotation_euler = (.9, 0, 0)
-        sphere(f'Crane{k}', '#3f9a7a', H * .09, (0, 0, 0), (1, 1.35, .85), 10, 6, T)
-        cone(f'Crete{k}', '#f08a2e', H * .04, H * .12, 4, (0, H * .04, H * .07), T, (-.8, 0, 0))
-        yeux_bete(T, H * .02, -H * .07, H * .03, H * .04, '#ffd34d', False)
-    peindre(r)
-    trot(r, duree=.8, ampl=.4, rebond=H * .02, queue=.4)
-    return r
+def vols(K):
+    ga = K.j('garrot'); v = []
+    for k, x in enumerate((-.2, -.1, .1, .2)):
+        top = (x * 1.6, ga.y - .3, ga.z + .25 - abs(x) * .4)
+        v += [seul(V('Dos', P[0], a=(x * .5, ga.y, ga.z), b=top, ra=.07, rb=.05)),
+              seul(V('Dos', P[1], c=(top[0], top[1] - .07, top[2] + .02), r=(.06, .1, .05)))]
+    return v
+
+def pieces(K):
+    ga = K.j('garrot')
+    for k, x in enumerate((-.2, -.1, .1, .2)):
+        top = (x * 1.6, ga.y - .3, ga.z + .25 - abs(x) * .4)
+        for s in (1, -1): K.oeil(f'OeilH{k}{s}', 'Dos', (top[0] + s * .035, top[1] - .1, top[2] + .04), .012)
+    return meches_dos(K, '#c8a83a', n=5, taille=.7, rangs=False) + griffes(K)
 
 def construire(ctx):
-    preparer(fabriquer())
+    bete('hydre', dict(z=1.45, poil=P, patte='#1f5a4a', crete='#c8a83a', tete='lezard', tete_r=1.0, longueur=1.0, pattes=.85,
+                       epaisseur=1.3, cou=1.1, queue=1.3, tete_z=.12, relief=RELIEF_ECAILLE, oeil='#ffe43a', ech=1.0, duree=.55,
+                       volumes=vols, pieces=pieces))

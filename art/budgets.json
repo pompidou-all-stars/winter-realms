@@ -1,8 +1,8 @@
 {
- "_explication": "Limites par fichier 3D livré au jeu (doit rester fluide sur téléphone). Modifiables par décision du concepteur.",
+ "_explication": "Limites par fichier 3D livré au jeu (doit rester fluide sur téléphone). Modifiables par décision du concepteur. 2.40 : monstre relevé à 4 500 triangles et 300 Ko (squelette, texture peinte et carte de relief), validé par le concepteur. Total relevé à 20 Mo (78 monstres de ≈ 190 Ko, chargés par palier : le palier 1 d'abord, les autres 1,5 s plus tard).",
  "tour": {"triangles": 3000, "octets": 153600},
- "monstre": {"triangles": 3000, "octets": 153600},
+ "monstre": {"triangles": 4500, "octets": 307200},
  "decor": {"triangles": 6000, "octets": 307200},
  "exemple": {"triangles": 1000, "octets": 51200},
- "total_octets": 8388608
+ "total_octets": 20971520
 }

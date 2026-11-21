@@ -80,6 +80,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.40 — bestiaire épique — 2026-11-20
+- New epic bestiary: the 72 monsters are renamed in place (same costs, HP, speeds and abilities; only display sizes change): goblins, rat-men, orcs, ogres, mounted saurians, Ruin warriors, Abyssal Oculus, Brain-eater, Abyssal Elder, Lord of Embers…
+- All 78 monster models are rebuilt with the new creature kit: shared skeletons (biped, quadruped, flyer), a detailed sculpt baked into a painted texture and a normal map, walk or fly, hit and death animations. In game, a hit monster flinches; a killed monster falls, stays on the ground, then sinks. 6 models are ready for upcoming abilities (summoning, resurrection). After reviewing the boards, 14 tier 2 and 3 monsters were retouched (carved rock for the golem and titan, wyrm, reaper, spectre, mana eater, Lord of Embers, Abyssal Elder, mammoth tower, behemoth, Ruin champion, chimera, giant, doom wheel). Total 3D budget raised to 20 MB (78 monsters loaded by tier).
+- `sim.js` changed (names, model keys and sizes only; the server redeploys automatically).
+
 ### 2.39 — style peint — 2026-11-20
 - Common painted style for every 3D model (towers, monsters, portal, castle): toon shading in 4 steps, a cold rim light on the edges and a thin dark outline of constant on-screen width, so silhouettes stand out from the snow on a phone. Applied when models load: no model regenerated. Add `?style=0` to the address to get the previous look. Costs about 1.7× more draw calls (to check on a low-end phone). Rendering only: `sim.js` unchanged.
 

@@ -1,34 +1,23 @@
-"""Tortue-dragon (palier 3, magique : armure) : tortue colossale à tête de dragon cornue, carapace
-bombée hérissée de pics, plaques de bronze. Blindée. Clé CR « dragonturtle »."""
-import math
-from communs.outils import collection, dans, pivot, peindre, sphere, cone, cylindre, boite, prisme, anneau, descendants
-from communs.betes import quadrupede, yeux_bete
-from communs.animations import trot
-from communs.export_jeu import preparer
-
-# taille selon le facteur z proposé pour CR (même formule que communs/echelles.py) ; voir PALIERS.md
-Z = 1.45
-def hauteur(): return .40 * Z ** 1.8
-def piece(r, nom): return next(o for o in descendants(r) if o.name.split('.')[0] == nom)
-
+"""Tortue-dragon (palier 3, spécial, blindée) — kit 2.40 : énorme tortue à tête de dragon, carapace bombée à pointes et plaques
+rouge et bronze, crête."""
+from communs.creatures import *
 INFOS = {'categorie': 'monstre', 'titre': "Tortue-dragon"}
 
-def fabriquer():
-    c = collection('tortue_dragon'); dans(c)
-    r = pivot('tortue_dragon'); H = hauteur()
-    corps = quadrupede(r, dict(poil='#4a8a6a', poil2='#5aa07a', patte='#3a6a52', yeux='#ff9f2e', museau='loup', tete=.24,
-                               pattes=.28, largeur=.26, epaisseur=.16, lqueue=.25), H * .7, H * 1.3)
-    sphere('Carapace', '#8a3a2a', H * .5, (0, H * .05, H * .04), (1, 1.2, .62), 14, 8, corps)
-    anneau('Rebord', '#c9a25a', H * .5, H * .04, 16, 4, (0, H * .05, -H * .01), corps, echelle=(1, 1.2, 1), metal=.5)
+def vols(K):
+    re = K.j('reins')
+    return [V('Dos', '#8a3a2a', c=(0, re.y - .05, re.z + .05), r=(.34, .46, .24), prio=1)]   # carapace
+
+def pieces(K):
+    re, nu = K.j('reins'), K.j('nuque'); out = []
     for k in range(7):
-        a = k * 2 * math.pi / 7
-        cone(f'Pic{k}', '#e8e2cf', H * .05, H * .16, 5, (math.cos(a) * H * .28, H * .05 + math.sin(a) * H * .33, H * .22), corps)
-    cone('PicHaut', '#e8e2cf', H * .06, H * .2, 5, (0, H * .05, H * .32), corps)
-    T = piece(r, 'Tete'); rt = H * .7 * .24
-    for s in (-1, 1): cone(f'Corne{s}', '#e8e2cf', rt * .18, rt * .9, 5, (s * rt * .45, rt * .2, rt * .5), T, (-1.0, s * .3, 0))
-    peindre(r)
-    trot(r, duree=1.0, ampl=.35, rebond=H * .01, queue=.2)
-    return r
+        a = k / 7 * 2 * math.pi
+        out.append(cone(f'Pointe{k}', '#e8b23a', 'Dos', (math.cos(a) * .2, re.y - .05 + math.sin(a) * .28, re.z + .22), .04, .002, .12,
+                        rot=(-math.sin(a) * .6, math.cos(a) * .6, 0), seg=5))
+    out.append(cone('PointeH', '#e8b23a', 'Dos', (0, re.y - .05, re.z + .29), .05, .002, .16, seg=5))
+    out += [corne(f'Corne.{n}', '#e8dcc0', 'Tete', (s * .05, nu.y - .05, nu.z + .08), .025, .14, .9, rot=(-1.0, s * .4, 0), seg=5, n=3) for s, n in ((1, 'L'), (-1, 'R'))]
+    return out + griffes(K)
 
 def construire(ctx):
-    preparer(fabriquer())
+    bete('tortue_dragon', dict(z=1.45, poil=('#3a6a4a', '#5a8a64', '#c8b88a'), patte='#2a4a34', crete='#e8b23a', tete='lezard', tete_r=1.15,
+                               longueur=.9, pattes=.7, epaisseur=1.3, cou=.9, queue=.8, relief=RELIEF_ECAILLE, oeil='#ffcf3a', ech=1.0,
+                               duree=.75, foulee=.35, volumes=vols, pieces=pieces))

@@ -224,7 +224,10 @@ void main() {
   const modele = url => { if (!prets.has(url)) { charger(url); return undefined } return prets.get(url) };
   function precharger(factions) {
     const l = [charger('assets/3d/decor/portail.glb'), charger('assets/3d/decor/chateau.glb')];
-    for (let k = 0; k < CR.length; k++) l.push(charger(urlMonstre(k)));
+    /* 2.40 : 78 monstres sur squelette et texture peinte, trop lourds pour tout attendre au lancement : on attend le palier 1,
+       les paliers 2 et 3 se chargent en fond juste après (un monstre pas encore chargé apparaît dès que son modèle arrive) */
+    for (let k = 0; k < CR.length; k++) if (CR[k].t === 1) l.push(charger(urlMonstre(k)));
+    setTimeout(() => { for (let k = 0; k < CR.length; k++) if (CR[k].t !== 1) charger(urlMonstre(k)) }, 1500);
     for (const f of factions) for (let j = 0; j < 10; j++) l.push(charger(urlTour(f * 10 + j)));
     return Promise.all(l);
   }
@@ -524,17 +527,60 @@ void main() {
   function creerMonstre(c) {
     const g = modele(urlMonstre(c.k)); if (g === undefined) return null;
     const T = CR[c.k];
-    const o = g ? g.scene.clone(true) : repliMonstre(c.k); o.scale.setScalar(echMonstre(c.k) * (g ? echelleModele(c.k) : 1));
+    const o = g ? cloner(g.scene) : repliMonstre(c.k); o.scale.setScalar(echMonstre(c.k) * (g ? echelleModele(c.k) : 1));
     if (T.inv) o.traverse(m => { if (m.userData.contour) m.visible = false; else if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true } });
     const r = new THREE.Group(); r.add(o);
-    let mixer = null;
-    if (g && g.animations.length) { mixer = new THREE.AnimationMixer(o); const a = mixer.clipAction(g.animations[0]); a.play(); a.time = (c.ph || 0) % g.animations[0].duration }
+    let mixer = null, clips = {}, marche = null;
+    if (g && g.animations.length) {
+      mixer = new THREE.AnimationMixer(o);
+      for (const a of g.animations) clips[a.name] = a;
+      /* 2.40 : modèles sur squelette avec plusieurs clips (marche ou vol, touche, mort) ; les anciens n'en ont qu'un */
+      const base = clips.marche || clips.vol || g.animations[0];
+      marche = mixer.clipAction(base); marche.play(); marche.time = (c.ph || 0) % base.duration;
+      if (clips.touche) { if (!g.touche) g.touche = THREE.AnimationUtils.makeClipAdditive(clips.touche.clone()); clips.touche = g.touche }
+    }
     /* halo au sol : ralenti (bleu), hâté (jaune), soigné (vert) */
     const halo = new THREE.Mesh(G.disque, transp('#8fdcff', .45)); halo.scale.setScalar(.22 * (T.z || 1)); halo.position.y = .01; halo.visible = false; r.add(halo);
     let aura = null;
     if (T.aura || T.heal) { aura = new THREE.Mesh(G.anneau, transp(T.aura ? '#ffe45e' : '#6fcf97', .55)); aura.scale.setScalar(AURA_R); aura.position.y = .02; r.add(aura) }
     r.position.set(c.x + .5 + (c.ox || 0), T.fly ? VOL : 0, c.y + .5 + (c.oy || 0));
-    return {r, o, mixer, halo, aura, k: c.k, px: r.position.x, pz: r.position.z, yaw: 0, inv: !!T.inv};
+    return {r, o, mixer, clips, marche, halo, aura, k: c.k, px: r.position.x, pz: r.position.z, yaw: 0, inv: !!T.inv, c, hp: c.hp, coup: 0};
+  }
+  /* 2.40 : copie d'un modèle ; un maillage sur squelette (et son contour) doit suivre les os de SA copie, pas ceux de l'original */
+  function cloner(src) {
+    const copie = src.clone(true), a = [], b = [];
+    src.traverse(x => a.push(x)); copie.traverse(x => b.push(x));
+    const corresp = new Map(a.map((x, i) => [x, b[i]]));
+    b.forEach((x, i) => {
+      if (!x.isSkinnedMesh) return;
+      const s = a[i].skeleton;
+      x.bind(new THREE.Skeleton(s.bones.map(os => corresp.get(os)), s.boneInverses), a[i].bindMatrix);
+      x.frustumCulled = false;   // la boîte englobante est celle de la pose de repos (fausse pendant la chute)
+    });
+    return copie;
+  }
+  /* coup reçu : petit recul du haut du corps (clip « touche » ajouté par-dessus la marche), au plus toutes les 0,6 s */
+  function toucher(Mo) {
+    if (!Mo.clips.touche || Mo.coup > 0) return;
+    const a = Mo.mixer.clipAction(Mo.clips.touche); a.blendMode = THREE.AdditiveAnimationBlendMode;
+    a.setLoop(THREE.LoopOnce, 1); a.reset().play(); Mo.coup = .6;
+  }
+  /* mort : le monstre tué (pas celui qui atteint le château) joue son clip « mort », reste au sol puis s'enfonce */
+  const mourants = [];
+  function retirerMonstre(Mo) {
+    const c = Mo.c, fuite = c.leak || Math.hypot(c.x - EX[0], c.y - EX[1]) < 1.2;
+    if (!Mo.clips || !Mo.clips.mort || fuite) { retirerGroupe(Mo); return }
+    Mo.halo.visible = false; if (Mo.aura) Mo.aura.visible = false;
+    const a = Mo.mixer.clipAction(Mo.clips.mort); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true;
+    a.reset().play(); if (Mo.marche) Mo.marche.crossFadeTo(a, .12, false);
+    Mo.t = 0; mourants.push(Mo);
+  }
+  function majMourants(dt) {
+    for (let i = mourants.length - 1; i >= 0; i--) {
+      const Mo = mourants[i]; Mo.t += dt; Mo.mixer.update(dt);
+      if (Mo.t > 1.6) Mo.r.position.y -= dt * .12;
+      if (Mo.t > 2.6) { retirerGroupe(Mo); mourants.splice(i, 1) }
+    }
   }
   function majMonstre(Mo, c, dt, temps) {
     const T = CR[c.k], x = c.x + .5 + (c.ox || 0), z = c.y + .5 + (c.oy || 0);
@@ -546,6 +592,9 @@ void main() {
     Mo.px = x; Mo.pz = z;
     Mo.r.position.set(x, T.fly ? VOL + Math.sin(temps * 3 + (c.ph || 0)) * .03 : 0, z);
     Mo.o.rotation.y = Mo.yaw;
+    Mo.c = c; Mo.coup -= dt;
+    if (Mo.mixer && c.hp < Mo.hp - .01) toucher(Mo);
+    Mo.hp = c.hp;
     if (Mo.mixer) Mo.mixer.update(dt * (c.sl > 0 ? .55 : 1) * (T.s / 1.4));
     const glow = c.sl > 0 ? '#8fdcff' : c.h ? '#ffe45e' : c.hl ? '#6fcf97' : '';
     Mo.halo.visible = !!glow; if (glow) Mo.halo.material.color.set(glow);
@@ -624,6 +673,7 @@ void main() {
   let terrain = null, dernier = 0;
   function vider() {
     for (const m of [tours, monstres, projs, effets]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
+    for (const Mo of mourants) retirerGroupe(Mo); mourants.length = 0;
   }
   function dessiner(b, temps, etat) {
     const dt = dernier ? Math.min(.1, Math.max(0, temps - dernier)) : 0; dernier = temps;
@@ -635,7 +685,8 @@ void main() {
 
     synchro(tours, b.t, t => t.x + ',' + t.y + ',' + t.k, t => { const T = creerTour(t); if (T) { T.r.position.set(t.x + .5, 0, t.y + .5); scene.add(T.r) } return T },
       (T, t) => majTour(T, t, temps), retirerGroupe);
-    synchro(monstres, b.cr, c => c.id, c => { const Mo = creerMonstre(c); if (Mo) scene.add(Mo.r); return Mo }, (Mo, c) => majMonstre(Mo, c, dt, temps), retirerGroupe);
+    synchro(monstres, b.cr, c => c.id, c => { const Mo = creerMonstre(c); if (Mo) scene.add(Mo.r); return Mo }, (Mo, c) => majMonstre(Mo, c, dt, temps), retirerMonstre);
+    majMourants(dt);
     synchro(projs, b.pr, p => p.id, creerProj, majProj, retirerGroupe);
     synchro(effets, b.fx, f => f, creerEffet, majEffet, o => scene.remove(o));
 
@@ -683,7 +734,7 @@ void main() {
         const d = new THREE.DirectionalLight('#fff4e0', 2.6); d.position.set(-2, 4, 3); rv.s.add(d);
         const b = new THREE.DirectionalLight('#9fd0ff', 1.3); b.position.set(3, 2, -3); rv.s.add(b);
       }
-      const o = g.scene.clone(true), piv = new THREE.Group(); piv.add(o); piv.rotation.y = type === 'tour' ? -.55 : -.7;
+      const o = cloner(g.scene), piv = new THREE.Group(); piv.add(o); piv.rotation.y = type === 'tour' ? -.55 : -.7;
       const box = new THREE.Box3().setFromObject(piv), ct = box.getCenter(new THREE.Vector3()), rad = Math.max(.05, box.getSize(new THREE.Vector3()).length() / 2);
       o.position.sub(ct.applyAxisAngle(new THREE.Vector3(0, 1, 0), -piv.rotation.y)); rv.s.add(piv);
       const dist = rad / Math.sin(rv.c.fov * Math.PI / 360) * (type === 'tour' ? .78 : .72);
