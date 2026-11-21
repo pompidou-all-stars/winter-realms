@@ -61,7 +61,7 @@ test('Améliorations : coût = arrondi(coût × 1,5 × 2^(niveau−1) / 5) × 5,
 test('Amélioration refusée quand l\'or manque (« poor »), action sur une case vide (« bad »)',()=>{const {G,b}=nouveau();
  G.action(0,{type:'place',x:3,y:3,k:0});pret(b);b.gold=0;assert.equal(G.action(0,{type:'upgrade',x:3,y:3}),'poor');
  assert.equal(G.action(0,{type:'upgrade',x:4,y:4}),'bad');assert.equal(G.action(0,{type:'sell',x:4,y:4}),'bad');
- assert.equal(G.action(0,{type:'danse'}),'bad');assert.equal(G.action(0,{type:'place',x:1,y:1,k:99}),'bad');
+ assert.equal(G.action(0,{type:'danse'}),'bad');assert.equal(G.action(0,{type:'place',x:1,y:1,k:999}),'bad');
 });
 test('Dégâts doublés et portée +5 % à chaque niveau',()=>{
  for(const k of [0,15,33,49])for(let lv=1;lv<=5;lv++){assert.equal(S.dmg({k,lv}),S.TW[k].d*2**(lv-1));assert.equal(S.rng({k,lv}),S.TW[k].r*(1+.05*(lv-1)))}

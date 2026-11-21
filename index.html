@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.41</title>
+<title>Winter Realms — Tower Wars · Édition 2.44</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -286,6 +286,10 @@ body.r2d .fleche{display:none}
 #factions button[data-faction='2']{--sigil:#8fd47d}
 #factions button[data-faction='3']{--sigil:#e2ad68}
 #factions button[data-faction='4']{--sigil:#c19aff}
+#factions button[data-faction='5']{--sigil:#7fc4ee}#factions button[data-faction='6']{--sigil:#f07850}#factions button[data-faction='7']{--sigil:#8fd47d}#factions button[data-faction='8']{--sigil:#e2ad68}#factions button[data-faction='9']{--sigil:#c19aff}
+/* 2.44 : 10 races, boutons plus compacts (la description reste dans la fiche de race) */
+#factions button{min-height:58px}#factions button small{display:none}
+#factions button:last-child{grid-column:auto!important}
 #classPick{width:min(620px,94vw);flex:0 0 auto}#lv{padding-bottom:6px;flex:0 0 auto}
 #ov>h1,#ov>p{flex:0 0 auto}
 @media(max-width:420px){#factions{grid-template-columns:1fr 1fr;gap:6px}#factions button{min-height:62px;padding:6px 7px;gap:7px}#factions button:last-child{grid-column:1/-1}#factions button strong{font-size:14px}#factions button small{font-size:10px}#factions button:after{display:none}#factions button.selected:after{display:block;content:'✓';top:4px;bottom:auto;right:6px;font-size:13px}#factions .ficon{height:40px;flex-basis:34px;font-size:19px;padding-bottom:6px}#ov{gap:9px}.embleme{width:58px;height:66px}#ov h1{font-size:40px}#ov p{font-size:14px}.regles{gap:6px}.regles li{flex:1 1 0;flex-direction:column;gap:2px;padding:6px 5px;text-align:center;font-size:11px}.regles li b{font-size:12px}}
@@ -535,6 +539,7 @@ body.prep #clock{display:none}
   <div id="lctl"><div class="orow" id="ldiff"><span>IA :</span><button type="button" data-lv="0">Normal</button><button type="button" data-lv="1">Difficile</button><button type="button" data-lv="2">Brutal</button></div><button id="lstart" type="button">Lancer la partie</button></div>
   <button id="lquit" type="button" class="ghost">Quitter le salon</button></div>
 </div>
+<script src="silhouettes.js"></script>
 <script src="sim.js"></script>
 <script src="audio.js"></script>
 <script>
@@ -730,6 +735,43 @@ function shaft(g,x,by,ty,rx,ry,mat,s,lw){const H=by-ty,cols=mat==1?['#cfa066','#
  g.stroke();g.restore();
  g.beginPath();g.moveTo(x-s*.075,by+ry*.95);g.lineTo(x-s*.075,by-s*.06);g.arc(x,by-s*.06,s*.075,Math.PI,0);g.lineTo(x+s*.075,by+ry*.95);g.closePath();fs(g,'#5a3a1c')}
 function merlons(g,x,ty,rx,ry,s,col){for(const px of[-.66,0,.66]){g.beginPath();g.rect(x+px*rx-s*.075,ty+ry*Math.sqrt(1-px*px)-s*.13,s*.15,s*.13);fs(g,col)}}
+/* 2.44 : les races de Thibaut (sil) sont dessinées par silhouettes.js (2.43), projetées en oblique ; les 5 premières gardent leur dessin */
+const projectionTour=(x,y,z)=>[x*.79+z*.61,.26-y*.78+(z*.79-x*.61)*.40];
+const silhouettes2D=SILHOUETTES.map(pieces=>pieces.map(p=>{
+ if(p.type==='trait'){
+  const [x,y]=projectionTour(...p.a),[x2,y2]=projectionTour(...p.b);
+  const depth=([a,b,c])=>c*.79-a*.61+b*.27;
+  return {...p,x,y,x2,y2,profondeur:(depth(p.a)+depth(p.b))/2}
+ }
+ const [x,y]=projectionTour(p.x,p.y,p.z);
+ return {...p,x,y,a:Math.hypot(p.a*.79,p.c*.61),b:p.b*.78+p.c*.15,profondeur:p.z*.79-p.x*.61+p.y*.27}
+}).sort((a,b)=>a.profondeur-b.profondeur));
+function drawSilhouette(g,k,x,y,s,a,t,lv,sw,stun){k-=50;
+ g.save();g.translate(x,y);
+ const e=s*(1+.045*(lv-1));g.scale(e,e);
+ const op=g.globalAlpha;
+ g.globalAlpha=op*.35;el(g,0,.28,.34,.12,'#181d2a');g.globalAlpha=op;
+ g.lineCap='round';g.lineJoin='round';g.strokeStyle=OUT;g.lineWidth=.026;
+ for(const p of silhouettes2D[k]){
+  if(p.type==='trait'){
+   g.beginPath();g.moveTo(p.x,p.y);g.lineTo(p.x2,p.y2);
+   g.strokeStyle=OUT;g.lineWidth=p.largeur+.025;g.stroke();
+   g.strokeStyle=p.col;g.lineWidth=p.largeur;g.stroke();
+  }else{
+   const w=p.a/2,h=p.b/2;g.beginPath();
+   if(p.type==='boule')g.ellipse(p.x,p.y,w,h,0,0,Math.PI*2);
+   else if(p.type==='bloc')g.roundRect(p.x-w,p.y-h,p.a,p.b,.025);
+   else{g.moveTo(p.x,p.y-h);g.lineTo(p.x+w,p.y);g.lineTo(p.x,p.y+h);g.lineTo(p.x-w,p.y);g.closePath()}
+   g.strokeStyle=OUT;g.lineWidth=.026;fs(g,p.col);
+  }
+ }
+ for(let q=0;q<lv;q++)el(g,(q-(lv-1)/2)*.105,.36,.025,.025,'#ffe17a');
+ if(stun)for(let q=0;q<3;q++){
+  const angle=t*6+q*2.1;el(g,Math.cos(angle)*.25,-.71+Math.sin(angle)*.06,.04,.04,'#ffe45e')
+ }
+ if(sw>0){g.strokeStyle='#fff';g.lineWidth=.05;g.beginPath();g.arc(0,-.20,.36,a-.65,a+.65);g.stroke()}
+ g.restore();
+}
 function drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun){
  const T=TW[k],f=T.faction,j=k%10,pal=[
   ['#e9e2cf','#9da9b6','#647487','#d9b45e','#355b83'],
@@ -808,8 +850,14 @@ function chantier(g,o,s,t){const x=(o.x+.5)*s,y=(o.y+.5)*s,p=1-o.b/(o.bt||1);g.s
  g.strokeStyle='#8a5a2b';g.lineWidth=Math.max(1.5,s*.045);g.beginPath();for(const q of[-1,1]){g.moveTo(x+q*s*.3,y+s*.3);g.lineTo(x+q*s*.3,y-s*.32)}g.moveTo(x-s*.3,y-s*.05);g.lineTo(x+s*.3,y-s*.05);g.moveTo(x-s*.3,y+s*.3);g.lineTo(x+s*.3,y-s*.05);g.stroke();
  const an=-.9+Math.abs(Math.sin(t*7))*1.1;g.translate(x+s*.2,y-s*.3);g.rotate(an);g.strokeStyle='#6b4423';g.lineWidth=Math.max(1.5,s*.05);g.beginPath();g.moveTo(0,0);g.lineTo(0,-s*.2);g.stroke();g.fillStyle='#c9ced6';g.strokeStyle=OUT;g.lineWidth=1;g.fillRect(-s*.08,-s*.26,s*.16,s*.08);g.strokeRect(-s*.08,-s*.26,s*.16,s*.08);g.restore();
  g.save();const w=s*.7,h=Math.max(3,s*.09),bx=x-w/2,by=y+s*.38;g.fillStyle='rgba(20,16,10,.75)';g.fillRect(bx-1,by-1,w+2,h+2);g.fillStyle='#ffc95e';g.fillRect(bx,by,w*p,h);g.restore()}
-function drawTower(g,k,x,y,s,a,t,lv,sw,stun){drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun)}
-function drawProj(g,p,s){const x=p.x*s,y=p.y*s,skin=TW[p.k].skin;g.save();
+function drawTower(g,k,x,y,s,a,t,lv,sw,stun){(RACES[TW[k].faction].sil?drawSilhouette:drawFactionTower)(g,k,x,y,s,a,t,lv,sw,stun)}
+function drawProj(g,p,s,densite){const x=p.x*s,y=p.y*s,T=TW[p.k],skin=T.skin;g.save();
+ const dx=(p.sx??p.x)-p.x,dy=(p.sy??p.y)-p.y,dist=Math.hypot(dx,dy);
+ if(dist>.01){const taille=Math.min(dist,densite>35?.18:densite>18?.32:.52)*s/dist;
+  g.beginPath();g.moveTo(x,y);g.lineTo(x+dx*taille,y+dy*taille);
+  g.strokeStyle=T.pz?'#79ad30':T.pe?'#9470d1':T.col;
+  g.globalAlpha=densite>35?.35:.65;g.lineWidth=Math.max(1,s*.045);g.stroke();g.globalAlpha=1;
+ }
  if(skin==0){g.translate(x,y);g.rotate(p.a);g.lineCap='round';g.strokeStyle='#5a3a1c';g.lineWidth=Math.max(1.5,s*.05);g.beginPath();g.moveTo(-s*.2,0);g.lineTo(s*.1,0);g.stroke();
   g.fillStyle='#ececec';g.beginPath();g.moveTo(s*.21,0);g.lineTo(s*.07,-s*.07);g.lineTo(s*.07,s*.07);g.fill();
   g.strokeStyle='#fff';g.beginPath();g.moveTo(-s*.2,0);g.lineTo(-s*.28,-s*.06);g.moveTo(-s*.2,0);g.lineTo(-s*.28,s*.06);g.stroke()}
@@ -902,7 +950,7 @@ function draw(b,g,s,t){
  for(const[,o]of ents){if(o.lv){g.save();g.shadowColor='rgba(0,0,0,.55)';g.shadowBlur=s*.2;g.shadowOffsetX=s*.07;g.shadowOffsetY=s*.15;if(o.b>0)g.globalAlpha=.5;drawTower(g,o.k,(o.x+.5)*s,(o.y+.5)*s,s,o.a,t,o.lv,o.sw,o.stun>0);g.restore();if(o.b>0)chantier(g,o,s,t)}else cre(o)}
  if(projet&&b===P){g.save();g.globalAlpha=.55+.15*Math.sin(t*6);drawTower(g,projet.k,(projet.x+.5)*s,(projet.y+.5)*s,s,.7,t,1,0,0);g.restore()}
  drawAllies(g,b,s,t);
- for(const p of b.pr)drawProj(g,p,s);
+ for(const p of b.pr)drawProj(g,p,s,b.pr.length);
  for(const c of fl)cre(c);
  for(const c of b.cr)pastillesEtat(g,c,(c.x+.5+c.ox)*s,(c.y+.5+c.oy)*s-s*CR[c.k].z*(CR[c.k].fly?1.05:.8),Math.max(4,s*.1));
  for(const f of b.fx)drawFx(g,f,s);
@@ -979,7 +1027,7 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   m.seats.forEach((s,i)=>{const d=document.createElement('div'),n=document.createElement('b');d.style.setProperty('--c',['#f2c14e','#e4572e','#4aa3df','#b06ad0'][i]);
    if(s){n.textContent=s.name+(i==m.you?' (toi)':'');d.append(n,FACTIONS[s.f].icon+' '+FACTIONS[s.f].name+(s.online?'':' · déconnecté'))}else{n.textContent='IA';d.append(n,'Place libre : une IA jouera ici')}
    if(i==m.you)d.className='me';box.appendChild(d)});
-  if(m.you>=0&&m.seats[m.you]&&m.seats[m.you].f!==chosenClass){chosenClass=m.seats[m.you].f;[...factionBox.querySelectorAll('button[data-faction]')].forEach(el=>el.classList.toggle('selected',Number(el.dataset.faction)===chosenClass))}
+  if(m.you>=0&&m.seats[m.you]&&m.seats[m.you].f!==chosenClass)selectFaction(m.seats[m.you].f,false);
   $('classPick').hidden=m.you<0;
   document.querySelectorAll('#ldiff button').forEach(b=>{b.classList.toggle('on',+b.dataset.lv==m.lv);b.disabled=!m.leader});
   $('lstart').hidden=!m.leader;
@@ -999,7 +1047,7 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
    const oc=new Map(b.cr.map(c=>[c.id,c])),cx=v=>Math.min(C-1,Math.max(0,Math.round(v))),cy=v=>Math.min(R-1,Math.max(0,Math.round(v)));
    b.cr=d.c.map(c=>{const o=oc.get(c[0]);return {id:c[0],k:c[1],px:o?o.x:c[2],py:o?o.y:c[3],nx:c[2],ny:c[3],x:o?o.x:c[2],y:o?o.y:c[3],tx:cx(c[2]),ty:cy(c[3]),hp:c[4],max:1,sl:c[5]&1,h:c[5]&2,hl:c[5]&4,hid:c[5]&8,e:c[5],f:c[6],ph:c[7],ox:c[8],oy:c[9]}});
    const op=new Map(b.pr.map(p=>[p.id,p]));
-   b.pr=d.p.map(p=>{const o=op.get(p[0]);return {id:p[0],k:p[1],px:o?o.x:p[2],py:o?o.y:p[3],nx:p[2],ny:p[3],x:o?o.x:p[2],y:o?o.y:p[3],tx:p[4],ty:p[5],tot:p[6],a:p[7]}});
+   b.pr=d.p.map(p=>{const o=op.get(p[0]);return {id:p[0],k:p[1],px:o?o.x:p[2],py:o?o.y:p[3],nx:p[2],ny:p[3],x:o?o.x:p[2],y:o?o.y:p[3],tx:p[4],ty:p[5],tot:p[6],a:p[7],sx:p[8]??o?.sx??p[2],sy:p[9]??o?.sy??p[3]}});
    for(const f of d.fx)b.fx.push(f);for(const e of d.ev)b.ev.push(e)});
   if(pick){const np=P.t.find(t=>t.x==pick.x&&t.y==pick.y);if(!np||np.lv!=pick.lv||(np.b>0)!=(pick.b>0)){pick=np||null;render()}else pick=np}
   for(const l of s.log)onLog(l)},
@@ -1042,7 +1090,7 @@ function caseVersEcran(x,y){const r=main.getBoundingClientRect();if(R3D.api){con
 function caseSous(cx,cy){const r=main.getBoundingClientRect();if(R3D.api){const p=R3D.api.sol(cx-r.left,cy-r.top);return p?{x:Math.floor(p.x),y:Math.floor(p.z)}:{x:-1,y:-1}}
  return {x:Math.floor((cx-r.left-VUE.ox)/cell),y:Math.floor((cy-r.top-VUE.oy)/cell)}}
 function charger3D(){if(!R3D.on)return;
- import('./rendu3d.js').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R,chemin});stage.insertBefore(R3D.api.canvas,main);
+ import('./rendu3d.js').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R,chemin,RACES,silhouettes:SILHOUETTES});stage.insertBefore(R3D.api.canvas,main);
   fit();recentrer();render();
   R3D.pret=R3D.api.precharger([...new Set(B.map(b=>b.classId))]).then(()=>{R3D.charge=true})})
  .catch(e=>{console.warn(e);R3D.on=false;R3D.echec=true;document.body.classList.add('r2d');toast('3D indisponible sur cet appareil : retour à la 2D')})}
@@ -1074,7 +1122,7 @@ function setView(v){view=v;projet=null;const b=B[v],bn=$('banner'),cb=$('cartesB
  if(v==me)cb.style.removeProperty('--c');else cb.style.setProperty('--c',b.col);$('cartesTxt').textContent=v==me?'Adversaires':b.name;$('advPoints').hidden=v!=me;
  cartes(false);cadre=v!=me?b.col:'#c9a24a';hudK='';if(pick&&(v!=me||explore)){pick=null;render()}else if(tab=='t'&&sel!=null)render()}
 const SOLO_COL=['#e4572e','#4aa3df','#b06ad0'];
-function soloSeats(f){return [{name:'Toi',col:FACTIONS[f].color,ai:0,classId:f}].concat([1,2,3].map(i=>({name:'IA '+i,col:SOLO_COL[i-1],ai:1,classId:(f+i)%5})))}
+function soloSeats(f){return [{name:'Toi',col:FACTIONS[f].color,ai:0,classId:f}].concat([1,2,3].map(i=>({name:'IA '+i,col:SOLO_COL[i-1],ai:1,classId:(f+i)%FACTIONS.length})))}
 /* installe une partie (locale ou reçue du serveur) : vignettes, joueur, vue */
 function useBoards(boards,mine){B=boards;me=mine;P=B[me];sel=null;mon=null;projet=null;FILE.length=0;parcSel.clear();parc(false);
  const ch=$('chips'),pts=$('advPoints');ch.textContent='';pts.textContent='';for(const b of B){const e=document.createElement('button'),cv=document.createElement('canvas'),tx=document.createElement('span'),n=document.createElement('b'),s=document.createElement('span');
@@ -1170,7 +1218,7 @@ function ralentit(T,lv){const i=Math.min(4,Math.max(0,lv-1));return T.fsp?{p:GIV
 /* 2.40 : mécanique propre de la race, et état de la tour posée (Fureur, Chauffe, Croissance, Cohésion) */
 function bonusFaction(f){const M=RACES[f].meca;return M.n+' : '+M.txt}
 function etatTour(t){const T=TW[t.k],l=[];if(t.co)l.push('Cohésion +'+Math.round(t.co*100)+' %');if(t.fu)l.push('Fureur '+t.fu+'/'+10+(t.rg>0?' · RAGE':''));if(T.ht)l.push('Chauffe '+Math.round(Math.min(1,t.ht||0)*100)+' %'+(t.oh>0?' · surchauffe':''));
- if(T.faction==2)l.push('Croissance +'+Math.min(25,Math.floor((t.age||0)/10))+' %');return l.join(' · ')}
+ if(T.m==2)l.push('Croissance +'+Math.min(25,Math.floor((t.age||0)/10))+' %');return l.join(' · ')}
 function combosTour(T){return RACES[T.faction].combos.filter(c=>c.a.includes(T.j)).map(c=>'Combo '+c.n+' avec '+c.a.filter(j=>j!=T.j).map(j=>TW[T.faction*10+j].n).join(', '))}
 /* effets propres à la tour, en clair */
 function effets(T,lv){const l=[];const R=ralentit(T,lv);if(R)l.push((T.fsp?'ralentit':'racines')+' −'+pr(R.p)+' pendant '+fd(R.d)+' s'+(R.r?', zone '+fr(R.r)+' cases':''));if(T.fl)l.push('souffle en cône');if(T.me)l.push('corps à corps');
@@ -1360,7 +1408,7 @@ function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(time<GR
 const factionBox=$('factions');
 /* 2.40 : boutons des races (générés depuis RACES) et fiche de race (Description, Tours, Combos) */
 const SIGIL=['#7fc4ee','#f07850','#8fd47d','#e2ad68','#c19aff'];
-factionBox.innerHTML=RACES.map((F,i)=>`<button type="button" data-faction="${i}" aria-pressed="false" onclick="window.chooseFaction(${i})"><span class="ficon">${F.icon}</span><span><strong>${F.name}</strong><small>${F.desc}</small><span class="fmeca">${F.meca.n}</span></span></button>`).join('');
+factionBox.innerHTML=RACES.map((F,i)=>`<button type="button" data-faction="${i}" aria-pressed="false"><span class="ficon">${F.icon}</span><span><strong>${F.name}</strong><small>${F.desc}</small><span class="fmeca">${F.meca.n}</span></span></button>`).join('');
 let rfF=0,rfO='desc';
 function ouvrirFicheRace(f,o){rfF=f;if(o)rfO=o;$('raceFiche').hidden=false;rendreFicheRace();}
 function fermerFicheRace(){$('raceFiche').hidden=true}
@@ -1374,14 +1422,14 @@ function radarSVG(v,col){const cx=150,cy=118,R0=82,N=v.length,pt=(i,r)=>[cx+Math
  return s+'</svg>'}
 const statsTour=(k,lv=1)=>{const T=TW[k];return [T.c+' or',T.no?'ne tire pas':'⚔ '+dps(k,lv)+' dégâts/s','◎ portée '+fr(T.r),T.ao?'air uniquement':T.gr?'sol uniquement':'sol et air'].join(' · ')};
 function iconeTour(k){const c=towerIcon(k,1);icone3D(c,'tour',k,56,46);return c}
-function rendreFicheRace(){const F=RACES[rfF],cad=$('raceFiche').querySelector('.rf-cadre'),corps=$('rfCorps');cad.style.setProperty('--sigil',SIGIL[rfF]);
+function rendreFicheRace(){const F=RACES[rfF],cad=$('raceFiche').querySelector('.rf-cadre'),corps=$('rfCorps');cad.style.setProperty('--sigil',SIGIL[F.m]);
  $('rfBlason').textContent=F.icon;$('rfNom').textContent=F.name;$('rfSous').textContent=F.desc;
  for(const b of $('raceFiche').querySelectorAll('.rf-onglets button'))b.classList.toggle('on',b.dataset.o==rfO);
  $('rfChoisir').textContent=chosenClass===rfF?'✓ Race choisie':'Choisir cette race';corps.textContent='';corps.scrollTop=0;
  if(rfO=='desc'){corps.innerHTML=`<p class="rf-hist">${F.histoire}</p><h4>Mécanique propre</h4><div class="rf-meca"><b>${F.meca.n}</b> : ${F.meca.txt}</div>
   <h4>États infligés</h4><ul class="rf-etats">${F.etats.map(e=>'<li>'+e+'</li>').join('')}</ul>
   <div class="rf-duo"><div><b>Forces</b>${F.forces}</div><div><b>Faiblesses</b>${F.faible}</div></div>
-  <h4>Profil</h4><div class="rf-radar">${radarSVG(F.radar,SIGIL[rfF])}</div>`;return}
+  <h4>Profil</h4><div class="rf-radar">${radarSVG(F.radar,SIGIL[F.m])}</div>`;return}
  if(rfO=='tours'){const L=elt('div','rf-tours');for(let j=0;j<10;j++){const k=rfF*10+j,T=TW[k],d=elt('div','rf-tour'+(T.u?' ult':'')),nm=elt('div','nm',T.n);nm.appendChild(elt('i','',(j+1)+' · '+T.role));
    d.append(iconeTour(k),nm,elt('div','st',statsTour(k)),elt('div','tx',T.txt));L.appendChild(d)}corps.appendChild(L);return}
  for(const c of F.combos){const d=elt('div','rf-combo'),eq=elt('div','eq'),ex=elt('div','ex');
@@ -1389,12 +1437,12 @@ function rendreFicheRace(){const F=RACES[rfF],cad=$('raceFiche').querySelector('
   ex.append(elt('b','',c.n),c.txt);d.append(eq,ex);corps.appendChild(d)}}
 $('ficheRaceBtn').onclick=()=>ouvrirFicheRace(chosenClass,'desc');
 $('rfClose').onclick=$('rfRetour').onclick=fermerFicheRace;
-$('rfPrev').onclick=()=>{rfF=(rfF+4)%5;rendreFicheRace()};$('rfNext').onclick=()=>{rfF=(rfF+1)%5;rendreFicheRace()};
+$('rfPrev').onclick=()=>{rfF=(rfF+RACES.length-1)%RACES.length;rendreFicheRace()};$('rfNext').onclick=()=>{rfF=(rfF+1)%RACES.length;rendreFicheRace()};
 $('rfChoisir').onclick=()=>{selectFaction(rfF);fermerFicheRace()};
 for(const b of $('raceFiche').querySelectorAll('.rf-onglets button'))b.onclick=()=>{rfO=b.dataset.o;rendreFicheRace()};
 $('raceFiche').addEventListener('click',e=>{if(e.target.id=='raceFiche')fermerFicheRace()});
 
-function selectFaction(i){
+function selectFaction(i,envoyer=true){
  i=Math.max(0,Math.min(FACTIONS.length-1,Number(i)||0));
  chosenClass=i;
  [...factionBox.querySelectorAll('button[data-faction]')].forEach(el=>{const active=Number(el.dataset.faction)===i;el.classList.toggle('selected',active);el.setAttribute('aria-pressed',active?'true':'false')});
@@ -1402,11 +1450,10 @@ function selectFaction(i){
  $('difficultyLabel').hidden=false;
  $('factionStatus').textContent='✓ '+FACTIONS[i].name+' sélectionnée';$('ficheRaceBtn').lastChild.textContent=FACTIONS[i].name;
  $('hint').textContent='Race choisie : '+FACTIONS[i].name+'. Lis sa fiche, puis choisis la difficulté pour commencer.';
- if(NET.on)NET.send({t:'faction',f:i});
+ if(envoyer&&NET.on)NET.send({t:'faction',f:i});
 }
-// Sélection redondante et robuste : onclick inline + délégation click.
+// Un seul clic traité, y compris pour les salons multijoueurs.
 // Le clic natif fonctionne au doigt, à la souris et dans les navigateurs intégrés iOS.
-window.chooseFaction=selectFaction;
 factionBox.addEventListener('click',e=>{
  const b=e.target.closest('button[data-faction]');
  if(!b||!factionBox.contains(b))return;

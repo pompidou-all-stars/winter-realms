@@ -8,8 +8,9 @@ const D=path.join(RACINE,'assets','3d'),FAC=['alliance','horde','sylvestres','na
 const lireGLB=f=>{const b=fs.readFileSync(f);return JSON.parse(b.slice(20,20+b.readUInt32LE(12)).toString('utf8'))};
 const S=charger();
 
-test('Un modèle 3D pour chaque tour (tours/<faction>-<j>) et chaque clé de monstre (monstres/<g>), plus le portail et le château',()=>{
- assert.equal(S.TW.length,FAC.length*10);
+/* 2.44 : les 5 premières races ont des modèles 3D ; les 5 races de Thibaut (sil) sont dessinées par silhouettes.js */
+test('Un modèle 3D pour chaque tour des races à modèles (tours/<faction>-<j>), chaque clé de monstre (monstres/<g>), le portail et le château',()=>{
+ assert.equal(S.RACES.filter(F=>!F.sil).length,FAC.length);
  for(const [f,F] of FAC.entries())for(let j=0;j<10;j++)assert.ok(fs.existsSync(path.join(D,'tours',`${F}-${j}.glb`)),`tour ${F}-${j} (${S.TW[f*10+j].n}) sans modèle`);
  for(const g of new Set(S.CR.map(c=>c.g)))assert.ok(fs.existsSync(path.join(D,'monstres',`${g}.glb`)),`monstre « ${g} » sans modèle`);
  for(const d of ['portail','chateau','mort-squelette','mort-colosse'])assert.ok(fs.existsSync(path.join(D,'decor',`${d}.glb`)),`décor ${d} manquant`);
@@ -20,7 +21,7 @@ test('Les monstres sont animés : « vol » pour les volants, « marche » pour 
 });
 /* 2.40 : les tours qui tirent sur une cible (ni soutien « no », ni impulsion « pu », ni mines « mn ») ont une pièce qui la suit */
 test('Les tours qui visent une cible ont une pièce « Tourelle »',()=>{
- S.TW.forEach((T,i)=>{if(T.no||T.pu===0||T.mn)return;const F=FAC[Math.floor(i/10)],j=i%10;
+ S.TW.forEach((T,i)=>{if(T.no||T.pu===0||T.mn||S.RACES[T.faction].sil)return;const F=FAC[Math.floor(i/10)],j=i%10;
   assert.ok(lireGLB(path.join(D,'tours',`${F}-${j}.glb`)).nodes.some(n=>n.name==='Tourelle'),`${F}-${j} sans Tourelle`)});
 });
 test('Les modèles du jeu sont compressés (meshopt) et leurs couleurs sont dans les sommets (« Peint ») ou dans une texture peinte (« Peau », 2.30)',()=>{
