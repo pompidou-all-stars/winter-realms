@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.43</title>
+<title>Winter Realms — Tower Wars · Édition 2.41</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -440,7 +440,7 @@ body.prep #clock{display:none}
 #rfChoisir{background:linear-gradient(180deg,#ffd76a,#c9922e);color:#2a1a05;font-weight:700;border:1px solid #fff1b0;box-shadow:0 3px 0 #6b4a12}
 #rfRetour{background:#0b1424;border:1px solid #8fb6d966;color:#d9ecff}
 @media(max-width:420px){.rf-combo{flex-direction:column;align-items:stretch}.rf-combo .eq{justify-content:center}.rf-titre b{font-size:17px}.rf-tours{grid-template-columns:1fr}}
-/* 2.40 : âmes (Magique) dans le bandeau */
+/* 2.40 : âmes (Cour des Ossements) dans le bandeau */
 #ames[hidden]{display:none}#ames b{color:#9fe8ff}
 </style></head><body>
 <div id="app">
@@ -450,7 +450,7 @@ body.prep #clock{display:none}
    <span class="pastille"><span class="coin"></span><b id="gold">0</b></span>
    <span class="pastille" title="Revenu toutes les 10 s"><svg class="anneau" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="#9be7ff33" stroke-width="3"/><circle id="arc" cx="10" cy="10" r="8" fill="none" stroke="#f2c14e" stroke-width="3" stroke-dasharray="50.3" stroke-dashoffset="50.3" transform="rotate(-90 10 10)"/></svg><b id="inc">+0</b></span>
    <span class="pastille" id="lives">♥ <b>40</b></span>
-   <span class="pastille" id="ames" hidden title="Âmes récoltées (Magique)">✦ <b>0</b></span>
+   <span class="pastille" id="ames" hidden title="Âmes récoltées (Cour des Ossements)">✦ <b>0</b></span>
    <span class="vide"></span>
    <span class="pastille" id="prep" hidden title="Phase de construction : pas d'envoi de monstres"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4l6 6-3 3-6-6z" fill="#f2c14e" stroke="#0b1626" stroke-width="1.4" stroke-linejoin="round"/><path d="M12.5 8.5L4 17l3 3 8.5-8.5" fill="#a0672e" stroke="#0b1626" stroke-width="1.4" stroke-linejoin="round"/></svg><b id="prepN">0:30</b></span>
    <span class="pastille" id="clock">0:00</span>
@@ -526,7 +526,7 @@ body.prep #clock{display:none}
   <h1 id="msg">Winter Realms</h1><div class="soustitre">Tower Wars</div></div>
  <p id="sub">L'hiver éternel s'abat sur les royaumes du Nord. Fortifie ton domaine et lance tes armées contre trois seigneurs rivaux : le dernier debout régnera sur les terres gelées.</p>
  <ul class="regles"><li><i>🏰</i><span><b>Bâtis</b>des tours pour tracer ton labyrinthe</span></li><li><i>⚔️</i><span><b>Envoie</b>des monstres : chaque vague augmente ton revenu</span></li><li><i>❤️</i><span><b>Résiste</b>40 vies, pas une de plus</span></li></ul></div>
- <div id="classPick"><h2>Choisis ta race</h2><div id="factions"></div><p id="factionStatus" aria-live="polite">Sélectionne une race ci-dessus.</p><button type="button" id="ficheRaceBtn">📜 Fiche de la race : <b>Humains</b></button></div><h2 id="difficultyLabel" hidden>Lance la bataille</h2><div id="lv"><button id="go0" disabled>Normal<small>IA à revenu égal</small></button><button id="go1" disabled>Difficile<small>IA : +25 % de revenu</small></button><button id="go2" disabled>Brutal<small>IA : +50 % de revenu</small></button></div>
+ <div id="classPick"><h2>Choisis ta race</h2><div id="factions"></div><p id="factionStatus" aria-live="polite">Sélectionne une race ci-dessus.</p><button type="button" id="ficheRaceBtn">📜 Fiche de la race : <b>Royaume d’Aubeval</b></button></div><h2 id="difficultyLabel" hidden>Lance la bataille</h2><div id="lv"><button id="go0" disabled>Normal<small>IA à revenu égal</small></button><button id="go1" disabled>Difficile<small>IA : +25 % de revenu</small></button><button id="go2" disabled>Brutal<small>IA : +50 % de revenu</small></button></div>
  <p id="hint">Carte de 13 × 17 cases. En Difficile et en Brutal, tes chantiers prennent aussi plus de temps.</p>
  <div id="online"><h2>Jouer entre amis</h2><input id="pname" maxlength="16" placeholder="Ton pseudo" autocomplete="nickname">
   <div class="orow"><button id="mkRoom" type="button">Créer un salon</button><input id="rcode" maxlength="4" placeholder="CODE" autocapitalize="characters"><button id="joinRoom" type="button">Rejoindre</button></div></div>
@@ -536,7 +536,6 @@ body.prep #clock{display:none}
   <button id="lquit" type="button" class="ghost">Quitter le salon</button></div>
 </div>
 <script src="sim.js"></script>
-<script src="silhouettes.js?v=243"></script>
 <script src="audio.js"></script>
 <script>
 /* ---------- sons : fichiers ElevenLabs (audio.js), sons synthétisés en secours ---------- */
@@ -730,41 +729,77 @@ function shaft(g,x,by,ty,rx,ry,mat,s,lw){const H=by-ty,cols=mat==1?['#cfa066','#
  else for(const[px,py,w]of[[-.26,.4,.12],[.1,.3,.14],[-.08,.55,.12],[.2,.6,.1],[-.3,.72,.1],[.02,.8,.12]]){g.moveTo(x+px*s,ty+py*H);g.lineTo(x+(px+w)*s,ty+py*H)}
  g.stroke();g.restore();
  g.beginPath();g.moveTo(x-s*.075,by+ry*.95);g.lineTo(x-s*.075,by-s*.06);g.arc(x,by-s*.06,s*.075,Math.PI,0);g.lineTo(x+s*.075,by+ry*.95);g.closePath();fs(g,'#5a3a1c')}
-/* Projection oblique des mêmes pièces sur le canevas 2D. */
-const projectionTour=(x,y,z)=>[x*.79+z*.61,.26-y*.78+(z*.79-x*.61)*.40];
-const silhouettes2D=SILHOUETTES.map(pieces=>pieces.map(p=>{
- if(p.type==='trait'){
-  const [x,y]=projectionTour(...p.a),[x2,y2]=projectionTour(...p.b);
-  const depth=([a,b,c])=>c*.79-a*.61+b*.27;
-  return {...p,x,y,x2,y2,profondeur:(depth(p.a)+depth(p.b))/2}
- }
- const [x,y]=projectionTour(p.x,p.y,p.z);
- return {...p,x,y,a:Math.hypot(p.a*.79,p.c*.61),b:p.b*.78+p.c*.15,profondeur:p.z*.79-p.x*.61+p.y*.27}
-}).sort((a,b)=>a.profondeur-b.profondeur));
+function merlons(g,x,ty,rx,ry,s,col){for(const px of[-.66,0,.66]){g.beginPath();g.rect(x+px*rx-s*.075,ty+ry*Math.sqrt(1-px*px)-s*.13,s*.15,s*.13);fs(g,col)}}
 function drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun){
- g.save();g.translate(x,y);
- const e=s*(1+.045*(lv-1));g.scale(e,e);
- const op=g.globalAlpha;
- g.globalAlpha=op*.35;el(g,0,.28,.34,.12,'#181d2a');g.globalAlpha=op;
- g.lineCap='round';g.lineJoin='round';g.strokeStyle=OUT;g.lineWidth=.026;
- for(const p of silhouettes2D[k]){
-  if(p.type==='trait'){
-   g.beginPath();g.moveTo(p.x,p.y);g.lineTo(p.x2,p.y2);
-   g.strokeStyle=OUT;g.lineWidth=p.largeur+.025;g.stroke();
-   g.strokeStyle=p.col;g.lineWidth=p.largeur;g.stroke();
-  }else{
-   const w=p.a/2,h=p.b/2;g.beginPath();
-   if(p.type==='boule')g.ellipse(p.x,p.y,w,h,0,0,Math.PI*2);
-   else if(p.type==='bloc')g.roundRect(p.x-w,p.y-h,p.a,p.b,.025);
-   else{g.moveTo(p.x,p.y-h);g.lineTo(p.x+w,p.y);g.lineTo(p.x,p.y+h);g.lineTo(p.x-w,p.y);g.closePath()}
-   g.strokeStyle=OUT;g.lineWidth=.026;fs(g,p.col);
-  }
+ const T=TW[k],f=T.faction,j=k%10,pal=[
+  ['#e9e2cf','#9da9b6','#647487','#d9b45e','#355b83'],
+  ['#bd7042','#6b3e2b','#33251f','#d34d36','#e5b24e'],
+  ['#8dcf8b','#397c57','#244b3c','#d8e99b','#8c70bd'],
+  ['#c6b5a0','#766b60','#3d4148','#e0a34d','#5f91a8'],
+  ['#b8a0d9','#5c477d','#282039','#a879c9','#7ff3ff']
+ ][f],[stone,mid,dark,glow,accent]=pal;
+ const bob=f===4?Math.sin(t*2.6)*s*.035:0,baseY=y+s*.25;
+ g.save();g.translate(x,y+bob);g.lineJoin='round';g.lineCap='round';g.lineWidth=Math.max(1,s*.035);g.strokeStyle=OUT;
+ /* Ombre portée et socle : la forme du socle suffit déjà à identifier la faction. */
+ g.fillStyle='rgba(0,0,0,.34)';g.beginPath();g.ellipse(s*.04,s*.31,s*.43,s*.16,0,0,7);g.fill();
+ if(f===0){ // Alliance : pierre taillée, créneaux et or
+  g.beginPath();g.ellipse(0,s*.25,s*.4,s*.15,0,0,7);fs(g,mid);g.beginPath();g.ellipse(0,s*.21,s*.36,s*.13,0,0,7);fs(g,stone);
+  for(let q=0;q<4;q++){let an=q*Math.PI/2;g.save();g.translate(Math.cos(an)*s*.29,s*.23+Math.sin(an)*s*.09);g.rotate(an);g.fillStyle=glow;g.fillRect(-s*.055,-s*.06,s*.11,s*.12);g.strokeRect(-s*.055,-s*.06,s*.11,s*.12);g.restore()}
+ }else if(f===1){ // Horde : plateforme de rondins, clous et défenses
+  g.beginPath();g.ellipse(0,s*.25,s*.41,s*.15,0,0,7);fs(g,dark);for(let q=-1;q<=1;q++){g.beginPath();g.moveTo(q*s*.25,s*.18);g.lineTo(q*s*.25,s*.34);g.strokeStyle=stone;g.lineWidth=s*.045;g.stroke()}
+  for(let q of[-1,1])pg(g,stone,q*s*.25,s*.2,q*s*.43,s*.03,q*s*.34,s*.31);
+ }else if(f===2){ // Sylvestres : racines nouées et feuillage
+  g.beginPath();g.ellipse(0,s*.25,s*.4,s*.14,0,0,7);fs(g,dark);
+  for(let q=-2;q<=2;q++){g.beginPath();g.moveTo(q*s*.12,s*.32);g.quadraticCurveTo(q*s*.2,s*.12,q*s*(.2+q*.04),-s*.02);g.strokeStyle=mid;g.lineWidth=s*.07;g.stroke()}
+  for(let q=-1;q<=1;q++)el(g,q*s*.25,s*.13,s*.09,s*.05,glow);
+ }else if(f===3){ // Nains : base hexagonale rivetée
+  g.beginPath();for(let q=0;q<6;q++){let an=Math.PI/3*q-Math.PI/6,xx=Math.cos(an)*s*.4,yy=s*.24+Math.sin(an)*s*.15;q?g.lineTo(xx,yy):g.moveTo(xx,yy)}g.closePath();fs(g,dark);g.beginPath();g.ellipse(0,s*.22,s*.31,s*.105,0,0,7);fs(g,mid);
+  for(let q=0;q<8;q++){let an=q*Math.PI/4;el(g,Math.cos(an)*s*.34,s*.24+Math.sin(an)*s*.11,s*.025,s*.025,glow)}
+ }else{ // Ombres : anneaux flottants et énergie spectrale
+  g.strokeStyle='rgba(184,145,255,.8)';g.lineWidth=s*.045;g.beginPath();g.ellipse(0,s*.26,s*.39,s*.14,0,0,7);g.stroke();g.beginPath();g.ellipse(0,s*.2,s*.27,s*.095,0,0,7);g.stroke();
+  for(let q=0;q<3;q++){let an=t*1.4+q*2.094;el(g,Math.cos(an)*s*.33,s*.22+Math.sin(an)*s*.09,s*.035,s*.035,accent)}
  }
- for(let q=0;q<lv;q++)el(g,(q-(lv-1)/2)*.105,.36,.025,.025,'#ffe17a');
- if(stun)for(let q=0;q<3;q++){
-  const angle=t*6+q*2.1;el(g,Math.cos(angle)*.25,-.71+Math.sin(angle)*.06,.04,.04,'#ffe45e')
+ /* Silhouette spécifique à chaque tour : guetteur, héros, cristal, artillerie, forge, mage… */
+ const top=-s*(.32+.035*(lv-1)),w=s*.29;
+ if(j===0||j===6){ // tour de guet / baliste
+  if(f===2){g.beginPath();g.moveTo(-w*.6,s*.2);g.quadraticCurveTo(-w*.9,-s*.1,-w*.35,top);g.quadraticCurveTo(0,top-s*.22,w*.35,top);g.quadraticCurveTo(w*.9,-s*.1,w*.6,s*.2);g.closePath();fs(g,mid);for(let q=-1;q<=1;q++)el(g,q*s*.13,top+s*.12,s*.07,s*.1,glow)}
+  else if(f===4){g.beginPath();g.moveTo(-w*.65,s*.2);g.quadraticCurveTo(-w*.8,-s*.1,-w*.2,top);g.quadraticCurveTo(0,top-s*.26,w*.2,top);g.quadraticCurveTo(w*.8,-s*.1,w*.65,s*.2);g.closePath();fs(g,'#47345f');el(g,0,top+s*.04,s*.13,s*.2,accent);g.globalAlpha=.65;el(g,0,top-s*.12,s*.19,s*.24,'#c7aaff');g.globalAlpha=1}
+  else{g.beginPath();g.moveTo(-w*.65,s*.2);g.lineTo(-w*.5,top+s*.12);g.lineTo(-w*.28,top);g.lineTo(w*.28,top);g.lineTo(w*.5,top+s*.12);g.lineTo(w*.65,s*.2);g.closePath();fs(g,mid);g.fillStyle=glow;g.fillRect(-s*.035,top+s*.08,s*.07,s*.22);if(f===1){pg(g,stone,-w*.5,top+s*.05,-w*.8,top-s*.1,-w*.48,top-s*.24);pg(g,stone,w*.5,top+s*.05,w*.8,top-s*.1,w*.48,top-s*.24)}}
+  if(j===6){g.save();g.translate(0,top+s*.02);g.rotate(a);g.strokeStyle=glow;g.lineWidth=s*.055;g.beginPath();g.moveTo(-s*.28,0);g.lineTo(s*.28,0);g.stroke();g.beginPath();g.moveTo(-s*.24,-s*.16);g.quadraticCurveTo(0,-s*.34,s*.24,-s*.16);g.stroke();g.restore()}
+ }else if(j===1||j===7){ // statue de champion / gardien
+  g.beginPath();g.roundRect(-s*.19,top+s*.08,s*.38,s*.48,s*.07);fs(g,f===1?'#6f4a35':f===4?'#59416e':stone);
+  el(g,0,top,s*.17,s*.17,f===2?'#b6d99a':f===4?'#d9c6ff':'#d7c7aa');
+  if(f===1){pg(g,glow,-s*.12,top-s*.05,-s*.3,top-s*.28,-s*.17,top+s*.04);pg(g,glow,s*.12,top-s*.05,s*.3,top-s*.28,s*.17,top+s*.04)}
+  else if(f===4){g.fillStyle=accent;g.fillRect(-s*.1,top-s*.01,s*.2,s*.035);g.beginPath();g.arc(0,top+s*.03,s*.045,0,7);g.fill()}
+  else{pg(g,glow,-s*.18,top+s*.06,-s*.24,top-s*.18,0,top-s*.11,s*.24,top-s*.18,s*.18,top+s*.06)}
+  g.fillStyle=accent;g.fillRect(-s*.13,top+s*.2,s*.26,s*.035);
+ }else if(j===2||j===8){ // obélisque / cristal
+  const pulse=.75+.25*Math.sin(t*4);g.beginPath();g.moveTo(0,top-s*.3*pulse);g.lineTo(s*.2,top+s*.04);g.lineTo(s*.13,s*.17);g.lineTo(-s*.13,s*.17);g.lineTo(-s*.2,top+s*.04);g.closePath();fs(g,f===4?'#8f70c7':f===2?'#b8e5a8':f===3?'#80b4c7':'#d4d8e1');
+  g.strokeStyle=glow;g.lineWidth=s*.045;g.beginPath();g.moveTo(0,top-s*.22);g.lineTo(0,s*.12);g.stroke();el(g,0,top+s*.02,s*.055,s*.055,accent);
+  if(j===8){for(let q=-1;q<=1;q+=2){g.beginPath();g.moveTo(q*s*.2,top+s*.1);g.lineTo(q*s*.34,top-s*.08);g.strokeStyle=glow;g.lineWidth=s*.04;g.stroke()}}
+ }else if(j===3){ // artillerie
+  g.beginPath();g.roundRect(-s*.28,top+s*.08,s*.56,s*.32,s*.08);fs(g,dark);g.save();g.translate(0,top+s*.18);g.rotate(a*.35);g.lineCap='round';g.lineWidth=s*.2;g.strokeStyle=OUT;g.beginPath();g.moveTo(-s*.04,0);g.lineTo(s*.34,-s*.18);g.stroke();g.lineWidth=s*.13;g.strokeStyle=f===3?'#d6a35d':f===1?'#9b5636':f===4?'#9d78cb':'#b5b9c1';g.stroke();el(g,s*.34,-s*.18,s*.08,s*.08,glow);g.restore();
+ }else if(j===4){ // forge / brasier
+  g.beginPath();g.moveTo(-s*.27,s*.18);g.lineTo(-s*.2,top+s*.08);g.lineTo(s*.2,top+s*.08);g.lineTo(s*.27,s*.18);g.closePath();fs(g,dark);el(g,0,top+s*.03,s*.18,s*.09,'#211c22');
+  const flame=s*(.12+.04*Math.sin(t*12));pg(g,glow,-flame*.8,top+s*.02,0,top-s*.3-flame*.3,flame*.8,top+s*.02);el(g,0,top-s*.02,flame*.28,flame*.4,'#fff0b2');
+ }else{ // mage / archimage : silhouette de héros et orbe
+  g.beginPath();g.moveTo(-s*.2,s*.18);g.lineTo(-s*.15,top+s*.08);g.lineTo(0,top-s*.13);g.lineTo(s*.15,top+s*.08);g.lineTo(s*.2,s*.18);g.closePath();fs(g,f===2?'#4e9b6d':f===4?'#4b315f':mid);
+  el(g,0,top+s*.02,s*.13,s*.13,f===4?'#e5d8ff':'#e5c9a0');el(g,s*.22,top-s*.17,s*.085,s*.085,accent);g.strokeStyle=glow;g.lineWidth=s*.035;g.beginPath();g.moveTo(s*.1,top+s*.02);g.lineTo(s*.22,top-s*.17);g.stroke();
+  if(j===9){pg(g,glow,-s*.18,top-s*.05,-s*.3,top-s*.28,0,top-s*.18,s*.3,top-s*.28,s*.18,top-s*.05)}
  }
- if(sw>0){g.strokeStyle='#fff';g.lineWidth=.05;g.beginPath();g.arc(0,-.20,.36,a-.65,a+.65);g.stroke()}
+ /* Marques de faction : bannière, défenses, feuilles, engrenages ou halo. */
+ if(f===0){g.strokeStyle=glow;g.lineWidth=s*.035;g.beginPath();g.moveTo(0,top+s*.1);g.lineTo(0,top-s*.36);g.stroke();pg(g,glow,0,top-s*.34,s*.2,top-s*.27,0,top-s*.19)}
+ if(f===1){for(let q of[-1,1])pg(g,stone,q*s*.22,s*.08,q*s*.34,-s*.08,q*s*.3,s*.17)}
+ if(f===2){for(let q=0;q<3;q++){let an=t*1.5+q*2.1;el(g,Math.cos(an)*s*.28,top+s*.12+Math.sin(an)*s*.08,s*.045,s*.07,glow)}}
+ if(f===3){for(let q=-1;q<=1;q++){g.fillStyle=glow;g.fillRect(q*s*.17-s*.025,top+s*.2,s*.05,s*.05)}if(j===4||j===3){g.fillStyle='#55565a';g.fillRect(-s*.06,top-s*.16,s*.12,s*.18)}}
+ if(f===4){g.globalAlpha=.35;g.strokeStyle=accent;g.lineWidth=s*.04;g.beginPath();g.ellipse(0,top+s*.08,s*.34,s*.12,t*.3,0,7);g.stroke();g.globalAlpha=1;for(let q=0;q<3;q++){let an=-t*1.2+q*2.1;el(g,Math.cos(an)*s*.34,top+s*.06+Math.sin(an)*s*.12,s*.035,s*.035,accent)}}
+ /* Niveau et état */
+ for(let q=0;q<lv;q++){el(g,(q-(lv-1)/2)*s*.105,s*.34,s*.025,s*.025,'#ffe17a')}
+ if(stun){for(let q=0;q<3;q++){let an=t*6+q*2.1;el(g,Math.cos(an)*s*.27,top-s*.43+Math.sin(an)*s*.06,s*.04,s*.04,'#ffe45e')}}
+ if(sw>0){g.globalAlpha=.6;g.strokeStyle='#fff';g.lineWidth=s*.06;g.beginPath();g.arc(0,top,s*.32,-.8,.8);g.stroke()}
+ // Reflet spéculaire et ombre au pied pour accentuer le volume façon maquette 3D.
+ g.globalAlpha=.22;g.strokeStyle='#fff7d8';g.lineWidth=Math.max(1,s*.018);g.beginPath();g.ellipse(-s*.035,s*.245,s*.29,s*.095,-.08,Math.PI*1.05,Math.PI*1.82);g.stroke();
+ g.globalAlpha=.12;g.fillStyle='#fff';g.beginPath();g.ellipse(-s*.12,top+s*.18,s*.07,s*.19,-.3,0,Math.PI*2);g.fill();g.globalAlpha=1;
  g.restore();
 }
 /* 2.4 : tour en chantier (construction ou amélioration) : échafaudage, marteau qui frappe et barre de progression */
@@ -774,13 +809,7 @@ function chantier(g,o,s,t){const x=(o.x+.5)*s,y=(o.y+.5)*s,p=1-o.b/(o.bt||1);g.s
  const an=-.9+Math.abs(Math.sin(t*7))*1.1;g.translate(x+s*.2,y-s*.3);g.rotate(an);g.strokeStyle='#6b4423';g.lineWidth=Math.max(1.5,s*.05);g.beginPath();g.moveTo(0,0);g.lineTo(0,-s*.2);g.stroke();g.fillStyle='#c9ced6';g.strokeStyle=OUT;g.lineWidth=1;g.fillRect(-s*.08,-s*.26,s*.16,s*.08);g.strokeRect(-s*.08,-s*.26,s*.16,s*.08);g.restore();
  g.save();const w=s*.7,h=Math.max(3,s*.09),bx=x-w/2,by=y+s*.38;g.fillStyle='rgba(20,16,10,.75)';g.fillRect(bx-1,by-1,w+2,h+2);g.fillStyle='#ffc95e';g.fillRect(bx,by,w*p,h);g.restore()}
 function drawTower(g,k,x,y,s,a,t,lv,sw,stun){drawFactionTower(g,k,x,y,s,a,t,lv,sw,stun)}
-function drawProj(g,p,s,densite){const x=p.x*s,y=p.y*s,T=TW[p.k],skin=T.skin;g.save();
- const dx=(p.sx??p.x)-p.x,dy=(p.sy??p.y)-p.y,dist=Math.hypot(dx,dy);
- if(dist>.01){const taille=Math.min(dist,densite>35?.18:densite>18?.32:.52)*s/dist;
-  g.beginPath();g.moveTo(x,y);g.lineTo(x+dx*taille,y+dy*taille);
-  g.strokeStyle=T.pz?'#79ad30':T.pe?'#9470d1':T.col;
-  g.globalAlpha=densite>35?.35:.65;g.lineWidth=Math.max(1,s*.045);g.stroke();g.globalAlpha=1;
- }
+function drawProj(g,p,s){const x=p.x*s,y=p.y*s,skin=TW[p.k].skin;g.save();
  if(skin==0){g.translate(x,y);g.rotate(p.a);g.lineCap='round';g.strokeStyle='#5a3a1c';g.lineWidth=Math.max(1.5,s*.05);g.beginPath();g.moveTo(-s*.2,0);g.lineTo(s*.1,0);g.stroke();
   g.fillStyle='#ececec';g.beginPath();g.moveTo(s*.21,0);g.lineTo(s*.07,-s*.07);g.lineTo(s*.07,s*.07);g.fill();
   g.strokeStyle='#fff';g.beginPath();g.moveTo(-s*.2,0);g.lineTo(-s*.28,-s*.06);g.moveTo(-s*.2,0);g.lineTo(-s*.28,s*.06);g.stroke()}
@@ -873,7 +902,7 @@ function draw(b,g,s,t){
  for(const[,o]of ents){if(o.lv){g.save();g.shadowColor='rgba(0,0,0,.55)';g.shadowBlur=s*.2;g.shadowOffsetX=s*.07;g.shadowOffsetY=s*.15;if(o.b>0)g.globalAlpha=.5;drawTower(g,o.k,(o.x+.5)*s,(o.y+.5)*s,s,o.a,t,o.lv,o.sw,o.stun>0);g.restore();if(o.b>0)chantier(g,o,s,t)}else cre(o)}
  if(projet&&b===P){g.save();g.globalAlpha=.55+.15*Math.sin(t*6);drawTower(g,projet.k,(projet.x+.5)*s,(projet.y+.5)*s,s,.7,t,1,0,0);g.restore()}
  drawAllies(g,b,s,t);
- for(const p of b.pr)drawProj(g,p,s,b.pr.length);
+ for(const p of b.pr)drawProj(g,p,s);
  for(const c of fl)cre(c);
  for(const c of b.cr)pastillesEtat(g,c,(c.x+.5+c.ox)*s,(c.y+.5+c.oy)*s-s*CR[c.k].z*(CR[c.k].fly?1.05:.8),Math.max(4,s*.1));
  for(const f of b.fx)drawFx(g,f,s);
@@ -950,7 +979,7 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   m.seats.forEach((s,i)=>{const d=document.createElement('div'),n=document.createElement('b');d.style.setProperty('--c',['#f2c14e','#e4572e','#4aa3df','#b06ad0'][i]);
    if(s){n.textContent=s.name+(i==m.you?' (toi)':'');d.append(n,FACTIONS[s.f].icon+' '+FACTIONS[s.f].name+(s.online?'':' · déconnecté'))}else{n.textContent='IA';d.append(n,'Place libre : une IA jouera ici')}
    if(i==m.you)d.className='me';box.appendChild(d)});
-  if(m.you>=0&&m.seats[m.you]&&m.seats[m.you].f!==chosenClass)selectFaction(m.seats[m.you].f,false);
+  if(m.you>=0&&m.seats[m.you]&&m.seats[m.you].f!==chosenClass){chosenClass=m.seats[m.you].f;[...factionBox.querySelectorAll('button[data-faction]')].forEach(el=>el.classList.toggle('selected',Number(el.dataset.faction)===chosenClass))}
   $('classPick').hidden=m.you<0;
   document.querySelectorAll('#ldiff button').forEach(b=>{b.classList.toggle('on',+b.dataset.lv==m.lv);b.disabled=!m.leader});
   $('lstart').hidden=!m.leader;
@@ -970,7 +999,7 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
    const oc=new Map(b.cr.map(c=>[c.id,c])),cx=v=>Math.min(C-1,Math.max(0,Math.round(v))),cy=v=>Math.min(R-1,Math.max(0,Math.round(v)));
    b.cr=d.c.map(c=>{const o=oc.get(c[0]);return {id:c[0],k:c[1],px:o?o.x:c[2],py:o?o.y:c[3],nx:c[2],ny:c[3],x:o?o.x:c[2],y:o?o.y:c[3],tx:cx(c[2]),ty:cy(c[3]),hp:c[4],max:1,sl:c[5]&1,h:c[5]&2,hl:c[5]&4,hid:c[5]&8,e:c[5],f:c[6],ph:c[7],ox:c[8],oy:c[9]}});
    const op=new Map(b.pr.map(p=>[p.id,p]));
-   b.pr=d.p.map(p=>{const o=op.get(p[0]);return {id:p[0],k:p[1],px:o?o.x:p[2],py:o?o.y:p[3],nx:p[2],ny:p[3],x:o?o.x:p[2],y:o?o.y:p[3],tx:p[4],ty:p[5],tot:p[6],a:p[7],sx:p[8]??o?.sx??p[2],sy:p[9]??o?.sy??p[3]}});
+   b.pr=d.p.map(p=>{const o=op.get(p[0]);return {id:p[0],k:p[1],px:o?o.x:p[2],py:o?o.y:p[3],nx:p[2],ny:p[3],x:o?o.x:p[2],y:o?o.y:p[3],tx:p[4],ty:p[5],tot:p[6],a:p[7]}});
    for(const f of d.fx)b.fx.push(f);for(const e of d.ev)b.ev.push(e)});
   if(pick){const np=P.t.find(t=>t.x==pick.x&&t.y==pick.y);if(!np||np.lv!=pick.lv||(np.b>0)!=(pick.b>0)){pick=np||null;render()}else pick=np}
   for(const l of s.log)onLog(l)},
@@ -1013,7 +1042,7 @@ function caseVersEcran(x,y){const r=main.getBoundingClientRect();if(R3D.api){con
 function caseSous(cx,cy){const r=main.getBoundingClientRect();if(R3D.api){const p=R3D.api.sol(cx-r.left,cy-r.top);return p?{x:Math.floor(p.x),y:Math.floor(p.z)}:{x:-1,y:-1}}
  return {x:Math.floor((cx-r.left-VUE.ox)/cell),y:Math.floor((cy-r.top-VUE.oy)/cell)}}
 function charger3D(){if(!R3D.on)return;
- import('./rendu3d.js?v=243').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R,chemin,silhouettes:SILHOUETTES});stage.insertBefore(R3D.api.canvas,main);
+ import('./rendu3d.js').then(m=>{R3D.api=m.creer({C,R,SP,EX,INF,DIRS,TW,CR,AURA_R,chemin});stage.insertBefore(R3D.api.canvas,main);
   fit();recentrer();render();
   R3D.pret=R3D.api.precharger([...new Set(B.map(b=>b.classId))]).then(()=>{R3D.charge=true})})
  .catch(e=>{console.warn(e);R3D.on=false;R3D.echec=true;document.body.classList.add('r2d');toast('3D indisponible sur cet appareil : retour à la 2D')})}
@@ -1330,9 +1359,8 @@ function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(time<GR
 
 const factionBox=$('factions');
 /* 2.40 : boutons des races (générés depuis RACES) et fiche de race (Description, Tours, Combos) */
-const ORDRE_FACTIONS=[0,3,1,2,4];
 const SIGIL=['#7fc4ee','#f07850','#8fd47d','#e2ad68','#c19aff'];
-factionBox.innerHTML=ORDRE_FACTIONS.map(i=>{const F=RACES[i];return `<button type="button" data-faction="${i}" aria-pressed="false"><span class="ficon">${F.icon}</span><span><strong>${F.name}</strong><small>${F.desc}</small><span class="fmeca">${F.meca.n}</span></span></button>`}).join('');
+factionBox.innerHTML=RACES.map((F,i)=>`<button type="button" data-faction="${i}" aria-pressed="false" onclick="window.chooseFaction(${i})"><span class="ficon">${F.icon}</span><span><strong>${F.name}</strong><small>${F.desc}</small><span class="fmeca">${F.meca.n}</span></span></button>`).join('');
 let rfF=0,rfO='desc';
 function ouvrirFicheRace(f,o){rfF=f;if(o)rfO=o;$('raceFiche').hidden=false;rendreFicheRace();}
 function fermerFicheRace(){$('raceFiche').hidden=true}
@@ -1361,12 +1389,12 @@ function rendreFicheRace(){const F=RACES[rfF],cad=$('raceFiche').querySelector('
   ex.append(elt('b','',c.n),c.txt);d.append(eq,ex);corps.appendChild(d)}}
 $('ficheRaceBtn').onclick=()=>ouvrirFicheRace(chosenClass,'desc');
 $('rfClose').onclick=$('rfRetour').onclick=fermerFicheRace;
-$('rfPrev').onclick=()=>{rfF=ORDRE_FACTIONS[(ORDRE_FACTIONS.indexOf(rfF)+4)%5];rendreFicheRace()};$('rfNext').onclick=()=>{rfF=ORDRE_FACTIONS[(ORDRE_FACTIONS.indexOf(rfF)+1)%5];rendreFicheRace()};
+$('rfPrev').onclick=()=>{rfF=(rfF+4)%5;rendreFicheRace()};$('rfNext').onclick=()=>{rfF=(rfF+1)%5;rendreFicheRace()};
 $('rfChoisir').onclick=()=>{selectFaction(rfF);fermerFicheRace()};
 for(const b of $('raceFiche').querySelectorAll('.rf-onglets button'))b.onclick=()=>{rfO=b.dataset.o;rendreFicheRace()};
 $('raceFiche').addEventListener('click',e=>{if(e.target.id=='raceFiche')fermerFicheRace()});
 
-function selectFaction(i,envoyer=true){
+function selectFaction(i){
  i=Math.max(0,Math.min(FACTIONS.length-1,Number(i)||0));
  chosenClass=i;
  [...factionBox.querySelectorAll('button[data-faction]')].forEach(el=>{const active=Number(el.dataset.faction)===i;el.classList.toggle('selected',active);el.setAttribute('aria-pressed',active?'true':'false')});
@@ -1374,10 +1402,11 @@ function selectFaction(i,envoyer=true){
  $('difficultyLabel').hidden=false;
  $('factionStatus').textContent='✓ '+FACTIONS[i].name+' sélectionnée';$('ficheRaceBtn').lastChild.textContent=FACTIONS[i].name;
  $('hint').textContent='Race choisie : '+FACTIONS[i].name+'. Lis sa fiche, puis choisis la difficulté pour commencer.';
- if(envoyer&&NET.on)NET.send({t:'faction',f:i});
+ if(NET.on)NET.send({t:'faction',f:i});
 }
-// Un seul clic traité, y compris pour les salons multijoueurs.
+// Sélection redondante et robuste : onclick inline + délégation click.
 // Le clic natif fonctionne au doigt, à la souris et dans les navigateurs intégrés iOS.
+window.chooseFaction=selectFaction;
 factionBox.addEventListener('click',e=>{
  const b=e.target.closest('button[data-faction]');
  if(!b||!factionBox.contains(b))return;
