@@ -20,6 +20,9 @@ import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 export const FOV = 34, ELEV = 44 * Math.PI / 180, COLONNES = 8.4;
 /* les monstres sont agrandis en jeu pour rester lisibles sur téléphone (les rapports de taille entre eux sont gardés) */
 const ECH_MONSTRES = 1.4;
+/* 2.32 : les volants sont plus compacts (ailes déployées, ils masquaient le terrain et les autres monstres) ; 2.35 : deux fois moins grands (×0,65 → ×0,5) */
+const ECH_VOLANTS = .5;
+const echMonstre = k => ECH_MONSTRES * (CR[k].fly ? ECH_VOLANTS : 1);
 const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
 /* couleurs du terrain : mêmes valeurs que art/communs/factions.py (SOL, BIOME) */
 /* thème hiver (2.9) : terrain enneigé (NEIGE ; TEINTE n'est plus utilisée depuis le paysage continu de la 2.26),
@@ -69,7 +72,7 @@ export function creer(J) {
   const cam = new THREE.PerspectiveCamera(FOV, 1, .5, 400);
   /* fx, fz : point regardé ; az : angle actuel (azC : visé, par huitièmes de tour) ; vx, vz : élan ; w, h : taille du canevas ;
      haut, bas : bandes couvertes par le bandeau et le dock (le point regardé est au centre de ce qui reste) */
-  const V = {fx: C / 2, fz: R / 2 + 1.5, az: 0, azC: 0, vx: 0, vz: 0, w: 1, h: 1, haut: 0, bas: 0};
+  const V = {fx: C / 2, fz: R / 2 + 1.5, az: 0, azC: 0, vx: 0, vz: 0, w: 1, h: 1, haut: 0, bas: 0, cx: null, cz: null};
   /* 2.26 : le point regardé reste à au moins MARGE cases des bords du terrain : on ne voit jamais plus d'environ une case et demie
      de paysage sur le côté (avant : jusqu'à la moitié de l'écran) */
   const MARGE = Math.min(C / 2, Math.max(1, COLONNES / 2 - 1.2));
@@ -98,7 +101,7 @@ export function creer(J) {
   }
   /* le doigt passe de (x0, y0) à (x1, y1) : la caméra suit pour garder le même point du sol sous le doigt. Renvoie le déplacement. */
   function glisser(x0, y0, x1, y1) {
-    const a = sol(x0, y0), b = sol(x1, y1), ax = V.fx, az = V.fz; let dx, dz;
+    V.cx = null; const a = sol(x0, y0), b = sol(x1, y1), ax = V.fx, az = V.fz; let dx, dz;
     if (a && b && Math.hypot(a.x - V.fx, a.z - V.fz) < 40) { dx = a.x - b.x; dz = a.z - b.z }
     else { const k = echelle(V.fx, V.fz) || 30, k2 = k * Math.sin(ELEV), c = Math.cos(V.az), s = Math.sin(V.az), du = (x1 - x0) / k, dv = (y1 - y0) / k2;
       dx = -du * c - dv * s; dz = du * s - dv * c }
@@ -108,13 +111,20 @@ export function creer(J) {
   /* un huitième de tour à gauche (-1) ou à droite (+1), animé dans dessiner */
   function pivoter(sens) { V.azC += sens * Math.PI / 4 }
   /* élan au lâcher (cases par seconde), amorti dans dessiner */
-  function lancer(vx, vz) { const n = Math.hypot(vx, vz), m = n > 14 ? 14 / n : 1; V.vx = vx * m; V.vz = vz * m }
-  function viser(x, z) { V.fx = x; V.fz = z; V.vx = V.vz = 0; borner(); placerCamera() }
+  function lancer(vx, vz) { const n = Math.hypot(vx, vz), m = n > 14 ? 14 / n : 1; V.vx = vx * m; V.vz = vz * m; V.cx = null }
+  function viser(x, z) { V.fx = x; V.fz = z; V.vx = V.vz = 0; V.cx = null; borner(); placerCamera() }
+  /* 2.35 : fait glisser la vue, en douceur, pour que le point (x, z) du sol arrive au pixel (px, py) du canevas
+     (par exemple une tour choisie qui serait cachée par la fiche). Glisser le doigt ou viser annule le mouvement. */
+  function amener(x, z, px, py) {
+    const g = sol(px, py); if (!g) return;
+    V.cx = Math.min(C - MARGE, Math.max(MARGE, V.fx + x - g.x)); V.cz = Math.min(R - MARGE, Math.max(MARGE, V.fz + z - g.z)); V.vx = V.vz = 0;
+  }
   /* coins de la zone libre, au sol (pour le cadre de la vignette) */
   const empreinte = () => [[0, V.haut], [V.w, V.haut], [V.w, V.h - V.bas], [0, V.h - V.bas]].map(([x, y]) => sol(x, y, true));
   function bougerCamera(dt) {
     V.az = Math.abs(V.azC - V.az) > 1e-3 ? V.az + (V.azC - V.az) * Math.min(1, dt * 8) : V.azC;
-    if (Math.hypot(V.vx, V.vz) > .05) { V.fx += V.vx * dt; V.fz += V.vz * dt; borner(); const f = Math.exp(-dt * 4); V.vx *= f; V.vz *= f } else V.vx = V.vz = 0;
+    if (V.cx != null) { const f = Math.min(1, dt * 7); V.fx += (V.cx - V.fx) * f; V.fz += (V.cz - V.fz) * f; if (Math.hypot(V.cx - V.fx, V.cz - V.fz) < .01) { V.fx = V.cx; V.fz = V.cz; V.cx = null } }
+    else if (Math.hypot(V.vx, V.vz) > .05) { V.fx += V.vx * dt; V.fz += V.vz * dt; borner(); const f = Math.exp(-dt * 4); V.vx *= f; V.vz *= f } else V.vx = V.vz = 0;
     placerCamera();
   }
 
@@ -130,6 +140,64 @@ export function creer(J) {
   const contre = new THREE.DirectionalLight('#cfe0ff', .8); contre.position.set(C / 2 + 3, 8, -6); contre.target.position.set(C / 2, 0, R / 2);
   scene.add(contre, contre.target);
 
+  /* ---------- style « peint » commun à tous les modèles (2.39) ----------
+     1. ombres en paliers (matériau « toon ») : la lumière du soleil passe par 4 paliers au lieu d'un dégradé ;
+     2. liseré de lumière froide sur les bords tournés à l'opposé de la caméra (rim light) : la silhouette se détache de la neige ;
+     3. contour sombre d'épaisseur constante à l'écran (coque inversée, en pixels) : lisible même à 30 pixels par case.
+     Désactivable avec ?style=0 (comparaison, ou téléphone trop lent). Les pièces lumineuses (« Lueur… ») ne sont pas touchées. */
+  const STYLE = !/[?&]style=0\b/.test(location.search);
+  const PALIERS = (() => { const d = new Uint8Array([90, 160, 215, 255]); const t = new THREE.DataTexture(d, d.length, 1, THREE.RedFormat);
+    t.minFilter = t.magFilter = THREE.NearestFilter; t.generateMipmaps = false; t.needsUpdate = true; return t })();
+  const RIM = {value: new THREE.Color('#d8e9ff').multiplyScalar(.42)};
+  const RESOL = {value: new THREE.Vector2(1, 1)}, LARGEUR = {value: 1.15};   // épaisseur du contour, en pixels CSS
+  const contourMat = new THREE.ShaderMaterial({
+    uniforms: {uRes: RESOL, uLargeur: LARGEUR, uCouleur: {value: new THREE.Color('#1a2233')}},
+    vertexShader: `#include <common>
+#include <skinning_pars_vertex>
+uniform vec2 uRes; uniform float uLargeur;
+void main() {
+#include <beginnormal_vertex>
+#include <skinbase_vertex>
+#include <skinnormal_vertex>
+#include <begin_vertex>
+#include <skinning_vertex>
+#include <project_vertex>
+  vec4 cn = projectionMatrix * vec4(normalize(normalMatrix * objectNormal), 0.0);
+  vec2 d = cn.xy; float l = length(d); if (l > 1e-5) gl_Position.xy += d / l * uLargeur * gl_Position.w * 2.0 / uRes;
+}`,
+    fragmentShader: `uniform vec3 uCouleur; void main() { gl_FragColor = vec4(uCouleur, 1.0); }`,
+    side: THREE.BackSide});
+  const versToon = new Map();
+  function toon(m) {
+    if (versToon.has(m)) return versToon.get(m);
+    const t = new THREE.MeshToonMaterial({name: m.name, color: m.color, map: m.map, normalMap: m.normalMap, normalScale: m.normalScale,
+      vertexColors: m.vertexColors, emissive: m.emissive, emissiveMap: m.emissiveMap, emissiveIntensity: m.emissiveIntensity,
+      transparent: m.transparent, opacity: m.opacity, alphaTest: m.alphaTest, side: m.side, gradientMap: PALIERS});
+    t.onBeforeCompile = s => {
+      s.uniforms.uRim = RIM;
+      s.fragmentShader = 'uniform vec3 uRim;\n' + s.fragmentShader.replace('#include <opaque_fragment>', `{
+  vec3 vd = isOrthographic ? vec3(0.0, 0.0, 1.0) : normalize(vViewPosition);
+  float r = smoothstep(0.55, 0.95, 1.0 - saturate(dot(normal, vd)));
+  outgoingLight += uRim * r * (0.4 + 0.6 * diffuseColor.rgb);
+}
+#include <opaque_fragment>`);
+    };
+    versToon.set(m, t); return t;
+  }
+  function styliser(racine) {
+    const l = []; racine.traverse(o => { if (o.isMesh && !o.userData.contour) l.push(o) });
+    for (const o of l) {
+      if (!o.material || (o.material.name || '').startsWith('Lueur')) continue;
+      o.material = toon(o.material);
+      let c;
+      if (o.isSkinnedMesh) { c = new THREE.SkinnedMesh(o.geometry, contourMat); c.bind(o.skeleton, o.bindMatrix) } else c = new THREE.Mesh(o.geometry, contourMat);
+      c.userData.contour = true; c.castShadow = c.receiveShadow = false; c.frustumCulled = o.frustumCulled; o.add(c);
+    }
+  }
+  /* avant chaque rendu : taille réelle du canevas (en pixels CSS) pour l'épaisseur du contour */
+  const tailleTmp = new THREE.Vector2();
+  function majContour(r) { r.getSize(tailleTmp); RESOL.value.copy(tailleTmp) }
+
   /* ---------- modèles ---------- */
   const loader = new GLTFLoader(); loader.setMeshoptDecoder(MeshoptDecoder);
   const cache = new Map(), prets = new Map();
@@ -142,11 +210,13 @@ export function creer(J) {
         if (m && m.name && m.name.startsWith('Lueur')) { m.emissiveIntensity = 1.6; o.castShadow = false }
         if (m) m.roughness = Math.max(.55, m.roughness);
       });
+      if (STYLE) styliser(g.scene);
       prets.set(url, g); return g;
     }).catch(e => { console.warn('Modèle 3D introuvable : ' + url, e); prets.set(url, null); return null }));
     return cache.get(url);
   }
   /* noms des fichiers : voir art/LISEZMOI.md (tours/<faction>-<j>, monstres/<clé g de CR>) */
+  const tourProcedurale = k => [1, 3].includes(TW[k].faction);
   const urlTour = k => `assets/3d/tours/${FAC[TW[k].faction]}-${k % 10}.glb`;
   const urlMonstre = k => `assets/3d/monstres/${CR[k].g}.glb`;
   /* plusieurs monstres peuvent partager un modèle (le Petit limon et la Gelée mutante) : le jeu le met à l'échelle de z */
@@ -155,8 +225,13 @@ export function creer(J) {
   const modele = url => { if (!prets.has(url)) { charger(url); return undefined } return prets.get(url) };
   function precharger(factions) {
     const l = [charger('assets/3d/decor/portail.glb'), charger('assets/3d/decor/chateau.glb')];
-    for (let k = 0; k < CR.length; k++) l.push(charger(urlMonstre(k)));
-    for (const f of factions) for (let j = 0; j < 10; j++) l.push(charger(urlTour(f * 10 + j)));
+    /* 2.40 : 78 monstres sur squelette et texture peinte, trop lourds pour tout attendre au lancement : on attend le palier 1,
+       les paliers 2 et 3 se chargent en fond juste après (un monstre pas encore chargé apparaît dès que son modèle arrive) */
+    for (let k = 0; k < CR.length; k++) if (CR[k].t === 1) l.push(charger(urlMonstre(k)));
+    setTimeout(() => { for (let k = 0; k < CR.length; k++) if (CR[k].t !== 1) charger(urlMonstre(k)) }, 1500);
+    for (const f of factions) for (let j = 0; j < 10; j++) if (!tourProcedurale(f * 10 + j)) l.push(charger(urlTour(f * 10 + j)));
+    /* 2.40 : morts relevés, seulement si la Cour des Ossements (race 4) est en jeu */
+    if (factions.includes(4)) l.push(charger('assets/3d/decor/mort-squelette.glb'), charger('assets/3d/decor/mort-colosse.glb'));
     return Promise.all(l);
   }
 
@@ -324,16 +399,19 @@ export function creer(J) {
   }
 
   /* ---------- flocons (thème hiver, 2.9) : 260 points qui tombent en boucle au-dessus du plateau ---------- */
-  const NF = 260, flocons = new Float32Array(NF * 3), vitesses = new Float32Array(NF);
+  /* 2.30 : la position de chaque flocon ne dépend que du temps (x0, y0 : position de départ), plus de l'enchaînement des images :
+     même mouvement à l'écran, mais deux captures au même instant sont identiques (comparaison visuelle des tests) */
+  const NF = 260, flocons = new Float32Array(NF * 3), vitesses = new Float32Array(NF), x0 = new Float32Array(NF), y0 = new Float32Array(NF);
   for (let i = 0; i < NF; i++) { const h = (i * 2654435761 >>> 0) / 4294967296, h2 = (i * 40503 % 997) / 997, h3 = (i * 7919 % 389) / 389;
-    flocons[i * 3] = -1 + h * (C + 2); flocons[i * 3 + 1] = h2 * 6; flocons[i * 3 + 2] = -1 + h3 * (R + 2); vitesses[i] = .35 + h2 * .35 }
+    x0[i] = flocons[i * 3] = -1 + h * (C + 2); y0[i] = flocons[i * 3 + 1] = h2 * 6; flocons[i * 3 + 2] = -1 + h3 * (R + 2); vitesses[i] = .35 + h2 * .35 }
   const geoF = new THREE.BufferGeometry(); geoF.setAttribute('position', new THREE.BufferAttribute(flocons, 3));
   const neige = new THREE.Points(geoF, new THREE.PointsMaterial({color: '#ffffff', size: .07, transparent: true, opacity: .85, depthWrite: false}));
   neige.frustumCulled = false; neige.renderOrder = 4; scene.add(neige);
-  function fairePleuvoir(dt, temps) {
+  /* chute à vitesse constante en boucle sur 6 unités de hauteur ; balancement latéral = intégrale de sin(0,8 t + i) × 0,08 */
+  function fairePleuvoir(temps) {
     for (let i = 0; i < NF; i++) {
-      let y = flocons[i * 3 + 1] - vitesses[i] * dt; if (y < 0) y += 6;
-      flocons[i * 3 + 1] = y; flocons[i * 3] += Math.sin(temps * .8 + i) * dt * .08;
+      let y = (y0[i] - vitesses[i] * temps) % 6; if (y < 0) y += 6;
+      flocons[i * 3 + 1] = y; flocons[i * 3] = x0[i] - .1 * Math.cos(temps * .8 + i);
     }
     geoF.attributes.position.needsUpdate = true;
   }
@@ -365,12 +443,63 @@ export function creer(J) {
   const tours = new Map();
   const pipGeo = new THREE.SphereGeometry(.035, 8, 6);
   /* formes de repli quand un modèle manque (règle d'art/LISEZMOI.md : le jeu fonctionne sans le fichier 3D) */
+  const formesTours = new Map();
   function repliTour(k) {
-    const g = new THREE.Group(), m = mat(TW[k].col);
-    const socle = new THREE.Mesh(new THREE.CylinderGeometry(.38, .4, .1, 12), mat('#8a8f99')); socle.position.y = .05;
-    const fut = new THREE.Mesh(new THREE.CylinderGeometry(.18, .24, .6, 10), m); fut.position.y = .4;
-    for (const o of [socle, fut]) { o.castShadow = o.receiveShadow = true; g.add(o) }
-    return g;
+    let g = formesTours.get(k);
+    if (g) return g.clone(true);
+    const T = TW[k], robot = T.faction === 3, creature = T.faction === 1;
+    const accent = mat(T.col), sombre = mat(robot ? '#263c53' : '#543025');
+    const clair = mat(robot ? '#b4f4ff' : '#ffdb89');
+    g = new THREE.Group();
+    function piece(parent, geo, material, position, scale) {
+      const mesh = new THREE.Mesh(geo, material);
+      mesh.position.set(...position); mesh.scale.set(...scale);
+      mesh.castShadow = mesh.receiveShadow = true; parent.add(mesh);
+      return mesh;
+    }
+    piece(g, G.boite, sombre, [0, .07, 0], [.69, .14, .65]);
+    const tete = new THREE.Group(); tete.name = 'Tourelle'; tete.position.y = .61; g.add(tete);
+    if (robot) {
+      for (const x of [-.22, .22]) piece(g, G.boite, sombre, [x, .23, 0], [.14, .32, .29]);
+      piece(g, G.boite, accent, [0, .44, 0], [.43, .35, .34]);
+      piece(tete, G.boite, sombre, [0, .1, 0], [.37, .23, .33]);
+      piece(tete, G.boite, clair, [0, .13, .18], [.28, .075, .045]);
+    } else if (creature) {
+      piece(g, G.sphere, accent, [0, .36, 0], [.31, .27, .34]);
+      piece(tete, G.sphere, sombre, [0, .08, .03], [.24, .21, .25]);
+      for (const x of [-.15, .15]) {
+        piece(tete, G.sphere, clair, [x, .12, .24], [.055, .06, .05]);
+        piece(tete, G.ico, accent, [x, .27, -.06], [.07, .21, .07]);
+      }
+    } else {
+      piece(g, G.boite, accent, [0, .39, 0], [.39, .62, .39]);
+    }
+
+    switch (T.j) {
+      case 0: piece(tete, G.boite, clair, [0, -.05, .3], [.1, .08, .3]); break;
+      case 1:
+        for (const x of [-.31, .31]) piece(tete, G.ico, accent, [x, -.14, .18], [.16, .21, .26]);
+        break;
+      case 2: piece(tete, G.octa, clair, [0, .03, .38], [.1, .1, .46]); break;
+      case 3: piece(tete, G.boite, accent, [0, .05, .36], [.28, .24, .49]); break;
+      case 4:
+        for (const x of [-.28, .28]) piece(tete, G.ico, accent, [x, .02, -.04], [.28, .07, .21]);
+        break;
+      case 5: piece(g, G.octa, clair, [0, 1.03, 0], [.15, .19, .15]).name = 'Cristal'; break;
+      case 6:
+        for (const x of [-.17, .17]) piece(tete, G.sphere, mat(robot ? '#ff7a3d' : '#9fe0ff'), [x, -.08, .3], [.1, .1, .16]);
+        break;
+      case 7: piece(g, G.sphere, clair, [0, 1.1, 0], [.21, .15, .21]).name = 'Orbe'; break;
+      case 8:
+        for (const x of [-.28, .28]) piece(g, G.ico, accent, [x, .38, .06], [.18, .28, .2]);
+        break;
+      case 9:
+        for (const x of [-.28, .28]) piece(tete, G.ico, accent, [x, .25, -.06], [.24, .16, .34]);
+        piece(g, G.octa, clair, [0, 1.14, 0], [.19, .24, .19]).name = 'Cristal';
+        break;
+    }
+    formesTours.set(k, g);
+    return g.clone(true);
   }
   function repliMonstre(k) {
     const T = CR[k], h = .4 * Math.pow(T.z, 1.8), o = new THREE.Mesh(G.sphere, mat(T.col));
@@ -391,9 +520,9 @@ export function creer(J) {
     return g;
   }
   function creerTour(t, fantome) {
-    const g = modele(urlTour(t.k)); if (g === undefined) return null;
+    const g = tourProcedurale(t.k) ? null : modele(urlTour(t.k)); if (g === undefined) return null;
     const o = g ? g.scene.clone(true) : repliTour(t.k);
-    if (fantome) o.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = .55; m.material.depthWrite = false; m.castShadow = false } });
+    if (fantome) o.traverse(m => { if (m.userData.contour) m.visible = false; else if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = .55; m.material.depthWrite = false; m.castShadow = false } });
     const r = new THREE.Group(); r.add(o);
     const anim = {};
     for (const n of ['Tourelle', 'Cristal', 'Eclats', 'Flamme', 'Anneaux', 'Orbe', 'AnneauFlottant']) anim[n] = o.getObjectByName(n) || null;
@@ -439,6 +568,12 @@ export function creer(J) {
     const m = new THREE.Mesh(G.boite, cadreMat); m.scale.set(sx, .03, sz); m.position.set(x, .02, z); cadreCase.add(m);
   }
   cadreCase.visible = false; scene.add(cadreCase);
+  /* 2.31 : cadres des tours choisies pour une amélioration en lot (un par tour, jusqu'à 10) */
+  const cadresLot = [], lotMat = transp('#ffd95e', .8);
+  function cadreLot(i) {
+    while (cadresLot.length <= i) { const c = cadreCase.clone(true); c.traverse(m => { if (m.isMesh) m.material = lotMat }); c.visible = false; scene.add(c); cadresLot.push(c) }
+    return cadresLot[i];
+  }
   const fantomes = new Map(); let fantome = null;
 
   /* ---------- monstres ---------- */
@@ -446,17 +581,60 @@ export function creer(J) {
   function creerMonstre(c) {
     const g = modele(urlMonstre(c.k)); if (g === undefined) return null;
     const T = CR[c.k];
-    const o = g ? g.scene.clone(true) : repliMonstre(c.k); o.scale.setScalar(ECH_MONSTRES * (g ? echelleModele(c.k) : 1));
-    if (T.inv) o.traverse(m => { if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true } });
+    const o = g ? cloner(g.scene) : repliMonstre(c.k); o.scale.setScalar(echMonstre(c.k) * (g ? echelleModele(c.k) : 1));
+    if (T.inv) o.traverse(m => { if (m.userData.contour) m.visible = false; else if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true } });
     const r = new THREE.Group(); r.add(o);
-    let mixer = null;
-    if (g && g.animations.length) { mixer = new THREE.AnimationMixer(o); const a = mixer.clipAction(g.animations[0]); a.play(); a.time = (c.ph || 0) % g.animations[0].duration }
+    let mixer = null, clips = {}, marche = null;
+    if (g && g.animations.length) {
+      mixer = new THREE.AnimationMixer(o);
+      for (const a of g.animations) clips[a.name] = a;
+      /* 2.40 : modèles sur squelette avec plusieurs clips (marche ou vol, touche, mort) ; les anciens n'en ont qu'un */
+      const base = clips.marche || clips.vol || g.animations[0];
+      marche = mixer.clipAction(base); marche.play(); marche.time = (c.ph || 0) % base.duration;
+      if (clips.touche) { if (!g.touche) g.touche = THREE.AnimationUtils.makeClipAdditive(clips.touche.clone()); clips.touche = g.touche }
+    }
     /* halo au sol : ralenti (bleu), hâté (jaune), soigné (vert) */
     const halo = new THREE.Mesh(G.disque, transp('#8fdcff', .45)); halo.scale.setScalar(.22 * (T.z || 1)); halo.position.y = .01; halo.visible = false; r.add(halo);
     let aura = null;
     if (T.aura || T.heal) { aura = new THREE.Mesh(G.anneau, transp(T.aura ? '#ffe45e' : '#6fcf97', .55)); aura.scale.setScalar(AURA_R); aura.position.y = .02; r.add(aura) }
     r.position.set(c.x + .5 + (c.ox || 0), T.fly ? VOL : 0, c.y + .5 + (c.oy || 0));
-    return {r, o, mixer, halo, aura, k: c.k, px: r.position.x, pz: r.position.z, yaw: 0, inv: !!T.inv};
+    return {r, o, mixer, clips, marche, halo, aura, k: c.k, px: r.position.x, pz: r.position.z, yaw: 0, inv: !!T.inv, c, hp: c.hp, coup: 0};
+  }
+  /* 2.40 : copie d'un modèle ; un maillage sur squelette (et son contour) doit suivre les os de SA copie, pas ceux de l'original */
+  function cloner(src) {
+    const copie = src.clone(true), a = [], b = [];
+    src.traverse(x => a.push(x)); copie.traverse(x => b.push(x));
+    const corresp = new Map(a.map((x, i) => [x, b[i]]));
+    b.forEach((x, i) => {
+      if (!x.isSkinnedMesh) return;
+      const s = a[i].skeleton;
+      x.bind(new THREE.Skeleton(s.bones.map(os => corresp.get(os)), s.boneInverses), a[i].bindMatrix);
+      x.frustumCulled = false;   // la boîte englobante est celle de la pose de repos (fausse pendant la chute)
+    });
+    return copie;
+  }
+  /* coup reçu : petit recul du haut du corps (clip « touche » ajouté par-dessus la marche), au plus toutes les 0,6 s */
+  function toucher(Mo) {
+    if (!Mo.clips.touche || Mo.coup > 0) return;
+    const a = Mo.mixer.clipAction(Mo.clips.touche); a.blendMode = THREE.AdditiveAnimationBlendMode;
+    a.setLoop(THREE.LoopOnce, 1); a.reset().play(); Mo.coup = .6;
+  }
+  /* mort : le monstre tué (pas celui qui atteint le château) joue son clip « mort », reste au sol puis s'enfonce */
+  const mourants = [];
+  function retirerMonstre(Mo) {
+    const c = Mo.c, fuite = c.leak || Math.hypot(c.x - EX[0], c.y - EX[1]) < 1.2;
+    if (!Mo.clips || !Mo.clips.mort || fuite) { retirerGroupe(Mo); return }
+    Mo.halo.visible = false; if (Mo.aura) Mo.aura.visible = false;
+    const a = Mo.mixer.clipAction(Mo.clips.mort); a.setLoop(THREE.LoopOnce, 1); a.clampWhenFinished = true;
+    a.reset().play(); if (Mo.marche) Mo.marche.crossFadeTo(a, .12, false);
+    Mo.t = 0; mourants.push(Mo);
+  }
+  function majMourants(dt) {
+    for (let i = mourants.length - 1; i >= 0; i--) {
+      const Mo = mourants[i]; Mo.t += dt; Mo.mixer.update(dt);
+      if (Mo.t > 1.6) Mo.r.position.y -= dt * .12;
+      if (Mo.t > 2.6) { retirerGroupe(Mo); mourants.splice(i, 1) }
+    }
   }
   function majMonstre(Mo, c, dt, temps) {
     const T = CR[c.k], x = c.x + .5 + (c.ox || 0), z = c.y + .5 + (c.oy || 0);
@@ -468,13 +646,16 @@ export function creer(J) {
     Mo.px = x; Mo.pz = z;
     Mo.r.position.set(x, T.fly ? VOL + Math.sin(temps * 3 + (c.ph || 0)) * .03 : 0, z);
     Mo.o.rotation.y = Mo.yaw;
+    Mo.c = c; Mo.coup -= dt;
+    if (Mo.mixer && c.hp < Mo.hp - .01) toucher(Mo);
+    Mo.hp = c.hp;
     if (Mo.mixer) Mo.mixer.update(dt * (c.sl > 0 ? .55 : 1) * (T.s / 1.4));
     const glow = c.sl > 0 ? '#8fdcff' : c.h ? '#ffe45e' : c.hl ? '#6fcf97' : '';
     Mo.halo.visible = !!glow; if (glow) Mo.halo.material.color.set(glow);
     if (Mo.aura) Mo.aura.material.opacity = .35 + Math.sin(temps * 5) * .15;
     if (Mo.inv) { const op = c.hid ? .3 : .85; Mo.o.traverse(m => { if (m.isMesh) m.material.opacity = op }) }
   }
-  const HAUT = k => (CR[k].fly ? VOL : 0) + .4 * Math.pow(CR[k].z, 1.8) * ECH_MONSTRES + .08;
+  const HAUT = k => (CR[k].fly ? VOL : 0) + .4 * Math.pow(CR[k].z, 1.8) * echMonstre(k) + .08;
 
   /* ---------- projectiles ---------- */
   const projs = new Map();
@@ -483,32 +664,36 @@ export function creer(J) {
     if (skin == 0) { r.add(new THREE.Mesh(G.fleche, M.bois), new THREE.Mesh(G.pointe, M.blanc)) }
     else if (skin == 1) { const m = new THREE.Mesh(G.sphere, M.fer); m.scale.setScalar(.08); m.castShadow = true; r.add(m) }
     else { const m = new THREE.Mesh(G.octa, skin == 2 ? M.givre : M.arcane); m.scale.set(.07, .07, .12); r.add(m) }
-    // Trace directionnelle : permet de remonter visuellement du projectile à sa tour.
-    // Un seul segment par projectile, sans particules ni allocations par image.
-    const couleurs = ['#f3d18b','#f7a65b','#8bd9ff','#d6a5ff','#ff9b6c'];
-    const trace = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(), new THREE.Vector3()
-    ]), new THREE.LineBasicMaterial({color: couleurs[TW[p.k].faction] || '#ffffff', transparent: true, opacity: .65, depthWrite: false}));
-    r.add(trace);
-    scene.add(r); return {r, skin, trace};
+    const T = TW[p.k];
+    const trace = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)),
+      new THREE.LineBasicMaterial({color: T.pz ? '#79ad30' : T.pe ? '#9470d1' : T.col, transparent: true, depthWrite: false}));
+    trace.frustumCulled = false;
+    scene.add(r, trace);
+    return {r, skin, trace};
   }
-  function majProj(Pj, p) {
+  function retirerProj(Pj) {
+    scene.remove(Pj.r, Pj.trace);
+    Pj.trace.geometry.dispose();
+    Pj.trace.material.dispose();
+  }
+  function majProj(Pj, p, densite) {
     const q = Math.max(0, Math.min(1, 1 - Math.hypot(p.tx - p.x, p.ty - p.y) / (p.tot || 1)));
     let h = 1.0 + (.3 - 1.0) * q; if (Pj.skin == 1) h += Math.sin(q * Math.PI) * .8;
-    Pj.r.position.set(p.x, h, p.y + .3 * (1 - q));
+    const z = p.y + .3 * (1 - q);
+    Pj.r.position.set(p.x, h, z);
     Pj.r.rotation.y = Math.atan2(p.tx - p.x, p.ty - p.y);
     if (Pj.skin >= 2) Pj.r.rotation.z += .2;
-    // Segment local, orienté vers la position de tir initiale ; raccourci en mêlée dense.
-    const densite = projs.size;
-    const longueur = densite > 35 ? .18 : densite > 18 ? .32 : .52;
-    const depart = new THREE.Vector3(p.x, h, p.y + .3 * (1 - q));
-    const origine = new THREE.Vector3(p.sx ?? p.x, h, p.sy ?? p.y);
-    const direction = origine.sub(depart);
-    if (direction.lengthSq() > 1e-6) direction.setLength(Math.min(longueur, direction.length()));
+
+    // Le segment est dans le repère de la scène, indépendamment de la rotation du projectile.
+    const dx = (p.sx ?? p.x) - p.x, dz = (p.sy ?? p.y) + .3 - z;
+    const distance = Math.hypot(dx, dz);
+    const limite = densite > 35 ? .18 : densite > 18 ? .32 : .52;
+    const ratio = distance > .01 ? Math.min(1, limite / distance) : 0;
     const positions = Pj.trace.geometry.attributes.position;
-    positions.setXYZ(0, 0, 0, 0);
-    positions.setXYZ(1, direction.x, direction.y, direction.z);
+    positions.setXYZ(0, p.x, h, z);
+    positions.setXYZ(1, p.x + dx * ratio, h, z + dz * ratio);
     positions.needsUpdate = true;
+    Pj.trace.visible = ratio > 0;
     Pj.trace.material.opacity = densite > 35 ? .35 : .65;
   }
 
@@ -525,13 +710,18 @@ export function creer(J) {
       case 'slash': o = new THREE.Mesh(G.tranche, transp('#ffffff', .9)); break;
       case 'bad': { o = new THREE.Mesh(G.boite, transp('#ff4d3d', .6)); o.scale.set(1, .02, 1); break }
       case 'zap': {
-        const pts = []; const a = new THREE.Vector3(f.x, .3, f.y), b = new THREE.Vector3(f.x2, 1.1, f.y2 + .4);
-        for (let i = 0; i <= 5; i++) { const p = a.clone().lerp(b, i / 5); if (i && i < 5) { p.x += (i % 2 ? 1 : -1) * .1; p.z += (i % 2 ? -.06 : .06) } pts.push(p) }
-        o = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: '#ffe45e', transparent: true})); break;
+        /* 2.40 : couleur (f.col), trait droit (f.ln : tir en ligne, rayon), éclair tombé du ciel (f.ciel) */
+        const pts = []; const a = f.ciel ? new THREE.Vector3(f.x2, 3.2, f.y2) : new THREE.Vector3(f.x, f.ln ? .7 : .3, f.y), b = new THREE.Vector3(f.x2, f.ciel ? .3 : f.ln ? .45 : 1.1, f.y2 + (f.ln || f.ciel ? 0 : .4));
+        for (let i = 0; i <= 5; i++) { const p = a.clone().lerp(b, i / 5); if (i && i < 5 && !f.ln) { p.x += (i % 2 ? 1 : -1) * .1; p.z += (i % 2 ? -.06 : .06) } pts.push(p) }
+        o = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: f.col || '#ffe45e', transparent: true})); break;
       }
       default: return null;
     }
     o.renderOrder = 3; scene.add(o); return o;
+  }
+  function retirerEffet(o) {
+    scene.remove(o);
+    o.traverse(m => { if (m.material) m.material.dispose(); if (m.isLine) m.geometry.dispose() });
   }
   function majEffet(o, f) {
     const p = 1 - f.t / f.d, fade = Math.max(0, 1 - p);
@@ -563,8 +753,33 @@ export function creer(J) {
 
   /* ---------- image ---------- */
   let terrain = null, dernier = 0;
+  /* 2.40 : morts relevés par la Cour des Ossements (squelette en armure, colosse d'os) et mines de Hautroc */
+  const allies = new Map(), mines = new Map(), matMine = transp('#ff9a3d', .85);
+  /* 2.40 : modèles à part (decor/mort-squelette, decor/mort-colosse), indépendants des monstres de CR */
+  const URL_MORT = {sq: 'assets/3d/decor/mort-squelette.glb', co: 'assets/3d/decor/mort-colosse.glb'};
+  function creerMort(c) {
+    const g = modele(URL_MORT[c.m]); if (g === undefined) return null;
+    let o;
+    if (g) o = g.scene.clone(true);
+    else { o = new THREE.Mesh(new THREE.CylinderGeometry(.06, .08, c.m === 'co' ? .6 : .4, 8), mat('#d8cfb6')); o.position.y = c.m === 'co' ? .3 : .2 }
+    const r = new THREE.Group(); r.add(o); r.position.set(c.x + .5, 0, c.y + .5); scene.add(r);
+    return {r, o, px: r.position.x, pz: r.position.z, yaw: 0, ph: (c.x * 7 + c.y * 13) % 6, y0: o.position.y};
+  }
+  function majMort(Mo, c, dt, temps) {
+    const x = c.x + .5, z = c.y + .5, dx = x - Mo.px, dz = z - Mo.pz;
+    if (dx * dx + dz * dz > 1e-6) { let d = Math.atan2(dx, dz) - Mo.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); Mo.yaw += d * Math.min(1, dt * 10) }
+    Mo.px = x; Mo.pz = z; Mo.r.position.set(x, 0, z); Mo.o.rotation.y = Mo.yaw;
+    /* démarche saccadée de mort-vivant : petits bonds et roulis */
+    Mo.o.position.y = Mo.y0 + Math.abs(Math.sin(temps * 7 + Mo.ph)) * .015; Mo.o.rotation.z = Math.sin(temps * 7 + Mo.ph) * .06;
+  }
+  function creerMine() { const r = new THREE.Group(), d = new THREE.Mesh(G.disque, matMine); d.scale.setScalar(.22); r.add(d); const c = new THREE.Mesh(G.octa, mat('#ffb347', {emissive: '#ff6a1a', emissiveIntensity: .8})); c.scale.setScalar(.07); c.position.y = .08; r.add(c); r.renderOrder = 2; scene.add(r); return {r, c} }
   function vider() {
-    for (const m of [tours, monstres, projs, effets]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
+    for (const p of projs.values()) retirerProj(p);
+    projs.clear();
+    for (const o of effets.values()) retirerEffet(o);
+    effets.clear();
+    for (const m of [tours, monstres, allies, mines]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
+    for (const Mo of mourants) retirerGroupe(Mo); mourants.length = 0;
   }
   function dessiner(b, temps, etat) {
     const dt = dernier ? Math.min(.1, Math.max(0, temps - dernier)) : 0; dernier = temps;
@@ -572,13 +787,17 @@ export function creer(J) {
     if (b.classId !== plateauFaction) construirePlateau(b.classId);
     placerDecor(b);
     if (decor.portail) decor.portail.traverse(o => { const m = /^Anneau(\d)$/.exec(o.name); if (m) o.rotation.y = temps * (2 + +m[1] * .6) * (m[1] % 2 ? 1 : -1) });
-    calculerChemin(b); dessinerChemin(temps); fairePleuvoir(dt, temps);
+    calculerChemin(b); dessinerChemin(temps); fairePleuvoir(temps);
 
     synchro(tours, b.t, t => t.x + ',' + t.y + ',' + t.k, t => { const T = creerTour(t); if (T) { T.r.position.set(t.x + .5, 0, t.y + .5); scene.add(T.r) } return T },
       (T, t) => majTour(T, t, temps), retirerGroupe);
-    synchro(monstres, b.cr, c => c.id, c => { const Mo = creerMonstre(c); if (Mo) scene.add(Mo.r); return Mo }, (Mo, c) => majMonstre(Mo, c, dt, temps), retirerGroupe);
-    synchro(projs, b.pr, p => p.id, creerProj, majProj, retirerGroupe);
-    synchro(effets, b.fx, f => f, creerEffet, majEffet, o => scene.remove(o));
+    synchro(monstres, b.cr, c => c.id, c => { const Mo = creerMonstre(c); if (Mo) scene.add(Mo.r); return Mo }, (Mo, c) => majMonstre(Mo, c, dt, temps), retirerMonstre);
+    majMourants(dt);
+    synchro(projs, b.pr, p => p.id, creerProj, (o, p) => majProj(o, p, b.pr.length), retirerProj);
+    synchro(allies, (b.al || []).map((a, i) => ({id: 'a' + (a.id ?? i) + (a.g ? 'g' : ''), m: a.g ? 'co' : 'sq', x: a.x, y: a.y})), c => c.id,
+      creerMort, (Mo, c) => majMort(Mo, c, dt, temps), retirerGroupe);
+    synchro(mines, b.mi || [], m => m.id ?? (m.x + ',' + m.y), creerMine, (o, m) => { o.r.position.set(m.x + .5, .03, m.y + .5); o.c.rotation.y = temps * 2; o.c.position.y = .08 + Math.sin(temps * 4) * .02 }, retirerGroupe);
+    synchro(effets, b.fx, f => f, creerEffet, majEffet, retirerEffet);
 
     /* sélection : tour touchée ou projet de construction */
     const sel = etat.projet || etat.pick;
@@ -590,6 +809,11 @@ export function creer(J) {
       cadreCase.position.set(sel.x + .5, 0, sel.y + .5); cadreMat.color.set(etat.projet && !etat.ok ? '#ff6b5a' : '#ffd95e');
       cadreMat.opacity = etat.projet ? .7 + .25 * Math.sin(temps * 6) : .95;
     }
+    const lt = etat.lot || [];
+    for (let i = 0; i < Math.max(lt.length, cadresLot.length); i++) {
+      const c = cadreLot(i); c.visible = i < lt.length; if (c.visible) c.position.set(lt[i].x + .5, 0, lt[i].y + .5);
+    }
+    lotMat.opacity = .55 + .35 * Math.sin(temps * 5);
     const pk = etat.projet ? etat.projet.k : -1;
     if (fantome && (pk < 0 || fantome.k !== pk)) { scene.remove(fantome.r); fantome = null }
     if (pk >= 0) {
@@ -599,7 +823,7 @@ export function creer(J) {
 
     /* caméra : rotation et élan (voir l'en-tête) */
     bougerCamera(dt);
-    renderer.render(scene, cam);
+    majContour(renderer); renderer.render(scene, cam);
   }
   function taille(w, h, dpr) { renderer.setPixelRatio(Math.min(2, dpr)); renderer.setSize(w, h, true) }
   /* point du monde (gx, gz au sol, hauteur h) → pixels du canevas */
@@ -610,7 +834,10 @@ export function creer(J) {
   let rv = null; const vignettes = new Map();
   function vignette(type, k, w, h) {
     const cle = type + k + '|' + w + 'x' + h; if (vignettes.has(cle)) return vignettes.get(cle);
-    const p = charger(type === 'tour' ? urlTour(k) : urlMonstre(k)).then(g => {
+    const modeleVignette = type === 'tour' && tourProcedurale(k)
+      ? Promise.resolve({scene: repliTour(k)})
+      : charger(type === 'tour' ? urlTour(k) : urlMonstre(k));
+    const p = modeleVignette.then(g => {
       if (!g) return null;
       if (!rv) {
         rv = {r: new THREE.WebGLRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true}), s: new THREE.Scene(), c: new THREE.PerspectiveCamera(26, 1, .05, 60)};
@@ -619,12 +846,12 @@ export function creer(J) {
         const d = new THREE.DirectionalLight('#fff4e0', 2.6); d.position.set(-2, 4, 3); rv.s.add(d);
         const b = new THREE.DirectionalLight('#9fd0ff', 1.3); b.position.set(3, 2, -3); rv.s.add(b);
       }
-      const o = g.scene.clone(true), piv = new THREE.Group(); piv.add(o); piv.rotation.y = type === 'tour' ? -.55 : -.7;
+      const o = cloner(g.scene), piv = new THREE.Group(); piv.add(o); piv.rotation.y = type === 'tour' ? -.55 : -.7;
       const box = new THREE.Box3().setFromObject(piv), ct = box.getCenter(new THREE.Vector3()), rad = Math.max(.05, box.getSize(new THREE.Vector3()).length() / 2);
       o.position.sub(ct.applyAxisAngle(new THREE.Vector3(0, 1, 0), -piv.rotation.y)); rv.s.add(piv);
       const dist = rad / Math.sin(rv.c.fov * Math.PI / 360) * (type === 'tour' ? .78 : .72);
       rv.c.aspect = w / h; rv.c.position.set(0, dist * .38, dist * .92); rv.c.lookAt(0, type === 'tour' ? -rad * .05 : 0, 0); rv.c.updateProjectionMatrix();
-      rv.r.setPixelRatio(2); rv.r.setSize(w, h, false); rv.r.render(rv.s, rv.c);
+      rv.r.setPixelRatio(2); rv.r.setSize(w, h, false); majContour(rv.r); rv.r.render(rv.s, rv.c);
       const url = rv.r.domElement.toDataURL('image/png'); rv.s.remove(piv); return url;
     }).catch(e => { console.warn(e); return null });
     vignettes.set(cle, p); return p;
@@ -635,5 +862,5 @@ export function creer(J) {
     portee: portee.visible, dessins: renderer.info.render.calls, triangles: renderer.info.render.triangles,
     vue: {fx: V.fx, fz: V.fz, az: Math.round(V.azC / (Math.PI / 4)), perspective: cam.isPerspectiveCamera}});
   return {canvas, dessiner, taille, versEcran, precharger, hauteurMonstre: HAUT, vignette, renderer, etat,
-    cadre, projeter, echelle, sol, glisser, pivoter, lancer, viser, empreinte};
+    cadre, projeter, echelle, sol, glisser, pivoter, lancer, viser, amener, empreinte};
 }

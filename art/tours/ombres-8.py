@@ -1,10 +1,9 @@
-"""Légion des ombres — Cristal corrupteur (emplacement 8 : Givre · entrave).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['ombres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Cour des Ossements — Faucheuse (emplacement 8 : anti-boss).
+Forme : communs/ossements_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.ossements_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Cristal corrupteur"}
+INFOS = {'categorie': 'tour', 'titre': "Faucheuse"}
 
 def construire(ctx):
-    preparer(tour('ombres', 8))
+    preparer(tour(8))

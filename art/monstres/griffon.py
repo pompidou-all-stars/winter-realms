@@ -1,35 +1,11 @@
-"""Griffon corrompu (CR griffon) : corps de lion doré, tête d'aigle blanche, bec orange, ailes de plumes
-dont les pointes sont gagnées par une corruption violette. Volant."""
-import math
-from communs.outils import collection, dans, pivot, peindre, sphere, cone, prisme
-from communs.betes import volant, yeux_bete
-from communs.animations import battement
-from communs.echelles import hauteur
-from communs.export_jeu import preparer
+"""Griffon sauvage (palier 1, volant) — kit 2.40 : corps de lion fauve, tête d'aigle blanche à bec doré, ailes de plumes."""
+from communs.creatures import *
+INFOS = {'categorie': 'monstre', 'titre': "Griffon sauvage"}
 
-INFOS = {'categorie': 'monstre', 'titre': "Griffon corrompu"}
-
-def fabriquer():
-    c = collection('griffon_corrompu'); dans(c)
-    r = pivot('griffon_corrompu'); H = hauteur('griffon')
-    corps = volant(r, dict(aile='#f3e3b3', forme='plumes', os='#8a4fb0'), H, H * 2.0)
-    sphere('Tronc', '#d9a441', H * .28, (0, H * .12, -H * .02), (1, 1.4, .85), 12, 8, corps)
-    sphere('Poitrail', '#fff4d6', H * .22, (0, -H * .2, H * .05), (1, 1, 1), 10, 6, corps)
-    for s in (-1, 1):
-        cone(f'Patte{s}', '#d9a441', H * .06, H * .25, 6, (s * H * .14, H * .3, -H * .15), corps, (.6, 0, 0))
-        cone(f'Serre{s}', '#e8a03a', H * .05, H * .18, 5, (s * H * .1, -H * .22, -H * .15), corps, (-.3, 0, 0))
-    T = pivot('Tete', (0, -H * .36, H * .16), corps)
-    sphere('Crane', '#fff4d6', H * .17, (0, 0, 0), (1, 1.1, 1), 10, 8, T)
-    cone('Bec', '#f08a2e', H * .07, H * .2, 6, (0, -H * .15, -H * .02), T, (1.9, 0, 0))
-    for s in (-1, 1):
-        prisme(f'Aigrette{s}', '#8a4fb0', [(0, 0), (s * H * .06, H * .2), (s * H * .1, H * .05)], H * .02, (s * H * .06, H * .05, H * .1), T, emis=.6)
-    yeux_bete(T, H * .045, -H * .12, H * .05, H * .08, '#c77dff', False)
-    q = pivot('Queue', (0, H * .48, 0), corps)
-    cone('QueueCone', '#d9a441', H * .04, H * .3, 5, (0, 0, 0), q, (-math.pi / 2 - .2, 0, 0))
-    sphere('Touffe', '#8a4fb0', H * .06, (0, H * .3, -H * .06), (1, 1.3, 1), 6, 4, q)
-    peindre(r, sol=.8)
-    battement(r, duree=.45, ampl=.7, flottement=H * .06)
-    return r
+def vols(K):
+    t = K.j('nuque')
+    return [V('Tete', '#f0ece2', c=(0, t.y - .05, t.z + .02), r=(.08, .085, .075), prio=1)]
 
 def construire(ctx):
-    preparer(fabriquer())
+    volant('griffon', dict(z=.85, corps=('#b8863a', '#d8a85a', '#e8d0a0'), aile=('#efe8da', '#a87a3a'), forme='plumes', tete='bec',
+                           bec=OR, envergure=1.0, queue=.9, oeil='#ffcf3a', relief=RELIEF_POIL, volumes=vols))

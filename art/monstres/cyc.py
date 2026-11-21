@@ -1,23 +1,16 @@
-"""Cyclope des cendres (CR cyc) : géant ventru à un seul œil, corne frontale, défenses, énorme massue.
-Le plus grand des monstres au sol."""
-from communs.outils import collection, dans, pivot, peindre
-from communs.personnages import humanoide, gourdin
-from communs.animations import marche
-from communs.echelles import hauteur
-from communs.export_jeu import preparer
-
+"""Cyclope des cendres (palier 2, boss) — kit 2.40 : géant à un œil, peau grise craquelée de braises, massue de pierre volcanique,
+pagne de peau, collier de crânes."""
+from communs.creatures import *
 INFOS = {'categorie': 'monstre', 'titre': "Cyclope des cendres"}
 
-def fabriquer():
-    c = collection('cyclope_cendres'); dans(c)
-    r = pivot('cyclope_cendres'); H = hauteur('cyclope')
-    humanoide(r, dict(peau='#d49a68', peau2='#e9bf95', tissu='#6b4a2f', torse='#d49a68', cuir='#4a321f', botte='#8a5a33',
-                      carrure=1.45, tete=.12, jambes=.33, voute=.15, machoire=1, nez=('rond', .22), defenses=1,
-                      un_oeil=1, yeux='#ff6a2a', corne='#3a3330', harnais=1,
-                      arme=lambda p, HH: gourdin(p, HH, '#5a3d26')), H)
-    peindre(r)
-    marche(r, duree=1.2, ampl_jambe=.45, ampl_bras=.35, rebond=H * .03, roulis=.08)
-    return r
+def pieces(K):
+    p = K.j('poitrine')
+    K.lueurs += [plaque(f'Braise{k}', '#ff7a2a', 'Torse', (x, -.17, p.z + z), .05, .01, .012, rot=(0, 0, a))
+                 for k, (x, z, a) in enumerate(((-.08, .02, .5), (.07, -.04, -.4), (0, -.1, .2)))]
+    return (arme(K, 'gourdin', taille=1.5, manche='#3a3330') + ceinture(K, pagne='#6a4a3a', crane=True) + collier_crocs(K, n=5) +
+            brassards(K, col=CUIR) + [boule('Crane_collier', OS_, 'Torse', (0, -.16, p.z + .02), .04, seg=8)])
 
 def construire(ctx):
-    preparer(fabriquer())
+    bipede('cyclope', dict(z=1.5, peau=('#8a7a70', '#a8988c', '#5a4a44'), bas='#6a4a3a', botte='#3a2a24', tete='cyclope', tete_r=1.05,
+                           carrure=1.45, ventre=1.2, jambes=.4, muscle=1.0, voute=.5, relief=RELIEF_PIERRE, oeil='#ff8a2a', lourd=1.5,
+                           pieces=pieces))

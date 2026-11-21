@@ -1,29 +1,14 @@
-"""Briseur de runes (CR breaker, anti-magie) : orc en armure d'acier, casque, grand bouclier gravé
-d'une rune barrée, marteau. Insensible au Givre et au Mage."""
-from communs.outils import collection, dans, pivot, peindre, boite
-from communs.personnages import humanoide, bouclier, marteau
-from communs.animations import marche
-from communs.echelles import hauteur
-from communs.export_jeu import preparer
-
+"""Briseur de runes (palier 1, spécial, anti-magie) — kit 2.40 : colosse de pierre trapu en armure runique brisée, grand marteau."""
+from communs.creatures import *
 INFOS = {'categorie': 'monstre', 'titre': "Briseur de runes"}
 
-def bouclier_anti_magie(p, H):
-    bouclier(p, H, '#b9c0c9', '#6c6e76', '#9ff3ff')
-    boite('Barre', '#c0392b', H * .2, H * .03, H * .03, (0, -H * .08, H * .02), 0, p, (0, .8, 0), emis=1)
-
-def fabriquer():
-    c = collection('briseur_runes'); dans(c)
-    r = pivot('briseur_runes'); H = hauteur('briseur')
-    humanoide(r, dict(peau='#4f9a3a', peau2='#63b04a', tissu='#6c6e76', torse='#b9c0c9', cuir='#4a321f', botte='#6c6e76',
-                      metal='#b9c0c9', carrure=1.15, tete=.12, jambes=.33, voute=.12, machoire=1, sourcils=1, yeux='#ff5a3c',
-                      nez=('rond', .24), defenses=1, oreilles=.3, casque='#b9c0c9', epaulieres='or',
-                      arme=lambda p, HH: marteau(p, HH, '#8a8f99'), arme_g=bouclier_anti_magie), H)
-    for o in c.objects:
-        if o.name.startswith('BrasG'): o.rotation_euler = (-.9, -.2, 0)
-    peindre(r)
-    marche(r, duree=.8, ampl_jambe=.45, ampl_bras=.2, rebond=H * .04, roulis=.07)
-    return r
+def pieces(K):
+    p = K.j('poitrine')
+    for k, (x, z) in enumerate(((-.08, .05), (.06, .0), (0, -.08))):
+        K.lueurs.append(plaque(f'Rune{k}', '#b07aff', 'Torse', (x, -.17, p.z + z), .03, .01, .05, rot=(0, 0, .5 * k)))
+    return (casque(K, 'heaume', col='#5a5f68') + epaulieres(K, col='#6a6f78', taille=1.1, pointes=0, bord='#4a4f58') +
+            arme(K, 'marteau', taille=1.35, col='#7a7f88') + genouilleres(K, col='#5a5f68') + brassards(K, col='#5a5f68'))
 
 def construire(ctx):
-    preparer(fabriquer())
+    bipede('briseur', dict(z=1.0, peau=('#8a8f99', '#a8adb5', '#6a6f78'), bas='#5a5f68', botte='#4a4f58', tete='orc', tete_r=.85,
+                           carrure=1.25, jambes=.34, muscle=.8, voute=.4, relief=RELIEF_PIERRE, oeil='#b07aff', lourd=1.2, pieces=pieces))

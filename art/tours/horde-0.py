@@ -1,10 +1,9 @@
-"""Horde — Tour des chasseurs (emplacement 0 : Archer · tir rapide).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['horde']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Clans de l’Orage Blanc — Lanceurs de haches (emplacement 0 : tir de base).
+Forme : communs/orage_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.orage_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Tour des chasseurs"}
+INFOS = {'categorie': 'tour', 'titre': "Lanceurs de haches"}
 
 def construire(ctx):
-    preparer(tour('horde', 0))
+    preparer(tour(0))

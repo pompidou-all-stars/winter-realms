@@ -7,13 +7,13 @@ const proche=(a,b,msg)=>assert.ok(Math.abs(a-b)<1e-9,`${msg||''} attendu ${b}, o
 const nouveau=(difficulte=0,ia=[0,0,0,0])=>{const G=partie(S,{difficulte,ia});for(const b of G.B)b.gold=1e6;return {G,b:G.B[0]}};
 
 test('Durée = min(8, max(0,5, prix / 50)) secondes, à la pose (Normal)',()=>{const {G,b}=nouveau();
- for(const [x,k,attendu] of [[1,0,.5],[3,5,1.7],[5,9,2.6]]){G.action(0,{type:'place',x,y:3,k});const t=b.t.at(-1);proche(t.bt,attendu,S.TW[k].n);proche(t.b,attendu)}
+ for(const [x,k] of [[1,0],[3,5],[5,9]]){const attendu=Math.min(8,Math.max(.5,S.TW[k].c/50));G.action(0,{type:'place',x,y:3,k});const t=b.t.at(-1);proche(t.bt,attendu,S.TW[k].n);proche(t.b,attendu)}
 });
 test('Une amélioration prend le temps de son prix, plafonné à 8 s',()=>{const {G,b}=nouveau();G.action(0,{type:'place',x:3,y:3,k:9});const t=b.t[0];pret(b);
  G.action(0,{type:'upgrade',x:3,y:3});proche(t.bt,Math.min(8,S.upCost({k:9,lv:1})/50));assert.equal(t.lv,2);
 });
 test('Difficulté : les humains construisent ×1 / ×1,25 / ×1,5, les IA restent à ×1',()=>{
- for(const [lv,m] of [[0,1],[1,1.25],[2,1.5]]){const {b,G}=nouveau(lv,[0,1,1,1]);G.action(0,{type:'place',x:3,y:3,k:9});proche(b.t[0].bt,2.6*m,'humain, difficulté '+lv);
+ for(const [lv,m] of [[0,1],[1,1.25],[2,1.5]]){const {b,G}=nouveau(lv,[0,1,1,1]);G.action(0,{type:'place',x:3,y:3,k:9});proche(b.t[0].bt,Math.min(8,Math.max(.5,S.TW[9].c/50))*m,'humain, difficulté '+lv);
   const ia=G.B[1];ia.place(3,3,19);proche(ia.t[0].bt,Math.min(8,Math.max(.5,S.TW[19].c/50)),'IA, difficulté '+lv)}
 });
 test('Pendant le chantier : pas de tir, amélioration refusée (« busy »), la case bloque déjà le chemin',()=>{const {G,b}=nouveau();

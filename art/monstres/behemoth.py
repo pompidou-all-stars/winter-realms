@@ -1,31 +1,14 @@
-"""Béhémoth (palier 3, sol) : bête titanesque à cuir violet sombre, échine hérissée de pics d'os,
-quatre cornes, défenses, yeux rouges. Clé CR « behemoth »."""
-import math
-from communs.outils import collection, dans, pivot, peindre, sphere, cone, cylindre, boite, prisme, anneau, descendants
-from communs.betes import quadrupede, yeux_bete
-from communs.animations import trot
-from communs.export_jeu import preparer
-
-# taille selon le facteur z proposé pour CR (même formule que communs/echelles.py) ; voir PALIERS.md
-Z = 1.7
-def hauteur(): return .40 * Z ** 1.8
-def piece(r, nom): return next(o for o in descendants(r) if o.name.split('.')[0] == nom)
-
+"""Béhémoth (palier 3, sol) — kit 2.40 : bête colossale et trapue à cuir violet sombre, cornes en arc, plaques osseuses, défenses."""
+from communs.creatures import *
 INFOS = {'categorie': 'monstre', 'titre': "Béhémoth"}
 
-def fabriquer():
-    c = collection('behemoth'); dans(c)
-    r = pivot('behemoth'); H = hauteur()
-    corps = quadrupede(r, dict(poil='#4a3a5a', poil2='#5a4a6a', ventre='#6a5a6a', patte='#2f2538', crete='#e8e2cf', yeux='#ff3a3a',
-                               museau='tortue', tete=.27, queue='#2f2538', largeur=.26, pattes=.42, epaisseur=.3, lqueue=.3), H * .78, H * 1.25)
-    T = piece(r, 'Tete'); rt = H * .78 * .27
-    for s in (-1, 1):
-        cone(f'Corne{s}', '#e8e2cf', rt * .25, rt * 1.1, 6, (s * rt * .6, 0, rt * .5), T, (-.7, s * .6, 0))
-        cone(f'CornePetite{s}', '#e8e2cf', rt * .15, rt * .5, 5, (s * rt * .35, -rt * .4, rt * .7), T, (-.4, s * .3, 0))
-        cone(f'Defense{s}', '#fff3d6', rt * .12, rt * .6, 6, (s * rt * .4, -rt * 1.05, -rt * .4), T, (-.5, s * .3, 0))
-    peindre(r)
-    trot(r, duree=1.1, ampl=.35, rebond=H * .02, queue=.2)
-    return r
+def pieces(K):
+    nu, m = K.j('nuque'), K.j('museau')
+    return (plaques_dos(K, '#c8b8a0', n=6, taille=1.1) + griffes(K) +
+            [corne(f'Corne.{n}', '#e8dcc0', 'Tete', (s * .1, nu.y - .05, nu.z + .1), .045, .28, 1.6, rot=(-.5, s * 1.2, 0), n=5) for s, n in ((1, 'L'), (-1, 'R'))] +
+            [corne(f'Defense.{n}', '#e8dcc0', 'Tete', (s * .06, m.y + .12, m.z - .05), .03, .14, 1.0, rot=(-.6, s * .3, 0)) for s, n in ((1, 'L'), (-1, 'R'))])
 
 def construire(ctx):
-    preparer(fabriquer())
+    bete('behemoth', dict(z=1.7, poil=('#4a3a5a', '#6a5a7a', '#8a7a98'), patte='#2a2034', crete='#2a2034', tete='taureau', tete_r=1.4,
+                          longueur=1.0, pattes=.9, epaisseur=1.6, cou=.85, queue=.6, relief=RELIEF_ECAILLE, ecailles=6, oeil='#ff5a2a', ech=.9,
+                          duree=.7, foulee=.35, pieces=pieces))

@@ -1,10 +1,9 @@
-"""Légion des ombres — Mortier infernal (emplacement 3 : Canon · artillerie).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['ombres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Cour des Ossements — Autel de peste (emplacement 3 : zone).
+Forme : communs/ossements_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.ossements_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Mortier infernal"}
+INFOS = {'categorie': 'tour', 'titre': "Autel de peste"}
 
 def construire(ctx):
-    preparer(tour('ombres', 3))
+    preparer(tour(3))

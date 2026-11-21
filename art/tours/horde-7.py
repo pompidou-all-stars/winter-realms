@@ -1,10 +1,9 @@
-"""Horde — Garde-lame (emplacement 7 : Garde · champion).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['horde']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Clans de l’Orage Blanc — Grands tambours de guerre (emplacement 7 : soutien).
+Forme : communs/orage_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.orage_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Garde-lame"}
+INFOS = {'categorie': 'tour', 'titre': "Grands tambours de guerre"}
 
 def construire(ctx):
-    preparer(tour('horde', 7))
+    preparer(tour(7))

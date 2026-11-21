@@ -8,17 +8,33 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 
 | Statut | Domaine | Idée |
 |---|---|---|
-| 💡 | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. |
-| 💡 | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. |
-| 💡 | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
-| 💡 | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
-| 💡 | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
+| ✅ | 🐞 Correctif | **Défilement des cartes sur PC** : on ne peut plus faire défiler la barre des tours et des monstres à la souris. *Fait en 2.32 : molette et glisser à la souris.* |
+| ✅ | 🐞 Correctif | **Affichage mobile encombré** : trop de fenêtres et de panneaux par-dessus le terrain, on ne voit plus où l'on construit, notamment avec le message « Touchez deux fois pour construire ». *Fait en 2.32 : plus de bulle au milieu du terrain, fiche réduite pendant l'aperçu ; en 2.35 : détails de la fiche sur une ligne, et la vue glisse pour que la tour choisie ne soit jamais cachée par la fiche.* |
+| ✅ | 🤖 IA | **Labyrinthes** : construction plus efficace et plus variée. **Chaque tour doit pouvoir tirer** : ne pas laisser de tours à des endroits où les monstres ne passent jamais (hors de portée du chemin). |
+| ✅ | 🤖 IA | **Répartition des tours** : meilleur choix des types et des emplacements (Givre, Mages, anti-aérien…). |
+| ✅ | 🤖 IA | **Stratégie par phase** : début, milieu et fin de partie (économie, défense, attaque). |
+| ✅ | 🤖 IA | **Monstres envoyés** : composition des vagues mieux adaptée aux faiblesses des adversaires. |
 | 💡 | ⚖️ Difficulté | **Avantages supplémentaires pour l'IA** si elle reste trop faible (or, revenu, vies, construction plus rapide…). |
+| ✅ | 🏰 Tours | **Améliorer en lot** : un moyen d'améliorer plusieurs tours d'un coup. *Fait en 2.32 : toucher deux fois une tour choisit jusqu'à 10 tours du même type et du même niveau, montrées en icônes ; un bouton les améliore toutes ; si l'or manque, les icônes de celles qui ne seront pas améliorées rétrécissent. En 2.37 : panneau « Mes tours » (cocher des types, niveau visé de 2 à 5) et file d'attente qui améliore niveau par niveau dès que l'or le permet, consultable et annulable.* |
 | 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
-| 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
-| 💡 | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. |
-| 🧭 | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. |
+| ✅ | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes pour qu'elles prennent moins de place (deux fois moins). *Fait en 2.35 : ×0,5 en 3D (×0,65 en 2.32).* |
+| 💡 | 🧭 Gameplay | **Point de relais** : pouvoir poser un point de passage autour duquel les monstres tournent. |
+| ✅ | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
+| ✅ | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. *Fait en 2.35 : tests et parties entre IA en parallèle ; simulation 24 s → 8 s, 15 parties 1 min 54 → 29 s (sur 22 cœurs).* |
+| ✅ | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. *Fait en 2.38 : 10 quêtes au titre décalé (« Qui a la plus grosse ? », « Clicker fou », « Picsou »…), une toutes les 3 à 4 min, annoncées par une bannière, suivies dans une pastille, gagnant annoncé ; les IA les jouent.* |
 | 🧭 | ✨ Palier 3 | **Pouvoirs magiques payants** : renforcements sur son propre terrain, ou malédictions à lancer sur le terrain d'un adversaire. |
+| 💡 | 🧊 Modèles 3D | **Refactorisation des modèles 3D**. |
+| 💡 | 🧭 Interface | **Menu de navigation** : lancement d'une partie sur plusieurs écrans successifs. |
+| ✅ | 🛡️ Factions | **Gameplay unique par race** : chaque race se joue différemment. |
+| 💡 | 🌍 Langues | **Version anglaise** (localisation). |
+| 💡 | 📊 Analytique | **Analytique** : mesurer comment le jeu est utilisé. |
+| 💡 | 🌐 Site web | **Site web propre** autour du jeu, optimisé pour les moteurs de recherche (SEO) et les moteurs d'IA (GEO). |
+| 💡 | 🎓 Tutoriel | **Tutoriel au lancement** du jeu. |
+| 💡 | 🔑 Compte | **Connexion** avec Google, ou création d'un compte. |
+| 💡 | 🛒 Boutique | **Boutique** (store). |
+| 💡 | 📣 Promotion | **Campagnes de promotion** : visuels de campagne, agent pour Reddit et jeuxvideo.com. |
+| 💡 | 💳 Paiement | **Système de paiement**. |
+| 💡 | 💰 Monétisation | **Monétisation**, une fois les idées précédentes en place. |
 
 A browser tower-wars game: the game itself is `index.html` (interface, drawing, sounds) plus `sim.js` (the simulation, also used by the multiplayer server). No build step, no dependencies.
 
@@ -50,7 +66,7 @@ Only Node.js 22 is required; browser tests also use Playwright/Chromium when ava
 node tests/tout.js
 ```
 
-- `node tests/tout.js --simulation`: simulation tests only (what GitHub runs on every pull request).
+- `node tests/tout.js --simulation`: simulation tests only (what GitHub runs on every pull request), about 10 s. Test files run in parallel; `--un-par-un` runs them one after the other.
 - `node tests/bilan.js`: the three reports (technical, gameplay, visual) in `rapports/bilan.html`, including a before/after visual comparison with `main`.
 - `node tests/captures.js`: phone screenshots (portrait and landscape) in `captures/actuel/`.
 
@@ -63,6 +79,88 @@ On the site, enter a nickname, click **Créer un salon** and share the link (or 
 The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](server/). It is **redeployed automatically** by a GitHub Action whenever a change to `sim.js` or `server/` is merged into `main` (see CLAUDE.md, section 9 bis). Manual fallback: `cd server` then `npx wrangler deploy`.
 
 ## Changelog
+
+### 2.42 — factions et tirs lisibles — 2026-11-21
+- Humains, Robots, Créatures, Herbe and Magique are selectable at launch, with 10 towers each and the asymmetric mechanics of 2.40.
+- Robot and creature silhouettes appear in game and in tower cards. Projectile trails point back to the shooter in 2D and 3D and shorten in dense fights.
+- Damage over time accounts for partial ticks. The bone colossus now summons when 15 souls are available. The multiplayer server sends projectile origins.
+
+### 2.41 — bestiaire épique — 2026-11-21
+- New epic bestiary: the 72 monsters are renamed in place (same costs, HP, speeds and abilities; only display sizes change): goblins, rat-men, orcs, ogres, mounted saurians, Ruin warriors, Abyssal Oculus, Brain-eater, Abyssal Elder, Lord of Embers…
+- All 78 monster models are rebuilt with the new creature kit: shared skeletons (biped, quadruped, flyer), a detailed sculpt baked into a painted texture and a normal map, walk or fly, hit and death animations. In game, a hit monster flinches; a killed monster falls, stays on the ground, then sinks. 6 models are ready for upcoming abilities (summoning, resurrection). After reviewing the boards, 14 tier 2 and 3 monsters were retouched (carved rock for the golem and titan, wyrm, reaper, spectre, mana eater, Lord of Embers, Abyssal Elder, mammoth tower, behemoth, Ruin champion, chimera, giant, doom wheel). Total 3D budget raised to 20 MB (78 monsters loaded by tier).
+- `sim.js` changed (names, model keys and sizes only; the server redeploys automatically).
+- Tooling: monster generation is much faster (bat 595 s → 7 s, orc 36 s → 11 s; same models). The GitHub "Assets 3D" check, stopped at 30 min, fits in its time limit again (10 min for all 131 assets locally).
+
+### 2.40 — races asymétriques — 2026-11-20
+- The 5 factions become 5 asymmetric races with 10 different towers each, their own mechanic, status effects and combos: Royaume d'Aubeval (cohesion, judgement seal, nets that ground flyers, trading post), Clans de l'Orage Blanc (fury and rage, chain lightning, soaked and conduction, hex, bleeding), Elfes de Lunebois (stacking poison and bloom, roots, growth, spores), Nains de Hautroc (forge, heat and overheat, armour break, mines), Cour des Ossements (souls, raised dead, plague and epidemic, curses, reaper).
+- 10 roles per race (base, close range, control, area, dedicated anti-air, detection, signature, support, anti-boss, ultimate — one ultimate per field).
+- Central balancing rules (effective power, 30-point radar profile, mandatory coverage, caps) checked by a new test file, and a race bench (`tests/outils/banc-races.js`): every race scores between 1.29 and 1.67 points per game (1.5 = even).
+- Home screen: race choice and a race sheet (description, towers, combos). In game: richer tower sheet, status pips on monsters, combo texts, souls counter, lightning, mines and raised dead in 2D and 3D. New 3D models for all 50 towers in a darker, “grimdark” art direction: soldiers, creatures, siege engines and totems sculpted with the organic-monster process (painted texture and baked relief), not all towers are towers. Tower budget raised to 9,000 triangles and 300 KB (approved by the designer).
+- `sim.js` and `server/` changed (the server redeploys automatically).
+
+### 2.39 — style peint — 2026-11-20
+- Common painted style for every 3D model (towers, monsters, portal, castle): toon shading in 4 steps, a cold rim light on the edges and a thin dark outline of constant on-screen width, so silhouettes stand out from the snow on a phone. Applied when models load: no model regenerated. Add `?style=0` to the address to get the previous look. Costs about 1.7× more draw calls (to check on a low-end phone). Rendering only: `sim.js` unchanged.
+
+### 2.38 — quêtes bonus — 2026-11-19
+- Bonus quests: short challenges drawn at random during the game (first at 1:30, then one every 3 to 4 min), with funny titles. Races (the first to reach the goal wins): "Clicker fou" (place 10 more towers; never drawn when someone has no room left), "Le facteur sonne toujours 4 fois" (be the first to get 4 of your own monsters through to an opponent; every monster now remembers who sent it), "Gonflette" (upgrade a tower to a level above the best current one), "Frozen" (own N frost towers, N above the current best), "Le gros cadeau" (send a boss). Snapshots (best score when time runs out): "Qui a la plus grosse ?" (longest maze), "Picsou" (most gold in the bank), "Pigeons voyageurs" (most gold sent as flyers), "Bling-bling" (most expensive tower), "Mamie Gâteau" (lowest income: a catch-up gift). No race can already be won when it starts. Reward: gold, 8 × the average income (at least 100), shared on a tie.
+- Banner when a quest starts (title, rule, reward), a tracking pill under the top bar (time left, your score and rank, green when you lead; tap it for the rule), and a banner announcing the winner. "Quêtes" column in the end-of-game table.
+- AI: each AI decides whether it plays a quest (50 % in Normal, 75 % in Hard, 100 % in Brutal) and adapts: builds cheap towers, saves its gold, sends small waves early, upgrades its best tower, builds frost towers or sends a boss.
+- `sim.js` and `server/` changed (the server redeploys automatically; the snapshot carries the current quest).
+
+### 2.37 — file d'améliorations — 2026-11-19
+- "Mes tours" panel: a button under the top bar lists all your towers by type (count per level). Tick types, pick a target level (2 to 5) and add them to an upgrade queue: each tower goes up one level at a time, lowest level first, as soon as gold allows; when gold runs short the queue spends what it can and the rest waits for income. The queue shows each order (progress bar, gold left) and can be cancelled order by order or entirely; queued towers get a gold chevron on the map. Interface only: `sim.js` unchanged.
+
+### 2.36 — cristal hivernal renforcé — 2026-11-19
+- The reinforced frost tower (slot 8: Cristal hivernal and its equivalents in every faction) cost more than the basic frost tower but did exactly the same thing. It now deals more damage (modifier ×0.9 → ×1.5, Cristal hivernal 2 → 3.4) and slows 10 points more at every level (−30 % to −60 % instead of −20 % to −50 %). It still does not stack with the basic frost tower: the strongest slow wins. `sim.js` changed (server redeployed automatically).
+- Tooling: the maze-generation timing test now runs on its own, after the other tests (`labyrinthe-duree`). Since the parallel tests of 2.35 it shared the CPU with the AI games and failed at random on GitHub. Same thresholds. No game change.
+- Tooling fix: the browser test of the rotation arrows failed every time. The swipe used by the test before it sent all its touch events at the same instant, so Chromium saw a very fast fling and, as on a real touch screen, swallowed the next tap (used to stop the fling): the arrow got pointerdown and pointerup but no click. The test swipe (`glisser` in `tests/outils/navigateur.js`) now lasts 0.3 s and holds still 0.2 s before lifting the finger. The test was not disabled. No game change.
+
+### 2.35 — terrain dégagé — 2026-11-19
+- Flying monsters are half the size of the other monsters in 3D (×0.5 instead of ×0.65), so they hide less of the field. No rule change.
+- Less cluttered mobile display: the details line of the info panel fits on one line (tap it to unfold), and in 3D, when the chosen tower (or batch, or build preview) is hidden by the info panel or the top bar, the view glides just enough to show it above the panel. Interface only.
+- Tooling: faster tests. `node tests/tout.js` runs the test files in parallel (one process per file, one per CPU core minus one; `--un-par-un` for the old behaviour) and the AI games run at the same time in worker threads, with identical results. On 22 cores: simulation 24 s → 8 s (13 s pinned to 4 cores, like GitHub), `--complet` 1 min 54 → 29 s. No game change.
+
+### 2.34 — consigne de construction — 2026-11-19
+- The "Touche encore la case pour construire" hint now sits between the two rotation arrows and appears only once per game (first build preview); the info card no longer repeats it afterwards. Interface only: `sim.js` unchanged.
+
+### 2.33 — ia plus stratège — 2026-11-19
+- AI builds more towers and upgrades less while its maze is unfinished (random upgrades from 12 towers at 25 %, 50 % from 28, instead of 10 towers at 35 %, 60 % from 24). Arena: +0.18 and +0.27 on two seed sets, neutral in long games. Other tweaks tried and dropped (earlier tiers and bosses, sending thresholds, a 20,000-gold wave cap, defence share, estimate caution, more upgrades).
+- AI performance: the defence estimate follows the path cell by cell and caches what each tower sees. The AI costs 0.02–0.04 ms per game step on average (0.01–0.03 on `main`); its slowest call drops from 7–10 ms to 3–5 ms (2–3 ms on `main`).
+- AI tower types chosen against the threat it receives: the AI remembers the monsters sent to it and, on the ordinary slots of its maze, builds the type that deals the most damage per gold against them (armour, flying, anti-magic, area, path in range): fewer archers and more guards, cannons and mages against bosses and armoured monsters. Arena: +0.52 points per seat (28 wins out of 42).
+- Tooling: `--vies` option for the AI arena (long games that reach the end game). Two end-game ideas were tried with it and dropped because they made the AI weaker: rebuilding a level-5 tower as a stronger type, and capping the defence savings. No game change.
+- AI waves aimed at what each opponent cannot absorb: for every monster family the AI estimates how many would get through each opponent's towers (damage while crossing, with armour, flying, anti-magic, invisibility and slows) and sends the family that costs them the most lives, with some randomness (more in Normal than in Brutal); otherwise ground monsters for income. Bosses and armoured monsters, very hard to absorb, come much more often. **The AI becomes much more dangerous: difficulty to be checked by playing.**
+- AI end game: once its maze is complete and every tower is at level 5, the AI moves its defence savings (which could no longer be spent) into attacks. Arena: +0.76 points per seat against the previous step (35 wins out of 42).
+- AI mazes where every tower shoots: the AI now builds its maze in an order that keeps each new tower next to the current monster path ("exposure": path cells seen by each tower), instead of only maximising the path length. Around 15–25 towers, towers far from the path drop from 3–4 to 1–2 on average, and each tower sees 10–50 % more path. In the AI arena it beats the previous AI by +0.64 points per seat (29 wins out of 42 games). `sim.js` changed (automatic server redeploy).
+- Tooling: AI arena (`node tests/outils/arene-ia.js`): the current AI plays against the AI of another version (`origin/main` by default) in the same game engine, seats and factions swapped, on all CPU cores; reports points, wins and the gap with its standard error. Not part of the GitHub checks. No game change.
+
+### 2.32 — correctifs de la feuille de route — 2026-11-19
+- Mouse scrolling of the tower and monster card bar on PC: the wheel scrolls it horizontally and it can be dragged; the scroll position is kept when a card is chosen.
+- Less clutter on mobile: the "Touchez encore la case" bubble in the middle of the board is gone; while previewing a build, the info card shrinks and shows the instruction instead.
+- Flying monsters are drawn smaller in 3D (×0.65).
+- Batch upgrade: tapping a tower twice selects up to 10 towers of the same type and level (gold frames on the board, a row of icons in the card); one button upgrades them all; when gold is short, the icons of the towers that won't be upgraded shrink.
+- Roadmap updated (these four items are done). Interface only: `sim.js` unchanged (no server redeploy).
+
+### 2.31 — équilibrage des tours — 2026-11-19
+- Roadmap: the designer's ideas added to the roadmap table (3D model refactoring, multi-screen launch menu, unique gameplay per race, English version, analytics, website with SEO and GEO, launch tutorial, Google login or account, store, promotion campaigns, payment, then monetization). No game change.
+- Roadmap: five new ideas (AI mazes where every tower can shoot, cluttered mobile display, batch upgrades, more compact flying units, waypoint for monsters). No game change.
+- Tooling: the tower test bench now runs on all CPU cores with identical results (a comparison with `main` takes about 3 min instead of 20–25). It stays out of the GitHub checks.
+- Frost towers deal 2 base damage instead of 4 (half as strong); their slow is unchanged, since it is what makes them strong.
+- Mages deal 55 base damage instead of 45 (+22 %): they were the weakest value tower. Archers (8) and cannons (20) keep their damage. Flame towers still hit everything in their cone (a 4 then 8 target cap was tried, but since monsters spread out in 2.25 it barely mattered). `sim.js` changed (automatic server redeploy).
+- Tooling: tower test bench (`node tests/outils/banc-tours.js`) measuring each tower's damage per gold invested, levels 1 to 5, against 7 typical waves, with before/after comparison. No gameplay change.
+
+### 2.30 — départ façon course — 2026-11-19
+- Starting gold is doubled: 200 instead of 100 for every board.
+- The first 30 seconds are a "Build!" phase: nobody (human or AI) can send monsters; the monster tabs are disabled and a countdown runs in the top bar.
+- Racing-style start: an animated "Construis !" banner with a logo and a big 30-second timer, a 3-2-1 countdown, then an animated "Envoie et résiste !" banner with its own logo.
+- `sim.js` is modified (automatic server redeploy).
+- Reproducible snowflakes: in 3D, each falling snowflake's position is now computed from the time instead of moving a little at each drawn frame. Same motion on screen, but two captures at the same instant are identical: the visual comparison witness drops from 0.1% to 0.00%, so the 3D comparison is reliable again. Only `rendu3d.js` changes.
+
+### 2.29 — bibliothèque elevenlabs — 2026-11-19
+- The whole sound library is remade with ElevenLabs (paid plan, commercial use): 371 files. Realistic, medieval, never shrill tower shots; monster deaths and growls while walking; a war horn when sending a wave, different for ground, flying, special and boss monsters; new interface sounds and ambiences.
+- 100 sarcastic dark-fantasy voice lines, with new contexts: placing a tower, maximum level and wave cleared. New voices made for the Horde (deeper, more bestial) and the Dwarves.
+- `sim.js` is unchanged (no server redeploy).
+- Tooling: lighter 3D tests. When a test fast-forwards the game in 3D, the view is now redrawn 4 times per second of game time instead of 60 (the game itself still advances frame by frame). The software-rendered test browser used to crash around 30 s of play since the 2.26 landscape, although the game runs fine on phones. 3D run in about 1 min instead of 5, 3D screenshots in 1.5 min instead of 10. New `WR_GPU=1` option to run the 3D tests on the machine's real graphics card (about 20 s). No game change.
+- Tooling: tests in 3D. The automated mobile walkthrough now runs in the real game (3D view): the former 2D and 3D walkthroughs are merged (26 checks), plus a test that the 2D fallback still works when 3D cannot load. Screenshots and the visual report are taken in 3D. Fixed along the way: the « before » version was extracted without three.js, models or sounds; three.js drew from the same seeded random numbers as the simulation, so the game differed between runs; the clock alignment was sometimes skipped in 3D. Known limit: falling snowflakes leave about 0.1% of changed pixels between two identical captures. No game change.
 
 ### 2.28 — mini-cartes d'hiver — 2026-11-19
 - The opponents panel (« Adversaires ») gets winter mini-maps: snow and grid like the 3D view, the monsters' path as a navy dotted line, the portal and a small castle with the player's flag. Towers are small tiles in the colour of their role (green archer, red guard, blue frost, copper cannon, orange flames, purple mage), so you can read an opponent's defence at a glance; monsters are outlined (red on the ground, white in the air). Slightly bigger mini-maps with a silver frame; lives with a heart and income with the gold coin.

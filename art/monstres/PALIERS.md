@@ -1,5 +1,7 @@
 # Monstres des paliers (préparation de la PR B)
 
+> **2.40 : bestiaire épique.** Les noms et les modèles ci-dessous sont ceux d'avant la 2.40. Les monstres ont été renommés à la même place (mêmes prix et capacités) : la liste à jour est dans CLAUDE.md §6.2, les scripts dans ce dossier (kit `communs/creatures.py`, CLAUDE.md §15.1).
+
 Décision du concepteur (2026-11-15) : **3 paliers**, et dans chaque palier **24 monstres** :
 12 au sol (les plus rentables pour le revenu), 3 volants, 8 magiques et 1 boss. Soit 72 monstres.
 
