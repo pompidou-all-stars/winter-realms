@@ -12,7 +12,7 @@ test('Un modèle 3D pour chaque tour (tours/<faction>-<j>) et chaque clé de mon
  assert.equal(S.TW.length,FAC.length*10);
  for(const [f,F] of FAC.entries())for(let j=0;j<10;j++)assert.ok(fs.existsSync(path.join(D,'tours',`${F}-${j}.glb`)),`tour ${F}-${j} (${S.TW[f*10+j].n}) sans modèle`);
  for(const g of new Set(S.CR.map(c=>c.g)))assert.ok(fs.existsSync(path.join(D,'monstres',`${g}.glb`)),`monstre « ${g} » sans modèle`);
- for(const d of ['portail','chateau'])assert.ok(fs.existsSync(path.join(D,'decor',`${d}.glb`)),`décor ${d} manquant`);
+ for(const d of ['portail','chateau','mort-squelette','mort-colosse'])assert.ok(fs.existsSync(path.join(D,'decor',`${d}.glb`)),`décor ${d} manquant`);
 });
 test('Les monstres sont animés : « vol » pour les volants, « marche » pour les autres',()=>{
  for(const g of new Set(S.CR.map(c=>c.g))){const T=S.CR.find(c=>c.g==g),noms=(lireGLB(path.join(D,'monstres',`${g}.glb`)).animations||[]).map(a=>a.name);

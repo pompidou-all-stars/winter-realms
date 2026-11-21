@@ -66,14 +66,14 @@ def chevalier_mort(nom):
     return HD.squelette_statue(nom, J, bras_r=((-.105, .01, .79), (-.15, -.05, .88), (-.07, -.13, .93), (-.06, -.16, .95)),
                                pieces=harnois_rouille() + epee_longue() + ecu(), lueurs=yeux(None, -.062, .91), H=.6, tri=1700)
 
-def colosse_os(nom):
+def colosse_os(nom, H=.95):
     """Géant de 2,4 fois la carrure, os épais, spallières à pointes, couronne de fer ; le cœur d'âme reste une pièce animée."""
     J, _ = HD.joints_debout(bras_l=((.105, .01, .79), (.17, -.03, .62), (.17, -.1, .46), (.17, -.13, .4)))
     p = harnois_rouille(casque=False)
     p.append(tore('Couronne', O.FER, 'Tete', (0, -.005, .93), .05, .008, ech=(1, 1.1, 1)))
     for k in range(5): p.append(corne(f'Fleuron{k}', O.FER, 'Tete', (math.sin(k * 1.256) * .05, math.cos(k * 1.256) * .055 - .005, .935), .006, .035, .1, seg=4))
     return HD.squelette_statue(nom, J, bras_r=((-.105, .01, .79), (-.17, -.03, .62), (-.17, -.1, .46), (-.17, -.13, .4)),
-                               pieces=p, lueurs=yeux(None, -.062, .91, r=.008), H=.95, tri=2200, epaisseur=1.9, cotes=5)
+                               pieces=p, lueurs=yeux(None, -.062, .91, r=.008), H=H, tri=2200, epaisseur=1.9, cotes=5)
 
 PIERRE_G, PIERRE_G2, PIERRE_G3 = '#7b7884', '#94919d', '#55535d'
 
@@ -364,6 +364,23 @@ def puits(nom):
 def faucheuse(nom):
     """8 · Faucheuse validée par le concepteur : même construction, occlusion cuite sur les pièces fixes."""
     r = O.faucheuse(nom); HD.peindre_architecture(r)
+    return r
+
+# ---------------------------------------------------------------- morts relevés (2.40)
+def mort_releve(colosse=False):
+    """Morts relevés par la Cour des Ossements qui marchent sur le chemin (décor du jeu, pas une tour) : squelette en armure
+    rouillée et épée, ou colosse d'os. Modèles à part : ils ne dépendent plus des monstres de CR."""
+    from .outils import collection, dans
+    nom = 'mort_colosse' if colosse else 'mort_squelette'
+    c = collection(nom); dans(c)
+    r = pivot(nom)
+    if colosse:
+        HD.poser(colosse_os(nom + '_corps', H=.7), r)
+    else:
+        J, _ = HD.joints_debout(bras_l=((.105, .01, .79), (.14, .0, .62), (.15, -.04, .47), (.15, -.06, .42)))
+        HD.poser(HD.squelette_statue(nom + '_corps', J, bras_r=((-.105, .01, .79), (-.15, -.05, .88), (-.07, -.13, .93), (-.06, -.16, .95)),
+                                     pieces=harnois_rouille(epaulieres=False) + epee_longue(), lueurs=yeux(None, -.062, .91),
+                                     H=.45, tri=1500, taille=256), r)
     return r
 
 def tour(j):
