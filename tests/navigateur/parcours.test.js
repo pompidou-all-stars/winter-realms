@@ -32,7 +32,7 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   const e=await r3d();assert.equal(e.on,true);assert.equal(e.scene.vue.perspective,true);assert.equal(e.scene.vue.az,0);
   assert.equal(await p.locator('#main3d').count(),1,'canevas WebGL présent');assert.deepEqual(o.erreurs,[]);
  });
- test('À l\'ouverture, Humains est présélectionnée et les boutons de difficulté sont actifs',async()=>{
+ test('À l\'ouverture, la faction Humains est présélectionnée et les boutons de difficulté sont actifs',async()=>{
   assert.equal(await p.getAttribute('[data-faction="0"]','aria-pressed'),'true');
   for(const l of [0,1,2])assert.equal(await p.isDisabled('#go'+l),false);
  });
@@ -68,10 +68,10 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   await N.toucherCase(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[]);assert.equal(e.projet,null);assert.match(e.toast,/Choisis d’abord une tour/);
  });
  test('Choisir une carte de tour (2.15) : la fiche la décrit en clair, rien n\'est construit',async()=>{
-  await N.toucherCarte(p,'Archers sylvains');const e=await N.etat(p);assert.equal(e.choix,20);assert.equal(e.or,200);
-  assert.match(e.fiche,/Archers sylvains/);assert.match(e.fiche,/Dégâts\/s/);assert.match(e.fiche,/Portée/);assert.match(e.fiche,/sol et air/);assert.match(e.fiche,/Croissance/);assert.match(e.fiche,/deux fois une case/);
-  assert.equal(await p.getAttribute('#bar button[aria-label^="Archers sylvains,"]','class'),'sel');
-  assert.match(await p.textContent('#bar button[aria-label^="Archers sylvains,"]'),/^20 or$/,'la carte ne montre que le prix');
+  await N.toucherCarte(p,'Arbre archer');const e=await N.etat(p);assert.equal(e.choix,20);assert.equal(e.or,200);
+  assert.match(e.fiche,/Arbre archer/);assert.match(e.fiche,/Dégâts\/s/);assert.match(e.fiche,/Portée/);assert.match(e.fiche,/sol et air/);assert.match(e.fiche,/Croissance/);assert.match(e.fiche,/deux fois une case/);
+  assert.equal(await p.getAttribute('#bar button[aria-label^="Arbre archer,"]','class'),'sel');
+  assert.match(await p.textContent('#bar button[aria-label^="Arbre archer,"]'),/^20 or$/,'la carte ne montre que le prix');
  });
  test('Construction : un premier toucher montre la tour fantôme et sa portée en 3D, sans rien construire',async()=>{
   await N.toucherCase(p,3,5);await N.avancer(p,50);const e=await N.etat(p),s=(await r3d()).scene;assert.deepEqual(e.tours,[]);assert.equal(e.or,200);
@@ -137,7 +137,7 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   await N.toucher(p,'#cartesBtn');assert.equal(await p.isVisible('#chips'),true);await N.toucher(p,'#chips .chip >> nth=1');
   assert.equal((await N.etat(p)).vue,1);assert.equal(await val(()=>document.getElementById('banner').hidden),false);
   assert.equal(await val(()=>document.getElementById('chips').hidden),true,'le panneau se referme');assert.match(await p.textContent('#cartesBtn'),/IA 1/);
-  await N.toucherCarte(p,'Archers sylvains');await N.toucherCase(p,2,8);const e=await N.etat(p);assert.match(e.toast,/lecture seule/);assert.equal(e.projet,null);
+  await N.toucherCarte(p,'Arbre archer');await N.toucherCase(p,2,8);const e=await N.etat(p);assert.match(e.toast,/lecture seule/);assert.equal(e.projet,null);
   await N.toucher(p,'#banner');assert.equal((await N.etat(p)).vue,0);assert.equal(await val(()=>document.getElementById('banner').hidden),true);
   await N.toucher(p,'#fiche .fermer');
  });
@@ -145,7 +145,7 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   const avant=(await N.etat(p)).or;await N.avancer(p,10000);const e=await N.etat(p);assert.ok(e.temps>10);assert.equal(e.or,avant+12);
  });
  test('Glisser le doigt déplace la carte (le terrain suit le doigt), sans rien construire',async()=>{
-  await N.toucherCarte(p,'Archers sylvains');
+  await N.toucherCarte(p,'Arbre archer');
   const avant=await N.etat(p),c0=await N.centreCase(p,6,9);await N.glisser(p,[6,9],[6,6]);await N.avancer(p,600);
   const c1=await N.centreCase(p,6,9),e=await N.etat(p);assert.ok(c0.y-c1.y>40,'la case (6,9) est remontée à l\'écran : '+Math.round(c0.y)+' → '+Math.round(c1.y));
   assert.equal(e.tours.length,avant.tours.length);assert.equal(e.or,avant.or);assert.equal(e.projet,null);
@@ -167,7 +167,7 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   await N.avancer(p,1500);const e0=await N.etat(p),t0=e0.tours.find(t=>t.k==20&&t.lv==1),n=Math.min(10,e0.tours.filter(t=>t.k==20&&t.lv==1).length);assert.ok(n>=3,'au moins 3 tours pareilles : '+n);
   await N.toucherCase(p,t0.x,t0.y);let e=await N.etat(p);assert.equal(e.panneauOuvert,true);assert.match(e.fiche,/Touche encore la tour/);
   await N.toucherCase(p,t0.x,t0.y);e=await N.etat(p);
-  assert.match(e.fiche,new RegExp(n+' × Archers sylvains'));assert.equal(await p.locator('#fiche .rangee span').count(),n,'une icône par tour');
+  assert.match(e.fiche,new RegExp(n+' × Arbre archer'));assert.equal(await p.locator('#fiche .rangee span').count(),n,'une icône par tour');
   assert.equal(await p.locator('#fiche .rangee span.non').count(),0);
   const cout=await p.evaluate(()=>lot.c);await p.evaluate(c=>{P.gold=c+1},cout);await N.avancer(p,50);
   assert.equal(await p.locator('#fiche .rangee span.non').count(),n-1,'les icônes des tours qu’on ne peut pas payer rétrécissent');
@@ -178,8 +178,8 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
  });
  test('Panneau « Mes tours » (2.37) : cocher un type, choisir le niveau, la file paie ce qu’elle peut puis le reste, et s’annule',async()=>{
   await N.toucher(p,'#parcBtn');assert.equal(await p.locator('#parc').isVisible(),true,'le panneau s’ouvre');
-  const n=await p.evaluate(()=>P.t.filter(t=>t.k==20&&t.lv<3).length);assert.ok(n>=3,'au moins 3 Archers sylvains sous le niveau 3 : '+n);
-  await p.locator('#parc .ligne',{hasText:'Archers sylvains'}).click();await p.locator('#parc .niv button',{hasText:'3'}).click();
+  const n=await p.evaluate(()=>P.t.filter(t=>t.k==20&&t.lv<3).length);assert.ok(n>=3,'au moins 3 Arbre archer sous le niveau 3 : '+n);
+  await p.locator('#parc .ligne',{hasText:'Arbre archer'}).click();await p.locator('#parc .niv button',{hasText:'3'}).click();
   /* juste assez d’or pour une amélioration (niveau 1 → 2) : la file la paie, le reste attend */
   await p.evaluate(()=>{P.gold=upCost({k:20,lv:1})});await N.avancer(p,50);
   assert.match(await p.textContent('#parcRes'),/Ton or en paie 1 tout de suite/);
@@ -192,7 +192,7 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   e=await p.evaluate(()=>({file:FILE.length,sous3:P.t.filter(t=>t.k==20&&t.lv<3).length,chantier:P.t.filter(t=>t.b>0).length}));
   assert.equal(e.sous3,0,'toutes au niveau 3 au moins');assert.equal(e.file,0,'ordre terminé');
   /* un nouvel ordre se consulte et s’annule */
-  await p.evaluate(()=>{P.gold=0});await p.locator('#parc .ligne',{hasText:'Archers sylvains'}).click();await p.locator('#parc .niv button',{hasText:'5'}).click();
+  await p.evaluate(()=>{P.gold=0});await p.locator('#parc .ligne',{hasText:'Arbre archer'}).click();await p.locator('#parc .niv button',{hasText:'5'}).click();
   await p.locator('#parcGo').click();await N.avancer(p,100);assert.equal(await p.locator('#parc .ordre').count(),1);
   await p.locator('#parc .annuler').click();await N.avancer(p,100);
   assert.equal(await p.evaluate(()=>FILE.length),0,'file annulée');assert.equal(await p.locator('#fileN').isVisible(),false);
@@ -240,6 +240,24 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   await N.toucher(p,'#mReprendre');assert.equal(await p.isVisible('#menu'),false);
   await N.toucher(p,'#menuBtn');await N.toucher(p,'#mQuitter');assert.equal(await val(()=>document.getElementById('ov').hidden),true,'un seul toucher ne quitte pas');
   await N.toucher(p,'#mQuitter');assert.equal(await val(()=>document.getElementById('ov').hidden),false,'retour à l\'accueil');assert.equal((await N.etat(p)).fin,true);
+ });
+ test('La scène WebGL rend les 50 tours et 50 traînées simultanément, puis retire les projectiles',async()=>{
+  const compte=await p.evaluate(async()=>{
+   const A=R3D.api;
+   await A.precharger([0,1,2,3,4]);
+   const plateau=new Board(0,'Charge','#d8b45c',0,0);
+   plateau.t=TW.map((_,k)=>({x:1+k%10,y:3+Math.floor(k/10),k,lv:1,a:0}));
+   plateau.pr=plateau.t.map(({x,y,k})=>({id:k,k,sx:x+.5,sy:y+.2,x:x+.8,y:y+.4,tx:x+1,ty:y+1,tot:1,a:0}));
+   A.dessiner(plateau,0,{rng});
+   const dense=A.etat();
+   plateau.pr=[];
+   A.dessiner(plateau,.1,{rng});
+   const vide=A.etat();
+   dessinerVue3D(.2);
+   return [dense.tours,dense.projectiles,vide.projectiles,dense.dessins];
+  });
+  assert.deepEqual(compte.slice(0,3),[50,50,0]);
+  assert.ok(compte[3]>0);
  });
  test('Aucune erreur JavaScript pendant tout le parcours',()=>assert.deepEqual(o.erreurs,[]));
 });
