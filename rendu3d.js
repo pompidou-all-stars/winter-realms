@@ -12,6 +12,7 @@
 
    Modèles : assets/3d/ (fabriqués par les scripts Blender de art/, voir CLAUDE.md §15). */
 import * as THREE from 'three';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
@@ -23,7 +24,6 @@ const ECH_MONSTRES = 1.4;
 /* 2.32 : les volants sont plus compacts (ailes déployées, ils masquaient le terrain et les autres monstres) ; 2.35 : deux fois moins grands (×0,65 → ×0,5) */
 const ECH_VOLANTS = .5;
 const echMonstre = k => ECH_MONSTRES * (CR[k].fly ? ECH_VOLANTS : 1);
-const FAC = ['alliance', 'horde', 'sylvestres', 'nains', 'ombres'];
 /* couleurs du terrain : mêmes valeurs que art/communs/factions.py (SOL, BIOME) */
 /* thème hiver (2.9) : terrain enneigé (NEIGE ; TEINTE n'est plus utilisée depuis le paysage continu de la 2.26),
    bord en roche givrée, décor d'hiver (sapins enneigés, rochers, cristaux de glace). */
@@ -36,7 +36,7 @@ const VOL = .5; // hauteur de vol des volants (cases)
 
 export function creer(J) {
   /* J : tables et constantes du jeu (C, R, SP, EX, INF, DIRS, TW, CR, AURA_R, topY, rng) */
-  const {C, R, SP, EX, INF, DIRS, TW, CR, AURA_R} = J;
+  const {C, R, SP, EX, INF, DIRS, TW, CR, AURA_R, silhouettes} = J;
   const canvas = document.createElement('canvas');
   canvas.id = 'main3d';
   canvas.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none';
@@ -215,9 +215,6 @@ void main() {
     }).catch(e => { console.warn('Modèle 3D introuvable : ' + url, e); prets.set(url, null); return null }));
     return cache.get(url);
   }
-  /* noms des fichiers : voir art/LISEZMOI.md (tours/<faction>-<j>, monstres/<clé g de CR>) */
-  const tourProcedurale = k => [1, 3].includes(TW[k].faction);
-  const urlTour = k => `assets/3d/tours/${FAC[TW[k].faction]}-${k % 10}.glb`;
   const urlMonstre = k => `assets/3d/monstres/${CR[k].g}.glb`;
   /* plusieurs monstres peuvent partager un modèle (le Petit limon et la Gelée mutante) : le jeu le met à l'échelle de z */
   const echelleModele = k => { const ref = CR.find(c => c.g === CR[k].g); return Math.pow(CR[k].z / ref.z, 1.8) };
@@ -229,7 +226,6 @@ void main() {
        les paliers 2 et 3 se chargent en fond juste après (un monstre pas encore chargé apparaît dès que son modèle arrive) */
     for (let k = 0; k < CR.length; k++) if (CR[k].t === 1) l.push(charger(urlMonstre(k)));
     setTimeout(() => { for (let k = 0; k < CR.length; k++) if (CR[k].t !== 1) charger(urlMonstre(k)) }, 1500);
-    for (const f of factions) for (let j = 0; j < 10; j++) if (!tourProcedurale(f * 10 + j)) l.push(charger(urlTour(f * 10 + j)));
     /* 2.40 : morts relevés, seulement si la Cour des Ossements (race 4) est en jeu */
     if (factions.includes(4)) l.push(charger('assets/3d/decor/mort-squelette.glb'), charger('assets/3d/decor/mort-colosse.glb'));
     return Promise.all(l);
@@ -442,64 +438,44 @@ void main() {
   /* ---------- tours ---------- */
   const tours = new Map();
   const pipGeo = new THREE.SphereGeometry(.035, 8, 6);
-  /* formes de repli quand un modèle manque (règle d'art/LISEZMOI.md : le jeu fonctionne sans le fichier 3D) */
+  // Une géométrie par unité, colorée par sommet et partagée entre ses instances.
   const formesTours = new Map();
-  function repliTour(k) {
-    let g = formesTours.get(k);
-    if (g) return g.clone(true);
-    const T = TW[k], robot = T.faction === 3, creature = T.faction === 1;
-    const accent = mat(T.col), sombre = mat(robot ? '#263c53' : '#543025');
-    const clair = mat(robot ? '#b4f4ff' : '#ffdb89');
-    g = new THREE.Group();
-    function piece(parent, geo, material, position, scale) {
-      const mesh = new THREE.Mesh(geo, material);
-      mesh.position.set(...position); mesh.scale.set(...scale);
-      mesh.castShadow = mesh.receiveShadow = true; parent.add(mesh);
-      return mesh;
-    }
-    piece(g, G.boite, sombre, [0, .07, 0], [.69, .14, .65]);
-    const tete = new THREE.Group(); tete.name = 'Tourelle'; tete.position.y = .61; g.add(tete);
-    if (robot) {
-      for (const x of [-.22, .22]) piece(g, G.boite, sombre, [x, .23, 0], [.14, .32, .29]);
-      piece(g, G.boite, accent, [0, .44, 0], [.43, .35, .34]);
-      piece(tete, G.boite, sombre, [0, .1, 0], [.37, .23, .33]);
-      piece(tete, G.boite, clair, [0, .13, .18], [.28, .075, .045]);
-    } else if (creature) {
-      piece(g, G.sphere, accent, [0, .36, 0], [.31, .27, .34]);
-      piece(tete, G.sphere, sombre, [0, .08, .03], [.24, .21, .25]);
-      for (const x of [-.15, .15]) {
-        piece(tete, G.sphere, clair, [x, .12, .24], [.055, .06, .05]);
-        piece(tete, G.ico, accent, [x, .27, -.06], [.07, .21, .07]);
+  const matTour = mat('#ffffff', {vertexColors:true});
+  const geoTrait = new THREE.CylinderGeometry(.5, .5, 1, 6);
+  const axeTrait = new THREE.Vector3(0, 1, 0);
+  function modeleTour(k) {
+    if (formesTours.has(k)) return formesTours.get(k).clone(true);
+    const geos = silhouettes[k].map(p => {
+      let geo;
+      if (p.type === 'trait') {
+        const a = new THREE.Vector3(...p.a), b = new THREE.Vector3(...p.b);
+        const direction = b.clone().sub(a);
+        geo = geoTrait.clone();
+        geo.scale(p.largeur, direction.length(), p.largeur);
+        geo.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(axeTrait, direction.normalize()));
+        const centre = a.add(b).multiplyScalar(.5);
+        geo.translate(centre.x, centre.y, centre.z);
+      } else {
+        geo = (p.type === 'bloc' ? G.boite : p.type === 'cristal' ? G.octa : G.sphere).clone();
+        const facteur = p.type === 'bloc' ? 1 : .5;
+        geo.scale(p.a * facteur, p.b * facteur, p.c * facteur);
+        geo.translate(p.x, p.y, p.z);
       }
-    } else {
-      piece(g, G.boite, accent, [0, .39, 0], [.39, .62, .39]);
-    }
-
-    switch (T.j) {
-      case 0: piece(tete, G.boite, clair, [0, -.05, .3], [.1, .08, .3]); break;
-      case 1:
-        for (const x of [-.31, .31]) piece(tete, G.ico, accent, [x, -.14, .18], [.16, .21, .26]);
-        break;
-      case 2: piece(tete, G.octa, clair, [0, .03, .38], [.1, .1, .46]); break;
-      case 3: piece(tete, G.boite, accent, [0, .05, .36], [.28, .24, .49]); break;
-      case 4:
-        for (const x of [-.28, .28]) piece(tete, G.ico, accent, [x, .02, -.04], [.28, .07, .21]);
-        break;
-      case 5: piece(g, G.octa, clair, [0, 1.03, 0], [.15, .19, .15]).name = 'Cristal'; break;
-      case 6:
-        for (const x of [-.17, .17]) piece(tete, G.sphere, mat(robot ? '#ff7a3d' : '#9fe0ff'), [x, -.08, .3], [.1, .1, .16]);
-        break;
-      case 7: piece(g, G.sphere, clair, [0, 1.1, 0], [.21, .15, .21]).name = 'Orbe'; break;
-      case 8:
-        for (const x of [-.28, .28]) piece(g, G.ico, accent, [x, .38, .06], [.18, .28, .2]);
-        break;
-      case 9:
-        for (const x of [-.28, .28]) piece(tete, G.ico, accent, [x, .25, -.06], [.24, .16, .34]);
-        piece(g, G.octa, clair, [0, 1.14, 0], [.19, .24, .19]).name = 'Cristal';
-        break;
-    }
-    formesTours.set(k, g);
-    return g.clone(true);
+      const col = new THREE.Color(p.col), n = geo.attributes.position.count;
+      const rgb = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) col.toArray(rgb, i * 3);
+      geo.setAttribute('color', new THREE.BufferAttribute(rgb, 3));
+      if (!geo.index) geo.setIndex(Array.from({length:n}, (_, i) => i));
+      return geo;
+    });
+    const corps = new THREE.Mesh(mergeGeometries(geos), matTour);
+    geos.forEach(geo => geo.dispose());
+    corps.name = 'Tourelle';
+    corps.castShadow = corps.receiveShadow = true;
+    const groupe = new THREE.Group();
+    groupe.add(corps);
+    formesTours.set(k, groupe);
+    return groupe.clone(true);
   }
   function repliMonstre(k) {
     const T = CR[k], h = .4 * Math.pow(T.z, 1.8), o = new THREE.Mesh(G.sphere, mat(T.col));
@@ -520,8 +496,7 @@ void main() {
     return g;
   }
   function creerTour(t, fantome) {
-    const g = tourProcedurale(t.k) ? null : modele(urlTour(t.k)); if (g === undefined) return null;
-    const o = g ? g.scene.clone(true) : repliTour(t.k);
+    const o = modeleTour(t.k);
     if (fantome) o.traverse(m => { if (m.userData.contour) m.visible = false; else if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = .55; m.material.depthWrite = false; m.castShadow = false } });
     const r = new THREE.Group(); r.add(o);
     const anim = {};
@@ -834,9 +809,9 @@ void main() {
   let rv = null; const vignettes = new Map();
   function vignette(type, k, w, h) {
     const cle = type + k + '|' + w + 'x' + h; if (vignettes.has(cle)) return vignettes.get(cle);
-    const modeleVignette = type === 'tour' && tourProcedurale(k)
-      ? Promise.resolve({scene: repliTour(k)})
-      : charger(type === 'tour' ? urlTour(k) : urlMonstre(k));
+    const modeleVignette = type === 'tour'
+      ? Promise.resolve({scene: modeleTour(k)})
+      : charger(urlMonstre(k));
     const p = modeleVignette.then(g => {
       if (!g) return null;
       if (!rv) {
@@ -846,7 +821,7 @@ void main() {
         const d = new THREE.DirectionalLight('#fff4e0', 2.6); d.position.set(-2, 4, 3); rv.s.add(d);
         const b = new THREE.DirectionalLight('#9fd0ff', 1.3); b.position.set(3, 2, -3); rv.s.add(b);
       }
-      const o = cloner(g.scene), piv = new THREE.Group(); piv.add(o); piv.rotation.y = type === 'tour' ? -.55 : -.7;
+      const o = cloner(g.scene), piv = new THREE.Group(); piv.add(o); piv.rotation.y = type === 'tour' ? .60 : -.7;
       const box = new THREE.Box3().setFromObject(piv), ct = box.getCenter(new THREE.Vector3()), rad = Math.max(.05, box.getSize(new THREE.Vector3()).length() / 2);
       o.position.sub(ct.applyAxisAngle(new THREE.Vector3(0, 1, 0), -piv.rotation.y)); rv.s.add(piv);
       const dist = rad / Math.sin(rv.c.fov * Math.PI / 360) * (type === 'tour' ? .78 : .72);
