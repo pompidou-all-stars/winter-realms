@@ -1,10 +1,9 @@
-"""Sylvestres — Arbre sentinelle (emplacement 0 : Archer · tir rapide).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['sylvestres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Elfes de Lunebois — Archers sylvains (emplacement 0 : tir de base).
+Forme : communs/lunebois_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.lunebois_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Arbre sentinelle"}
+INFOS = {'categorie': 'tour', 'titre': "Archers sylvains"}
 
 def construire(ctx):
-    preparer(tour('sylvestres', 0))
+    preparer(tour(0))

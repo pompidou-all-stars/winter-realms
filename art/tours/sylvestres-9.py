@@ -1,10 +1,9 @@
-"""Sylvestres — Ancien arcanique (emplacement 9 : Mage · archimage).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['sylvestres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Elfes de Lunebois — Arbre-Mère (emplacement 9 : ultime).
+Forme : communs/lunebois_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.lunebois_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Ancien arcanique"}
+INFOS = {'categorie': 'tour', 'titre': "Arbre-Mère"}
 
 def construire(ctx):
-    preparer(tour('sylvestres', 9))
+    preparer(tour(9))

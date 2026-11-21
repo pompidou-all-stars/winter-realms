@@ -98,9 +98,9 @@ export class GameRoom{
  snap(full){const g=this.game;
   /* 2.38 : quête bonus en cours (scores en direct) ; son début et sa fin passent par log */
   const q=g.qu;
-  return {t:'snap',time:r2(g.time),tick:r2(g.tick),qu:q?{id:q.id,t0:r2(q.t0),fin:r2(q.fin),or:q.or,cible:q.cible,sc:q.sc}:null,log:full?[]:g.log.splice(0),B:g.B.map(b=>({gold:Math.floor(b.gold),inc:b.inc,lives:b.lives,dead:b.dead,tier:b.tier,
+  return {t:'snap',time:r2(g.time),tick:r2(g.tick),qu:q?{id:q.id,t0:r2(q.t0),fin:r2(q.fin),or:q.or,cible:q.cible,sc:q.sc}:null,log:full?[]:g.log.splice(0),B:g.B.map(b=>({gold:Math.floor(b.gold),inc:b.inc,lives:b.lives,dead:b.dead,tier:b.tier,am:b.am||0,al:(b.al||[]).map(a=>[r2(a.x),r2(a.y),a.g,a.f||1]),mi:(b.mi||[]).map(m=>[r2(m.x),r2(m.y)]),
    t:b.t.map(t=>[t.x,t.y,t.k,t.lv,t.inv,r2(t.a),t.sw>0?1:0,t.stun>0?1:0,t.b>0?r2(t.b):0,t.b>0?r2(t.bt):0]),
-   c:b.cr.map(c=>[c.id,c.k,r2(c.x),r2(c.y),r2(Math.max(0,c.hp/c.max)),(c.sl>0?1:0)|(c.h?2:0)|(c.hl?4:0)|(c.hid?8:0),c.f,r2(c.ph),r2(c.ox),r2(c.oy)]),
+   c:b.cr.map(c=>[c.id,c.k,r2(c.x),r2(c.y),r2(Math.max(0,c.hp/c.max)),sim.etats(c),c.f,r2(c.ph),r2(c.ox),r2(c.oy)]),
    p:b.pr.map(p=>[p.id,p.k,r2(p.x),r2(p.y),r2(p.tx),r2(p.ty),r2(p.tot),r2(p.a)]),
    fx:full?[]:b.fx.filter(f=>!f.s).map(f=>{f.s=1;const o={};for(const k in f)if(k!=='s')o[k]=typeof f[k]=='number'?r2(f[k]):f[k];return o}),
    ev:full?[]:b.ev.splice(0)}))}}

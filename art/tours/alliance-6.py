@@ -1,10 +1,9 @@
-"""Alliance — Tour des sentinelles (emplacement 6 : Archer · tireur d'élite).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['alliance']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Royaume d’Aubeval — Comptoir marchand (emplacement 6 : signature).
+Forme : communs/aubeval_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.aubeval_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Tour des sentinelles"}
+INFOS = {'categorie': 'tour', 'titre': "Comptoir marchand"}
 
 def construire(ctx):
-    preparer(tour('alliance', 6))
+    preparer(tour(6))

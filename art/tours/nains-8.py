@@ -1,10 +1,9 @@
-"""Nains — Générateur runique (emplacement 8 : Givre · entrave).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['nains']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Nains de Hautroc — Champ de mines (emplacement 8 : anti-boss).
+Forme : communs/hautroc_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.hautroc_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Générateur runique"}
+INFOS = {'categorie': 'tour', 'titre': "Champ de mines"}
 
 def construire(ctx):
-    preparer(tour('nains', 8))
+    preparer(tour(8))

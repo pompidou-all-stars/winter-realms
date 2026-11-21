@@ -1,10 +1,9 @@
-"""Alliance — Bombarde royale (emplacement 3 : Canon · artillerie).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['alliance']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Royaume d’Aubeval — Trébuchet (emplacement 3 : zone).
+Forme : communs/aubeval_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.aubeval_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Bombarde royale"}
+INFOS = {'categorie': 'tour', 'titre': "Trébuchet"}
 
 def construire(ctx):
-    preparer(tour('alliance', 3))
+    preparer(tour(3))

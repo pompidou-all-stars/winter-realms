@@ -44,6 +44,8 @@ def cuire(racine):
         if o.type != 'MESH' or not o.data.materials: continue
         me = o.data
         if me.users > 1: o.data = me = me.copy()
+        # 2.40 : créatures « haute définition » (texture peinte « Peau ») et pièces déjà cuites (« Peint ») : rien à refaire
+        if me.materials[0].name.startswith(('Peau', 'Peint')): continue
         if me.materials[0].name == 'Drapeau':
             if 'Col' in me.color_attributes: me.color_attributes.remove(me.color_attributes['Col'])
             continue

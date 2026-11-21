@@ -19,7 +19,7 @@ EPAISSEUR = .014        # hauteur de la couche au-dessus de la face
 RETRAIT = .93           # la couche est un peu plus petite que la face (bord visible de la pièce)
 PLAT = .85              # au-dessous, la face est une pente (toit, dôme)
 RETRAIT_PENTE = .55     # sur une pente, la neige couvre la partie haute (55 % depuis le sommet)
-EXCLUS = ('Tourelle', 'Corps', 'Tete', 'Bras', 'Jambe', 'Cristal', 'Eclats', 'Flamme', 'Orbe', 'Anneaux', 'Anneau', 'Servant', 'Arme')
+EXCLUS = ('Tourelle', 'Corps', 'Tete', 'Bras', 'Jambe', 'Cristal', 'Eclats', 'Flamme', 'Orbe', 'Anneaux', 'Anneau', 'Servant', 'Arme', 'Dallage', 'SansNeige')  # Dallage (2.40) : sol de pierre laissé visible ; SansNeige (2.40) : eau, braises, intérieurs
 
 def _exclu(o):
     p = o.parent

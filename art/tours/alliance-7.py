@@ -1,10 +1,9 @@
-"""Alliance — Garde du lion (emplacement 7 : Garde · champion).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['alliance']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Royaume d’Aubeval — Étendard royal (emplacement 7 : soutien).
+Forme : communs/aubeval_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.aubeval_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Garde du lion"}
+INFOS = {'categorie': 'tour', 'titre': "Étendard royal"}
 
 def construire(ctx):
-    preparer(tour('alliance', 7))
+    preparer(tour(7))

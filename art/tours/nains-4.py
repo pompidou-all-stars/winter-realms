@@ -1,10 +1,9 @@
-"""Nains — Forge incandescente (emplacement 4 : Flammes · dégâts continus).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['nains']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Nains de Hautroc — Canon antiaérien à éclats (emplacement 4 : anti-aérien).
+Forme : communs/hautroc_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.hautroc_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Forge incandescente"}
+INFOS = {'categorie': 'tour', 'titre': "Canon antiaérien à éclats"}
 
 def construire(ctx):
-    preparer(tour('nains', 4))
+    preparer(tour(4))

@@ -1,10 +1,9 @@
-"""Sylvestres — Cristal lunaire (emplacement 8 : Givre · entrave).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['sylvestres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Elfes de Lunebois — Tireur des cimes (emplacement 8 : anti-boss).
+Forme : communs/lunebois_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.lunebois_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Cristal lunaire"}
+INFOS = {'categorie': 'tour', 'titre': "Tireur des cimes"}
 
 def construire(ctx):
-    preparer(tour('sylvestres', 8))
+    preparer(tour(8))

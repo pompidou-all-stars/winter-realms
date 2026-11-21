@@ -1,10 +1,9 @@
-"""Légion des ombres — Puits de lave (emplacement 4 : Flammes · dégâts continus).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['ombres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Cour des Ossements — Perchoir des gargouilles (emplacement 4 : anti-aérien).
+Forme : communs/ossements_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.ossements_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Puits de lave"}
+INFOS = {'categorie': 'tour', 'titre': "Perchoir des gargouilles"}
 
 def construire(ctx):
-    preparer(tour('ombres', 4))
+    preparer(tour(4))

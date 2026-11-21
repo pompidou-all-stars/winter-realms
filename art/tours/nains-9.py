@@ -1,10 +1,9 @@
-"""Nains — Maître ingénieur (emplacement 9 : Mage · archimage).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['nains']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Nains de Hautroc — Grondeterre (emplacement 9 : ultime).
+Forme : communs/hautroc_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.hautroc_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Maître ingénieur"}
+INFOS = {'categorie': 'tour', 'titre': "Grondeterre"}
 
 def construire(ctx):
-    preparer(tour('nains', 9))
+    preparer(tour(9))

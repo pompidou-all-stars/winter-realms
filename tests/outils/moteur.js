@@ -7,7 +7,7 @@ const {mulberry32}=require('./hasard');
 const RACINE=path.join(__dirname,'..','..');
 /* WR_MOTEUR permet de faire passer toute la suite de tests à un autre moteur (vérification, comparaison de versions) */
 const MOTEURS={actuel:process.env.WR_MOTEUR?path.resolve(process.env.WR_MOTEUR):path.join(RACINE,'sim.js')};
-const INTERNES=['aiAct','quJ','posables','quOr','encaisse','trajet','expo','observer','contreMenace','choixType','aiDefend','aiAttack','PLAN','pathCells','mzStep','mzPath','plen','mzKind','invest','airInv','mages','BASE_TW','FACTION_BALANCE','ARCH','ROLE','ORDER','HPK','GRACE','GROUP','AURA_R','DIRS','dmg','rng','upCost','topY','flyH','NORM','FLY','AURA','SPEC','HEAL','SPLIT','TURT','BRK','SAP','KID'];
+const INTERNES=['BOSS','RACES','REGLES','ROLES_J','etats','eco','vole','cible','AMP_MAX','SF_MIN','DOSE_MAX','IM_IMMU','BRISE','BRISE_MAX','FORGE','COH','FUREUR','FUREUR_MAX','CROIT','CROIT_MAX','AMES_MAX','transformer','estimer','aiAct','quJ','posables','quOr','encaisse','trajet','expo','observer','contreMenace','choixType','aiDefend','aiAttack','PLAN','pathCells','mzStep','mzPath','plen','mzKind','invest','airInv','mages','BASE_TW','FACTION_BALANCE','ARCH','ROLE','ORDER','HPK','GRACE','GROUP','AURA_R','DIRS','dmg','rng','upCost','topY','flyH','NORM','FLY','AURA','SPEC','HEAL','SPLIT','TURT','BRK','SAP','KID'];
 
 function sha256(fichier){return crypto.createHash('sha256').update(fs.readFileSync(fichier)).digest('hex')}
 

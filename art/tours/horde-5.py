@@ -1,10 +1,9 @@
-"""Horde — Chaman des flammes (emplacement 5 : Mage · arcanes).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['horde']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Clans de l’Orage Blanc — Hutte du chaman des esprits (emplacement 5 : détection).
+Forme : communs/orage_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.orage_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Chaman des flammes"}
+INFOS = {'categorie': 'tour', 'titre': "Hutte du chaman des esprits"}
 
 def construire(ctx):
-    preparer(tour('horde', 5))
+    preparer(tour(5))

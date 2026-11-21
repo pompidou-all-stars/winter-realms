@@ -1,10 +1,9 @@
-"""Légion des ombres — Tour des damnés (emplacement 0 : Archer · tir rapide).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['ombres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Cour des Ossements — Tour des archers squelettes (emplacement 0 : tir de base).
+Forme : communs/ossements_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.ossements_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Tour des damnés"}
+INFOS = {'categorie': 'tour', 'titre': "Tour des archers squelettes"}
 
 def construire(ctx):
-    preparer(tour('ombres', 0))
+    preparer(tour(0))
