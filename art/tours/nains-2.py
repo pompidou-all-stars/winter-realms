@@ -1,10 +1,9 @@
-"""Nains — Cryo-forge (emplacement 2 : Givre · contrôle).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['nains']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Nains de Hautroc — Baliste perce-plaque (emplacement 2 : contrôle).
+Forme : communs/hautroc_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.hautroc_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Cryo-forge"}
+INFOS = {'categorie': 'tour', 'titre': "Baliste perce-plaque"}
 
 def construire(ctx):
-    preparer(tour('nains', 2))
+    preparer(tour(2))

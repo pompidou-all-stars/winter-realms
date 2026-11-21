@@ -1,10 +1,9 @@
-"""Nains — Sentinelle d’acier (emplacement 7 : Garde · champion).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['nains']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Nains de Hautroc — Enclume runique (emplacement 7 : soutien).
+Forme : communs/hautroc_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.hautroc_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Sentinelle d’acier"}
+INFOS = {'categorie': 'tour', 'titre': "Enclume runique"}
 
 def construire(ctx):
-    preparer(tour('nains', 7))
+    preparer(tour(7))

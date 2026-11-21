@@ -1,10 +1,9 @@
-"""Sylvestres — Pierre de rosée (emplacement 2 : Givre · contrôle).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['sylvestres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Elfes de Lunebois — Gardien enracineur (emplacement 2 : contrôle).
+Forme : communs/lunebois_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.lunebois_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Pierre de rosée"}
+INFOS = {'categorie': 'tour', 'titre': "Gardien enracineur"}
 
 def construire(ctx):
-    preparer(tour('sylvestres', 2))
+    preparer(tour(2))

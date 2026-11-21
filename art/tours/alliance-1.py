@@ -1,10 +1,9 @@
-"""Alliance — Bastion du chevalier (emplacement 1 : Garde · garde rapprochée).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['alliance']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Royaume d’Aubeval — Poste de hallebardiers (emplacement 1 : corps à corps).
+Forme : communs/aubeval_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.aubeval_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Bastion du chevalier"}
+INFOS = {'categorie': 'tour', 'titre': "Poste de hallebardiers"}
 
 def construire(ctx):
-    preparer(tour('alliance', 1))
+    preparer(tour(1))

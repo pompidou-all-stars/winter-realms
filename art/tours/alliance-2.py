@@ -1,10 +1,9 @@
-"""Alliance — Obélisque de givre (emplacement 2 : Givre · contrôle).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['alliance']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Royaume d’Aubeval — Lance-filets (emplacement 2 : contrôle).
+Forme : communs/aubeval_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.aubeval_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Obélisque de givre"}
+INFOS = {'categorie': 'tour', 'titre': "Lance-filets"}
 
 def construire(ctx):
-    preparer(tour('alliance', 2))
+    preparer(tour(2))

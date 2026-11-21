@@ -1,10 +1,9 @@
-"""Horde — Canon des clans (emplacement 3 : Canon · artillerie).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['horde']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Clans de l’Orage Blanc — Catapulte à rochers (emplacement 3 : zone).
+Forme : communs/orage_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.orage_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Canon des clans"}
+INFOS = {'categorie': 'tour', 'titre': "Catapulte à rochers"}
 
 def construire(ctx):
-    preparer(tour('horde', 3))
+    preparer(tour(3))

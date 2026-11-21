@@ -76,7 +76,7 @@ test('IA : une IA qui joue Picsou ne dépense rien tant qu’elle n’est pas en
 test('IA : Clicker fou, elle pose des Archers sans rien améliorer ; Frozen, du Givre ; Gonflette, elle monte sa tour la plus haute',()=>{
  let A=iaEnQuete('clicker'),n=A.t.length,lv=A.t.reduce((s,t)=>s+t.lv,0);for(let i=0;i<3;i++)S.aiDefend(A);
  assert.ok(A.t.length>n,'tours posées');assert.equal(A.t.reduce((s,t)=>s+t.lv,0)-lv,A.t.length-n,'aucune amélioration');assert.ok(A.t.slice(n).every(t=>t.k==A.classId*10),'des Archers');
- A=iaEnQuete('frozen');n=A.t.length;for(let i=0;i<6;i++)S.aiDefend(A);assert.ok(A.t.length>n);assert.ok(A.t.slice(n).every(t=>S.TW[t.k].fsp),'du Givre');
+ A=iaEnQuete('frozen');n=A.t.length;for(let i=0;i<6;i++)S.aiDefend(A);assert.ok(A.t.length>n);assert.ok(A.t.slice(n).every(t=>S.TW[t.k].ctl),'des tours de contrôle');
  A=iaEnQuete('gonflette');const haut=A.t.slice().sort((a,b)=>b.lv-a.lv||b.inv-a.inv)[0];for(const t of A.t)t.b=0;const l0=haut.lv;S.aiDefend(A);assert.equal(haut.lv,l0+1);
 });
 test('IA : Le gros cadeau, elle envoie un boss dès qu’elle peut le payer',()=>{

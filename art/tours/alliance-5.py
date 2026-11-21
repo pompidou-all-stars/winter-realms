@@ -1,10 +1,9 @@
-"""Alliance — Sanctuaire solaire (emplacement 5 : Mage · arcanes).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['alliance']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Royaume d’Aubeval — Chapelle du guet (emplacement 5 : détection).
+Forme : communs/aubeval_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.aubeval_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Sanctuaire solaire"}
+INFOS = {'categorie': 'tour', 'titre': "Chapelle du guet"}
 
 def construire(ctx):
-    preparer(tour('alliance', 5))
+    preparer(tour(5))

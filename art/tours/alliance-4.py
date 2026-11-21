@@ -1,10 +1,9 @@
-"""Alliance — Brasier du griffon (emplacement 4 : Flammes · dégâts continus).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['alliance']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Royaume d’Aubeval — Baliste céleste (emplacement 4 : anti-aérien).
+Forme : communs/aubeval_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.aubeval_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Brasier du griffon"}
+INFOS = {'categorie': 'tour', 'titre': "Baliste céleste"}
 
 def construire(ctx):
-    preparer(tour('alliance', 4))
+    preparer(tour(4))

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<title>Winter Realms — Tower Wars · Édition 2.40</title>
+<title>Winter Realms — Tower Wars · Édition 2.41</title>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
 <!-- three.js (copie figée dans vendor/three), chargé par le rendu 3D (par défaut depuis la 2.8, sauf ?rendu=2d) -->
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.min.js","three/addons/":"./vendor/three/addons/"}}</script>
@@ -401,6 +401,47 @@ body.prep #clock{display:none}
 @keyframes queteArrive{0%{transform:translateX(-50%) scale(.3);opacity:0}60%{transform:translateX(-50%) scale(1.12);opacity:1}100%{transform:translateX(-50%) scale(1)}}
 #quete:focus-visible{outline:2px solid var(--ice);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){#annonce *,#prep.fin,#prep.arrive,#tabs button.mon.ouvert,#quete.arrive{animation:none!important}#annonce .an-rayons,#annonce .an-flash{display:none}}
+/* 2.40 : fiche des races (accueil) */
+#ficheRaceBtn{margin:7px auto 0;display:flex;align-items:center;gap:7px;padding:7px 14px;font-size:13px;border-radius:999px;background:linear-gradient(180deg,#2a3f63,#16243d);border:1px solid #f2c14e88;color:#ffe597;box-shadow:0 3px 0 #0008}
+#ficheRaceBtn b{color:#fff}
+#factions button .fmeca{display:inline-block;margin-top:3px;padding:1px 6px;border-radius:5px;background:#0b1424;border:1px solid color-mix(in srgb,var(--sigil) 60%,transparent);color:color-mix(in srgb,var(--sigil) 70%,#fff);font-size:10px;letter-spacing:.04em}
+#raceFiche{position:fixed;inset:0;z-index:1200;display:flex;align-items:center;justify-content:center;padding:calc(10px + env(safe-area-inset-top,0px)) 10px calc(10px + env(safe-area-inset-bottom,0px));background:#030712d9;backdrop-filter:blur(3px)}
+#raceFiche[hidden]{display:none}
+.rf-cadre{--sigil:#f2c14e;width:min(680px,100%);max-height:100%;display:flex;flex-direction:column;border-radius:14px;background:linear-gradient(180deg,#17263fef,#0c1527f5),var(--givre);border:2px solid color-mix(in srgb,var(--sigil) 55%,#8fb6d9);box-shadow:0 0 0 1px #000,0 18px 50px #000c,inset 0 0 40px color-mix(in srgb,var(--sigil) 12%,transparent);overflow:hidden}
+.rf-tete{display:flex;align-items:center;gap:10px;padding:10px 10px 8px;background:linear-gradient(180deg,color-mix(in srgb,var(--sigil) 26%,#0c1527),transparent)}
+.rf-blason{flex:0 0 52px;height:60px;display:grid;place-items:center;font-size:28px;background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--sigil) 55%,#0d1628),#0b1322 75%);clip-path:polygon(0 0,100% 0,100% 58%,50% 100%,0 58%)}
+.rf-titre{flex:1;min-width:0}.rf-titre b{display:block;font-size:20px;color:#ffe597;text-shadow:0 2px 0 #000;line-height:1.1}.rf-titre small{display:block;color:var(--dim);font-size:12px;margin-top:2px}
+.rf-nav,.rf-x{flex:0 0 38px;height:38px;border-radius:50%;font-size:22px;line-height:1;padding:0;background:#0b1424;border:1px solid #8fb6d966;color:#d9ecff}
+.rf-onglets{display:flex;gap:4px;padding:0 10px}
+.rf-onglets button{flex:1;padding:8px 4px;font-size:13px;border-radius:8px 8px 0 0;background:#0b1424;border:1px solid #8fb6d944;border-bottom:none;color:var(--dim)}
+.rf-onglets button.on{background:linear-gradient(180deg,color-mix(in srgb,var(--sigil) 40%,#1b2c4a),#16243d);color:#fff;border-color:color-mix(in srgb,var(--sigil) 70%,#fff)}
+.rf-corps{flex:1;overflow-y:auto;padding:12px;border-top:1px solid color-mix(in srgb,var(--sigil) 55%,#8fb6d9);font-size:13px;line-height:1.4;color:var(--ink);overscroll-behavior:contain}
+.rf-corps h4{margin:12px 0 5px;color:#ffe597;font-size:13px;letter-spacing:.08em;text-transform:uppercase}.rf-corps h4:first-child{margin-top:0}
+.rf-corps p{margin:0 0 6px}.rf-hist{font-style:italic;color:#d4e3f5}
+.rf-meca{padding:8px 10px;border-radius:9px;background:#0a142acc;border:1px solid color-mix(in srgb,var(--sigil) 55%,transparent)}
+.rf-meca b{color:color-mix(in srgb,var(--sigil) 70%,#fff)}
+.rf-etats{margin:0;padding-left:18px}.rf-etats li{margin:2px 0}
+.rf-duo{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}.rf-duo div{padding:6px 8px;border-radius:8px;background:#0a142acc;border:1px solid #8fb6d933}.rf-duo b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#9fe0a0}.rf-duo div+div b{color:#ff9a8a}
+.rf-radar{display:flex;justify-content:center;margin-top:4px}.rf-radar svg{width:min(300px,86vw);height:auto}
+.rf-tours{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:7px}
+.rf-tour{display:grid;grid-template-columns:56px minmax(0,1fr);gap:3px 9px;padding:7px 8px;border-radius:9px;background:#0a142acc;border:1px solid #8fb6d933}
+.rf-tour.ult{border-color:#f2c14e99;box-shadow:inset 0 0 14px #f2c14e22}
+.rf-tour canvas{grid-row:span 3;width:56px;height:46px;border-radius:7px;background:#0d1a2e}
+.rf-tour .nm{font-weight:700;color:#fff}.rf-tour .nm i{font-style:normal;font-weight:500;margin-left:5px;padding:0 5px;border-radius:4px;font-size:10px;background:color-mix(in srgb,var(--sigil) 35%,#0b1424);color:#ffe597}
+.rf-tour .st{color:var(--dim);font-size:11px}.rf-tour .tx{grid-column:2;font-size:12px}
+.rf-combo{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;background:#0a142acc;border:1px solid color-mix(in srgb,var(--sigil) 45%,transparent);margin-bottom:8px}
+.rf-combo .eq{display:flex;align-items:center;gap:4px;flex:0 0 auto}
+.rf-combo .eq span{display:flex;flex-direction:column;align-items:center;width:64px;font-size:9.5px;line-height:1.1;text-align:center;color:var(--dim)}
+.rf-combo .eq canvas{width:56px;height:46px;border-radius:7px;background:#0d1a2e;margin-bottom:2px}
+.rf-combo .eq em{font-style:normal;font-size:20px;color:#ffe597;font-weight:700}
+.rf-combo .ex b{display:block;color:#ffe597;font-size:14px;letter-spacing:.05em}.rf-combo .ex{font-size:12px}
+.rf-pied{display:flex;gap:8px;padding:9px 10px;border-top:1px solid #8fb6d933;background:#0a1220}
+.rf-pied button{flex:1;padding:10px;font-size:15px;border-radius:10px}
+#rfChoisir{background:linear-gradient(180deg,#ffd76a,#c9922e);color:#2a1a05;font-weight:700;border:1px solid #fff1b0;box-shadow:0 3px 0 #6b4a12}
+#rfRetour{background:#0b1424;border:1px solid #8fb6d966;color:#d9ecff}
+@media(max-width:420px){.rf-combo{flex-direction:column;align-items:stretch}.rf-combo .eq{justify-content:center}.rf-titre b{font-size:17px}.rf-tours{grid-template-columns:1fr}}
+/* 2.40 : âmes (Cour des Ossements) dans le bandeau */
+#ames[hidden]{display:none}#ames b{color:#9fe8ff}
 </style></head><body>
 <div id="app">
  <div id="stage"><canvas id="main"></canvas>
@@ -409,6 +450,7 @@ body.prep #clock{display:none}
    <span class="pastille"><span class="coin"></span><b id="gold">0</b></span>
    <span class="pastille" title="Revenu toutes les 10 s"><svg class="anneau" viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="8" fill="none" stroke="#9be7ff33" stroke-width="3"/><circle id="arc" cx="10" cy="10" r="8" fill="none" stroke="#f2c14e" stroke-width="3" stroke-dasharray="50.3" stroke-dashoffset="50.3" transform="rotate(-90 10 10)"/></svg><b id="inc">+0</b></span>
    <span class="pastille" id="lives">♥ <b>40</b></span>
+   <span class="pastille" id="ames" hidden title="Âmes récoltées (Cour des Ossements)">✦ <b>0</b></span>
    <span class="vide"></span>
    <span class="pastille" id="prep" hidden title="Phase de construction : pas d'envoi de monstres"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4l6 6-3 3-6-6z" fill="#f2c14e" stroke="#0b1626" stroke-width="1.4" stroke-linejoin="round"/><path d="M12.5 8.5L4 17l3 3 8.5-8.5" fill="#a0672e" stroke="#0b1626" stroke-width="1.4" stroke-linejoin="round"/></svg><b id="prepN">0:30</b></span>
    <span class="pastille" id="clock">0:00</span>
@@ -461,6 +503,11 @@ body.prep #clock{display:none}
  </div>
 </div>
 <div id="tourner" role="alert"><svg viewBox="0 0 48 48" aria-hidden="true"><rect x="15" y="6" width="18" height="32" rx="3"/><path d="M8 30a16 16 0 0 0 10 12M8 30l-1 5M8 30l5 1"/></svg>Tourne ton téléphone :<br>Winter Realms se joue en portrait.</div>
+<div id="raceFiche" hidden role="dialog" aria-modal="true" aria-label="Fiche de la race"><div class="rf-cadre">
+ <div class="rf-tete"><button type="button" class="rf-nav" id="rfPrev" aria-label="Race précédente">‹</button><div class="rf-blason" id="rfBlason"></div><div class="rf-titre"><b id="rfNom"></b><small id="rfSous"></small></div><button type="button" class="rf-nav" id="rfNext" aria-label="Race suivante">›</button><button type="button" class="rf-x" id="rfClose" aria-label="Fermer">×</button></div>
+ <div class="rf-onglets"><button type="button" data-o="desc" class="on">1. Description</button><button type="button" data-o="tours">2. Les tours</button><button type="button" data-o="combos">3. Les combos</button></div>
+ <div class="rf-corps" id="rfCorps"></div>
+ <div class="rf-pied"><button type="button" id="rfRetour">Retour</button><button type="button" id="rfChoisir">Choisir cette race</button></div></div></div>
 <div id="ov"><canvas id="ovSnow" aria-hidden="true"></canvas>
  <svg class="monts" viewBox="0 0 400 140" preserveAspectRatio="none" aria-hidden="true">
   <path d="M0 140V78l38-30 26 18 44-46 30 26 22-14 48 40 40-52 46 44 28-18 40 30 38-26v90z" fill="#3a5a85" opacity=".55"/>
@@ -479,13 +526,7 @@ body.prep #clock{display:none}
   <h1 id="msg">Winter Realms</h1><div class="soustitre">Tower Wars</div></div>
  <p id="sub">L'hiver éternel s'abat sur les royaumes du Nord. Fortifie ton domaine et lance tes armées contre trois seigneurs rivaux : le dernier debout régnera sur les terres gelées.</p>
  <ul class="regles"><li><i>🏰</i><span><b>Bâtis</b>des tours pour tracer ton labyrinthe</span></li><li><i>⚔️</i><span><b>Envoie</b>des monstres : chaque vague augmente ton revenu</span></li><li><i>❤️</i><span><b>Résiste</b>40 vies, pas une de plus</span></li></ul></div>
- <div id="classPick"><h2>Choisis ta faction</h2><div id="factions">
- <button type="button" data-faction="0" aria-pressed="false" onclick="window.chooseFaction(0)"><span class="ficon">🛡️</span><span><strong>Alliance</strong><small>Défense équilibrée · portée et anti-aérien</small></span></button>
- <button type="button" data-faction="1" aria-pressed="false" onclick="window.chooseFaction(1)"><span class="ficon">🪓</span><span><strong>Horde</strong><small>Agressivité · exécution des ennemis affaiblis</small></span></button>
- <button type="button" data-faction="2" aria-pressed="false" onclick="window.chooseFaction(2)"><span class="ficon">🌿</span><span><strong>Peuples sylvestres</strong><small>Contrôle · racines et ralentissements</small></span></button>
- <button type="button" data-faction="3" aria-pressed="false" onclick="window.chooseFaction(3)"><span class="ficon">⚒️</span><span><strong>Clans nains</strong><small>Artillerie · perforation des armures</small></span></button>
- <button type="button" data-faction="4" aria-pressed="false" onclick="window.chooseFaction(4)"><span class="ficon">☠️</span><span><strong>Légion des ombres</strong><small>Malédictions · amplification des dégâts</small></span></button>
- </div><p id="factionStatus" aria-live="polite">Sélectionne une faction ci-dessus.</p></div><h2 id="difficultyLabel" hidden>Lance la bataille</h2><div id="lv"><button id="go0" disabled>Normal<small>IA à revenu égal</small></button><button id="go1" disabled>Difficile<small>IA : +25 % de revenu</small></button><button id="go2" disabled>Brutal<small>IA : +50 % de revenu</small></button></div>
+ <div id="classPick"><h2>Choisis ta race</h2><div id="factions"></div><p id="factionStatus" aria-live="polite">Sélectionne une race ci-dessus.</p><button type="button" id="ficheRaceBtn">📜 Fiche de la race : <b>Royaume d’Aubeval</b></button></div><h2 id="difficultyLabel" hidden>Lance la bataille</h2><div id="lv"><button id="go0" disabled>Normal<small>IA à revenu égal</small></button><button id="go1" disabled>Difficile<small>IA : +25 % de revenu</small></button><button id="go2" disabled>Brutal<small>IA : +50 % de revenu</small></button></div>
  <p id="hint">Carte de 13 × 17 cases. En Difficile et en Brutal, tes chantiers prennent aussi plus de temps.</p>
  <div id="online"><h2>Jouer entre amis</h2><input id="pname" maxlength="16" placeholder="Ton pseudo" autocomplete="nickname">
   <div class="orow"><button id="mkRoom" type="button">Créer un salon</button><input id="rcode" maxlength="4" placeholder="CODE" autocapitalize="characters"><button id="joinRoom" type="button">Rejoindre</button></div></div>
@@ -780,6 +821,19 @@ function drawProj(g,p,s){const x=p.x*s,y=p.y*s,skin=TW[p.k].skin;g.save();
   if(skin==2){g.beginPath();g.moveTo(s*.16,0);g.lineTo(0,-s*.08);g.lineTo(-s*.12,0);g.lineTo(0,s*.08);g.closePath();g.fillStyle=c0;g.fill();g.strokeStyle=c1;g.lineWidth=1;g.stroke()}
   else{g.beginPath();g.arc(0,0,s*.1,0,7);g.fill();g.beginPath();g.arc(s*.02,-s*.02,s*.05,0,7);g.fillStyle=c0;g.fill()}}
  g.restore()}
+/* 2.40 : pastilles des états des races au-dessus d'un monstre (couleur, signe ; nombre de doses de poison et de points d'armure brisée) */
+const PIPS=[[16,'#5ec44a','☠'],[32,'#f2c14e','!'],[64,'#a46cff','♦'],[128,'#b98a52','■'],[256,'#4aa8ff','≈'],[512,'#ff8a3d','◆'],[1024,'#ff5a2a','▲'],[2048,'#8fa83a','+'],[4096,'#3c9a4a','●'],[8192,'#e8eef5','▼'],[16384,'#d43a3a','♦']];
+function pastillesEtat(g,c,x,y,r){const e=c.e!==undefined?c.e:etats(c);if(e<16)return;const L=PIPS.filter(p=>e&p[0]);let px=x-(L.length-1)*r*1.1;
+ g.save();g.font='700 '+Math.round(r*1.3)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';
+ for(const[b,col,gl]of L){g.beginPath();g.arc(px,y,r,0,7);g.fillStyle='rgba(8,12,22,.85)';g.fill();g.lineWidth=Math.max(1,r*.28);g.strokeStyle=col;g.stroke();g.fillStyle=col;
+  g.fillText(b==16&&c.pz?String(c.pz):b==512&&c.bs?String(c.bs):gl,px,y+r*.05);px+=r*2.2}g.restore()}
+/* 2.40 : morts relevés (squelettes, colosse d'os) et mines runiques, en 2D */
+function drawAllies(g,b,s,t){for(const m of b.mi||[]){const x=(m.x+.5)*s,y=(m.y+.5)*s;g.beginPath();g.arc(x,y,s*.16,0,7);g.fillStyle='rgba(40,20,8,.7)';g.fill();g.strokeStyle='#ff9a3d';g.lineWidth=s*.04;g.stroke();
+  g.beginPath();g.arc(x,y,s*(.05+.02*Math.sin(t*5)),0,7);g.fillStyle='#ffd27a';g.fill()}
+ for(const a of b.al||[]){const x=(a.x+.5)*s,y=(a.y+.5)*s,u=s*(a.g?.55:.3),bob=Math.sin(t*9+a.x*3)*u*.06;g.save();g.translate(x,y+bob);
+  g.fillStyle='rgba(0,0,0,.3)';g.beginPath();g.ellipse(0,u*.55,u*.5,u*.18,0,0,7);g.fill();g.fillStyle='#e8e2c8';g.strokeStyle='#3a3226';g.lineWidth=Math.max(1,u*.08);
+  g.beginPath();g.roundRect(-u*.28,-u*.1,u*.56,u*.6,u*.12);g.fill();g.stroke();g.beginPath();g.arc(0,-u*.4,u*.32,0,7);g.fill();g.stroke();
+  g.fillStyle='#3a8fd9';g.beginPath();g.arc(-u*.12,-u*.42,u*.07,0,7);g.arc(u*.12,-u*.42,u*.07,0,7);g.fill();g.restore()}}
 function drawFx(g,f,s){const p=1-f.t/f.d,x=f.x*s,y=f.y*s;g.save();g.globalAlpha=Math.max(0,1-p);
  if(f.type=='ring'){g.beginPath();g.arc(x,y,f.r*s*(.3+.7*p),0,7);g.strokeStyle=f.col;g.lineWidth=s*.07;g.stroke()}
  else if(f.type=='range'){g.beginPath();g.arc(x,y,f.r*s,0,7);g.globalAlpha=(1-p)*.12;g.fillStyle=f.col;g.fill();g.globalAlpha=(1-p)*.7;g.strokeStyle='#fff';g.lineWidth=1.5;g.stroke()}
@@ -788,7 +842,8 @@ function drawFx(g,f,s){const p=1-f.t/f.d,x=f.x*s,y=f.y*s;g.save();g.globalAlpha=
  else if(f.type=='text'){g.font='700 '+Math.round(s*.36)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='rgba(0,0,0,.6)';g.strokeText(f.txt,x,y-p*s*.6);g.fillStyle=f.col;g.fillText(f.txt,x,y-p*s*.6)}
  else if(f.type=='flame'){g.globalAlpha=(1-p)*.85;g.beginPath();g.arc(x,y,s*(.06+.15*p),0,7);g.fillStyle=p<.3?'#fff3a8':p<.65?'#ffb347':'#e4572e';g.fill()}
  else if(f.type=='slash'){g.beginPath();g.arc(x,y,s*.34,f.a+1.9-2.6*p,f.a+2.6-2.6*p);g.strokeStyle='#fff';g.lineCap='round';g.lineWidth=s*.11*(1-p)+1;g.stroke()}
- else if(f.type=='zap'){g.strokeStyle='#ffe45e';g.lineWidth=s*.06;g.lineJoin='round';g.beginPath();g.moveTo(x,y);const X=f.x2*s,Y=f.y2*s;for(let i=1;i<5;i++)g.lineTo(x+(X-x)*i/5+(i%2?1:-1)*s*.12,y+(Y-y)*i/5);g.lineTo(X,Y);g.stroke()}
+ else if(f.type=='zap'&&f.ln){g.strokeStyle=f.col||'#ffe45e';g.lineWidth=s*.08;g.lineCap='round';g.beginPath();g.moveTo(x,y);g.lineTo(f.x2*s,f.y2*s);g.stroke()}
+ else if(f.type=='zap'){g.strokeStyle=f.col||'#ffe45e';g.lineWidth=s*.06;g.lineJoin='round';g.beginPath();g.moveTo(x,y);const X=f.x2*s,Y=f.y2*s;for(let i=1;i<5;i++)g.lineTo(x+(X-x)*i/5+(i%2?1:-1)*s*.12,y+(Y-y)*i/5);g.lineTo(X,Y);g.stroke()}
  else if(f.type=='bad'){g.globalAlpha=(1-p)*.6;g.fillStyle='#ff4d3d';g.fillRect((f.x-.5)*s,(f.y-.5)*s,s,s)}
  g.restore()}
 function draw(b,g,s,t){
@@ -846,8 +901,10 @@ function draw(b,g,s,t){
  for(const w of b.t)ents.push([w.y+.32,w]);for(const c of b.cr)CR[c.k].fly?fl.push(c):ents.push([c.y+c.oy+.1,c]);ents.sort((a,c)=>a[0]-c[0]);
  for(const[,o]of ents){if(o.lv){g.save();g.shadowColor='rgba(0,0,0,.55)';g.shadowBlur=s*.2;g.shadowOffsetX=s*.07;g.shadowOffsetY=s*.15;if(o.b>0)g.globalAlpha=.5;drawTower(g,o.k,(o.x+.5)*s,(o.y+.5)*s,s,o.a,t,o.lv,o.sw,o.stun>0);g.restore();if(o.b>0)chantier(g,o,s,t)}else cre(o)}
  if(projet&&b===P){g.save();g.globalAlpha=.55+.15*Math.sin(t*6);drawTower(g,projet.k,(projet.x+.5)*s,(projet.y+.5)*s,s,.7,t,1,0,0);g.restore()}
+ drawAllies(g,b,s,t);
  for(const p of b.pr)drawProj(g,p,s);
  for(const c of fl)cre(c);
+ for(const c of b.cr)pastillesEtat(g,c,(c.x+.5+c.ox)*s,(c.y+.5+c.oy)*s-s*CR[c.k].z*(CR[c.k].fly?1.05:.8),Math.max(4,s*.1));
  for(const f of b.fx)drawFx(g,f,s);
  if(b.dead&&explore){etiquetteElimine(g,C*s/2,s*.9)}else if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,C*s,R*s);g.font='700 '+Math.round(s*.7)+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',C*s/2,R*s/2)}}
 /* sur la vignette du terrain affiché, en 3D, un cadre montre la partie visible (la vue tactique ne montre pas tout le terrain) */
@@ -934,13 +991,13 @@ const NET={on:false,ws:null,code:'',playing:false,spect:false,snapAt:0,retry:0,
   $('lobby').hidden=true;$('ov').hidden=true;if(this.spect)toast('Tu regardes la partie en spectateur');else astuce(true)},
  /* applique un instantané : les positions sont lissées entre deux instantanés dans frame() */
  apply(s){this.snapAt=performance.now();time=s.time;tick=s.tick;QU=s.qu||null;
-  s.B.forEach((d,i)=>{const b=B[i];if(!b)return;b.gold=d.gold;b.inc=d.inc;b.lives=d.lives;b.dead=d.dead;b.tier=d.tier||1;
+  s.B.forEach((d,i)=>{const b=B[i];if(!b)return;b.gold=d.gold;b.inc=d.inc;b.lives=d.lives;b.dead=d.dead;b.tier=d.tier||1;b.am=d.am||0;b.al=(d.al||[]).map(a=>({x:a[0],y:a[1],g:a[2],f:a[3]||1}));b.mi=(d.mi||[]).map(m=>({x:m[0],y:m[1]}));
    const tk=JSON.stringify(d.t.map(t=>t.slice(0,5)));
    if(tk!==b.tk){b.tk=tk;b.g=Array.from({length:R},()=>Array(C).fill(0));for(const t of d.t)b.g[t[1]][t[0]]=1;b.d=b.dist()}
    b.t=d.t.map(t=>({x:t[0],y:t[1],k:t[2],lv:t[3],inv:t[4],a:t[5],sw:t[6]?.1:0,stun:t[7],b:t[8]||0,bt:t[9]||1}));
    /* l'instantané ne contient pas la case visée (tx, ty) : on prend la case la plus proche, sinon peutConstruire plantait dès qu'un monstre au sol était sur le terrain */
    const oc=new Map(b.cr.map(c=>[c.id,c])),cx=v=>Math.min(C-1,Math.max(0,Math.round(v))),cy=v=>Math.min(R-1,Math.max(0,Math.round(v)));
-   b.cr=d.c.map(c=>{const o=oc.get(c[0]);return {id:c[0],k:c[1],px:o?o.x:c[2],py:o?o.y:c[3],nx:c[2],ny:c[3],x:o?o.x:c[2],y:o?o.y:c[3],tx:cx(c[2]),ty:cy(c[3]),hp:c[4],max:1,sl:c[5]&1,h:c[5]&2,hl:c[5]&4,hid:c[5]&8,f:c[6],ph:c[7],ox:c[8],oy:c[9]}});
+   b.cr=d.c.map(c=>{const o=oc.get(c[0]);return {id:c[0],k:c[1],px:o?o.x:c[2],py:o?o.y:c[3],nx:c[2],ny:c[3],x:o?o.x:c[2],y:o?o.y:c[3],tx:cx(c[2]),ty:cy(c[3]),hp:c[4],max:1,sl:c[5]&1,h:c[5]&2,hl:c[5]&4,hid:c[5]&8,e:c[5],f:c[6],ph:c[7],ox:c[8],oy:c[9]}});
    const op=new Map(b.pr.map(p=>[p.id,p]));
    b.pr=d.p.map(p=>{const o=op.get(p[0]);return {id:p[0],k:p[1],px:o?o.x:p[2],py:o?o.y:p[3],nx:p[2],ny:p[3],x:o?o.x:p[2],y:o?o.y:p[3],tx:p[4],ty:p[5],tot:p[6],a:p[7]}});
    for(const f of d.fx)b.fx.push(f);for(const e of d.ev)b.ev.push(e)});
@@ -997,11 +1054,12 @@ function dessinerVue3D(t){const g=mx,b=VB(),A=R3D.api,E=(x,z,h)=>A.projeter(x,h,
  A.dessiner(b,t,{pick:b===VB()&&b.t.includes(pick)&&!lot?pick:null,lot:b===P?cadresLot():null,projet:b===P?projet:null,ok:b===P&&projet?!peutConstruire(projet.x,projet.y,projet.k):true,rng});
  for(const c of b.cr){const hp=c.hp/c.max;if(hp>=1)continue;const x=c.x+.5+(c.ox||0),z=c.y+.5+(c.oy||0),p=E(x,z,A.hauteurMonstre(c.k));if(p.z>1)continue;const s=A.echelle(x,z),w=s*.6;
   g.fillStyle='rgba(0,0,0,.6)';g.fillRect(p.x-w/2,p.y-s*.12,w,s*.09);g.fillStyle=c.sl>0?'#5dc8ff':hp>.4?'#7cdc6a':'#ff6b4a';g.fillRect(p.x-w/2,p.y-s*.12,w*Math.max(0,hp),s*.09)}
+ for(const c of b.cr){const x=c.x+.5+(c.ox||0),z=c.y+.5+(c.oy||0),p=E(x,z,A.hauteurMonstre(c.k));if(p.z>1)continue;const s=A.echelle(x,z);pastillesEtat(g,c,p.x,p.y-s*.26,Math.max(5,s*.09))}
  for(const t of b.t)if(t.b>0){const p=1-t.b/(t.bt||1),q=E(t.x+.5,t.y+.5,0);if(q.z>1)continue;const s=A.echelle(t.x+.5,t.y+.5),w=s*.7,h=Math.max(3,s*.09),y=q.y+s*.3;
   g.fillStyle='rgba(20,16,10,.75)';g.fillRect(q.x-w/2-1,y-1,w+2,h+2);g.fillStyle='#ffc95e';g.fillRect(q.x-w/2,y,w*p,h)}
  if(b===P&&FILE.length)for(const t of b.t)if(viseFile(t)>t.lv){const q=E(t.x+.5,t.y+.5,0);if(q.z>1)continue;const s=A.echelle(t.x+.5,t.y+.5);marqueFile(g,q.x+s*.36,q.y+s*.06,Math.max(6,s*.15))}
  for(const f of b.fx)if(f.type=='text'){const p=1-f.t/f.d,q=E(f.x,f.y,.9+p*.6);if(q.z>1)continue;const s=A.echelle(f.x,f.y);g.save();g.globalAlpha=Math.max(0,1-p);
-  g.font='700 '+Math.round(Math.max(11,s*.36))+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.lineWidth=3;g.strokeStyle='rgba(0,0,0,.6)';g.strokeText(f.txt,q.x,q.y);g.fillStyle=f.col;g.fillText(f.txt,q.x,q.y);g.restore()}
+  g.font='700 '+Math.round(Math.max(f.combo?14:11,s*(f.combo?.5:.36)))+'px Fredoka,system-ui,sans-serif';g.textAlign='center';g.lineWidth=f.combo?4:3;g.strokeStyle='rgba(0,0,0,.6)';g.strokeText(f.txt,q.x,q.y);g.fillStyle=f.col;g.fillText(f.txt,q.x,q.y);g.restore()}
  if(b.dead&&explore)etiquetteElimine(g,VUE.w/2,bandes().haut+70);else if(b.dead){g.fillStyle='rgba(10,16,12,.6)';g.fillRect(0,0,VUE.w,VUE.h);g.font='700 32px Fredoka,system-ui,sans-serif';g.textAlign='center';g.fillStyle='#fff';g.fillText('Éliminé',VUE.w/2,VUE.h*.42)}}
 function dessinerVue(t){if(R3D.api){dessinerVue3D(t);return}const g=mx,s=cell*VUE.z,W=C*s,H=R*s,rr=Math.min(10*VUE.z,30);g.clearRect(0,0,VUE.w,VUE.h);g.save();g.translate(VUE.ox,VUE.oy);
  g.save();g.shadowColor='rgba(0,0,0,.56)';g.shadowBlur=32;g.shadowOffsetY=14;g.fillStyle=cadre;g.beginPath();g.roundRect(-3,-3,W+6,H+6,rr+3);g.fill();g.restore();
@@ -1098,23 +1156,25 @@ function icone3D(cv,type,k,w,h){if(!R3D.api||!R3D.api.vignette||!cv)return;const
 const towerIcon=(k,lv)=>icon(g=>{drawTower(g,k,28,27,30,.7,0,lv,0);drawTowerBadges(g,k)},56,46);
 const mmss=s=>Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');
 /* messages d'erreur renvoyés par Game.action */
-const ERR={early:'Construis d’abord : les envois s’ouvrent à 0:30',poor:"Pas assez d'or",blocked:'Impossible ici : le chemin serait bloqué',max:'Niveau maximum atteint',busy:'Tour en chantier : attends la fin des travaux',over:'Partie terminée',bad:'Action impossible'};
+const ERR={unique:'Une seule tour ultime par terrain',early:'Construis d’abord : les envois s’ouvrent à 0:30',poor:"Pas assez d'or",blocked:'Impossible ici : le chemin serait bloqué',max:'Niveau maximum atteint',busy:'Tour en chantier : attends la fin des travaux',over:'Partie terminée',bad:'Action impossible'};
 function showErr(e,a){if(!e)return;sfx('nope');if(e!='locked')voix('impossible',5000);if(e=='locked'){const T=CR[a.k];toast(T?'Ouvre le palier '+T.t+' pour envoyer : '+T.n:'Ouvre d’abord le palier précédent',true)}else if(e=='early'&&time<GRACE)toast('Construis d’abord : envoi des monstres dans '+Math.ceil(GRACE-time)+' s',true);else toast(ERR[e]||ERR.bad,true)}
 /* toutes les actions du joueur passent par ici : en solo vers G, en ligne vers le serveur */
 function doAction(a){if(over)return;if(NET.on){NET.act(a);return ''}const e=G.action(me,a);showErr(e,a);return e}
 /* ---------- fiche d'information (au-dessus des boutons) ---------- */
 const fr=n=>String(+(+n).toFixed(1)).replace('.',',');
-const dps=(k,lv)=>Math.round(dmg({k,lv})/TW[k].cd);
-/* bonus de faction, en clair, calculé à partir de FACTION_BALANCE */
+/* 2.40 : dégâts par seconde estimés (poison et brûlure compris), qui doublent à chaque niveau */
+const dps=(k,lv)=>Math.round(TW[k].ed*2**(lv-1));
 /* ralentissement d'une tour à un niveau donné (2.18) : froid du Givre (avec sa zone) ou racines sylvestres */
 const pr=x=>fr(x*100)+' %',fd=n=>String(+(+n).toFixed(2)).replace('.',',');
 function ralentit(T,lv){const i=Math.min(4,Math.max(0,lv-1));return T.fsp?{p:GIVRE_LV.p[i]+(T.gb||0),d:GIVRE_LV.d[i],r:GIVRE_LV.r[i]}:T.sl?{p:RACINES_LV.p[i],d:RACINES_LV.d[i]}:null}
-function bonusFaction(f){const B=FACTION_BALANCE[f],pc=x=>Math.round((x-1)*100)+' %';
- return B.airBonus?'Anti-aérien : +'+pc(B.airBonus)+' de dégâts contre les volants':B.execute?'Frénésie : +'+pc(B.execute)+' sur les monstres à moins de 35 % de vie':
-  B.root?'Racines : chaque coup ralentit le monstre de '+pr(RACINES_LV.p[0])+' (niveau 1) à '+pr(RACINES_LV.p[4])+' (niveau 5), en plus du froid':B.pierce?'Perforant : ignore '+Math.round(B.pierce*100)+' % de l\'armure':B.mark?'Malédiction : chaque coup suivant sur la même cible fait +'+pc(B.mark):''}
+/* 2.40 : mécanique propre de la race, et état de la tour posée (Fureur, Chauffe, Croissance, Cohésion) */
+function bonusFaction(f){const M=RACES[f].meca;return M.n+' : '+M.txt}
+function etatTour(t){const T=TW[t.k],l=[];if(t.co)l.push('Cohésion +'+Math.round(t.co*100)+' %');if(t.fu)l.push('Fureur '+t.fu+'/'+10+(t.rg>0?' · RAGE':''));if(T.ht)l.push('Chauffe '+Math.round(Math.min(1,t.ht||0)*100)+' %'+(t.oh>0?' · surchauffe':''));
+ if(T.faction==2)l.push('Croissance +'+Math.min(25,Math.floor((t.age||0)/10))+' %');return l.join(' · ')}
+function combosTour(T){return RACES[T.faction].combos.filter(c=>c.a.includes(T.j)).map(c=>'Combo '+c.n+' avec '+c.a.filter(j=>j!=T.j).map(j=>TW[T.faction*10+j].n).join(', '))}
 /* effets propres à la tour, en clair */
-function effets(T,lv){const l=[];if(T.sp)l.push('explosion de zone');const R=ralentit(T,lv);if(R)l.push((T.fsp?'ralentit':'racines')+' −'+pr(R.p)+' pendant '+fd(R.d)+' s'+(R.r?', zone '+fr(R.r)+' cases':''));if(T.fl)l.push('souffle en cône');if(T.me)l.push('corps à corps');
- if(T.mg)l.push('révèle les Spectres invisibles');if(T.mag)l.push('magique : sans effet sur le Briseur de runes');return l}
+function effets(T,lv){const l=[];const R=ralentit(T,lv);if(R)l.push((T.fsp?'ralentit':'racines')+' −'+pr(R.p)+' pendant '+fd(R.d)+' s'+(R.r?', zone '+fr(R.r)+' cases':''));if(T.fl)l.push('souffle en cône');if(T.me)l.push('corps à corps');
+ if(T.mag)l.push('magique : sans effet sur le Briseur de runes');return l}
 /* 2.15 : une seule fiche, et seulement quand on a choisi quelque chose : une tour à construire, une tour posée ou un monstre.
    Elle rappelle le geste suivant ; celle d'une tour posée porte les boutons Améliorer et Vendre. Le × la referme (et annule le choix). */
 const elt=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e};
@@ -1124,13 +1184,14 @@ function teteFiche(f,ic,nom,sous,stats){const txt=elt('div','txt'),tt=elt('div',
 const aideFiche=(geste,txt)=>{const d=elt('div','aide');d.append(elt('i','',geste),txt);return d};
 let detailsOuverts=false;
 function remplirFiche(mode,k,t){const f=$('fiche'),T=TW[k],lv=t?t.lv:1;f.textContent='';f.className='';f.dataset.mode=mode;f.hidden=false;
- const ic=towerIcon(k,lv),stats=[['⚔ Dégâts/s',dps(k,lv)],['◎ Portée',fr(rng({k,lv}))],['Cibles',T.gr?'sol uniquement':'sol et air']];if(!t)stats.push(['Prix',T.c+' or']);
- teteFiche(f,ic,T.n,BASE_TW[T.skin].n+' · '+T.role+(t?' · niveau '+lv+'/5':''),stats);icone3D(ic,'tour',k,56,46);
+ const ic=towerIcon(k,lv),stats=[['⚔ Dégâts/s',T.no?'—':dps(k,lv)],['◎ Portée',fr(t?rng(t):rng({k,lv}))],['Cibles',T.ao?'air uniquement':T.gr?'sol uniquement':'sol et air']];if(!t)stats.push(['Prix',T.c+' or']);
+ teteFiche(f,ic,T.n,T.role+(T.u?' · ultime':'')+(t?' · niveau '+lv+'/5':''),stats);icone3D(ic,'tour',k,56,46);
  const ex=elt('div','ex'),part=(t,c)=>{if(ex.childNodes.length)ex.append(' · ');ex.appendChild(elt('span',c||'',t))};
  if(t&&P.t.includes(t)&&viseFile(t)>lv)part('⏫ Dans la file : vers le niveau '+viseFile(t),'chantier');
  if(t&&t.b>0)part('🔨 '+(lv>1?'Amélioration':'Construction')+' en cours : '+Math.ceil(t.b)+' s','chantier');else if(!t)part('🔨 Construction : '+fr(btJ(T.c))+' s');
  if(t&&lv<5&&!(t.b>0)&&!explore)part('Niveau '+(lv+1)+' : ⚔ '+dps(k,lv+1)+'/s, ◎ '+fr(rng({k,lv:lv+1}))+(ralentit(T,lv+1)?', ❄ −'+pr(ralentit(T,lv+1).p)+' · '+fd(ralentit(T,lv+1).d)+' s'+(T.fsp?' · zone '+fr(ralentit(T,lv+1).r):''):'')+' ('+fr(btJ(upCost(t)))+' s de travaux)','next');
- const ef=effets(T,lv);if(ef.length)part('Effet : '+ef.join(', '));
+ part(T.txt);const ef=effets(T,lv);if(ef.length)part(ef.join(', '));if(t){const et=etatTour(t);if(et)part(et,'next')}
+ for(const c of combosTour(T))part(c,'next');
  const bf=bonusFaction(T.faction);if(bf)part(bf);
  /* 2.35 : les détails tiennent sur une ligne (la fiche cachait trop de terrain) ; la toucher la déplie ou la replie */
  ex.classList.toggle('ouvert',detailsOuverts);ex.onclick=()=>{detailsOuverts=!detailsOuverts;ex.classList.toggle('ouvert',detailsOuverts)};
@@ -1297,14 +1358,50 @@ function playerSend(k){if(over)return;const T=CR[k],a={type:'send',k};if(time<GR
  toast((rafale.n>1?'×'+rafale.n+' · ':'')+GROUP+' × '+T.n+' chez chaque adversaire · +'+T.i+' revenu')}
 
 const factionBox=$('factions');
+/* 2.40 : boutons des races (générés depuis RACES) et fiche de race (Description, Tours, Combos) */
+const SIGIL=['#7fc4ee','#f07850','#8fd47d','#e2ad68','#c19aff'];
+factionBox.innerHTML=RACES.map((F,i)=>`<button type="button" data-faction="${i}" aria-pressed="false" onclick="window.chooseFaction(${i})"><span class="ficon">${F.icon}</span><span><strong>${F.name}</strong><small>${F.desc}</small><span class="fmeca">${F.meca.n}</span></span></button>`).join('');
+let rfF=0,rfO='desc';
+function ouvrirFicheRace(f,o){rfF=f;if(o)rfO=o;$('raceFiche').hidden=false;rendreFicheRace();}
+function fermerFicheRace(){$('raceFiche').hidden=true}
+/* profil en radar (6 axes de REGLES.axes, notés de 1 à 10) */
+function radarSVG(v,col){const cx=150,cy=118,R0=82,N=v.length,pt=(i,r)=>[cx+Math.sin(i*2*Math.PI/N)*r,cy-Math.cos(i*2*Math.PI/N)*r],P=a=>a.map(p=>p.map(n=>n.toFixed(1)).join(',')).join(' ');
+ let s=`<svg viewBox="-20 0 340 236" role="img" aria-label="Profil de la race">`;
+ for(const k of [.25,.5,.75,1])s+=`<polygon points="${P(v.map((_,i)=>pt(i,R0*k)))}" fill="none" stroke="#8fb6d9" stroke-opacity="${k==1?.6:.25}"/>`;
+ v.forEach((_,i)=>{const[x,y]=pt(i,R0);s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#8fb6d9" stroke-opacity=".25"/>`});
+ s+=`<polygon points="${P(v.map((n,i)=>pt(i,R0*n/10)))}" fill="${col}" fill-opacity=".35" stroke="${col}" stroke-width="2"/>`;
+ v.forEach((n,i)=>{const[x,y]=pt(i,R0+16),a=Math.abs(x-cx)<8?'middle':x<cx?'end':'start';s+=`<text x="${x}" y="${y+4}" text-anchor="${a}" font-size="10.5" fill="#d9ecff">${REGLES.court[i]} <tspan fill="#ffe597" font-weight="700">${n}</tspan></text>`});
+ return s+'</svg>'}
+const statsTour=(k,lv=1)=>{const T=TW[k];return [T.c+' or',T.no?'ne tire pas':'⚔ '+dps(k,lv)+' dégâts/s','◎ portée '+fr(T.r),T.ao?'air uniquement':T.gr?'sol uniquement':'sol et air'].join(' · ')};
+function iconeTour(k){const c=towerIcon(k,1);icone3D(c,'tour',k,56,46);return c}
+function rendreFicheRace(){const F=RACES[rfF],cad=$('raceFiche').querySelector('.rf-cadre'),corps=$('rfCorps');cad.style.setProperty('--sigil',SIGIL[rfF]);
+ $('rfBlason').textContent=F.icon;$('rfNom').textContent=F.name;$('rfSous').textContent=F.desc;
+ for(const b of $('raceFiche').querySelectorAll('.rf-onglets button'))b.classList.toggle('on',b.dataset.o==rfO);
+ $('rfChoisir').textContent=chosenClass===rfF?'✓ Race choisie':'Choisir cette race';corps.textContent='';corps.scrollTop=0;
+ if(rfO=='desc'){corps.innerHTML=`<p class="rf-hist">${F.histoire}</p><h4>Mécanique propre</h4><div class="rf-meca"><b>${F.meca.n}</b> : ${F.meca.txt}</div>
+  <h4>États infligés</h4><ul class="rf-etats">${F.etats.map(e=>'<li>'+e+'</li>').join('')}</ul>
+  <div class="rf-duo"><div><b>Forces</b>${F.forces}</div><div><b>Faiblesses</b>${F.faible}</div></div>
+  <h4>Profil</h4><div class="rf-radar">${radarSVG(F.radar,SIGIL[rfF])}</div>`;return}
+ if(rfO=='tours'){const L=elt('div','rf-tours');for(let j=0;j<10;j++){const k=rfF*10+j,T=TW[k],d=elt('div','rf-tour'+(T.u?' ult':'')),nm=elt('div','nm',T.n);nm.appendChild(elt('i','',(j+1)+' · '+T.role));
+   d.append(iconeTour(k),nm,elt('div','st',statsTour(k)),elt('div','tx',T.txt));L.appendChild(d)}corps.appendChild(L);return}
+ for(const c of F.combos){const d=elt('div','rf-combo'),eq=elt('div','eq'),ex=elt('div','ex');
+  c.a.forEach((j,i)=>{if(i)eq.appendChild(elt('em','','+'));const s=elt('span');s.append(iconeTour(rfF*10+j),TW[rfF*10+j].n);eq.appendChild(s)});
+  ex.append(elt('b','',c.n),c.txt);d.append(eq,ex);corps.appendChild(d)}}
+$('ficheRaceBtn').onclick=()=>ouvrirFicheRace(chosenClass,'desc');
+$('rfClose').onclick=$('rfRetour').onclick=fermerFicheRace;
+$('rfPrev').onclick=()=>{rfF=(rfF+4)%5;rendreFicheRace()};$('rfNext').onclick=()=>{rfF=(rfF+1)%5;rendreFicheRace()};
+$('rfChoisir').onclick=()=>{selectFaction(rfF);fermerFicheRace()};
+for(const b of $('raceFiche').querySelectorAll('.rf-onglets button'))b.onclick=()=>{rfO=b.dataset.o;rendreFicheRace()};
+$('raceFiche').addEventListener('click',e=>{if(e.target.id=='raceFiche')fermerFicheRace()});
+
 function selectFaction(i){
  i=Math.max(0,Math.min(FACTIONS.length-1,Number(i)||0));
  chosenClass=i;
  [...factionBox.querySelectorAll('button[data-faction]')].forEach(el=>{const active=Number(el.dataset.faction)===i;el.classList.toggle('selected',active);el.setAttribute('aria-pressed',active?'true':'false')});
  document.querySelectorAll('#lv button').forEach(x=>x.disabled=false);
  $('difficultyLabel').hidden=false;
- $('factionStatus').textContent='✓ '+FACTIONS[i].name+' sélectionnée';
- $('hint').textContent='Faction sélectionnée : '+FACTIONS[i].name+'. Choisis ensuite la difficulté pour commencer.';
+ $('factionStatus').textContent='✓ '+FACTIONS[i].name+' sélectionnée';$('ficheRaceBtn').lastChild.textContent=FACTIONS[i].name;
+ $('hint').textContent='Race choisie : '+FACTIONS[i].name+'. Lis sa fiche, puis choisis la difficulté pour commencer.';
  if(NET.on)NET.send({t:'faction',f:i});
 }
 // Sélection redondante et robuste : onclick inline + délégation click.
@@ -1325,6 +1422,7 @@ for(const[t,k,n]of[['n','patte','Monstres au sol'],['f','air','Monstres volants'
 let projet=null;
 /* même contrôle que Board.place, sans rien modifier : '' si la pose est possible, sinon le code d'erreur */
 function peutConstruire(x,y,k){const T=TW[k];if(x<0||y<0||x>=C||y>=R||P.g[y][x]||(x==SP[0]&&y==SP[1])||(x==EX[0]&&y==EX[1]))return 'blocked';
+ if(T.u&&P.t.some(t=>TW[t.k].u))return 'unique';
  if(P.gold<T.c)return 'poor';
  P.g[y][x]=1;const nd=P.dist();P.g[y][x]=0;return nd[SP[1]][SP[0]]>=INF||genant(P,x,y,nd)?'blocked':''}
 function annulerProjet(){if(projet){projet=null;render()}}
@@ -1437,7 +1535,7 @@ function onLog(l){
  else if(l.type=='quete')queteLog(l);
  else if(l.type=='end')end(l.winner)}
 function hud(){const k=Math.floor(P.gold)+'|'+B.map(b=>b.inc+','+b.lives+','+b.dead).join('|')+'|'+Math.floor(time);
- if(k!=hudK){hudK=k;$('gold').textContent=Math.floor(P.gold);$('inc').textContent='+'+P.inc;$('clock').textContent=mmss(time);$('lives').lastChild.textContent=Math.max(0,P.lives);
+ if(k!=hudK){hudK=k;$('gold').textContent=Math.floor(P.gold);$('inc').textContent='+'+P.inc;$('clock').textContent=mmss(time);$('lives').lastChild.textContent=Math.max(0,P.lives);$('ames').hidden=P.classId!=4;$('ames').lastChild.textContent=P.am||0;
   for(const b of B){const v=b.dead?'éliminé':Math.max(0,b.lives)+'|'+eff(b);if(b.ui.v!==v){b.ui.v=v;b.ui.s.innerHTML=b.dead?v:'<i class="vie">♥</i> '+Math.max(0,b.lives)+' vies<br><span class="coin"></span> +'+eff(b)}b.ui.e.className='chip'+(b.i==view?' on':'')+(b.dead?' dead':'')}}
  if(P.tier!==hudPal){hudPal=P.tier;if(tab!='t')render()}
  /* anneau du revenu : il se remplit pendant les 10 secondes qui précèdent le versement */

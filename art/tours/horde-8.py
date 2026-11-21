@@ -1,10 +1,9 @@
-"""Horde — Totem des esprits (emplacement 8 : Givre · entrave).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['horde']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Clans de l’Orage Blanc — Totem de sang (emplacement 8 : anti-boss).
+Forme : communs/orage_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.orage_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Totem des esprits"}
+INFOS = {'categorie': 'tour', 'titre': "Totem de sang"}
 
 def construire(ctx):
-    preparer(tour('horde', 8))
+    preparer(tour(8))

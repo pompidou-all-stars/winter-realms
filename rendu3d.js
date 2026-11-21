@@ -229,6 +229,8 @@ void main() {
     for (let k = 0; k < CR.length; k++) if (CR[k].t === 1) l.push(charger(urlMonstre(k)));
     setTimeout(() => { for (let k = 0; k < CR.length; k++) if (CR[k].t !== 1) charger(urlMonstre(k)) }, 1500);
     for (const f of factions) for (let j = 0; j < 10; j++) l.push(charger(urlTour(f * 10 + j)));
+    /* 2.40 : morts relevés, seulement si la Cour des Ossements (race 4) est en jeu */
+    if (factions.includes(4)) l.push(charger('assets/3d/decor/mort-squelette.glb'), charger('assets/3d/decor/mort-colosse.glb'));
     return Promise.all(l);
   }
 
@@ -633,9 +635,10 @@ void main() {
       case 'slash': o = new THREE.Mesh(G.tranche, transp('#ffffff', .9)); break;
       case 'bad': { o = new THREE.Mesh(G.boite, transp('#ff4d3d', .6)); o.scale.set(1, .02, 1); break }
       case 'zap': {
-        const pts = []; const a = new THREE.Vector3(f.x, .3, f.y), b = new THREE.Vector3(f.x2, 1.1, f.y2 + .4);
-        for (let i = 0; i <= 5; i++) { const p = a.clone().lerp(b, i / 5); if (i && i < 5) { p.x += (i % 2 ? 1 : -1) * .1; p.z += (i % 2 ? -.06 : .06) } pts.push(p) }
-        o = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: '#ffe45e', transparent: true})); break;
+        /* 2.40 : couleur (f.col), trait droit (f.ln : tir en ligne, rayon), éclair tombé du ciel (f.ciel) */
+        const pts = []; const a = f.ciel ? new THREE.Vector3(f.x2, 3.2, f.y2) : new THREE.Vector3(f.x, f.ln ? .7 : .3, f.y), b = new THREE.Vector3(f.x2, f.ciel ? .3 : f.ln ? .45 : 1.1, f.y2 + (f.ln || f.ciel ? 0 : .4));
+        for (let i = 0; i <= 5; i++) { const p = a.clone().lerp(b, i / 5); if (i && i < 5 && !f.ln) { p.x += (i % 2 ? 1 : -1) * .1; p.z += (i % 2 ? -.06 : .06) } pts.push(p) }
+        o = new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color: f.col || '#ffe45e', transparent: true})); break;
       }
       default: return null;
     }
@@ -671,8 +674,28 @@ void main() {
 
   /* ---------- image ---------- */
   let terrain = null, dernier = 0;
+  /* 2.40 : morts relevés par la Cour des Ossements (squelette en armure, colosse d'os) et mines de Hautroc */
+  const allies = new Map(), mines = new Map(), matMine = transp('#ff9a3d', .85);
+  /* 2.40 : modèles à part (decor/mort-squelette, decor/mort-colosse), indépendants des monstres de CR */
+  const URL_MORT = {sq: 'assets/3d/decor/mort-squelette.glb', co: 'assets/3d/decor/mort-colosse.glb'};
+  function creerMort(c) {
+    const g = modele(URL_MORT[c.m]); if (g === undefined) return null;
+    let o;
+    if (g) o = g.scene.clone(true);
+    else { o = new THREE.Mesh(new THREE.CylinderGeometry(.06, .08, c.m === 'co' ? .6 : .4, 8), mat('#d8cfb6')); o.position.y = c.m === 'co' ? .3 : .2 }
+    const r = new THREE.Group(); r.add(o); r.position.set(c.x + .5, 0, c.y + .5); scene.add(r);
+    return {r, o, px: r.position.x, pz: r.position.z, yaw: 0, ph: (c.x * 7 + c.y * 13) % 6, y0: o.position.y};
+  }
+  function majMort(Mo, c, dt, temps) {
+    const x = c.x + .5, z = c.y + .5, dx = x - Mo.px, dz = z - Mo.pz;
+    if (dx * dx + dz * dz > 1e-6) { let d = Math.atan2(dx, dz) - Mo.yaw; d = Math.atan2(Math.sin(d), Math.cos(d)); Mo.yaw += d * Math.min(1, dt * 10) }
+    Mo.px = x; Mo.pz = z; Mo.r.position.set(x, 0, z); Mo.o.rotation.y = Mo.yaw;
+    /* démarche saccadée de mort-vivant : petits bonds et roulis */
+    Mo.o.position.y = Mo.y0 + Math.abs(Math.sin(temps * 7 + Mo.ph)) * .015; Mo.o.rotation.z = Math.sin(temps * 7 + Mo.ph) * .06;
+  }
+  function creerMine() { const r = new THREE.Group(), d = new THREE.Mesh(G.disque, matMine); d.scale.setScalar(.22); r.add(d); const c = new THREE.Mesh(G.octa, mat('#ffb347', {emissive: '#ff6a1a', emissiveIntensity: .8})); c.scale.setScalar(.07); c.position.y = .08; r.add(c); r.renderOrder = 2; scene.add(r); return {r, c} }
   function vider() {
-    for (const m of [tours, monstres, projs, effets]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
+    for (const m of [tours, monstres, projs, effets, allies, mines]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
     for (const Mo of mourants) retirerGroupe(Mo); mourants.length = 0;
   }
   function dessiner(b, temps, etat) {
@@ -688,6 +711,9 @@ void main() {
     synchro(monstres, b.cr, c => c.id, c => { const Mo = creerMonstre(c); if (Mo) scene.add(Mo.r); return Mo }, (Mo, c) => majMonstre(Mo, c, dt, temps), retirerMonstre);
     majMourants(dt);
     synchro(projs, b.pr, p => p.id, creerProj, majProj, retirerGroupe);
+    synchro(allies, (b.al || []).map((a, i) => ({id: 'a' + (a.id ?? i) + (a.g ? 'g' : ''), m: a.g ? 'co' : 'sq', x: a.x, y: a.y})), c => c.id,
+      creerMort, (Mo, c) => majMort(Mo, c, dt, temps), retirerGroupe);
+    synchro(mines, b.mi || [], m => m.id ?? (m.x + ',' + m.y), creerMine, (o, m) => { o.r.position.set(m.x + .5, .03, m.y + .5); o.c.rotation.y = temps * 2; o.c.position.y = .08 + Math.sin(temps * 4) * .02 }, retirerGroupe);
     synchro(effets, b.fx, f => f, creerEffet, majEffet, o => scene.remove(o));
 
     /* sélection : tour touchée ou projet de construction */

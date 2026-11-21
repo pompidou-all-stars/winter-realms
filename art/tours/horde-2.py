@@ -1,10 +1,9 @@
-"""Horde — Totem de glace (emplacement 2 : Givre · contrôle).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['horde']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Clans de l’Orage Blanc — Totem des pluies glacées (emplacement 2 : contrôle).
+Forme : communs/orage_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.orage_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Totem de glace"}
+INFOS = {'categorie': 'tour', 'titre': "Totem des pluies glacées"}
 
 def construire(ctx):
-    preparer(tour('horde', 2))
+    preparer(tour(2))

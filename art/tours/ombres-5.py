@@ -1,10 +1,9 @@
-"""Légion des ombres — Nexus du néant (emplacement 5 : Mage · arcanes).
-Forme : archétype de communs/tours_communes.py dans le style de la faction (STYLE['ombres']).
-Pour personnaliser cette tour seule, remplacer l'appel à tour() par sa propre construction."""
-from communs.tours_communes import tour
+"""Cour des Ossements — Œil du Voile (emplacement 5 : détection).
+Forme : communs/ossements_hd.py (2.40, direction « grimdark » ; créatures au procédé des monstres organiques)."""
+from communs.ossements_hd import tour
 from communs.export_jeu import preparer
 
-INFOS = {'categorie': 'tour', 'titre': "Nexus du néant"}
+INFOS = {'categorie': 'tour', 'titre': "Œil du Voile"}
 
 def construire(ctx):
-    preparer(tour('ombres', 5))
+    preparer(tour(5))
