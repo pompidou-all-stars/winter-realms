@@ -19,13 +19,13 @@ Statuts : 💡 idée · 🧭 à préciser · 🛠️ en cours · ✅ fait
 | 💡 | 🏰 Tours | **Diversification des tours** : nouveaux effets et rôles, tours plus distinctes d'une faction à l'autre. |
 | ✅ | 👹 Monstres | **Volants plus compacts** : réduire la taille des unités volantes pour qu'elles prennent moins de place (deux fois moins). *Fait en 2.35 : ×0,5 en 3D (×0,65 en 2.32).* |
 | 💡 | 🧭 Gameplay | **Point de relais** : pouvoir poser un point de passage autour duquel les monstres tournent. |
-| ✅ | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
+| 💡 | 🛡️ Factions | **Nouvelles races** jouables, avec leurs tours, leur bonus et leur style. |
 | ✅ | 🔧 Outillage | **Accélérer les tests** : la simulation (`node tests/tout.js`) prend plusieurs minutes ; la rendre plus rapide pour tester plus souvent. *Fait en 2.35 : tests et parties entre IA en parallèle ; simulation 24 s → 8 s, 15 parties 1 min 54 → 29 s (sur 22 cœurs).* |
 | ✅ | 🎯 Quêtes | **Quêtes bonus** : une récompense pour le premier qui réussit (ex. : « le plus long labyrinthe au tour X gagne N or »). Quêtes tirées au hasard à chaque partie ; l'IA doit savoir les jouer. *Fait en 2.38 : 10 quêtes au titre décalé (« Qui a la plus grosse ? », « Clicker fou », « Picsou »…), une toutes les 3 à 4 min, annoncées par une bannière, suivies dans une pastille, gagnant annoncé ; les IA les jouent.* |
 | 🧭 | ✨ Palier 3 | **Pouvoirs magiques payants** : renforcements sur son propre terrain, ou malédictions à lancer sur le terrain d'un adversaire. |
 | 💡 | 🧊 Modèles 3D | **Refactorisation des modèles 3D**. |
 | 💡 | 🧭 Interface | **Menu de navigation** : lancement d'une partie sur plusieurs écrans successifs. |
-| ✅ | 🛡️ Factions | **Gameplay unique par race** : chaque race se joue différemment. |
+| 💡 | 🛡️ Factions | **Gameplay unique par race** : chaque race se joue différemment. |
 | 💡 | 🌍 Langues | **Version anglaise** (localisation). |
 | 💡 | 📊 Analytique | **Analytique** : mesurer comment le jeu est utilisé. |
 | 💡 | 🌐 Site web | **Site web propre** autour du jeu, optimisé pour les moteurs de recherche (SEO) et les moteurs d'IA (GEO). |
@@ -80,13 +80,8 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
-### 2.43 — silhouettes des unités — 2026-11-21
-- All 50 units have distinct silhouettes on the 3D and 2D boards, placement previews and cards. The Royal Archer carries a bow and quiver.
-
-### 2.42 — factions et tirs lisibles — 2026-11-21
-- Humains, Robots, Créatures, Herbe and Magique are selectable at launch, with 10 towers each and the asymmetric mechanics of 2.40.
-- Robot and creature silhouettes appear in game and in tower cards. Projectile trails point back to the shooter in 2D and 3D and shorten in dense fights.
-- Base damage is 9 for Chasseur épineux and 5.1 for Drone sentinelle. Damage over time accounts for partial ticks. The bone colossus now summons when 15 souls are available. The multiplayer server sends projectile origins.
+### 2.41 (retour) — 2026-11-21
+- Back to version 2.41 at the designer's request: versions 2.42 and 2.43 had renamed the five races and their towers and replaced the 3D tower models with simple shapes. Their additions (projectile trails, fixes, tests) will be added back on top in a follow-up.
 
 ### 2.41 — bestiaire épique — 2026-11-21
 - New epic bestiary: the 72 monsters are renamed in place (same costs, HP, speeds and abilities; only display sizes change): goblins, rat-men, orcs, ogres, mounted saurians, Ruin warriors, Abyssal Oculus, Brain-eater, Abyssal Elder, Lord of Embers…
