@@ -60,7 +60,7 @@ const RACES=[
    {n:'Rage animale',a:[7,1],txt:'Le Béhémoth gardien double la Fureur gagnée : le Griffeur sauvage atteint vite 10 charges et entre en Rage.'},
    {n:'Crapaud saignant',a:[5,8],txt:'L’Oracle chimérique ralentit la cible et retire son armure. Le Vampire des neiges profite d’une cible plus lente pour renouveler le saignement.'}],
   tours:[
-   {n:'Chasseur épineux',skin:0,c:20,r:2.6,d:8.8,cd:.5,txt:'Épines lancées au sol et dans les airs. Gagne vite de la Fureur.'},
+   {n:'Chasseur épineux',skin:0,c:20,r:2.6,d:9,cd:.5,txt:'Épines lancées au sol et dans les airs. Gagne vite de la Fureur.'},
    {n:'Griffeur sauvage',skin:4,me:1,gr:1,c:30,r:1.5,d:19,cd:.55,fu2:1,txt:'Corps à corps. Sa Fureur monte deux fois plus vite.'},
    {n:'Souffle de givre',skin:2,mag:1,c:40,r:2.5,d:2,cd:1,ps:8,sl:1.5,fsp:1.2,tw:1,txt:'Pluie glacée en zone : ralentit et trempe les monstres (les éclairs rebondissent deux fois plus).'},
    {n:'Cracheur de rochers',skin:1,gr:1,c:55,r:2.7,d:21,cd:1.3,ps:6.5,sp:1.1,im:.3,txt:'Rocher en zone, au sol, qui étourdit 0,3 s.'},

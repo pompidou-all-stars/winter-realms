@@ -277,7 +277,7 @@ test('Secours 2D : si la 3D ne se charge pas, le jeu le dit, passe en 2D et on p
   assert.equal(await N.attendre3D(p,15000),false,'la 3D échoue');const r=await p.evaluate(()=>R3D_ETAT());assert.equal(r.on,false);assert.equal(r.echec,true);
   assert.match(await p.textContent('#toast'),/3D indisponible sur cet appareil/);assert.equal(await p.locator('#main3d').count(),0);
   await N.toucher(p,'#go0');await N.avancer(p,600);assert.equal(await p.isVisible('#rotG'),false,'pas de flèches de rotation en 2D');
-  await N.toucherCarte(p,'Tour d’arbalétriers');await N.construire(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[{x:3,y:5,k:0,lv:1}]);assert.equal(e.or,180);
+  await N.toucherCarte(p,'Archer royal');await N.construire(p,3,5);const e=await N.etat(p);assert.deepEqual(e.tours,[{x:3,y:5,k:0,lv:1}]);assert.equal(e.or,180);
   assert.deepEqual(o.erreurs.filter(m=>!/rendu3d|Failed to load|ERR_FAILED|module script/i.test(m)),[]);await o.fermer();
   const o2=await N.ouvrir(nav,srv.url+'?rendu=2d');assert.equal((await o2.page.evaluate(()=>R3D_ETAT())).on,false,'?rendu=2d force la 2D');assert.deepEqual(o2.erreurs,[]);await o2.fermer()}
  finally{await nav.close();await srv.fermer()}});

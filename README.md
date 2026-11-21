@@ -83,7 +83,7 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 ### 2.42 — factions et tirs lisibles — 2026-11-21
 - Humains, Robots, Créatures, Herbe and Magique are selectable at launch, with 10 towers each and the asymmetric mechanics of 2.40.
 - Robot and creature silhouettes appear in game and in tower cards. Projectile trails point back to the shooter in 2D and 3D and shorten in dense fights.
-- Base damage is 8.8 for Chasseur épineux and 5.1 for Drone sentinelle. Damage over time accounts for partial ticks. The bone colossus now summons when 15 souls are available. The multiplayer server sends projectile origins.
+- Base damage is 9 for Chasseur épineux and 5.1 for Drone sentinelle. Damage over time accounts for partial ticks. The bone colossus now summons when 15 souls are available. The multiplayer server sends projectile origins.
 
 ### 2.41 — bestiaire épique — 2026-11-21
 - New epic bestiary: the 72 monsters are renamed in place (same costs, HP, speeds and abilities; only display sizes change): goblins, rat-men, orcs, ogres, mounted saurians, Ruin warriors, Abyssal Oculus, Brain-eater, Abyssal Elder, Lord of Embers…
