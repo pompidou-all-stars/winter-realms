@@ -4,7 +4,7 @@ const test=require('node:test'),assert=require('node:assert/strict'),fs=require(
 const {charger}=require('../outils/moteur');
 const S=charger('actuel');
 test('Five new factions, ten distinct towers each',()=>{
- assert.deepEqual(S.FACTIONS.map(f=>f.name),['Humains','Robots','Créatures','Nature','Magiques']);
+ assert.deepEqual(Array.from(S.FACTIONS, f=>f.name),['Humains','Robots','Créatures','Nature','Magiques']);
  assert.equal(S.TW.length,50);
  assert.equal(new Set(S.TW.map(t=>t.n)).size,50);
  for(let f=0;f<5;f++){
