@@ -241,6 +241,14 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   await N.toucher(p,'#menuBtn');await N.toucher(p,'#mQuitter');assert.equal(await val(()=>document.getElementById('ov').hidden),true,'un seul toucher ne quitte pas');
   await N.toucher(p,'#mQuitter');assert.equal(await val(()=>document.getElementById('ov').hidden),false,'retour à l\'accueil');assert.equal((await N.etat(p)).fin,true);
  });
+ test('Les cartes de tours ont 50 silhouettes 2D distinctes et une vignette 3D par faction',async()=>{
+  const resultat=await p.evaluate(async()=>{
+   const cartes=TW.map((_,k)=>towerIcon(k,1).toDataURL());
+   const vignettes=await Promise.all([0,10,20,30,40].map(k=>R3D.api.vignette('tour',k,56,46)));
+   return [new Set(cartes).size,new Set(vignettes.filter(url=>url?.startsWith('data:image/png'))).size];
+  });
+  assert.deepEqual(resultat,[50,5]);
+ });
  test('La scène WebGL rend les 50 tours et 50 traînées simultanément, puis retire les projectiles',async()=>{
   const compte=await p.evaluate(async()=>{
    const A=R3D.api;

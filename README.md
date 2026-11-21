@@ -80,6 +80,9 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.43 — silhouettes des unités — 2026-11-21
+- All 50 units have distinct silhouettes on the 3D and 2D boards, placement previews and cards. The Royal Archer carries a bow and quiver.
+
 ### 2.42 — factions et tirs lisibles — 2026-11-21
 - Humains, Robots, Créatures, Herbe and Magique are selectable at launch, with 10 towers each and the asymmetric mechanics of 2.40.
 - Robot and creature silhouettes appear in game and in tower cards. Projectile trails point back to the shooter in 2D and 3D and shorten in dense fights.
