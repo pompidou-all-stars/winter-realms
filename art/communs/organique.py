@@ -39,16 +39,38 @@ class Volume:
         return (q.length - 1.0) * min(self.r)
 
     def maillage(self, bm):
-        """Ajoute le volume au bmesh (sphère déformée, ou chapelet de sphères pour un membre)."""
+        """Ajoute le volume au bmesh (sphère déformée, ou chapelet de sphères pour un membre).
+        2.40 : les sphères sont calculées à partir d'un gabarit puis ajoutées d'un coup. Avant, chaque sphère était
+        un opérateur bmesh, qui parcourt tout le maillage : temps quadratique (10 min pour une chauve-souris aux
+        bouts d'ailes très fins, des centaines de sphères). Même géométrie, même ordre des sommets."""
         if self.kind == 'ellipse':
-            res = bmesh.ops.create_uvsphere(bm, u_segments=20, v_segments=12, radius=1.0)
-            bmesh.ops.transform(bm, matrix=self.M, verts=res['verts'])
+            gv, gf = _gabarit(20, 12); M = self.M
+            _ajouter(bm, [M @ Vector(p) for p in gv], gf, 1)
             return
+        gv, gf = _gabarit(16, 10)
         n = max(2, int((self.b - self.a).length / (min(self.ra, self.rb) * .5)) + 1)
+        sommets = []
         for i in range(n + 1):
-            t = i / n; r = self.ra + (self.rb - self.ra) * t
-            res = bmesh.ops.create_uvsphere(bm, u_segments=16, v_segments=10, radius=r)
-            bmesh.ops.translate(bm, vec=self.a.lerp(self.b, t), verts=res['verts'])
+            t = i / n; r = self.ra + (self.rb - self.ra) * t; c = self.a.lerp(self.b, t)
+            sommets += [c + Vector(p) * r for p in gv]
+        _ajouter(bm, sommets, gf, n + 1)
+
+_GABARITS = {}
+def _gabarit(u, v):
+    """Sommets et faces d'une sphère UV de rayon 1 (celle de bmesh.ops.create_uvsphere), calculés une fois."""
+    if (u, v) not in _GABARITS:
+        b = bmesh.new(); bmesh.ops.create_uvsphere(b, u_segments=u, v_segments=v, radius=1.0)
+        b.verts.index_update()
+        _GABARITS[(u, v)] = ([tuple(x.co) for x in b.verts], [[x.index for x in f.verts] for f in b.faces])
+        b.free()
+    return _GABARITS[(u, v)]
+
+def _ajouter(bm, sommets, faces, copies):
+    """Ajoute au bmesh `copies` sphères (sommets déjà placés, faces du gabarit) en une seule opération."""
+    k = len(sommets) // copies
+    me = bpy.data.meshes.new('_volume')
+    me.from_pydata([tuple(p) for p in sommets], [], [[i + j * k for i in f] for j in range(copies) for f in faces])
+    bm.from_mesh(me); bpy.data.meshes.remove(me)
 
 def _ctx(objs, actif=None):
     """Contexte explicite pour les opérateurs (fonctionne en ligne de commande comme dans Blender ouvert)."""
@@ -112,6 +134,24 @@ def corps(nom, vols, voxel=.011, lissage=6, triangles=2000):
     for p in me2.polygons: p.use_smooth = True
     return _nouvel_objet(nom, me2)
 
+def _plus_proches(vols, me):
+    """Pour chaque sommet du maillage, l'indice du volume le plus proche (même règle que Volume.distance, priorité
+    comprise ; à égalité, le premier de la liste). 2.40 : calcul groupé avec numpy, au lieu d'une boucle Python
+    sommet par sommet (5,7 millions de distances, 17 s pour une Brute orc)."""
+    import numpy as np
+    P = np.empty(len(me.vertices) * 3); me.vertices.foreach_get('co', P); P = P.reshape(-1, 3)
+    D = np.empty((len(vols), len(P)))
+    for j, v in enumerate(vols):
+        if v.kind == 'membre':
+            a, ab = np.array(v.a), np.array(v.b - v.a); L2 = float(ab @ ab)
+            t = np.clip((P - a) @ ab / L2, 0.0, 1.0) if L2 else np.zeros(len(P))
+            d = np.linalg.norm(P - (a + t[:, None] * ab), axis=1) - (v.ra + (v.rb - v.ra) * t)
+        else:
+            Mi = np.array(v.Mi); q = P @ Mi[:3, :3].T + Mi[:3, 3]
+            d = (np.linalg.norm(q, axis=1) - 1.0) * min(v.r)
+        D[j] = d - v.prio * 1e-3
+    return D.argmin(axis=0)
+
 def corps_haut(nom, vols, voxel=.0045, lissage=4, reliefs=()):
     """Version très détaillée du corps (2.31), qui n'est jamais exportée : elle sert de « sculpture » dont on cuit
     le relief (normal map) et les ombres fines (texture) sur le corps léger.
@@ -131,9 +171,8 @@ def corps_haut(nom, vols, voxel=.0045, lissage=4, reliefs=()):
     # couleur et dose de relief du volume le plus proche
     cols, g = [None] * len(me2.vertices), h.vertex_groups.new(name='relief')
     par_rel = {}
-    for v in me2.vertices:
-        d, vol = min(((vol.distance(v.co) - vol.prio * 1e-3, vol) for vol in vols), key=lambda x: x[0])
-        cols[v.index] = vol.col; par_rel.setdefault(vol.rel, []).append(v.index)
+    for i, k in enumerate(_plus_proches(vols, me2)):
+        vol = vols[k]; cols[i] = vol.col; par_rel.setdefault(vol.rel, []).append(i)
     for r, idx in par_rel.items():
         if r > 0: g.add(idx, r, 'REPLACE')
     _remplir_couleurs(h, lambda vi: cols[vi])
