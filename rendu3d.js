@@ -12,6 +12,7 @@
 
    Modèles : assets/3d/ (fabriqués par les scripts Blender de art/, voir CLAUDE.md §15). */
 import * as THREE from 'three';
+import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/addons/libs/meshopt_decoder.module.js';
 
@@ -36,7 +37,7 @@ const VOL = .5; // hauteur de vol des volants (cases)
 
 export function creer(J) {
   /* J : tables et constantes du jeu (C, R, SP, EX, INF, DIRS, TW, CR, AURA_R, topY, rng) */
-  const {C, R, SP, EX, INF, DIRS, TW, CR, AURA_R} = J;
+  const {C, R, SP, EX, INF, DIRS, TW, CR, AURA_R} = J, silhouettes = J.silhouettes || [];
   const canvas = document.createElement('canvas');
   canvas.id = 'main3d';
   canvas.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none';
@@ -228,7 +229,7 @@ void main() {
        les paliers 2 et 3 se chargent en fond juste après (un monstre pas encore chargé apparaît dès que son modèle arrive) */
     for (let k = 0; k < CR.length; k++) if (CR[k].t === 1) l.push(charger(urlMonstre(k)));
     setTimeout(() => { for (let k = 0; k < CR.length; k++) if (CR[k].t !== 1) charger(urlMonstre(k)) }, 1500);
-    for (const f of factions) for (let j = 0; j < 10; j++) l.push(charger(urlTour(f * 10 + j)));
+    for (const f of factions) if (!sil(f * 10)) for (let j = 0; j < 10; j++) l.push(charger(urlTour(f * 10 + j)));
     /* 2.40 : morts relevés, seulement si la Cour des Ossements (race 4) est en jeu */
     if (factions.includes(4)) l.push(charger('assets/3d/decor/mort-squelette.glb'), charger('assets/3d/decor/mort-colosse.glb'));
     return Promise.all(l);
@@ -467,9 +468,69 @@ void main() {
     g.traverse(o => { if (o.isMesh) o.castShadow = true });
     return g;
   }
+  /* 2.44 : les races de Thibaut (RACES[f].sil) sont dessinées par les silhouettes de silhouettes.js (2.43, indices 0 à 49 = leurs 50 tours) */
+  const sil = k => !!(J.RACES && J.RACES[TW[k].faction].sil);
+  // Une géométrie par unité, colorée par sommet et partagée entre ses instances.
+  const formesTours = new Map();
+  const matTour = mat('#ffffff', {vertexColors:true});
+  const geoTrait = new THREE.CylinderGeometry(.5, .5, 1, 6);
+  const axeTrait = new THREE.Vector3(0, 1, 0);
+  function modeleTour(k) {
+    if (formesTours.has(k)) return formesTours.get(k).clone(true);
+    const geos = silhouettes[k - 50].map(p => {
+      let geo;
+      if (p.type === 'trait') {
+        const a = new THREE.Vector3(...p.a), b = new THREE.Vector3(...p.b);
+        const direction = b.clone().sub(a);
+        geo = geoTrait.clone();
+        geo.scale(p.largeur, direction.length(), p.largeur);
+        geo.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(axeTrait, direction.normalize()));
+        const centre = a.add(b).multiplyScalar(.5);
+        geo.translate(centre.x, centre.y, centre.z);
+      } else {
+        geo = (p.type === 'bloc' ? G.boite : p.type === 'cristal' ? G.octa : G.sphere).clone();
+        const facteur = p.type === 'bloc' ? 1 : .5;
+        geo.scale(p.a * facteur, p.b * facteur, p.c * facteur);
+        geo.translate(p.x, p.y, p.z);
+      }
+      const col = new THREE.Color(p.col), n = geo.attributes.position.count;
+      const rgb = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) col.toArray(rgb, i * 3);
+      geo.setAttribute('color', new THREE.BufferAttribute(rgb, 3));
+      if (!geo.index) geo.setIndex(Array.from({length:n}, (_, i) => i));
+      return geo;
+    });
+    const corps = new THREE.Mesh(mergeGeometries(geos), matTour);
+    geos.forEach(geo => geo.dispose());
+    corps.name = 'Tourelle';
+    corps.castShadow = corps.receiveShadow = true;
+    const groupe = new THREE.Group();
+    groupe.add(corps);
+    formesTours.set(k, groupe);
+    return groupe.clone(true);
+  }
+  function repliMonstre(k) {
+    const T = CR[k], h = .4 * Math.pow(T.z, 1.8), o = new THREE.Mesh(G.sphere, mat(T.col));
+    o.scale.set(h * .45, h * .5, h * .45); o.position.y = h * .5; o.castShadow = true;
+    const g = new THREE.Group(); g.add(o); return g;
+  }
+  /* échafaudage d'un chantier (construction ou amélioration, depuis la 2.4) */
+  function echafaudage() {
+    const g = new THREE.Group();
+    for (const [x, z] of [[-.34, -.34], [.34, -.34], [-.34, .34], [.34, .34]]) { const p = new THREE.Mesh(G.boite, M.bois); p.scale.set(.04, 1.0, .04); p.position.set(x, .5, z); g.add(p) }
+    for (const y of [.35, .75]) for (const [x, z, sx, sz] of [[0, -.34, .72, .03], [0, .34, .72, .03], [-.34, 0, .03, .72], [.34, 0, .03, .72]]) {
+      const p = new THREE.Mesh(G.boite, M.bois); p.scale.set(sx, .03, sz); p.position.set(x, y, z); g.add(p);
+    }
+    const marteau = new THREE.Group(), manche = new THREE.Mesh(G.boite, M.bois), tete = new THREE.Mesh(G.boite, M.fer);
+    manche.scale.set(.03, .22, .03); manche.position.y = .11; tete.scale.set(.12, .06, .06); tete.position.y = .22;
+    marteau.add(manche, tete); marteau.position.set(.3, .78, .3); g.add(marteau); g.userData.marteau = marteau;
+    g.traverse(o => { if (o.isMesh) o.castShadow = true });
+    return g;
+  }
   function creerTour(t, fantome) {
-    const g = modele(urlTour(t.k)); if (g === undefined) return null;
-    const o = g ? g.scene.clone(true) : repliTour(t.k);
+    let o;
+    if (sil(t.k)) o = modeleTour(t.k);
+    else { const g = modele(urlTour(t.k)); if (g === undefined) return null; o = g ? g.scene.clone(true) : repliTour(t.k) }
     if (fantome) o.traverse(m => { if (m.userData.contour) m.visible = false; else if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = .55; m.material.depthWrite = false; m.castShadow = false } });
     const r = new THREE.Group(); r.add(o);
     const anim = {};
@@ -612,14 +673,38 @@ void main() {
     if (skin == 0) { r.add(new THREE.Mesh(G.fleche, M.bois), new THREE.Mesh(G.pointe, M.blanc)) }
     else if (skin == 1) { const m = new THREE.Mesh(G.sphere, M.fer); m.scale.setScalar(.08); m.castShadow = true; r.add(m) }
     else { const m = new THREE.Mesh(G.octa, skin == 2 ? M.givre : M.arcane); m.scale.set(.07, .07, .12); r.add(m) }
-    scene.add(r); return {r, skin};
+    /* 2.42 (Thibaut) : traînée derrière le projectile, plus courte quand il y a beaucoup de tirs */
+    const T = TW[p.k];
+    const trace = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)),
+      new THREE.LineBasicMaterial({color: T.pz ? '#79ad30' : T.pe ? '#9470d1' : T.col, transparent: true, depthWrite: false}));
+    trace.frustumCulled = false;
+    scene.add(r, trace);
+    return {r, skin, trace};
   }
-  function majProj(Pj, p) {
+  function retirerProj(Pj) {
+    scene.remove(Pj.r, Pj.trace);
+    Pj.trace.geometry.dispose();
+    Pj.trace.material.dispose();
+  }
+  function majProj(Pj, p, densite) {
     const q = Math.max(0, Math.min(1, 1 - Math.hypot(p.tx - p.x, p.ty - p.y) / (p.tot || 1)));
     let h = 1.0 + (.3 - 1.0) * q; if (Pj.skin == 1) h += Math.sin(q * Math.PI) * .8;
-    Pj.r.position.set(p.x, h, p.y + .3 * (1 - q));
+    const z = p.y + .3 * (1 - q);
+    Pj.r.position.set(p.x, h, z);
     Pj.r.rotation.y = Math.atan2(p.tx - p.x, p.ty - p.y);
     if (Pj.skin >= 2) Pj.r.rotation.z += .2;
+
+    // Le segment est dans le repère de la scène, indépendamment de la rotation du projectile.
+    const dx = (p.sx ?? p.x) - p.x, dz = (p.sy ?? p.y) + .3 - z;
+    const distance = Math.hypot(dx, dz);
+    const limite = densite > 35 ? .18 : densite > 18 ? .32 : .52;
+    const ratio = distance > .01 ? Math.min(1, limite / distance) : 0;
+    const positions = Pj.trace.geometry.attributes.position;
+    positions.setXYZ(0, p.x, h, z);
+    positions.setXYZ(1, p.x + dx * ratio, h, z + dz * ratio);
+    positions.needsUpdate = true;
+    Pj.trace.visible = ratio > 0;
+    Pj.trace.material.opacity = densite > 35 ? .35 : .65;
   }
 
   /* ---------- effets ---------- */
@@ -695,7 +780,9 @@ void main() {
   }
   function creerMine() { const r = new THREE.Group(), d = new THREE.Mesh(G.disque, matMine); d.scale.setScalar(.22); r.add(d); const c = new THREE.Mesh(G.octa, mat('#ffb347', {emissive: '#ff6a1a', emissiveIntensity: .8})); c.scale.setScalar(.07); c.position.y = .08; r.add(c); r.renderOrder = 2; scene.add(r); return {r, c} }
   function vider() {
-    for (const m of [tours, monstres, projs, effets, allies, mines]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
+    for (const p of projs.values()) retirerProj(p);
+    projs.clear();
+    for (const m of [tours, monstres, effets, allies, mines]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
     for (const Mo of mourants) retirerGroupe(Mo); mourants.length = 0;
   }
   function dessiner(b, temps, etat) {
@@ -710,7 +797,7 @@ void main() {
       (T, t) => majTour(T, t, temps), retirerGroupe);
     synchro(monstres, b.cr, c => c.id, c => { const Mo = creerMonstre(c); if (Mo) scene.add(Mo.r); return Mo }, (Mo, c) => majMonstre(Mo, c, dt, temps), retirerMonstre);
     majMourants(dt);
-    synchro(projs, b.pr, p => p.id, creerProj, majProj, retirerGroupe);
+    synchro(projs, b.pr, p => p.id, creerProj, (o, p) => majProj(o, p, b.pr.length), retirerProj);
     synchro(allies, (b.al || []).map((a, i) => ({id: 'a' + (a.id ?? i) + (a.g ? 'g' : ''), m: a.g ? 'co' : 'sq', x: a.x, y: a.y})), c => c.id,
       creerMort, (Mo, c) => majMort(Mo, c, dt, temps), retirerGroupe);
     synchro(mines, b.mi || [], m => m.id ?? (m.x + ',' + m.y), creerMine, (o, m) => { o.r.position.set(m.x + .5, .03, m.y + .5); o.c.rotation.y = temps * 2; o.c.position.y = .08 + Math.sin(temps * 4) * .02 }, retirerGroupe);
@@ -751,7 +838,7 @@ void main() {
   let rv = null; const vignettes = new Map();
   function vignette(type, k, w, h) {
     const cle = type + k + '|' + w + 'x' + h; if (vignettes.has(cle)) return vignettes.get(cle);
-    const p = charger(type === 'tour' ? urlTour(k) : urlMonstre(k)).then(g => {
+    const p = (type === 'tour' && sil(k) ? Promise.resolve({scene: modeleTour(k)}) : charger(type === 'tour' ? urlTour(k) : urlMonstre(k))).then(g => {
       if (!g) return null;
       if (!rv) {
         rv = {r: new THREE.WebGLRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true}), s: new THREE.Scene(), c: new THREE.PerspectiveCamera(26, 1, .05, 60)};
@@ -760,7 +847,7 @@ void main() {
         const d = new THREE.DirectionalLight('#fff4e0', 2.6); d.position.set(-2, 4, 3); rv.s.add(d);
         const b = new THREE.DirectionalLight('#9fd0ff', 1.3); b.position.set(3, 2, -3); rv.s.add(b);
       }
-      const o = cloner(g.scene), piv = new THREE.Group(); piv.add(o); piv.rotation.y = type === 'tour' ? -.55 : -.7;
+      const o = cloner(g.scene), piv = new THREE.Group(); piv.add(o); piv.rotation.y = type === 'tour' ? (sil(k) ? .60 : -.55) : -.7;
       const box = new THREE.Box3().setFromObject(piv), ct = box.getCenter(new THREE.Vector3()), rad = Math.max(.05, box.getSize(new THREE.Vector3()).length() / 2);
       o.position.sub(ct.applyAxisAngle(new THREE.Vector3(0, 1, 0), -piv.rotation.y)); rv.s.add(piv);
       const dist = rad / Math.sin(rv.c.fov * Math.PI / 360) * (type === 'tour' ? .78 : .72);

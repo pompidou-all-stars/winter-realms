@@ -40,6 +40,43 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
   await N.toucher(p,'[data-faction="2"]');assert.equal(await p.getAttribute('[data-faction="2"]','aria-pressed'),'true');
   assert.equal(await p.getAttribute('[data-faction="0"]','aria-pressed'),'false');assert.match(await p.textContent('#factionStatus'),/Lunebois/);
  });
+ /* 2.44 : 10 races (les 5 races asymétriques, puis les 5 de Thibaut) ; tests repris de la 2.42 et de la 2.43 */
+ test('Les dix races sont sélectionnables et donnent chacune accès à dix tours',async()=>{
+  const noms=await val(()=>RACES.map(F=>F.name));assert.equal(noms.length,10);
+  assert.deepEqual(await p.locator('#factions strong').allTextContents(),noms);
+  for(let id=0;id<10;id++){
+   await N.toucher(p,'[data-faction="'+id+'"]');
+   assert.equal(await p.locator('#factions [aria-pressed="true"]').count(),1);
+   assert.equal(await p.getAttribute('[data-faction="'+id+'"]','aria-pressed'),'true');
+   assert.match(await p.textContent('#factionStatus'),new RegExp(noms[id]));
+   assert.equal(await val(()=>RACES[chosenClass].tours.length),10);
+  }
+  await N.toucher(p,'[data-faction="2"]');
+ });
+ test('Les 50 tours des races de Thibaut ont des silhouettes 2D distinctes, et chaque race a sa vignette 3D',async()=>{
+  const resultat=await p.evaluate(async()=>{
+   const cartes=TW.slice(50).map((_,i)=>towerIcon(50+i,1).toDataURL());
+   const vignettes=await Promise.all(RACES.map((_,f)=>R3D.api.vignette('tour',f*10,56,46)));
+   return [new Set(cartes).size,new Set(vignettes.filter(url=>url?.startsWith('data:image/png'))).size];
+  });
+  assert.deepEqual(resultat,[50,10]);
+ });
+ test('La scène WebGL rend les 100 tours et 100 traînées simultanément, puis retire les projectiles',async()=>{
+  const compte=await p.evaluate(async()=>{
+   const A=R3D.api;
+   await A.precharger(RACES.map((_,f)=>f));
+   const plateau=new Board(0,'Charge','#d8b45c',0,0);
+   plateau.t=TW.map((_,k)=>({x:k%10+1,y:1+Math.floor(k/10)*1.5,k,lv:1,a:0}));
+   plateau.pr=plateau.t.map(({x,y,k})=>({id:k,k,sx:x+.5,sy:y+.2,x:x+.8,y:y+.4,tx:x+1,ty:y+1,tot:1,a:0}));
+   A.dessiner(plateau,0,{rng});
+   const dense=A.etat();
+   plateau.pr=[];
+   A.dessiner(plateau,.1,{rng});
+   const vide=A.etat();
+   return [dense.tours,dense.projectiles,vide.projectiles];
+  });
+  assert.deepEqual(compte,[100,100,0]);
+ });
  test('Lancer une partie en Normal : l\'accueil disparaît, l\'horloge tourne, une astuce s\'affiche et aucune fiche',async()=>{
   await N.toucher(p,'#go0');assert.equal(await val(()=>document.getElementById('ov').hidden),true);
   await N.avancer(p,2100);const e=await N.etat(p);assert.equal(e.horloge,'0:02');assert.deepEqual([e.or,e.revenu,e.vies,e.faction],[200,10,40,2]);

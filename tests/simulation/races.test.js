@@ -5,7 +5,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const {charger,partie,apparaitre,avancerTerrain,pret}=require('../outils/moteur');
 const S=charger('actuel');
 const proche=(a,b,msg,eps=1e-6)=>assert.ok(Math.abs(a-b)<=eps,`${msg||''} attendu ${b}, obtenu ${a}`);
-const terrain=f=>{const b=partie(S,{factions:[f,(f+1)%5,(f+2)%5,(f+3)%5]}).B[0];b.gold=1e6;return b};
+const N=S.RACES.length,terrain=f=>{const b=partie(S,{factions:[f,(f+1)%N,(f+2)%N,(f+3)%N]}).B[0];b.gold=1e6;return b};
 const fort=c=>{c.hp=c.max=1e6;return c};
 const TW=(f,j)=>S.TW[f*10+j],K=(f,j)=>f*10+j;
 
@@ -16,7 +16,7 @@ test('Règle 1 — profil en radar : 6 axes, somme 30, chaque axe entre 3 et 8, 
   assert.ok(v.every(n=>n>=R.RADAR_MIN&&n<=R.RADAR_MAX),F.name+' : bornes');assert.ok(v.some(n=>n<=4),F.name+' : faiblesse');assert.ok(v.filter(n=>n>=7).length<=2,F.name+' : spécialités')}
 });
 test('Règle 2 — couverture : tour de base sol et air ≤ 25 or, anti-aérien dédié, détection ≤ 120 or, 2 sources non magiques, une réponse aux blindés, une seule ultime',()=>{
- for(let f=0;f<5;f++){const F=S.RACES[f],L=Array.from({length:10},(_,j)=>TW(f,j));
+ for(let f=0;f<N;f++){const F=S.RACES[f],L=Array.from({length:10},(_,j)=>TW(f,j));
   assert.ok(L[0].c<=25&&!L[0].gr&&!L[0].ao&&!L[0].no,F.name+' : base sol et air');
   assert.ok(L[4].air>=2||L[4].ao,F.name+' : anti-aérien dédié');
   assert.ok(L[5].det&&L[5].c<=120,F.name+' : détection');
@@ -27,7 +27,7 @@ test('Règle 2 — couverture : tour de base sol et air ≤ 25 or, anti-aérien 
   assert.ok(F.meca&&F.meca.n&&F.etats.length>=1&&F.histoire&&F.forces&&F.faible,F.name+' : fiche complète')}
 });
 test('Règle 3 — pas de domination : aucune tour n’est meilleure qu’une autre de sa race en prix, dégâts estimés, portée et cibles à la fois',()=>{
- for(let f=0;f<5;f++)for(let a=0;a<10;a++)for(let b=0;b<10;b++){if(a==b)continue;const A=TW(f,a),B=TW(f,b);
+ for(let f=0;f<N;f++)for(let a=0;a<10;a++)for(let b=0;b<10;b++){if(a==b)continue;const A=TW(f,a),B=TW(f,b);
   const domine=A.c<=B.c&&A.ed*A.zf>B.ed*B.zf&&A.r>=B.r&&(!A.gr||B.gr)&&(!A.ao||B.ao)&&!A.mag&&!B.det&&!B.au&&!B.eco&&!B.u&&!B.no&&
    !(B.im||B.ab||B.hx||B.mk||B.ma||B.br||B.tw||B.sg||B.flo||B.rz||B.mn||B.fsp||B.jug||B.ex||B.spe||B.pierce||B.ch||B.ln||B.bm||B.pu!==undefined);
   assert.ok(!domine,`${A.n} domine ${B.n}`)}
@@ -111,4 +111,69 @@ test('IA : chaque race construit, améliore, et pose au moins une tour de soutie
  for(const b of [...G.B,G2.B[0]]){const F=S.RACES[b.classId].name;if(b.dead&&b.st.mort<300)continue;
   assert.ok(b.t.length>=15,F+' : '+b.t.length+' tours');assert.ok(b.t.some(t=>t.lv>1),F+' : améliorations')}
  assert.ok([...G.B,...G2.B].some(b=>b.t.some(t=>S.TW[t.k].j==7||S.TW[t.k].u)),'soutien ou ultime posé');
+});
+
+/* ---------- 2.44 : 10 races, et tests repris de la 2.42 (Thibaut) ---------- */
+test('Les 10 races : les 5 races asymétriques puis les 5 de Thibaut, aux mêmes mécaniques, noms de tours distincts dans chaque race',()=>{
+ assert.equal(Array.from(S.RACES,f=>f.court).join(),'Aubeval,Orage Blanc,Lunebois,Hautroc,Ossements,Humains,Créatures,Herbe,Robots,Magique');
+ for(const F of S.RACES)assert.equal(new Set(F.towers).size,10,F.name);
+ for(let f=5;f<N;f++)assert.equal(S.RACES[f].m,f-5);
+});
+
+test('Brûlure et poison ignorent l’armure et appliquent leur durée exacte, même entre deux pas',()=>{
+ const b=terrain(3),c=fort(apparaitre(S,b,S.TURT));
+ b.hit(c,0,TW(3,6),1);b.hit(c,0,TW(3,6),2);b.hit(c,0,TW(3,6),1);
+ b.hit(c,0,TW(2,0),1);b.hit(c,0,TW(2,3),2);
+ assert.equal(c.pz,3);assert.equal(c.bud,8);
+ const hp=c.hp;
+ for(let i=0;i<45;i++)b.update(.093);
+ proche(hp-c.hp,8*2+3*1*4,'dégâts cumulés');
+ assert.equal(c.pz,0);assert.equal(c.bud,0);
+});
+
+test('L’ultime des Ossements (et de Magique) invoque un colosse quand les 15 âmes sont disponibles',()=>{
+ const b=terrain(4);b.place(5,3,K(4,9));pret(b);fort(apparaitre(S,b,0));
+ b.am=14;b.update(.05);assert.equal(b.al?.length||0,0);
+ b.am=15;b.t[0].cd=0;b.update(.05);
+ assert.equal(b.am,0);assert.equal(b.al.length,1);assert.equal(b.al[0].g,1);
+});
+
+test('Un projectile garde les coordonnées de sa tour après son premier déplacement',()=>{
+ const b=terrain(0);b.place(5,2,K(0,0));pret(b);fort(apparaitre(S,b,0));
+ b.update(.01);
+ const p=b.pr[0];assert.ok(p);assert.equal(p.sx,5.5);
+ assert.ok(p.sy<2.5);assert.notEqual(p.x,p.sx);
+ const source=[p.sx,p.sy];b.update(.01);assert.deepEqual([p.sx,p.sy],source);
+});
+
+test('Les 100 tours, construites en jeu, produisent l’action ou le soutien de leur rôle',()=>{
+ const attendus=[
+  ['projectile','slash','projectile','projectile','zap','projectile','soutien','soutien','projectile','zap'],
+  ['projectile','slash','projectile','projectile','zap','projectile','zap','soutien','projectile','zap'],
+  ['projectile','boom','boom','projectile','projectile','projectile','projectile','soutien','projectile','boom'],
+  ['projectile','boom','projectile','projectile','projectile','projectile','flame','soutien','mine','zap'],
+  ['projectile','slash','projectile','projectile','projectile','projectile','projectile','soutien','projectile','invocation']
+ ];
+ for(let f=0;f<N;f++)for(let j=0;j<10;j++){
+  const T=TW(f,j),b=terrain(f);assert.ok(b.place(5,3,K(f,j)),T.n);pret(b);b.am=15;b.t[0].stun=1;
+  const c=fort(apparaitre(S,b,T.ao||T.ab?S.FLY[0]:0));c.x=6;c.y=3.25;c.tx=6;c.ty=4;
+  if(T.rmin)c.y=4.5;
+  b.t[0].stun=0;b.fx=[];b.update(.01);
+  const a=attendus[f%5][j];
+  if(a==='projectile')assert.equal(b.pr[0]?.k,K(f,j),T.n);
+  else if(a==='mine')assert.ok(b.mi?.length===1||b.fx.some(e=>e.type==='boom'),T.n);
+  else if(a==='invocation')assert.equal(b.al?.length,1,T.n);
+  else if(a==='soutien')assert.ok(T.au||T.eco,T.n);
+  else assert.ok(b.fx.some(e=>e.type===a),T.n+' : '+a);
+ }
+});
+
+test('L’instantané multijoueur conserve les états et l’origine des tirs',async()=>{
+ const {GameRoom}=await import('../../server/src/worker.js');
+ const game=partie(S),b=game.B[0],c=fort(apparaitre(S,b,0));
+ b.hit(c,0,TW(2,0),1);b.hit(c,0,TW(3,6),1);
+ b.pr.push({id:42,k:0,x:5.75,y:2,tx:6.5,ty:4.25,tot:3,a:0,sx:5.5,sy:1.75});
+ const snap=GameRoom.prototype.snap.call({game},true);
+ assert.equal(snap.B[0].c[0][5]&(16|1024),16|1024);
+ assert.deepEqual(Array.from(snap.B[0].p[0]),[42,0,5.75,2,6.5,4.25,3,0,5.5,1.75]);
 });

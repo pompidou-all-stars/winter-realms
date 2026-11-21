@@ -57,7 +57,7 @@ export class GameRoom{
    cl.token=clean(m.token,40);cl.name=clean(m.name,16)||'Joueur';if(!cl.token){cl.ws.close();return}
    for(const o of this.clients)if(o!==cl&&o.token===cl.token){o.token=null;try{o.ws.close()}catch(_){}} // même joueur, nouvel onglet
    let i=this.seats.findIndex(s=>s&&s.token===cl.token);
-   if(i<0&&!this.game){i=this.seats.findIndex(s=>!s);if(i>=0){const used=this.seats.filter(Boolean).map(s=>s.f);const f=[0,1,2,3,4].find(x=>!used.includes(x));this.seats[i]={token:cl.token,name:cl.name,f:f??0}}}
+   if(i<0&&!this.game){i=this.seats.findIndex(s=>!s);if(i>=0){const used=this.seats.filter(Boolean).map(s=>s.f);const f=FACTIONS.map((_,i)=>i).find(x=>!used.includes(x));this.seats[i]={token:cl.token,name:cl.name,f:f??0}}}
    cl.seat=i;if(i>=0)this.seats[i].name=cl.name;
    if(!this.leader||!this.online(this.leader))this.leader=cl.token;
    this.lobby();
@@ -79,7 +79,7 @@ export class GameRoom{
 
  /* IA sur les sièges vides : de préférence les factions que personne n'a prises */
  start(){const humans=this.seats.filter(Boolean);if(!humans.length)return;
-  const free=[0,1,2,3,4].filter(f=>!humans.some(s=>s.f===f));let k=0;
+  const free=FACTIONS.map((_,i)=>i).filter(f=>!humans.some(s=>s.f===f));let k=0;
   this.gseats=this.seats.map((s,i)=>s?{name:s.name,col:SEAT_COL[i],ai:0,classId:s.f}:{name:'IA '+(i+1),col:SEAT_COL[i],ai:1,classId:free.length?free[k++%free.length]:(i%5)});
   this.game=new Game(this.gseats,this.lv);this.n=0;this.last=Date.now();
   for(const cl of this.clients)this.put(cl,this.startMsg(cl));
@@ -101,7 +101,7 @@ export class GameRoom{
   return {t:'snap',time:r2(g.time),tick:r2(g.tick),qu:q?{id:q.id,t0:r2(q.t0),fin:r2(q.fin),or:q.or,cible:q.cible,sc:q.sc}:null,log:full?[]:g.log.splice(0),B:g.B.map(b=>({gold:Math.floor(b.gold),inc:b.inc,lives:b.lives,dead:b.dead,tier:b.tier,am:b.am||0,al:(b.al||[]).map(a=>[r2(a.x),r2(a.y),a.g,a.f||1]),mi:(b.mi||[]).map(m=>[r2(m.x),r2(m.y)]),
    t:b.t.map(t=>[t.x,t.y,t.k,t.lv,t.inv,r2(t.a),t.sw>0?1:0,t.stun>0?1:0,t.b>0?r2(t.b):0,t.b>0?r2(t.bt):0]),
    c:b.cr.map(c=>[c.id,c.k,r2(c.x),r2(c.y),r2(Math.max(0,c.hp/c.max)),sim.etats(c),c.f,r2(c.ph),r2(c.ox),r2(c.oy)]),
-   p:b.pr.map(p=>[p.id,p.k,r2(p.x),r2(p.y),r2(p.tx),r2(p.ty),r2(p.tot),r2(p.a)]),
+   p:b.pr.map(p=>[p.id,p.k,r2(p.x),r2(p.y),r2(p.tx),r2(p.ty),r2(p.tot),r2(p.a),r2(p.sx??p.x),r2(p.sy??p.y)]),
    fx:full?[]:b.fx.filter(f=>!f.s).map(f=>{f.s=1;const o={};for(const k in f)if(k!=='s')o[k]=typeof f[k]=='number'?r2(f[k]):f[k];return o}),
    ev:full?[]:b.ev.splice(0)}))}}
 }

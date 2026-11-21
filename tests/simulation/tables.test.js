@@ -5,9 +5,10 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const {charger}=require('../outils/moteur');
 const S=charger('actuel');
 
-test('Les tables ont la forme attendue : 6 archétypes de dessin, 5 races de 10 tours, 10 rôles, 50 tours, 3 difficultés',()=>{
- assert.equal(S.BASE_TW.length,6);assert.equal(S.RACES.length,5);assert.equal(S.FACTIONS,S.RACES);for(const F of S.RACES){assert.equal(F.tours.length,10);assert.equal(F.towers.length,10)}
- assert.equal(S.ROLES_J.length,10);assert.equal(S.TW.length,50);assert.equal(S.DIFF.length,3);
+/* 2.44 : 10 races (les 5 races asymétriques et les 5 de Thibaut, qui reprennent leurs mécaniques : champ m) */
+test('Les tables ont la forme attendue : 6 archétypes de dessin, 10 races de 10 tours, 10 rôles, 100 tours, 3 difficultés',()=>{
+ assert.equal(S.BASE_TW.length,6);assert.equal(S.RACES.length,10);assert.equal(S.RACES.map(F=>F.m).join(),"0,1,2,3,4,0,1,2,3,4");assert.equal(S.FACTIONS,S.RACES);for(const F of S.RACES){assert.equal(F.tours.length,10);assert.equal(F.towers.length,10)}
+ assert.equal(S.ROLES_J.length,10);assert.equal(S.TW.length,100);assert.equal(S.DIFF.length,3);
 });
 test('Chaque tour et chaque monstre a des statistiques valides (nombres positifs)',()=>{
  for(const T of S.TW){for(const f of ['c','r','cd'])assert.ok(Number.isFinite(T[f])&&T[f]>0,`${T.n} : ${f}`);

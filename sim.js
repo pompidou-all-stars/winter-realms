@@ -30,7 +30,7 @@ const ROLES_J=[{name:'Base',tag:'sol et air'},{name:'Proximité',tag:'corps à c
  {name:'Détection',tag:'détecte'},{name:'Signature',tag:'signature'},{name:'Soutien',tag:'soutien'},{name:'Anti-boss',tag:'anti-boss'},{name:'Ultime',tag:'ultime'}];
 const REGLES={RADAR_SOMME:30,RADAR_MIN:3,RADAR_MAX:8,axes:['Mono-cible','Zone','Anti-aérien','Anti-blindé et boss','Contrôle','Économie et montée en puissance'],court:['Mono-cible','Zone','Anti-air','Anti-blindé','Contrôle','Économie']};
 const RACES=[
- {name:'Royaume d’Aubeval',court:'Aubeval',icon:'👑',color:'#d8b45c',dark:'#59451f',ex:'Alliance',
+ {m:0,name:'Royaume d’Aubeval',court:'Aubeval',icon:'👑',color:'#d8b45c',dark:'#59451f',ex:'Alliance',
   desc:'Ordre, foi et ingénierie de siège : la race la plus polyvalente, la seule à avoir une économie.',
   histoire:'Les chevaliers d’Aubeval tiennent les cols du Sud depuis mille hivers. Leurs murs se serrent en formation, leurs chapelles marquent l’ennemi du sceau du Jugement, et leurs marchands financent la guerre.',
   meca:{n:'Cohésion',txt:'Chaque tour d’Aubeval voisine donne +4 % de dégâts (jusqu’à +16 %). Les murs serrés du labyrinthe deviennent plus forts.'},
@@ -50,7 +50,7 @@ const RACES=[
    {n:'Étendard royal',skin:4,no:1,c:90,r:1.5,au:{cad:.15,coh:2},txt:'Ne tire pas. Tours voisines : +15 % de cadence, et la Cohésion compte double autour de lui.'},
    {n:'Inquisiteur',skin:3,c:140,r:3,d:48,cd:1.3,pierce:1,spe:2,jug:1.6,txt:'Ignore l’armure. Dégâts ×2 contre les monstres spéciaux et les boss. Fait détoner le sceau des Marqués.'},
    {n:'Rayon de l’Aube',skin:3,u:1,mag:1,c:260,r:3.4,d:14,cd:.25,bm:.25,bmx:4,jug:1.6,txt:'Ultime, une seule par terrain. Rayon continu : +25 % à chaque tir sur la même cible, jusqu’à ×4.'}]},
- {name:'Clans de l’Orage Blanc',court:'Orage Blanc',icon:'⚡',color:'#78a94b',dark:'#294322',ex:'Horde',
+ {m:1,name:'Clans de l’Orage Blanc',court:'Orage Blanc',icon:'⚡',color:'#78a94b',dark:'#294322',ex:'Horde',
   desc:'Chamanes des steppes gelées : totems, tambours, foudre en chaîne et rage.',
   histoire:'Quand l’orage blanc gronde sur la toundra, les clans dressent leurs totems. Leurs chamanes appellent la foudre, leurs tambours réveillent la rage, et chaque ennemi abattu nourrit la Fureur du clan.',
   meca:{n:'Fureur',txt:'Chaque monstre tué par une tour lui donne 1 charge de Fureur (+3 % de cadence, jusqu’à 10). Une charge se perd toutes les 2 s sans victoire. À 10 charges : Rage, +30 % de dégâts pendant 3 s.'},
@@ -70,7 +70,7 @@ const RACES=[
    {n:'Grands tambours de guerre',skin:4,no:1,c:90,r:1.5,au:{cad:.2,fu:2},txt:'Ne tire pas. Tours voisines : +20 % de cadence et Fureur gagnée doublée.'},
    {n:'Totem de sang',skin:3,c:120,r:2.6,d:6,cd:1,sg:.015,txt:'Saignement : la cible perd 1,5 % de ses PV max par seconde pendant 3 s. L’arme des clans contre les géants.'},
    {n:'Cœur de l’Orage',skin:3,u:1,mag:1,c:280,r:4,d:90,cd:4,pu:6,fuG:1,txt:'Ultime, une seule par terrain. Toutes les 4 s, 6 éclairs tombent à sa portée ; chaque victime donne +1 Fureur à toutes tes tours.'}]},
- {name:'Elfes de Lunebois',court:'Lunebois',icon:'🌿',color:'#69bd83',dark:'#214b38',ex:'Sylvestres',
+ {m:2,name:'Elfes de Lunebois',court:'Lunebois',icon:'🌿',color:'#69bd83',dark:'#214b38',ex:'Sylvestres',
   desc:'La forêt vivante, le venin et la patience : poison, racines et tours qui grandissent.',
   histoire:'Sous la lune d’hiver, les forêts de Lunebois ne dorment jamais. Leurs archers trempent leurs flèches dans le venin, leurs gardiens enracinent l’ennemi, et leurs arbres grandissent à chaque saison de guerre.',
   meca:{n:'Croissance',txt:'Chaque tour gagne +1 % de dégâts et de portée toutes les 10 s sur place, jusqu’à +25 %. La vendre lui fait perdre ce bonus.'},
@@ -90,11 +90,11 @@ const RACES=[
    {n:'Bosquet ancien',skin:4,no:1,c:85,r:1.5,au:{rg:.12,dose:1},txt:'Ne tire pas. Tours voisines : +12 % de portée et +1 dose de poison par coup.'},
    {n:'Tireur des cimes',skin:0,c:130,r:4.4,d:54,cd:1.8,vise:'pv',xim:1.5,txt:'Très longue portée, vise le monstre le plus résistant. Dégâts ×1,5 sur un enraciné.'},
    {n:'Arbre-Mère',skin:2,u:1,gr:1,c:250,r:3.6,d:36,cd:10,pu:0,im:1.5,cgG:3,txt:'Ultime, une seule par terrain. Toutes les 10 s, enracine tout à sa portée ; toutes tes tours grandissent trois fois plus vite.'}]},
- {name:'Nains de Hautroc',court:'Hautroc',icon:'⚒️',color:'#c58b55',dark:'#56351f',ex:'Nains',
+ {m:3,name:'Nains de Hautroc',court:'Hautroc',icon:'⚒️',color:'#c58b55',dark:'#56351f',ex:'Nains',
   desc:'Forge, runes et artillerie lourde : la race de l’armure brisée et de la chauffe.',
   histoire:'Dans les halls de Hautroc, les forges ne s’éteignent jamais. Les nains chauffent leurs canons au rouge, gravent des runes qui fendent les armures et posent des mines sous la neige.',
   meca:{n:'Forge et Chauffe',txt:'Améliorations 15 % moins chères et plus rapides ; étourdissements subis deux fois plus courts. Les tours à tir continu chauffent (+50 % de dégâts au maximum) mais s’arrêtent 2 s en surchauffe, sauf à côté d’une Enclume runique.'},
-  etats:['Brisé : −12 % d’armure par point, jusqu’à 5 points','Brûlant : dégâts par seconde'],
+  etats:['Brisé : −15 % d’armure par point, jusqu’à 5 points','Brûlant : dégâts par seconde'],
   forces:'blindés, boss, artillerie au sol',faible:'volants hors de la tour dédiée, aucun ralentissement',radar:[6,6,4,8,3,3],up:{1:6,3:8},
   combos:[{n:'Brèche',a:[2,3],txt:'La Baliste perce-plaque brise l’armure ; à 5 points, le Mortier runique (et Grondeterre) font +40 %.'},
    {n:'Fusion',a:[6,1],txt:'Un monstre Brûlant frappé par le Marteau-pilon perd 2 points d’armure de plus.'},
@@ -110,7 +110,7 @@ const RACES=[
    {n:'Enclume runique',skin:4,no:1,c:90,r:1.5,au:{dm:.15,nf:1},txt:'Ne tire pas. Tours voisines : +15 % de dégâts, et elles ne surchauffent plus.'},
    {n:'Champ de mines',skin:1,gr:1,c:110,r:2.2,d:68.8,cd:2.5,mn:4,txt:'Pose jusqu’à 4 mines runiques sur le chemin à sa portée ; elles explosent au passage.'},
    {n:'Grondeterre',skin:1,u:1,gr:1,c:280,r:5,d:275,cd:6,ln:1,pierce:1,bre:1.4,txt:'Ultime, une seule par terrain. Canon de siège : toutes les 6 s, un tir en ligne qui traverse tout et ignore l’armure.'}]},
- {name:'Cour des Ossements',court:'Ossements',icon:'☠️',color:'#a879c9',dark:'#39204d',ex:'Légion des ombres',
+ {m:4,name:'Cour des Ossements',court:'Ossements',icon:'☠️',color:'#a879c9',dark:'#39204d',ex:'Légion des ombres',
   desc:'Nécromancie, âmes, peste et malédictions : la race de l’invocation et du nombre.',
   histoire:'Sous les glaciers dorment les morts de mille batailles. La Cour des Ossements récolte les âmes des vaincus, maudit les vivants, répand la peste et relève les morts pour qu’ils combattent encore.',
   meca:{n:'Âmes',txt:'Chaque monstre qui meurt près de tes tours donne 1 âme (2 s’il était Maudit), jusqu’à 30. Le Nécromancien et le Colosse d’os les dépensent ; le Puits des âmes les convertit.'},
@@ -129,7 +129,108 @@ const RACES=[
    {n:'Nécromancien',skin:3,mag:1,c:95,r:2.8,d:10,cd:1.2,rz:{d:12,t:6},txt:'Dépense 1 âme pour relever un monstre tué à sa portée : le mort remonte le chemin et frappe.'},
    {n:'Puits des âmes',skin:4,no:1,c:80,r:1.5,au:{am:1},txt:'Ne tire pas. Tours voisines : +2 % de cadence par tranche de 5 âmes. Âmes au maximum : 5 âmes deviennent de l’or.'},
    {n:'Faucheuse',skin:3,c:130,r:2.6,d:50,cd:1.4,ex:.12,txt:'Exécute les monstres sous 12 % de PV. Contre un boss : +50 % de dégâts sous 25 %.'},
-   {n:'Colosse d’os',skin:4,u:1,no:1,c:260,r:3,cd:45,col:{am:15,d:60,t:12},txt:'Ultime, un seul par terrain. Dépense 15 âmes : un colosse d’os remonte le chemin et écrase tout autour de lui.'}]}];
+   {n:'Colosse d’os',skin:4,u:1,no:1,c:260,r:3,cd:45,summon:{am:15,d:60,t:12},txt:'Ultime, un seul par terrain. Dépense 15 âmes : un colosse d’os remonte le chemin et écrase tout autour de lui.'}]},
+ /* 2.44 : les 5 races de Thibaut (2.42), en plus : mêmes mécaniques que les 5 premières (champ m), tours dessinées par silhouettes (sil) */
+ {m:0,sil:1,name:'Humains',court:'Humains',icon:'🏹',color:'#d8b45c',dark:'#59451f',ex:'Alliance',
+  desc:'Archers, chevaliers et ingénieurs de siège : défense polyvalente et économie.',
+  histoire:'Les chevaliers d’Aubeval tiennent les cols du Sud. Leurs chapelles marquent l’ennemi du sceau du Jugement et leurs marchands financent leurs fortifications.',
+  meca:{n:'Cohésion',txt:'Chaque tour humaine voisine donne +4 % de dégâts (jusqu’à +16 %). Les murs serrés du labyrinthe deviennent plus forts.'},
+  etats:['Marqué : +15 % de dégâts subis ; l’Inquisiteur et le Rayon de l’Aube font détoner le sceau','Abattu : un volant tombe au sol 2 s, les tours « sol » peuvent le frapper'],
+  forces:'polyvalence, économie, anti-boss',faible:'zone moyenne, peu de contrôle',radar:[6,4,6,7,3,4],up:{0:8},
+  combos:[{n:'Jugement',a:[5,8],txt:'Le Prêtre solaire marque un monstre ; l’Inquisiteur (ou le Rayon de l’Aube) fait détoner le sceau : +60 % sur ce coup.'},
+   {n:'Chute',a:[2,3],txt:'Le Lance-filets abat un volant ; la Bombarde impériale l’écrase au sol : dégâts ×1,5.'},
+   {n:'Formation',a:[7,0],txt:'Autour de l’Étendard royal, chaque voisin compte double pour la Cohésion : jusqu’à +32 % de dégâts.'}],
+  tours:[
+   {n:'Archer royal',skin:0,c:20,r:2.9,d:8,cd:.5,txt:'Carreaux réguliers, au sol et dans les airs. La base, solide et bon marché.'},
+   {n:'Chevalier du rempart',skin:4,me:1,gr:1,c:30,r:1.5,d:16,cd:.6,cl:2,txt:'Corps à corps : chaque balayage frappe 2 monstres à la fois.'},
+   {n:'Lance-filets',skin:2,c:45,r:2.6,d:3,cd:2.2,ps:9,im:.8,ab:2,txt:'Lance un filet : le monstre est immobilisé 0,8 s. Un volant est abattu au sol pendant 2 s.'},
+   {n:'Bombarde impériale',skin:1,gr:1,c:65,r:3.6,rmin:1.5,d:34,cd:2.4,ps:5,sp:1.3,chu:1.5,txt:'Très longue portée et grosse explosion, au sol. Ne tire pas à moins de 1,5 case.'},
+   {n:'Baliste céleste',skin:0,c:60,r:3.3,d:22,cd:1.3,ln:1,air:2,sol:.5,txt:'Carreau qui traverse tout sur sa ligne. Dégâts ×2 contre les volants, ×0,5 au sol.'},
+   {n:'Prêtre solaire',skin:3,mag:1,det:1,c:80,r:3,d:14,cd:1,mk:3,txt:'Révèle les invisibles et pose le sceau du Jugement (Marqué : +15 % de dégâts subis pendant 3 s).'},
+   {n:'Comptoir marchand',skin:4,no:1,c:100,r:2.5,eco:5,prime:.2,txt:'Ne tire pas. +5 or toutes les 10 s par niveau, et +20 % de prime sur les monstres tués à sa portée.'},
+   {n:'Étendard royal',skin:4,no:1,c:90,r:1.5,au:{cad:.15,coh:2},txt:'Ne tire pas. Tours voisines : +15 % de cadence, et la Cohésion compte double autour de lui.'},
+   {n:'Inquisiteur',skin:3,c:140,r:3,d:48,cd:1.3,pierce:1,spe:2,jug:1.6,txt:'Ignore l’armure. Dégâts ×2 contre les monstres spéciaux et les boss. Fait détoner le sceau des Marqués.'},
+   {n:'Rayon de l’Aube',skin:3,u:1,mag:1,c:260,r:3.4,d:14,cd:.25,bm:.25,bmx:4,jug:1.6,txt:'Ultime, une seule par terrain. Rayon continu : +25 % à chaque tir sur la même cible, jusqu’à ×4.'}]},
+ {m:1,sil:1,name:'Créatures',court:'Créatures',icon:'🐉',color:'#c77964',dark:'#543025',ex:'Horde',
+  desc:'Prédateurs, chimères et dragons : éclairs en chaîne et Fureur.',
+  histoire:'Dans la toundra, les créatures chassent ensemble. Leurs cris réveillent la Fureur et leurs éclairs bondissent de proie en proie.',
+  meca:{n:'Fureur',txt:'Chaque monstre tué par une tour lui donne 1 charge de Fureur (+3 % de cadence, jusqu’à 10). Une charge se perd toutes les 2 s sans victoire. À 10 charges : Rage, +30 % de dégâts pendant 3 s.'},
+  etats:['Trempé : −20 % de vitesse ; les éclairs rebondissent deux fois plus','Maléfice : le monstre devient un crapaud 1,5 s (armure 0, vitesse ×0,6), jamais sur un boss','Saignement : perd 1,5 % de ses PV max par seconde'],
+  forces:'zone en chaîne, foules, anti-aérien',faible:'monstres isolés et blindés, boss',radar:[3,8,6,3,5,5],up:{0:6,1:8},
+  combos:[{n:'Conduction',a:[2,6],txt:'Le Souffle de givre trempe les monstres ; l’éclair de la Salamandre foudroyante rebondit deux fois plus sur un Trempé.'},
+   {n:'Rage animale',a:[7,1],txt:'Le Béhémoth gardien double la Fureur gagnée : le Griffeur sauvage atteint vite 10 charges et entre en Rage.'},
+   {n:'Crapaud saignant',a:[5,8],txt:'L’Oracle chimérique ralentit la cible et retire son armure. Le Vampire des neiges profite d’une cible plus lente pour renouveler le saignement.'}],
+  tours:[
+   {n:'Chasseur épineux',skin:0,c:20,r:2.6,d:9,cd:.5,txt:'Épines lancées au sol et dans les airs. Gagne vite de la Fureur.'},
+   {n:'Griffeur sauvage',skin:4,me:1,gr:1,c:30,r:1.5,d:19,cd:.55,fu2:1,txt:'Corps à corps. Sa Fureur monte deux fois plus vite.'},
+   {n:'Souffle de givre',skin:2,mag:1,c:40,r:2.5,d:2,cd:1,ps:8,sl:1.5,fsp:1.2,tw:1,txt:'Pluie glacée en zone : ralentit et trempe les monstres (les éclairs rebondissent deux fois plus).'},
+   {n:'Cracheur de rochers',skin:1,gr:1,c:55,r:2.7,d:21,cd:1.3,ps:6.5,sp:1.1,im:.3,txt:'Rocher en zone, au sol, qui étourdit 0,3 s.'},
+   {n:'Rapace des cimes',skin:0,c:60,r:3,d:16,cd:.8,ch:2,air:2,sol:.6,txt:'L’aigle plonge et son éclair rebondit sur 2 autres cibles. Dégâts ×2 contre les volants.'},
+   {n:'Oracle chimérique',skin:3,mag:1,det:1,c:85,r:3.1,d:26,cd:1.4,hx:1.5,txt:'Révèle les invisibles. Maléfice : change le monstre en crapaud 1,5 s (armure 0, vitesse ×0,6).'},
+   {n:'Salamandre foudroyante',skin:3,mag:1,c:75,r:2.8,d:18,cd:1.1,ch:3,cond:2,txt:'Chaîne d’éclairs : 3 rebonds, −25 % par rebond. Deux fois plus de rebonds sur un Trempé.'},
+   {n:'Béhémoth gardien',skin:4,no:1,c:90,r:1.5,au:{cad:.2,fu:2},txt:'Ne tire pas. Tours voisines : +20 % de cadence et Fureur gagnée doublée.'},
+   {n:'Vampire des neiges',skin:3,c:120,r:2.6,d:6,cd:1,sg:.015,txt:'Saignement : la cible perd 1,5 % de ses PV max par seconde pendant 3 s. L’arme des clans contre les géants.'},
+   {n:'Dragon ancestral',skin:3,u:1,mag:1,c:280,r:4,d:90,cd:4,pu:6,fuG:1,txt:'Ultime, une seule par terrain. Toutes les 4 s, 6 éclairs tombent à sa portée ; chaque victime donne +1 Fureur à toutes tes tours.'}]},
+ {m:2,sil:1,name:'Herbe',court:'Herbe',icon:'🌿',color:'#69bd83',dark:'#214b38',ex:'Sylvestres',
+  desc:'Arbres, ronces et plantes : poison, racines et croissance.',
+  histoire:'Les forêts ne dorment jamais. Leurs gardiens enracinent l’ennemi et leurs plantes accumulent le venin à chaque attaque.',
+  meca:{n:'Croissance',txt:'Chaque tour gagne +1 % de dégâts et de portée toutes les 10 s sur place, jusqu’à +25 %. La vendre lui fait perdre ce bonus.'},
+  etats:['Empoisonné : jusqu’à 10 doses, chacune inflige des dégâts par seconde qui ignorent l’armure','Enraciné : le monstre ne bouge plus (moitié moins longtemps pour un boss)'],
+  forces:'blindés, contrôle, contagion',faible:'démarrage lent, monstres rapides',radar:[4,5,5,6,7,3],up:{0:8,3:6},
+  combos:[{n:'Floraison',a:[0,6],txt:'Les flèches et la Fleur de venin empilent le poison ; le Cercle de Floraison fait éclore toutes les doses d’un coup.'},
+   {n:'Terreau',a:[2,3],txt:'Sur un monstre enraciné par le Gardien, le poison de la Fleur de venin agit deux fois plus vite.'},
+   {n:'Spores',a:[3,0],txt:'Un monstre qui meurt avec 5 doses ou plus éclate en spores et empoisonne ses voisins.'}],
+  tours:[
+   {n:'Arbre archer',skin:0,c:20,r:2.8,d:5.4,cd:.5,pz:1,pv:.3,txt:'Flèches au sol et dans les airs ; chacune ajoute 1 dose de poison.'},
+   {n:'Haie de ronces',skin:4,gr:1,c:25,r:1.3,d:4.5,cd:.5,pu:0,pz:1,pv:.3,txt:'Épines : blesse et empoisonne tout ce qui passe à côté, au sol.'},
+   {n:'Gardien des racines',skin:2,gr:1,c:45,r:2.2,d:5.4,cd:4,pu:0,im:1,txt:'Toutes les 4 s, des racines immobilisent 1 s tous les monstres au sol à sa portée.'},
+   {n:'Fleur de venin',skin:1,c:55,r:2.4,d:4,cd:1,ps:6.5,sp:1.3,pz:2,pv:.5,txt:'Nuage de venin en zone, au sol et dans les airs : 2 doses de poison.'},
+   {n:'Faucon sylvestre',skin:0,c:55,r:3.1,d:10.8,cd:.7,air:2,sol:.5,pz:1,pv:.4,txt:'Les chouettes chassent les volants (dégâts ×2) et les empoisonnent.'},
+   {n:'Druide des clairières',skin:3,mag:1,det:1,c:80,r:3.2,d:19.8,cd:1.3,au:{cg:2},txt:'Révèle les invisibles. Les tours voisines grandissent deux fois plus vite.'},
+   {n:'Cercle de Floraison',skin:3,mag:1,c:90,r:2.8,d:9,cd:1.6,flo:1.3,txt:'Fait éclore le poison : toutes les doses de la cible explosent d’un coup.'},
+   {n:'Ent protecteur',skin:4,no:1,c:85,r:1.5,au:{rg:.12,dose:1},txt:'Ne tire pas. Tours voisines : +12 % de portée et +1 dose de poison par coup.'},
+   {n:'Tireur des cimes',skin:0,c:130,r:4.4,d:54,cd:1.8,vise:'pv',xim:1.5,txt:'Très longue portée, vise le monstre le plus résistant. Dégâts ×1,5 sur un enraciné.'},
+   {n:'Ancien des forêts',skin:2,u:1,gr:1,c:250,r:3.6,d:36,cd:10,pu:0,im:1.5,cgG:3,txt:'Ultime, une seule par terrain. Toutes les 10 s, enracine tout à sa portée ; toutes tes tours grandissent trois fois plus vite.'}]},
+ {m:3,sil:1,name:'Robots',court:'Robots',icon:'🤖',color:'#78a9c9',dark:'#203e54',ex:'Nains',
+  desc:'Drones et automates : surchauffe, blindage percé et mines.',
+  histoire:'Les automates chauffent leurs réacteurs au rouge et déploient des mines sous la neige. Leurs ateliers accélèrent les améliorations.',
+  meca:{n:'Maintenance et Chauffe',txt:'Améliorations 15 % moins chères et plus rapides ; étourdissements subis deux fois plus courts. Les tours à tir continu chauffent (+50 % de dégâts au maximum) mais s’arrêtent 2 s en surchauffe, sauf à côté d’un Cerveau quantique.'},
+  etats:['Brisé : −15 % d’armure par point, jusqu’à 5 points','Brûlant : dégâts par seconde'],
+  forces:'blindés, boss, artillerie au sol',faible:'volants hors de la tour dédiée, aucun ralentissement',radar:[6,6,4,8,3,3],up:{1:6,3:8},
+  combos:[{n:'Brèche',a:[2,3],txt:'Le Perforateur mécanique brise l’armure ; à 5 points, le Canon à impulsion et le Titan mécanique infligent 40 % de dégâts en plus.'},
+   {n:'Fusion',a:[6,1],txt:'Un monstre Brûlant frappé par l’Automate de mêlée perd 2 points d’armure de plus.'},
+   {n:'Forge froide',a:[7,0],txt:'À côté du Cerveau quantique, le Drone sentinelle et le Réacteur incendiaire ne surchauffent plus.'}],
+  tours:[
+   {n:'Drone sentinelle',skin:0,c:20,r:2.7,d:5.1,cd:.3,ht:.04,txt:'Tir très rapide au sol et dans les airs, qui monte en Surchauffe.'},
+   {n:'Automate de mêlée',skin:4,gr:1,c:35,r:1.4,d:25,cd:.9,pu:0,im:.2,fus:2,txt:'Onde de choc autour de lui, au sol, qui sonne les monstres 0,2 s.'},
+   {n:'Perforateur mécanique',skin:0,c:45,r:2.9,d:17.5,cd:.8,br:1,txt:'Brise l’armure : −15 % par coup, jusqu’à 5 points.'},
+   {n:'Canon à impulsion',skin:1,gr:1,c:60,r:3.4,d:32.5,cd:1.6,ps:6,sp:1.2,bre:1.4,txt:'Obus runique en zone, longue portée, au sol.'},
+   {n:'Drone antiaérien',skin:1,ao:1,c:60,r:3.2,d:23.8,cd:.6,ps:9,sp:.9,txt:'Ne vise que les volants : éclats qui explosent en l’air.'},
+   {n:'Module à plasma',skin:3,det:1,c:75,r:3.6,d:15,cd:1,rvb:1,txt:'Rayon runique. Révèle les invisibles et brise d’un point l’armure de tout ce qui passe dans sa lumière.'},
+   {n:'Réacteur incendiaire',skin:5,fl:1,c:70,r:2,d:4,cd:.12,bu:4,ht:.02,txt:'Souffle de flammes en cône qui rend les monstres Brûlants, et monte en Surchauffe.'},
+   {n:'Cerveau quantique',skin:4,no:1,c:90,r:1.5,au:{dm:.15,nf:1},txt:'Ne tire pas. Tours voisines : +15 % de dégâts, et elles ne surchauffent plus.'},
+   {n:'Poseur de mines',skin:1,gr:1,c:110,r:2.2,d:68.8,cd:2.5,mn:4,txt:'Pose jusqu’à 4 mines runiques sur le chemin à sa portée ; elles explosent au passage.'},
+   {n:'Titan mécanique',skin:1,u:1,gr:1,c:280,r:5,d:275,cd:6,ln:1,pierce:1,bre:1.4,txt:'Ultime, une seule par terrain. Canon de siège : toutes les 6 s, un tir en ligne qui traverse tout et ignore l’armure.'}]},
+ {m:4,sil:1,name:'Magique',court:'Magique',icon:'🔮',color:'#a879c9',dark:'#39204d',ex:'Légion des ombres',
+  desc:'Mages et esprits : malédictions, peste et invocations.',
+  histoire:'Les mages récoltent les âmes des vaincus. Ils se servent de cette énergie pour relever les morts et invoquer des colosses.',
+  meca:{n:'Âmes',txt:'Chaque monstre qui meurt près de tes tours donne 1 âme (2 s’il était Maudit), jusqu’à 30. L’Enchanteur du néant et le Colosse d’os les dépensent ; le Gardien éthéré les convertit.'},
+  etats:['Maudit : +20 % de dégâts subis','Pestiféré : dégâts par seconde ; à sa mort, la peste saute sur ses voisins'],
+  forces:'foules, amplification, blocage',faible:'boss isolé, démarrage lent',radar:[3,6,4,4,6,7],up:{0:8,1:6},
+  combos:[{n:'Récolte',a:[2,0],txt:'Un monstre Maudit par le Sceau de malédiction qui meurt donne 2 âmes au lieu d’une.'},
+   {n:'Épidémie',a:[3,2],txt:'La peste de l’Orbe fait deux fois plus de dégâts sur un monstre Maudit.'},
+   {n:'Armée des morts',a:[6,3],txt:'Avec l’Orbe de peste, les morts relevés par l’Enchanteur du néant répandent la peste en frappant.'}],
+  tours:[
+   {n:'Apprenti arcanique',skin:0,c:20,r:2.8,d:7.8,cd:.5,txt:'Flèches d’os au sol et dans les airs.'},
+   {n:'Lame spectrale',skin:4,me:1,gr:1,c:35,r:1.8,d:8,cd:3,im:1.5,os:1,txt:'Des squelettes sortent de la neige et retiennent un monstre 1,5 s.'},
+   {n:'Sceau de malédiction',skin:2,mag:1,c:40,r:2.6,d:3,cd:.9,ps:8,sp:1,ma:3,txt:'Malédiction en zone : Maudit, +20 % de dégâts subis pendant 3 s.'},
+   {n:'Orbe de peste',skin:1,c:55,r:2.4,d:4,cd:1.2,ps:6.5,sp:1.3,pe:5,txt:'Nuage de peste en zone : dégâts dans la durée, qui sautent sur les voisins à la mort.'},
+   {n:'Perchoir des gargouilles',skin:0,c:60,r:3,d:18,cd:.7,air:2,sol:.6,txt:'Les gargouilles harcèlent les volants : dégâts ×2 contre eux.'},
+   {n:'Œil des arcanes',skin:3,mag:1,det:1,c:85,r:3.2,d:24,cd:1.3,ma:3,txt:'Révèle les invisibles et maudit sa cible.'},
+   {n:'Enchanteur du néant',skin:3,mag:1,c:95,r:2.8,d:10,cd:1.2,rz:{d:12,t:6},txt:'Dépense 1 âme pour relever un monstre tué à sa portée : le mort remonte le chemin et frappe.'},
+   {n:'Gardien éthéré',skin:4,no:1,c:80,r:1.5,au:{am:1},txt:'Ne tire pas. Tours voisines : +2 % de cadence par tranche de 5 âmes. Âmes au maximum : 5 âmes deviennent de l’or.'},
+   {n:'Faucheuse',skin:3,c:130,r:2.6,d:50,cd:1.4,ex:.12,txt:'Exécute les monstres sous 12 % de PV. Contre un boss : +50 % de dégâts sous 25 %.'},
+   {n:'Colosse d’os',skin:4,u:1,no:1,c:260,r:3,cd:45,summon:{am:15,d:60,t:12},txt:'Ultime, un seul par terrain. Dépense 15 âmes : un colosse d’os remonte le chemin et écrase tout autour de lui.'}]}];
 const FACTIONS=RACES;
 for(const F of RACES)F.towers=F.tours.map(o=>o.n);
 /* ancienne table (avant 2.40), gardée pour compatibilité : l'emplacement j donnait l'archétype */
@@ -138,7 +239,7 @@ const ARCH=[0,4,2,1,5,3,0,4,2,3],ROLE=ROLES_J;
 function estimer(T){const tir=T.no?0:T.d/T.cd,dot=T.dot=(T.pz?Math.min(DOSE_MAX,T.pz/T.cd*4)*T.pv:0)+(T.bu||0)+(T.pe?T.pe*.6:0);
  T.zf=T.sp?2.5:T.fl?3:T.ch?1+T.ch*.6:T.ln?2:T.pu===0?3:T.pu?Math.min(3,T.pu*.5):T.cl?T.cl:1;T.ed=tir+dot;return T}
 const TW=RACES.flatMap((F,fi)=>F.tours.map((o,j)=>{const B=BASE_TW[o.skin];
- const T={...B,sp:0,sl:0,fsp:0,me:0,fl:0,gr:0,mag:0,mg:0,...o,ps:o.ps||B.ps||9,s:o.s||B.s,col:F.color,faction:fi,j,role:ROLES_J[j].name,tag:ROLES_J[j].tag,
+ const T={...B,sp:0,sl:0,fsp:0,me:0,fl:0,gr:0,mag:0,mg:0,...o,ps:o.ps||B.ps||9,s:o.s||B.s,col:F.color,faction:fi,m:F.m??fi,j,role:ROLES_J[j].name,tag:ROLES_J[j].tag,
   air:o.air||1,sol:o.sol||1,mg:o.det?1:0,ctl:j==2?1:0,cd:o.cd||1,d:o.d||0};
  if(T.fsp)T.sl=GIVRE_LV.d[0];if(T.no){T.d=0;if(!o.cd)T.cd=1}
  return estimer(T)}));
@@ -252,7 +353,7 @@ const ETATS_T=['mk','ma','im','imI','hx','hxI','ab','tw','pt','sgT','bsT','bu','
  etats=c=>(c.sl>0?1:0)|(c.h?2:0)|(c.hl?4:0)|(c.hid?8:0)|(c.pz>0?16:0)|(c.mk>0?32:0)|(c.ma>0?64:0)|(c.im>0?128:0)|(c.tw>0?256:0)|(c.bs>0?512:0)|(c.bu>0?1024:0)|(c.pe>0?2048:0)|(c.hx>0?4096:0)|(c.ab>0?8192:0)|(c.sgT>0?16384:0),
  SERVITEUR={n:'Mort relevé',d:0},SERVITEUR_PESTE={n:'Mort relevé',d:0,pe:4};
 /* 2.40 : xd, xr = bonus de la tour (Cohésion, auras, Croissance, Chauffe, Rage) ; les Nains (Forge) paient leurs améliorations FORGE × le prix */
-const dmg=t=>TW[t.k].d*2**(t.lv-1)*(t.xd||1),rng=t=>TW[t.k].r*(1+.05*(t.lv-1))*(t.xr||1),upCost=t=>Math.round(TW[t.k].c*1.5*2**(t.lv-1)*(TW[t.k].faction==3?FORGE:1)/5)*5,topY=t=>.28+.045*(t.lv-1);
+const dmg=t=>TW[t.k].d*2**(t.lv-1)*(t.xd||1),rng=t=>TW[t.k].r*(1+.05*(t.lv-1))*(t.xr||1),upCost=t=>Math.round(TW[t.k].c*1.5*2**(t.lv-1)*(TW[t.k].m==3?FORGE:1)/5)*5,topY=t=>.28+.045*(t.lv-1);
 /* 2.38 : quêtes bonus. Une à la fois, tirées au hasard sans remise : la première à QU_T0 s, puis la suivante QU_PAUSE à QU_PAUSE + 60 s après la fin de la précédente.
    f = 'course' : le premier qui atteint la cible gagne (au plus dur s, sinon personne) ; f = 'photo' : au bout de dur s, le meilleur score gagne (sens -1 : le plus petit).
    sc(b) : score du terrain b ; sans abs, il se compte depuis le début de la quête (écart avec le score de départ) ; cible(G) : cible d'une course, calculée au lancement
@@ -410,11 +511,11 @@ class Board{
  bonus(){const L=this.t,act=L.filter(t=>!(t.b>0)),cg=this.t.some(t=>!(t.b>0)&&TW[t.k].cgG)?3:1,am=this.am||0;
   for(const t of L){const T=TW[t.k];let coh=0,cad=0,dm=0,rg=0,dose=0,nf=0,crg=1,fu=1,cw=1;
    for(const o of act){if(o===t||Math.abs(o.x-t.x)>1||Math.abs(o.y-t.y)>1)continue;const O=TW[o.k],a=O.au;
-    if(O.faction==0&&T.faction==0)coh++;if(!a)continue;const lv=1+.2*(o.lv-1);
+    if(O.m==0&&T.m==0)coh++;if(!a)continue;const lv=1+.2*(o.lv-1);
     if(a.cad)cad+=a.cad*lv;if(a.dm)dm+=a.dm*lv;if(a.rg)rg+=a.rg*lv;if(a.dose)dose+=a.dose;if(a.nf)nf=1;if(a.cg)crg=Math.max(crg,a.cg);if(a.fu)fu=Math.max(fu,a.fu);if(a.coh)cw=Math.max(cw,a.coh);
     if(a.am)cad+=Math.min(.12,.02*Math.floor(am/5))*lv}
-   const cr=T.faction==2?Math.min(CROIT_MAX,CROIT*Math.floor((t.age||0)/10)):0;
-   t.co=T.faction==0?Math.min(4*cw,coh*cw)*COH:0;t.bz=dose;t.nf=nf;t.fm=fu;t.cgr=crg*cg;
+   const cr=T.m==2?Math.min(CROIT_MAX,CROIT*Math.floor((t.age||0)/10)):0;
+   t.co=T.m==0?Math.min(4*cw,coh*cw)*COH:0;t.bz=dose;t.nf=nf;t.fm=fu;t.cgr=crg*cg;
    t.xc=(1+cad)*(1+FUREUR*(t.fu||0));t.xd=(1+t.co)*(1+dm)*(1+cr)*(1+.5*Math.min(1,t.ht||0))*(t.rg>0?1.3:1);t.xr=(1+rg)*(1+cr)}}
  update(dt){
   this.hurt=Math.max(0,this.hurt-dt);
@@ -427,16 +528,22 @@ class Board{
   const ar=AURA_R+3.4*dt+.01,auG=au.length>GRID_MIN&&(this.ag||(this.ag=new Grid())).fill(au),hlG=hl.length>GRID_MIN&&(this.hg||(this.hg=new Grid())).fill(hl);
   for(const c of this.cr){const T=CR[c.k];c.gt=Math.max(0,(c.gt||0)-dt);c.rt=Math.max(0,(c.rt||0)-dt);
    /* 2.40 : états des races (durées) et dégâts dans la durée, qui ignorent l'armure (poison deux fois plus rapide sur un immobilisé : Terreau ; peste deux fois plus forte sur un Maudit : Épidémie) */
+   if(c.pz>0)c.hp-=c.pz*c.pd*(Math.min(dt,c.pt)+Math.min(dt,c.pt,c.im||0));
+   if(c.sgT>0)c.hp-=c.sg*c.max*Math.min(dt,c.sgT);
+   if(c.bu>0)c.hp-=c.bud*Math.min(dt,c.bu);
+   if(c.pe>0)c.hp-=c.ped*(Math.min(dt,c.pe)+Math.min(dt,c.pe,c.ma||0));
    for(const e of ETATS_T)if(c[e]>0)c[e]=Math.max(0,c[e]-dt);
-   let dot=0;if(c.pz>0){if(c.pt>0)dot+=c.pz*c.pd*(c.im>0?2:1);else c.pz=0}if(c.sgT>0)dot+=c.sg*c.max;if(c.bu>0)dot+=c.bud;else c.bud=0;if(c.pe>0)dot+=c.ped*(c.ma>0?2:1);else c.ped=0;
-   if(!(c.bsT>0))c.bs=0;if(dot)c.hp-=dot*dt;
+   if(!(c.pt>0))c.pz=0;
+   if(!(c.bu>0))c.bud=0;
+   if(!(c.pe>0))c.ped=0;
+   if(!(c.bsT>0))c.bs=0;
    for(const t of ph)if(Math.hypot(c.x-t.x,c.y-t.y)<=rng(t)){c.bs=Math.max(c.bs||0,1);c.bsT=Math.max(c.bsT||0,.3)}
    ralentir(c);if(T.acc)c.age=(c.age||0)+dt;c.mark=Math.max(0,(c.mark||0)-dt);c.h=!T.aura&&(auG?auG.near(c.x,c.y,ar).some(n=>Math.hypot(au[n].x-c.x,au[n].y-c.y)<AURA_R):au.some(a=>Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));
    c.hid=T.inv&&!mg.some(m=>Math.hypot(c.x-m.x,c.y-m.y)<=rng(m));
    c.hl=c.hp<c.max&&(hlG?hlG.near(c.x,c.y,ar).some(n=>hl[n]!==c&&Math.hypot(hl[n].x-c.x,hl[n].y-c.y)<AURA_R):hl.some(a=>a!==c&&Math.hypot(a.x-c.x,a.y-c.y)<AURA_R));if(c.hl)c.hp=Math.min(c.max,c.hp+c.max*.05*dt);
    if(T.stun){c.cs-=dt;if(c.cs<=0){let bt=null,bd=2.3;for(const t of this.t){const d=Math.hypot(t.x-c.x,t.y-c.y);if(d<bd&&!(t.stun>0)&&!(t.b>0)){bd=d;bt=t}}
     /* 2.40 : les tours naines (Forge) ne restent étourdies que moitié moins longtemps */
-    if(bt){bt.stun=TW[bt.k].faction==3?1:2;c.cs=3.5;this.fx.push({type:'zap',x:c.x+.5,y:c.y+.3,x2:bt.x+.5,y2:bt.y+.5-topY(bt),t:.3,d:.3});this.ev.push('zap')}else c.cs=.3}}
+    if(bt){bt.stun=TW[bt.k].m==3?1:2;c.cs=3.5;this.fx.push({type:'zap',x:c.x+.5,y:c.y+.3,x2:bt.x+.5,y2:bt.y+.5-topY(bt),t:.3,d:.3});this.ev.push('zap')}else c.cs=.3}}
    let sp=T.s*(c.sl>0?c.sf:1)*(c.h?1.4:1)*(T.acc?Math.min(ACC_MAX,1+ACC*c.age):1)*dt;
    if(T.fly){const dx=EX[0]-c.x,dy=EX[1]-c.y,dd=Math.hypot(dx,dy);if(dd<=sp)c.leak=1;else{c.x+=dx/dd*sp;c.y+=dy/dd*sp}continue}
    /* toutes les 0,25 s, le monstre regarde s'il voit plus loin sur son chemin (il coupe ainsi au plus court après un virage) */
@@ -454,17 +561,17 @@ class Board{
   for(const t of this.t){if(t.b>0){t.b-=dt;if(t.b<=0){t.b=0;t.cd=0;this.fx.push({type:'range',x:t.x+.5,y:t.y+.5,r:rng(t),t:.6,d:.6,col:TW[t.k].col})}continue}
    const T=TW[t.k];
    /* 2.40 : Croissance (Lunebois), Fureur qui retombe, Rage, Chauffe qui refroidit, surchauffe */
-   if(T.faction==2)t.age=(t.age||0)+dt*(t.cgr||1);
+   if(T.m==2)t.age=(t.age||0)+dt*(t.cgr||1);
    if(t.fu>0){t.fuT=(t.fuT||0)-dt;if(t.fuT<=0){t.fu--;t.fuT=2}}if(t.rg>0)t.rg-=dt;t.lf=(t.lf||0)+dt;if(t.ht>0&&t.lf>1)t.ht=Math.max(0,t.ht-.5*dt);if(t.oh>0){t.oh-=dt;continue}
    if(t.stun>0){t.stun-=dt;continue}t.cd-=dt;if(t.sw>0)t.sw-=dt;if(t.cd>0)continue;const r=rng(t),dm=dmg(t),cdx=T.cd/(t.xc||1);
-   if(T.no){if(T.col){if((this.am||0)>=T.col.am&&this.cr.some(c=>!CR[c.k].fly)){this.am-=T.col.am;this.invoquer(t.x,t.y,T.col.d*2**(t.lv-1),T.col.t,1);t.cd=T.cd;this.combo({x:t.x,y:t.y,k:0},'COLOSSE D’OS !','#e8e2c8')}else t.cd=1}else t.cd=1;continue}
+   if(T.no){if(T.summon){if((this.am||0)>=T.summon.am&&this.cr.some(c=>!CR[c.k].fly)){this.am-=T.summon.am;this.invoquer(t.x,t.y,T.summon.d*2**(t.lv-1),T.summon.t,1);t.cd=T.cd;this.combo({x:t.x,y:t.y,k:0},'COLOSSE D’OS !','#e8e2c8')}else t.cd=1}else t.cd=1;continue}
    /* mines : une nouvelle mine sur une case du chemin à portée (au plus T.mn par tour) */
    if(T.mn){const mi=this.mi||(this.mi=[]);if(mi.filter(m=>m.t===t).length<T.mn){const P=trajet(this).filter(([a,b])=>Math.hypot(a-t.x,b-t.y)<=r&&!mi.some(m=>Math.hypot(m.x-a,m.y-b)<.8));
      if(P.length){const[a,b]=P[Math.floor(Math.random()*P.length)];mi.push({id:++UID,x:a,y:b,t,d:dm,lv:t.lv});t.cd=cdx}else t.cd=.5}else t.cd=.5;continue}
    /* impulsion : tout ce qui est à portée (pu = 0) ou pu cibles tirées au hasard */
    if(T.pu!==undefined){const L=voisins(t.x,t.y,r).filter(c=>ok(T,c,t,r));if(!L.length){t.cd=.2;continue}t.cd=cdx;
     const cib=T.pu?L.sort(()=>Math.random()-.5).slice(0,T.pu):L;for(const c of cib){this.hit(c,dm,T,t.lv,t);if(T.pu)this.fx.push({type:'zap',x:c.x+.5,y:c.y-1.9,x2:c.x+.5,y2:c.y+.5-flyH(c.k),t:.3,d:.3,col:'#bfe6ff',ciel:1})}
-    if(!T.pu)this.fx.push({type:'boom',x:t.x+.5,y:t.y+.5,r,t:.4,d:.4,col:T.im&&T.faction==2?'#7ac46a':T.im?'#ffe2a8':'#9be36a'});this.ev.push(T.pu?'zap':T.s);continue}
+    if(!T.pu)this.fx.push({type:'boom',x:t.x+.5,y:t.y+.5,r,t:.4,d:.4,col:T.im&&T.m==2?'#7ac46a':T.im?'#ffe2a8':'#9be36a'});this.ev.push(T.pu?'zap':T.s);continue}
    let tg=null,bd=INF;
    for(const c of voisins(t.x,t.y,r)){if(!ok(T,c,t,r))continue;const F=CR[c.k].fly;
     const rem=T.vise=='pv'?-c.hp:F?Math.hypot(EX[0]-c.x,EX[1]-c.y):this.d[c.ty][c.tx]+Math.hypot(c.tx-c.x,c.ty-c.y);if(rem<bd){bd=rem;tg=c}}
@@ -484,7 +591,10 @@ class Board{
     this.fx.push({type:'zap',x:t.x+.5,y:t.y+.5-topY(t),x2:t.x+.5+ux*r,y2:t.y+.5+uy*r,t:.3,d:.3,col:T.u?'#ffb36b':'#f4f0d0',ln:1})}
    /* rayon : +bm à chaque tir sur la même cible, jusqu'à ×bmx */
    else if(T.bm){t.rm=t.bt0===tg?Math.min(T.bmx,(t.rm||1)+T.bm):1;t.bt0=tg;this.hit(tg,dm*t.rm,T,t.lv,t);this.fx.push({type:'zap',x:t.x+.5,y:t.y+.5-topY(t),x2:tg.x+.5,y2:tg.y+.5-flyH(tg.k),t:.2,d:.2,col:'#ffe9a0',ln:1})}
-   else this.pr.push({id:++UID,x:t.x+.5,y:t.y+.5-topY(t),tg,k:t.k,d:dm,lv:t.lv,t,tx:tg.x+.5,ty:tg.y+.5,tot:Math.hypot(tg.x-t.x,tg.y-t.y)||.1,a:t.a});
+   else {
+    const sx=t.x+.5,sy=t.y+.5-topY(t),tx=tg.x+.5,ty=tg.y+.5-flyH(tg.k);
+    this.pr.push({id:++UID,x:sx,y:sy,sx,sy,tg,k:t.k,d:dm,lv:t.lv,t,tx,ty,tot:Math.hypot(tx-sx,ty-sy)||.1,a:t.a});
+   }
    this.ev.push(T.s)}
   for(const p of this.pr){const T=TW[p.k];if(!p.tg.dead&&!p.tg.leak){p.tx=p.tg.x+.5;p.ty=p.tg.y+.5-flyH(p.tg.k)}
    const dx=p.tx-p.x,dy=p.ty-p.y,dd=Math.hypot(dx,dy),m=T.ps*dt;
@@ -509,8 +619,8 @@ class Board{
   for(const f of this.fx){f.t-=dt;if(f.vx!==undefined){f.x+=f.vx*dt;f.y+=f.vy*dt}}this.fx=this.fx.filter(f=>f.t>0)}
  /* 2.40 : ce que la mort d'un monstre déclenche selon la race du terrain (Fureur, Spores, Âmes, morts relevés) */
  mourir(c,me){const lt=c.lt&&this.t.includes(c.lt)?c.lt:null,LT=lt&&TW[lt.k];
-  if(LT&&LT.faction==1){const g=(LT.fu2?2:1)*(lt.fm||1),av=lt.fu||0;lt.fu=Math.min(FUREUR_MAX,av+g);lt.fuT=2;if(lt.fu>=FUREUR_MAX&&av<FUREUR_MAX&&!(lt.rg>0)){lt.rg=3;this.combo({x:lt.x,y:lt.y,k:0},'RAGE !','#ff6a4a')}
-   if(LT.fuG)for(const t of this.t)if(TW[t.k].faction==1&&t!==lt){t.fu=Math.min(FUREUR_MAX,(t.fu||0)+1);t.fuT=2}}
+  if(LT&&LT.m==1){const g=(LT.fu2?2:1)*(lt.fm||1),av=lt.fu||0;lt.fu=Math.min(FUREUR_MAX,av+g);lt.fuT=2;if(lt.fu>=FUREUR_MAX&&av<FUREUR_MAX&&!(lt.rg>0)){lt.rg=3;this.combo({x:lt.x,y:lt.y,k:0},'RAGE !','#ff6a4a')}
+   if(LT.fuG)for(const t of this.t)if(TW[t.k].m==1&&t!==lt){t.fu=Math.min(FUREUR_MAX,(t.fu||0)+1);t.fuT=2}}
   if(c.pz>=5){let n=0;for(const o of this.cr)if(o!==c&&o.hp>0&&Math.hypot(o.x-c.x,o.y-c.y)<1.3){o.pz=Math.min(DOSE_MAX,(o.pz||0)+3);o.pd=Math.max(o.pd||0,c.pd);o.pt=4;n++}
    if(n){this.fx.push({type:'boom',x:c.x+.5,y:c.y+.5,r:1.3,t:.4,d:.4,col:'#9be36a'});this.combo(c,'SPORES !','#b6f27a')}}
   if(me==4){const pr=this.t.some(t=>!(t.b>0)&&Math.hypot(t.x-c.x,t.y-c.y)<=rng(t)+.5);if(pr){this.am=Math.min(AMES_MAX,(this.am||0)+(c.ma>0?2:1));if(c.ma>0)this.combo(c,'RÉCOLTE !','#9fe8ff')}

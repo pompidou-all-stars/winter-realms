@@ -80,6 +80,11 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.44 — 10 races — 2026-11-21
+- Thibaut’s five races (Humains, Créatures, Herbe, Robots, Magique) are added next to the five asymmetric races instead of replacing them: 10 races in all. They reuse the mechanics of the first five and are drawn with his code-built silhouettes (2D and 3D); the first five keep their 3D models.
+- Thibaut’s other additions kept: projectile trails, damage-over-time capped to its remaining duration, fixed Bone Colossus summoning, single-click race choice, Chromium check on GitHub, his tests.
+- `sim.js` and `server/` changed (the server redeploys automatically).
+
 ### 2.41 (retour) — 2026-11-21
 - Back to version 2.41 at the designer's request: versions 2.42 and 2.43 had renamed the five races and their towers and replaced the 3D tower models with simple shapes. Their additions (projectile trails, fixes, tests) will be added back on top in a follow-up.
 
