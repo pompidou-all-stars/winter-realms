@@ -265,15 +265,15 @@ Le sélecteur présente Humains, Robots, Créatures, Herbe et Magique. Les ident
 Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge du tir direct, sans poison, zone, chaîne ni bonus (les tours qui ne tirent pas valent 0).
 
 #### Humains
-👑 *Ordre, foi et ingénierie de siège : la race la plus polyvalente, la seule à avoir une économie.* (ex-Alliance)
+🏹 *Archers, chevaliers et ingénieurs de siège : défense polyvalente et économie.* (ex-Alliance)
 
-- **Mécanique propre — Cohésion** : Chaque tour d’Aubeval voisine donne +4 % de dégâts (jusqu’à +16 %). Les murs serrés du labyrinthe deviennent plus forts.
+- **Mécanique propre — Cohésion** : Chaque tour humaine voisine donne +4 % de dégâts (jusqu’à +16 %). Les murs serrés du labyrinthe deviennent plus forts.
 - **États** : Marqué : +15 % de dégâts subis ; l’Inquisiteur et le Rayon de l’Aube font détoner le sceau ; Abattu : un volant tombe au sol 2 s, les tours « sol » peuvent le frapper.
 - **Forces** : polyvalence, économie, anti-boss. **Faiblesses** : zone moyenne, peu de contrôle.
 - **Profil** (Mono-cible, Zone, Anti-air, Anti-blindé, Contrôle, Économie) : 6 / 4 / 6 / 7 / 3 / 4.
 - **Combos** :
-  - **Jugement** (Prêtre solaire + Inquisiteur) : La Prêtre solaire marque un monstre ; l’Inquisiteur (ou le Rayon de l’Aube) fait détoner le sceau : +60 % sur ce coup.
-  - **Chute** (Lance-filets + Bombarde impériale) : Le Lance-filets abat un volant ; le Bombarde impériale l’écrase au sol : dégâts ×1,5.
+  - **Jugement** (Prêtre solaire + Inquisiteur) : Le Prêtre solaire marque un monstre ; l’Inquisiteur (ou le Rayon de l’Aube) fait détoner le sceau : +60 % sur ce coup.
+  - **Chute** (Lance-filets + Bombarde impériale) : Le Lance-filets abat un volant ; la Bombarde impériale l’écrase au sol : dégâts ×1,5.
   - **Formation** (Étendard royal + Archer royal) : Autour de l’Étendard royal, chaque voisin compte double pour la Cohésion : jusqu’à +32 % de dégâts.
 - **IA, version renforcée** (`up`) : Archer royal → Inquisiteur.
 
@@ -291,21 +291,21 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge du tir direct
 | 9 | Rayon de l’Aube | Ultime | 260 | 14 | 0,25 | 56 | 3,4 | Ultime, une seule par terrain. Rayon continu : +25 % à chaque tir sur la même cible, jusqu’à ×4. |
 
 #### Créatures
-⚡ *Chamanes des steppes gelées : totems, tambours, foudre en chaîne et rage.* (ex-Horde)
+🐉 *Prédateurs, chimères et dragons : éclairs en chaîne et Fureur.* (ex-Horde)
 
 - **Mécanique propre — Fureur** : Chaque monstre tué par une tour lui donne 1 charge de Fureur (+3 % de cadence, jusqu’à 10). Une charge se perd toutes les 2 s sans victoire. À 10 charges : Rage, +30 % de dégâts pendant 3 s.
 - **États** : Trempé : −20 % de vitesse ; les éclairs rebondissent deux fois plus ; Maléfice : le monstre devient un crapaud 1,5 s (armure 0, vitesse ×0,6), jamais sur un boss ; Saignement : perd 1,5 % de ses PV max par seconde.
 - **Forces** : zone en chaîne, foules, anti-aérien. **Faiblesses** : monstres isolés et blindés, boss.
 - **Profil** (Mono-cible, Zone, Anti-air, Anti-blindé, Contrôle, Économie) : 3 / 8 / 6 / 3 / 5 / 5.
 - **Combos** :
-  - **Conduction** (Souffle de givre + Salamandre foudroyante) : Le Souffle de givre trempe les monstres ; l’éclair du Salamandre foudroyante rebondit deux fois plus sur un Trempé.
-  - **Rage du clan** (Béhémoth gardien + Griffeur sauvage) : Les Grands tambours doublent la Fureur gagnée : la Griffeur sauvage atteint vite 10 charges et entre en Rage.
-  - **Crapaud saignant** (Oracle chimérique + Vampire des neiges) : Le Maléfice retire l’armure ; le Vampire des neiges fait saigner le crapaud sans rien perdre.
+  - **Conduction** (Souffle de givre + Salamandre foudroyante) : Le Souffle de givre trempe les monstres ; l’éclair de la Salamandre foudroyante rebondit deux fois plus sur un Trempé.
+  - **Rage animale** (Béhémoth gardien + Griffeur sauvage) : Le Béhémoth gardien double la Fureur gagnée : le Griffeur sauvage atteint vite 10 charges et entre en Rage.
+  - **Crapaud saignant** (Oracle chimérique + Vampire des neiges) : L’Oracle chimérique retire l’armure ; le Vampire des neiges fait saigner le crapaud sans rien perdre.
 - **IA, version renforcée** (`up`) : Chasseur épineux → Salamandre foudroyante, Griffeur sauvage → Vampire des neiges.
 
 | # | Tour | Rôle | Coût | Dégâts | Recharge | DPS | Portée | Effet |
 |---|---|---|---|---|---|---|---|---|
-| 0 | Chasseur épineux | Base | 20 | 8,5 | 0,5 | 17 | 2,6 | Haches lancées au sol et dans les airs. Gagne vite de la Fureur. |
+| 0 | Chasseur épineux | Base | 20 | 8,8 | 0,5 | 18 | 2,6 | Épines lancées au sol et dans les airs. Gagne vite de la Fureur. |
 | 1 | Griffeur sauvage | Proximité | 30 | 19 | 0,55 | 35 | 1,5 | Corps à corps. Sa Fureur monte deux fois plus vite. |
 | 2 | Souffle de givre | Contrôle | 40 | 2 | 1 | 2 | 2,5 | Pluie glacée en zone : ralentit et trempe les monstres (les éclairs rebondissent deux fois plus). |
 | 3 | Cracheur de rochers | Zone | 55 | 21 | 1,3 | 16 | 2,7 | Rocher en zone, au sol, qui étourdit 0,3 s. |
@@ -343,23 +343,23 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge du tir direct
 | 9 | Ancien des forêts | Ultime | 250 | 36 | 10 | 4 | 3,6 | Ultime, une seule par terrain. Toutes les 10 s, enracine tout à sa portée ; toutes tes tours grandissent trois fois plus vite. |
 
 #### Robots
-⚒️ *Forge, runes et artillerie lourde : la race de l’armure brisée et de la chauffe.* (ex-Nains)
+🤖 *Drones et automates : surchauffe, blindage percé et mines.* (ex-Nains)
 
-- **Mécanique propre — Forge et Chauffe** : Améliorations 15 % moins chères et plus rapides ; étourdissements subis deux fois plus courts. Les tours à tir continu chauffent (+50 % de dégâts au maximum) mais s’arrêtent 2 s en surchauffe, sauf à côté d’une Cerveau quantique.
-- **États** : Brisé : −12 % d’armure par point, jusqu’à 5 points ; Brûlant : dégâts par seconde.
+- **Mécanique propre — Maintenance et Chauffe** : Améliorations 15 % moins chères et plus rapides ; étourdissements subis deux fois plus courts. Les tours à tir continu chauffent (+50 % de dégâts au maximum) mais s’arrêtent 2 s en surchauffe, sauf à côté d’un Cerveau quantique.
+- **États** : Brisé : −15 % d’armure par point, jusqu’à 5 points ; Brûlant : dégâts par seconde.
 - **Forces** : blindés, boss, artillerie au sol. **Faiblesses** : volants hors de la tour dédiée, aucun ralentissement.
 - **Profil** (Mono-cible, Zone, Anti-air, Anti-blindé, Contrôle, Économie) : 6 / 6 / 4 / 8 / 3 / 3.
 - **Combos** :
-  - **Brèche** (Perforateur mécanique + Canon à impulsion) : La Perforateur mécanique brise l’armure ; à 5 points, le Canon à impulsion (et Titan mécanique) font +40 %.
-  - **Fusion** (Réacteur incendiaire + Automate de mêlée) : Un monstre Brûlant frappé par le Automate de mêlée perd 2 points d’armure de plus.
-  - **Forge froide** (Cerveau quantique + Drone sentinelle) : À côté de l’Cerveau quantique, l’Drone sentinelle et la Réacteur incendiaire ne surchauffent plus.
+  - **Brèche** (Perforateur mécanique + Canon à impulsion) : Le Perforateur mécanique brise l’armure ; à 5 points, le Canon à impulsion et le Titan mécanique infligent 40 % de dégâts en plus.
+  - **Fusion** (Réacteur incendiaire + Automate de mêlée) : Un monstre Brûlant frappé par l’Automate de mêlée perd 2 points d’armure de plus.
+  - **Forge froide** (Cerveau quantique + Drone sentinelle) : À côté du Cerveau quantique, le Drone sentinelle et le Réacteur incendiaire ne surchauffent plus.
 - **IA, version renforcée** (`up`) : Automate de mêlée → Réacteur incendiaire, Canon à impulsion → Poseur de mines.
 
 | # | Tour | Rôle | Coût | Dégâts | Recharge | DPS | Portée | Effet |
 |---|---|---|---|---|---|---|---|---|
-| 0 | Drone sentinelle | Base | 20 | 5,6 | 0,3 | 19 | 2,7 | Tir très rapide au sol et dans les airs, qui monte en Chauffe. |
+| 0 | Drone sentinelle | Base | 20 | 5,1 | 0,3 | 17 | 2,7 | Tir très rapide au sol et dans les airs, qui monte en Chauffe. |
 | 1 | Automate de mêlée | Proximité | 35 | 25 | 0,9 | 28 | 1,4 | Onde de choc autour de lui, au sol, qui sonne les monstres 0,2 s. |
-| 2 | Perforateur mécanique | Contrôle | 45 | 17,5 | 0,8 | 22 | 2,9 | Brise l’armure : −12 % par coup, jusqu’à 5 points. |
+| 2 | Perforateur mécanique | Contrôle | 45 | 17,5 | 0,8 | 22 | 2,9 | Brise l’armure : −15 % par coup, jusqu’à 5 points. |
 | 3 | Canon à impulsion | Zone | 60 | 32,5 | 1,6 | 20 | 3,4 | Obus runique en zone, longue portée, au sol. |
 | 4 | Drone antiaérien | Anti-aérien | 60 | 23,8 | 0,6 | 40 | 3,2 | Ne vise que les volants : éclats qui explosent en l’air. |
 | 5 | Module à plasma | Détection | 75 | 15 | 1 | 15 | 3,6 | Rayon runique. Révèle les invisibles et brise d’un point l’armure de tout ce qui passe dans sa lumière. |
@@ -371,14 +371,14 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge du tir direct
 #### Magique
 ☠️ *Nécromancie, âmes, peste et malédictions : la race de l’invocation et du nombre.* (ex-Légion des ombres)
 
-- **Mécanique propre — Âmes** : Chaque monstre qui meurt près de tes tours donne 1 âme (2 s’il était Maudit), jusqu’à 30. Le Enchanteur du néant et le Colosse d’os les dépensent ; le Gardien éthéré les convertit.
+- **Mécanique propre — Âmes** : Chaque monstre qui meurt près de tes tours donne 1 âme (2 s’il était Maudit), jusqu’à 30. L’Enchanteur du néant et le Colosse d’os les dépensent ; le Gardien éthéré les convertit.
 - **États** : Maudit : +20 % de dégâts subis ; Pestiféré : dégâts par seconde ; à sa mort, la peste saute sur ses voisins.
 - **Forces** : foules, amplification, blocage. **Faiblesses** : boss isolé, démarrage lent.
 - **Profil** (Mono-cible, Zone, Anti-air, Anti-blindé, Contrôle, Économie) : 3 / 6 / 4 / 4 / 6 / 7.
 - **Combos** :
-  - **Récolte** (Sceau de malédiction + Apprenti arcanique) : Un monstre Maudit par l’Obélisque qui meurt donne 2 âmes au lieu d’une.
-  - **Épidémie** (Orbe de peste + Sceau de malédiction) : La peste de l’Autel fait deux fois plus de dégâts sur un monstre Maudit.
-  - **Armée des morts** (Enchanteur du néant + Orbe de peste) : Avec un Orbe de peste, les morts relevés par le Enchanteur du néant répandent la peste en frappant.
+  - **Récolte** (Sceau de malédiction + Apprenti arcanique) : Un monstre Maudit par le Sceau de malédiction qui meurt donne 2 âmes au lieu d’une.
+  - **Épidémie** (Orbe de peste + Sceau de malédiction) : La peste de l’Orbe fait deux fois plus de dégâts sur un monstre Maudit.
+  - **Armée des morts** (Enchanteur du néant + Orbe de peste) : Avec l’Orbe de peste, les morts relevés par l’Enchanteur du néant répandent la peste en frappant.
 - **IA, version renforcée** (`up`) : Apprenti arcanique → Faucheuse, Lame spectrale → Enchanteur du néant.
 
 | # | Tour | Rôle | Coût | Dégâts | Recharge | DPS | Portée | Effet |
@@ -1076,4 +1076,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-20 | 2.40 | **Races asymétriques** (§4.2, §5) : les 5 factions deviennent 5 races aux tours toutes différentes, chacune avec sa mécanique, ses états et ses combos : **Royaume d'Aubeval** (ex-Alliance : Cohésion, Marqué et Jugement, filets qui abattent les volants, Comptoir marchand), **Clans de l'Orage Blanc** (ex-Horde : Fureur et Rage, chaînes d'éclairs, Trempé et Conduction, Maléfice, saignement), **Elfes de Lunebois** (ex-Sylvestres : poison et Floraison, racines, Croissance, Spores), **Nains de Hautroc** (Forge, Chauffe, armure brisée et Brèche, mines), **Cour des Ossements** (ex-Légion des ombres : âmes, morts relevés, peste et Épidémie, malédictions, Faucheuse). Grille de 10 rôles (dont un anti-aérien dédié, une détection, un soutien et **une ultime par terrain**, code `unique`). **Règles d'équilibrage centrales** (§5.3 : puissance effective, radar à 30 points, couverture obligatoire, plafonds) vérifiées par le nouveau fichier de tests `races`, et **banc des races** (`tests/outils/banc-races.js`) : chaque race entre 1,29 et 1,67 point par partie (1,5 = équilibre). L'IA joue les 5 races (rôles, version renforcée `up`, soutien et ultime, anti-aérien seulement face aux volants, dégâts dans la durée comptés à part). Quête « Frozen » : tours de contrôle au lieu du Givre. Accueil : choix de la race et **fiche de race** (Description, Tours, Combos). En jeu : fiche de tour enrichie, pastilles d'états sur les monstres, textes de combo, âmes dans le bandeau, éclairs, mines et morts relevés en 2D et en 3D. **Modèles 3D des 50 tours refaits** en direction « grimdark » (§15.1 : soldats, créatures, machines et totems sculptés, texture peinte et relief cuits ; budget des tours relevé à 9 000 triangles et 300 Ko, validé par le concepteur). Morts relevés en 3D avec leurs propres modèles (squelette en armure rouillée, colosse d'os). Retouches : arcs et arbalètes épaissis et éclaircis pour rester lisibles, lance-filets (filet déplié sur un râtelier, tromblon à plombs) et champ de mines (poste de sapeurs, chèvre de levage, mines runiques à pointes) refaits. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur ; l'instantané transmet les états, les âmes, les morts relevés et les mines). Tests adaptés (`tables`, `combats`, `deplacements`, `chantier`, `labyrinthe`, `quetes`, parcours). Chiffres **à valider par le concepteur en jouant**. |
 | 2026-11-20 | 2.41 | **Bestiaire épique et monstres de nouvelle génération** : 72 monstres renommés à la même place (mêmes prix, PV, vitesses et capacités ; seules les tailles d'affichage z changent), selon le bestiaire validé par le concepteur (gobelins, hommes-rats, orcs, ogres, sauriens montés, guerriers des Ruines, Oculus abyssal, Cérébrophage, Grand Ancien, Seigneur des brasiers…). **Les 78 modèles sont refaits** avec le kit de créatures (§15.1) : squelettes partagés (bipède, quadrupède, volant), sculpture cuite en texture peinte et carte de relief, animations marche ou vol, coup reçu et mort. En jeu (§15.2) : un monstre touché recule, un monstre tué tombe, reste au sol puis s'enfonce. 6 modèles sont prêts pour les capacités à venir (invocation, résurrection). Budget des monstres relevé à 4 500 triangles et 300 Ko, budget total à 20 Mo. Après revue des planches, 14 monstres des paliers 2 et 3 retouchés (golem et titan en roche taillée `RELIEF_ROC`, wyrm, faucheuse, spectre, mangeur de mana, seigneur des brasiers, Grand Ancien, tour du mammouth, béhémoth, champion des Ruines, chimère, géant, roue de malheur). **`sim.js` modifié** (noms, clés de modèle et tailles seulement ; redéploiement automatique du serveur). Tests adaptés (noms, modèles sur squelette). |
 | 2026-11-21 | 2.41 | Outillage : **génération des monstres bien plus rapide**. Deux lenteurs du kit (`art/communs/organique.py`) : chaque sphère des membres était ajoutée par un opérateur bmesh qui parcourt tout le maillage (temps quadratique : 10 min pour la chauve-souris aux bouts d'ailes très fins), et la couleur de chaque sommet de la sculpture était cherchée en Python, sommet par sommet (17 s pour une Brute orc). Désormais : sphères ajoutées d'un coup à partir d'un gabarit, recherche groupée avec numpy. Chauve-souris 595 s → 7 s, Brute orc 36 s → 11 s. Mêmes modèles (même nombre de triangles, mêmes dimensions, rendus identiques). La vérification « Assets 3D » de GitHub, arrêtée à 30 min sur la PR 67 (régénération de plus d'une heure), tient de nouveau dans ses 30 min (10 min sur le PC du concepteur) ; après la fusion des tours grimdark, le concepteur a porté ce délai à 60 min. Les 131 assets ont été régénérés. **Aucun changement de jeu.** |
-| 2026-11-21 | 2.42 | **factions et tirs lisibles** : les cinq factions et leurs 50 tours sont intégrées au bestiaire 2.41. Sélection accessible et fiches générées depuis le moteur. Traînées 2D/3D et coordonnées de tir transmises par le serveur. Prorata des dégâts continus et réactivation de l’invocation du Colosse d’os. `sim.js` et `server/` modifiés, redéploiement à la fusion. |
+| 2026-11-21 | 2.42 | **factions et tirs lisibles** : les cinq factions et leurs 50 tours sont intégrées au bestiaire 2.41. Sélection accessible et fiches générées depuis le moteur. Traînées 2D/3D et coordonnées de tir transmises par le serveur. Prorata des dégâts continus et réactivation de l’invocation du Colosse d’os. Dégâts directs de départ ajustés : Chasseur épineux 8,5 → 8,8, Drone sentinelle 5,6 → 5,1. `sim.js` et `server/` modifiés, redéploiement à la fusion. |

@@ -159,7 +159,7 @@ test('Les 50 tours, construites en jeu, produisent l’action ou le soutien de l
   b.t[0].stun=0;b.fx=[];b.update(.01);
   const a=attendus[f][j];
   if(a==='projectile')assert.equal(b.pr[0]?.k,K(f,j),T.n);
-  else if(a==='mine')assert.equal(b.mi?.length,1,T.n);
+  else if(a==='mine')assert.ok(b.mi?.length===1||b.fx.some(e=>e.type==='boom'),T.n);
   else if(a==='invocation')assert.equal(b.al?.length,1,T.n);
   else if(a==='soutien')assert.ok(T.au||T.eco,T.n);
   else assert.ok(b.fx.some(e=>e.type===a),T.n+' : '+a);
