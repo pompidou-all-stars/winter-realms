@@ -112,3 +112,66 @@ test('IA : chaque race construit, améliore, et pose au moins une tour de soutie
   assert.ok(b.t.length>=15,F+' : '+b.t.length+' tours');assert.ok(b.t.some(t=>t.lv>1),F+' : améliorations')}
  assert.ok([...G.B,...G2.B].some(b=>b.t.some(t=>S.TW[t.k].j==7||S.TW[t.k].u)),'soutien ou ultime posé');
 });
+
+test('Les cinq factions conservent leurs identifiants et ont 50 noms de tours distincts',()=>{
+ assert.deepEqual(Array.from(S.RACES,f=>f.name),['Humains','Créatures','Herbe','Robots','Magique']);
+ assert.equal(new Set(Array.from(S.TW,t=>t.n)).size,50);
+});
+
+test('Brûlure et poison ignorent l’armure et appliquent leur durée exacte, même entre deux pas',()=>{
+ const b=terrain(3),c=fort(apparaitre(S,b,S.TURT));
+ b.hit(c,0,TW(3,6),1);b.hit(c,0,TW(3,6),2);b.hit(c,0,TW(3,6),1);
+ b.hit(c,0,TW(2,0),1);b.hit(c,0,TW(2,3),2);
+ assert.equal(c.pz,3);assert.equal(c.bud,8);
+ const hp=c.hp;
+ for(let i=0;i<45;i++)b.update(.093);
+ proche(hp-c.hp,8*2+3*1*4,'dégâts cumulés');
+ assert.equal(c.pz,0);assert.equal(c.bud,0);
+});
+
+test('L’ultime Magique invoque un colosse quand les 15 âmes sont disponibles',()=>{
+ const b=terrain(4);b.place(5,3,K(4,9));pret(b);fort(apparaitre(S,b,0));
+ b.am=14;b.update(.05);assert.equal(b.al?.length||0,0);
+ b.am=15;b.t[0].cd=0;b.update(.05);
+ assert.equal(b.am,0);assert.equal(b.al.length,1);assert.equal(b.al[0].g,1);
+});
+
+test('Un projectile garde les coordonnées de sa tour après son premier déplacement',()=>{
+ const b=terrain(0);b.place(5,2,K(0,0));pret(b);fort(apparaitre(S,b,0));
+ b.update(.01);
+ const p=b.pr[0];assert.ok(p);assert.equal(p.sx,5.5);
+ assert.ok(p.sy<2.5);assert.notEqual(p.x,p.sx);
+ const source=[p.sx,p.sy];b.update(.01);assert.deepEqual([p.sx,p.sy],source);
+});
+
+test('Les 50 tours, construites en jeu, produisent l’action ou le soutien de leur rôle',()=>{
+ const attendus=[
+  ['projectile','slash','projectile','projectile','zap','projectile','soutien','soutien','projectile','zap'],
+  ['projectile','slash','projectile','projectile','zap','projectile','zap','soutien','projectile','zap'],
+  ['projectile','boom','boom','projectile','projectile','projectile','projectile','soutien','projectile','boom'],
+  ['projectile','boom','projectile','projectile','projectile','projectile','flame','soutien','mine','zap'],
+  ['projectile','slash','projectile','projectile','projectile','projectile','projectile','soutien','projectile','invocation']
+ ];
+ for(let f=0;f<5;f++)for(let j=0;j<10;j++){
+  const T=TW(f,j),b=terrain(f);assert.ok(b.place(5,3,K(f,j)),T.n);pret(b);b.am=15;b.t[0].stun=1;
+  const c=fort(apparaitre(S,b,T.ao||T.ab?S.FLY[0]:0));c.x=6;c.y=3.25;c.tx=6;c.ty=4;
+  if(T.rmin)c.y=4.5;
+  b.t[0].stun=0;b.fx=[];b.update(.01);
+  const a=attendus[f][j];
+  if(a==='projectile')assert.equal(b.pr[0]?.k,K(f,j),T.n);
+  else if(a==='mine')assert.ok(b.mi?.length===1||b.fx.some(e=>e.type==='boom'),T.n);
+  else if(a==='invocation')assert.equal(b.al?.length,1,T.n);
+  else if(a==='soutien')assert.ok(T.au||T.eco,T.n);
+  else assert.ok(b.fx.some(e=>e.type===a),T.n+' : '+a);
+ }
+});
+
+test('L’instantané multijoueur conserve les états et l’origine des tirs',async()=>{
+ const {GameRoom}=await import('../../server/src/worker.js');
+ const game=partie(S),b=game.B[0],c=fort(apparaitre(S,b,0));
+ b.hit(c,0,TW(2,0),1);b.hit(c,0,TW(3,6),1);
+ b.pr.push({id:42,k:0,x:5.75,y:2,tx:6.5,ty:4.25,tot:3,a:0,sx:5.5,sy:1.75});
+ const snap=GameRoom.prototype.snap.call({game},true);
+ assert.equal(snap.B[0].c[0][5]&(16|1024),16|1024);
+ assert.deepEqual(Array.from(snap.B[0].p[0]),[42,0,5.75,2,6.5,4.25,3,0,5.5,1.75]);
+});

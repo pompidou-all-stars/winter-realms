@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.41)
+# Winter Realms — Tower Wars (Édition 2.42)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -112,7 +112,7 @@ Claude : avant de modifier quoi que ce soit, vérifie la branche courante. Si tu
 
 ## 2. Déroulement d'une partie
 
-1. **Écran d'accueil** : on choisit une **race** (5 au choix, §5), on peut lire sa **fiche** (Description, Tours, Combos), puis une **difficulté** (Normal, Difficile ou Brutal). Le Royaume d'Aubeval est présélectionné.
+1. **Écran d'accueil** : on choisit une **race** (5 au choix, §5), on peut lire sa **fiche** (Description, Tours, Combos), puis une **difficulté** (Normal, Difficile ou Brutal). La faction Humains est présélectionnée.
 2. **Les 4 terrains** : celui du joueur (« Toi ») et ceux de IA 1 (rouge), IA 2 (bleu) et IA 3 (violet). Les IA jouent automatiquement les factions suivantes dans la liste : `(faction du joueur + 1, + 2, + 3) % 5`.
 3. **Victoire** : toutes les IA sont éliminées. **Défaite** : le joueur est éliminé. Une fenêtre de fin donne alors les statistiques et propose de regarder la carte ou de quitter (§9, depuis la 2.23).
 4. Un joueur est **éliminé** quand ses vies tombent à 0. Son terrain est alors vidé et grisé, et il ne reçoit plus de vagues.
@@ -249,11 +249,12 @@ Chaque race a 10 tours **différentes** ; l'emplacement `j` fixe le **rôle** (l
 Depuis la 2.40, les 5 factions sont devenues des **races asymétriques** (table `RACES` de `sim.js`, alias `FACTIONS`) : chacune a sa **mécanique propre**, ses **états**, ses **combos** et **10 tours toutes différentes**. Les anciens coefficients (`FACTION_BALANCE`) et le calcul automatique des tours ont disparu : chaque tour est écrite à la main dans `RACES[f].tours`, puis complétée par `estimer` (dégâts par seconde estimés `ed`, part dans la durée `dot`, facteur de zone `zf`).
 Les noms ne reprennent aucun univers existant (l'Alliance et la Horde étaient trop proches d'un jeu connu). **10 races sont prévues à terme** (idées : Géants du givre, Gobelins ferrailleurs, Fées des aurores, Draconides, Ordre céleste) : chacune suivra les règles du §5.3.
 
-Chaque race garde son style visuel de terrain (socle, couleur du sol, palette). **Modèles 3D** : en attendant leur refonte (§15.1), chaque tour utilise le modèle de son emplacement dans l'ancienne faction (`tours/<faction>-<j>`).
+Le sélecteur présente Humains, Robots, Créatures, Herbe et Magique. Les identifiants réseau restent respectivement 0, 3, 1, 2 et 4. Les Robots et Créatures ont dix silhouettes procédurales par faction, en jeu et en vignette. Les Humains, Herbe et Magique utilisent leurs modèles GLB par emplacement.
 
 ### 5.1 Mécaniques communes
 - **États** (champs des monstres, décomptés à chaque pas ; `etats(c)` les donne en bits pour l'affichage et le serveur) : Marqué `mk`, Maudit `ma`, immobilisé `im`, Maléfice `hx`, Abattu `ab`, Trempé `tw`, poison `pz` (doses) / `pd` / `pt`, saignement `sg`, Brisé `bs`, Brûlant `bu`, Pestiféré `pe`.
 - **Dégâts dans la durée** (poison, saignement, brûlure, peste) : ils **ignorent l'armure**. Poison : jusqu'à **10 doses** (`DOSE_MAX`), chacune fait `pv × (1 + niveau − 1)` dégâts par seconde, rafraîchies 4 s ; deux fois plus vite sur un monstre immobilisé (Terreau).
+- **Brûlure** : le Réacteur incendiaire applique 4 DPS au niveau 1 sur 2 s. Une nouvelle application rafraîchit la durée et seule l’intensité la plus forte est retenue. Les dégâts dans la durée sont calculés au prorata du dernier pas.
 - **Amplification** : Marqué +15 %, Maudit +20 %, cumul plafonné à **+60 %** (`AMP_MAX`).
 - **Armure brisée** : −15 % d'armure par point (`BRISE`), jusqu'à 5 points.
 - **Auras** : une tour de soutien agit sur les **8 cases voisines** ; ses bonus montent de 20 % par niveau. Les bonus des tours (`xd` dégâts, `xr` portée, `xc` cadence) sont recalculés tous les 0,25 s (`Board.bonus`).
@@ -263,59 +264,59 @@ Chaque race garde son style visuel de terrain (socle, couleur du sol, palette). 
 ### 5.2 Les 5 races
 Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge du tir direct, sans poison, zone, chaîne ni bonus (les tours qui ne tirent pas valent 0).
 
-#### Royaume d’Aubeval
-👑 *Ordre, foi et ingénierie de siège : la race la plus polyvalente, la seule à avoir une économie.* (ex-Alliance)
+#### Humains
+🏹 *Archers, chevaliers et ingénieurs de siège : défense polyvalente et économie.* (ex-Alliance)
 
-- **Mécanique propre — Cohésion** : Chaque tour d’Aubeval voisine donne +4 % de dégâts (jusqu’à +16 %). Les murs serrés du labyrinthe deviennent plus forts.
+- **Mécanique propre — Cohésion** : Chaque tour humaine voisine donne +4 % de dégâts (jusqu’à +16 %). Les murs serrés du labyrinthe deviennent plus forts.
 - **États** : Marqué : +15 % de dégâts subis ; l’Inquisiteur et le Rayon de l’Aube font détoner le sceau ; Abattu : un volant tombe au sol 2 s, les tours « sol » peuvent le frapper.
 - **Forces** : polyvalence, économie, anti-boss. **Faiblesses** : zone moyenne, peu de contrôle.
 - **Profil** (Mono-cible, Zone, Anti-air, Anti-blindé, Contrôle, Économie) : 6 / 4 / 6 / 7 / 3 / 4.
 - **Combos** :
-  - **Jugement** (Chapelle du guet + Inquisiteur) : La Chapelle du guet marque un monstre ; l’Inquisiteur (ou le Rayon de l’Aube) fait détoner le sceau : +60 % sur ce coup.
-  - **Chute** (Lance-filets + Trébuchet) : Le Lance-filets abat un volant ; le Trébuchet l’écrase au sol : dégâts ×1,5.
-  - **Formation** (Étendard royal + Tour d’arbalétriers) : Autour de l’Étendard royal, chaque voisin compte double pour la Cohésion : jusqu’à +32 % de dégâts.
-- **IA, version renforcée** (`up`) : Tour d’arbalétriers → Inquisiteur.
+  - **Jugement** (Prêtre solaire + Inquisiteur) : Le Prêtre solaire marque un monstre ; l’Inquisiteur (ou le Rayon de l’Aube) fait détoner le sceau : +60 % sur ce coup.
+  - **Chute** (Lance-filets + Bombarde impériale) : Le Lance-filets abat un volant ; la Bombarde impériale l’écrase au sol : dégâts ×1,5.
+  - **Formation** (Étendard royal + Archer royal) : Autour de l’Étendard royal, chaque voisin compte double pour la Cohésion : jusqu’à +32 % de dégâts.
+- **IA, version renforcée** (`up`) : Archer royal → Inquisiteur.
 
 | # | Tour | Rôle | Coût | Dégâts | Recharge | DPS | Portée | Effet |
 |---|---|---|---|---|---|---|---|---|
-| 0 | Tour d’arbalétriers | Base | 20 | 8 | 0,5 | 16 | 2,9 | Carreaux réguliers, au sol et dans les airs. La base, solide et bon marché. |
-| 1 | Poste de hallebardiers | Proximité | 30 | 16 | 0,6 | 27 | 1,5 | Corps à corps : chaque balayage frappe 2 monstres à la fois. |
+| 0 | Archer royal | Base | 20 | 8 | 0,5 | 16 | 2,9 | Carreaux réguliers, au sol et dans les airs. La base, solide et bon marché. |
+| 1 | Chevalier du rempart | Proximité | 30 | 16 | 0,6 | 27 | 1,5 | Corps à corps : chaque balayage frappe 2 monstres à la fois. |
 | 2 | Lance-filets | Contrôle | 45 | 3 | 2,2 | 1 | 2,6 | Lance un filet : le monstre est immobilisé 0,8 s. Un volant est abattu au sol pendant 2 s. |
-| 3 | Trébuchet | Zone | 65 | 34 | 2,4 | 14 | 3,6 | Très longue portée et grosse explosion, au sol. Ne tire pas à moins de 1,5 case. |
+| 3 | Bombarde impériale | Zone | 65 | 34 | 2,4 | 14 | 3,6 | Très longue portée et grosse explosion, au sol. Ne tire pas à moins de 1,5 case. |
 | 4 | Baliste céleste | Anti-aérien | 60 | 22 | 1,3 | 17 | 3,3 | Carreau qui traverse tout sur sa ligne. Dégâts ×2 contre les volants, ×0,5 au sol. |
-| 5 | Chapelle du guet | Détection | 80 | 14 | 1 | 14 | 3 | Révèle les invisibles et pose le sceau du Jugement (Marqué : +15 % de dégâts subis pendant 3 s). |
+| 5 | Prêtre solaire | Détection | 80 | 14 | 1 | 14 | 3 | Révèle les invisibles et pose le sceau du Jugement (Marqué : +15 % de dégâts subis pendant 3 s). |
 | 6 | Comptoir marchand | Signature | 100 | 0 | 1 | 0 | 2,5 | Ne tire pas. +5 or toutes les 10 s par niveau, et +20 % de prime sur les monstres tués à sa portée. |
 | 7 | Étendard royal | Soutien | 90 | 0 | 1 | 0 | 1,5 | Ne tire pas. Tours voisines : +15 % de cadence, et la Cohésion compte double autour de lui. |
 | 8 | Inquisiteur | Anti-boss | 140 | 48 | 1,3 | 37 | 3 | Ignore l’armure. Dégâts ×2 contre les monstres spéciaux et les boss. Fait détoner le sceau des Marqués. |
 | 9 | Rayon de l’Aube | Ultime | 260 | 14 | 0,25 | 56 | 3,4 | Ultime, une seule par terrain. Rayon continu : +25 % à chaque tir sur la même cible, jusqu’à ×4. |
 
-#### Clans de l’Orage Blanc
-⚡ *Chamanes des steppes gelées : totems, tambours, foudre en chaîne et rage.* (ex-Horde)
+#### Créatures
+🐉 *Prédateurs, chimères et dragons : éclairs en chaîne et Fureur.* (ex-Horde)
 
 - **Mécanique propre — Fureur** : Chaque monstre tué par une tour lui donne 1 charge de Fureur (+3 % de cadence, jusqu’à 10). Une charge se perd toutes les 2 s sans victoire. À 10 charges : Rage, +30 % de dégâts pendant 3 s.
 - **États** : Trempé : −20 % de vitesse ; les éclairs rebondissent deux fois plus ; Maléfice : le monstre devient un crapaud 1,5 s (armure 0, vitesse ×0,6), jamais sur un boss ; Saignement : perd 1,5 % de ses PV max par seconde.
 - **Forces** : zone en chaîne, foules, anti-aérien. **Faiblesses** : monstres isolés et blindés, boss.
 - **Profil** (Mono-cible, Zone, Anti-air, Anti-blindé, Contrôle, Économie) : 3 / 8 / 6 / 3 / 5 / 5.
 - **Combos** :
-  - **Conduction** (Totem des pluies glacées + Totem de foudre) : Le Totem des pluies glacées trempe les monstres ; l’éclair du Totem de foudre rebondit deux fois plus sur un Trempé.
-  - **Rage du clan** (Grands tambours de guerre + Hutte du berserker) : Les Grands tambours doublent la Fureur gagnée : la Hutte du berserker atteint vite 10 charges et entre en Rage.
-  - **Crapaud saignant** (Hutte du chaman des esprits + Totem de sang) : Le Maléfice retire l’armure ; le Totem de sang fait saigner le crapaud sans rien perdre.
-- **IA, version renforcée** (`up`) : Lanceurs de haches → Totem de foudre, Hutte du berserker → Totem de sang.
+  - **Conduction** (Souffle de givre + Salamandre foudroyante) : Le Souffle de givre trempe les monstres ; l’éclair de la Salamandre foudroyante rebondit deux fois plus sur un Trempé.
+  - **Rage animale** (Béhémoth gardien + Griffeur sauvage) : Le Béhémoth gardien double la Fureur gagnée : le Griffeur sauvage atteint vite 10 charges et entre en Rage.
+  - **Crapaud saignant** (Oracle chimérique + Vampire des neiges) : L’Oracle chimérique retire l’armure ; le Vampire des neiges fait saigner le crapaud sans rien perdre.
+- **IA, version renforcée** (`up`) : Chasseur épineux → Salamandre foudroyante, Griffeur sauvage → Vampire des neiges.
 
 | # | Tour | Rôle | Coût | Dégâts | Recharge | DPS | Portée | Effet |
 |---|---|---|---|---|---|---|---|---|
-| 0 | Lanceurs de haches | Base | 20 | 8,5 | 0,5 | 17 | 2,6 | Haches lancées au sol et dans les airs. Gagne vite de la Fureur. |
-| 1 | Hutte du berserker | Proximité | 30 | 19 | 0,55 | 35 | 1,5 | Corps à corps. Sa Fureur monte deux fois plus vite. |
-| 2 | Totem des pluies glacées | Contrôle | 40 | 2 | 1 | 2 | 2,5 | Pluie glacée en zone : ralentit et trempe les monstres (les éclairs rebondissent deux fois plus). |
-| 3 | Catapulte à rochers | Zone | 55 | 21 | 1,3 | 16 | 2,7 | Rocher en zone, au sol, qui étourdit 0,3 s. |
-| 4 | Aire des aigles-tempête | Anti-aérien | 60 | 16 | 0,8 | 20 | 3 | L’aigle plonge et son éclair rebondit sur 2 autres cibles. Dégâts ×2 contre les volants. |
-| 5 | Hutte du chaman des esprits | Détection | 85 | 26 | 1,4 | 19 | 3,1 | Révèle les invisibles. Maléfice : change le monstre en crapaud 1,5 s (armure 0, vitesse ×0,6). |
-| 6 | Totem de foudre | Signature | 75 | 18 | 1,1 | 16 | 2,8 | Chaîne d’éclairs : 3 rebonds, −25 % par rebond. Deux fois plus de rebonds sur un Trempé. |
-| 7 | Grands tambours de guerre | Soutien | 90 | 0 | 1 | 0 | 1,5 | Ne tire pas. Tours voisines : +20 % de cadence et Fureur gagnée doublée. |
-| 8 | Totem de sang | Anti-boss | 120 | 6 | 1 | 6 | 2,6 | Saignement : la cible perd 1,5 % de ses PV max par seconde pendant 3 s. L’arme des clans contre les géants. |
-| 9 | Cœur de l’Orage | Ultime | 280 | 90 | 4 | 23 | 4 | Ultime, une seule par terrain. Toutes les 4 s, 6 éclairs tombent à sa portée ; chaque victime donne +1 Fureur à toutes tes tours. |
+| 0 | Chasseur épineux | Base | 20 | 9 | 0,5 | 18 | 2,6 | Épines lancées au sol et dans les airs. Gagne vite de la Fureur. |
+| 1 | Griffeur sauvage | Proximité | 30 | 19 | 0,55 | 35 | 1,5 | Corps à corps. Sa Fureur monte deux fois plus vite. |
+| 2 | Souffle de givre | Contrôle | 40 | 2 | 1 | 2 | 2,5 | Pluie glacée en zone : ralentit et trempe les monstres (les éclairs rebondissent deux fois plus). |
+| 3 | Cracheur de rochers | Zone | 55 | 21 | 1,3 | 16 | 2,7 | Rocher en zone, au sol, qui étourdit 0,3 s. |
+| 4 | Rapace des cimes | Anti-aérien | 60 | 16 | 0,8 | 20 | 3 | L’aigle plonge et son éclair rebondit sur 2 autres cibles. Dégâts ×2 contre les volants. |
+| 5 | Oracle chimérique | Détection | 85 | 26 | 1,4 | 19 | 3,1 | Révèle les invisibles. Maléfice : change le monstre en crapaud 1,5 s (armure 0, vitesse ×0,6). |
+| 6 | Salamandre foudroyante | Signature | 75 | 18 | 1,1 | 16 | 2,8 | Chaîne d’éclairs : 3 rebonds, −25 % par rebond. Deux fois plus de rebonds sur un Trempé. |
+| 7 | Béhémoth gardien | Soutien | 90 | 0 | 1 | 0 | 1,5 | Ne tire pas. Tours voisines : +20 % de cadence et Fureur gagnée doublée. |
+| 8 | Vampire des neiges | Anti-boss | 120 | 6 | 1 | 6 | 2,6 | Saignement : la cible perd 1,5 % de ses PV max par seconde pendant 3 s. L’arme des clans contre les géants. |
+| 9 | Dragon ancestral | Ultime | 280 | 90 | 4 | 23 | 4 | Ultime, une seule par terrain. Toutes les 4 s, 6 éclairs tombent à sa portée ; chaque victime donne +1 Fureur à toutes tes tours. |
 
-#### Elfes de Lunebois
+#### Herbe
 🌿 *La forêt vivante, le venin et la patience : poison, racines et tours qui grandissent.* (ex-Sylvestres)
 
 - **Mécanique propre — Croissance** : Chaque tour gagne +1 % de dégâts et de portée toutes les 10 s sur place, jusqu’à +25 %. La vendre lui fait perdre ce bonus.
@@ -323,73 +324,73 @@ Recharge en secondes, portée en cases. DPS = dégâts ÷ recharge du tir direct
 - **Forces** : blindés, contrôle, contagion. **Faiblesses** : démarrage lent, monstres rapides.
 - **Profil** (Mono-cible, Zone, Anti-air, Anti-blindé, Contrôle, Économie) : 4 / 5 / 5 / 6 / 7 / 3.
 - **Combos** :
-  - **Floraison** (Archers sylvains + Cercle de Floraison) : Les flèches et la Fleur de venin empilent le poison ; le Cercle de Floraison fait éclore toutes les doses d’un coup.
-  - **Terreau** (Gardien enracineur + Fleur de venin) : Sur un monstre enraciné par le Gardien, le poison de la Fleur de venin agit deux fois plus vite.
-  - **Spores** (Fleur de venin + Archers sylvains) : Un monstre qui meurt avec 5 doses ou plus éclate en spores et empoisonne ses voisins.
-- **IA, version renforcée** (`up`) : Archers sylvains → Tireur des cimes, Fleur de venin → Cercle de Floraison.
+  - **Floraison** (Arbre archer + Cercle de Floraison) : Les flèches et la Fleur de venin empilent le poison ; le Cercle de Floraison fait éclore toutes les doses d’un coup.
+  - **Terreau** (Gardien des racines + Fleur de venin) : Sur un monstre enraciné par le Gardien, le poison de la Fleur de venin agit deux fois plus vite.
+  - **Spores** (Fleur de venin + Arbre archer) : Un monstre qui meurt avec 5 doses ou plus éclate en spores et empoisonne ses voisins.
+- **IA, version renforcée** (`up`) : Arbre archer → Tireur des cimes, Fleur de venin → Cercle de Floraison.
 
 | # | Tour | Rôle | Coût | Dégâts | Recharge | DPS | Portée | Effet |
 |---|---|---|---|---|---|---|---|---|
-| 0 | Archers sylvains | Base | 20 | 5,4 | 0,5 | 11 | 2,8 | Flèches au sol et dans les airs ; chacune ajoute 1 dose de poison. |
+| 0 | Arbre archer | Base | 20 | 5,4 | 0,5 | 11 | 2,8 | Flèches au sol et dans les airs ; chacune ajoute 1 dose de poison. |
 | 1 | Haie de ronces | Proximité | 25 | 4,5 | 0,5 | 9 | 1,3 | Épines : blesse et empoisonne tout ce qui passe à côté, au sol. |
-| 2 | Gardien enracineur | Contrôle | 45 | 5,4 | 4 | 1 | 2,2 | Toutes les 4 s, des racines immobilisent 1 s tous les monstres au sol à sa portée. |
+| 2 | Gardien des racines | Contrôle | 45 | 5,4 | 4 | 1 | 2,2 | Toutes les 4 s, des racines immobilisent 1 s tous les monstres au sol à sa portée. |
 | 3 | Fleur de venin | Zone | 55 | 4 | 1 | 4 | 2,4 | Nuage de venin en zone, au sol et dans les airs : 2 doses de poison. |
-| 4 | Nid des chouettes des neiges | Anti-aérien | 55 | 10,8 | 0,7 | 15 | 3,1 | Les chouettes chassent les volants (dégâts ×2) et les empoisonnent. |
-| 5 | Puits de lune | Détection | 80 | 19,8 | 1,3 | 15 | 3,2 | Révèle les invisibles. Les tours voisines grandissent deux fois plus vite. |
+| 4 | Faucon sylvestre | Anti-aérien | 55 | 10,8 | 0,7 | 15 | 3,1 | Les chouettes chassent les volants (dégâts ×2) et les empoisonnent. |
+| 5 | Druide des clairières | Détection | 80 | 19,8 | 1,3 | 15 | 3,2 | Révèle les invisibles. Les tours voisines grandissent deux fois plus vite. |
 | 6 | Cercle de Floraison | Signature | 90 | 9 | 1,6 | 6 | 2,8 | Fait éclore le poison : toutes les doses de la cible explosent d’un coup. |
-| 7 | Bosquet ancien | Soutien | 85 | 0 | 1 | 0 | 1,5 | Ne tire pas. Tours voisines : +12 % de portée et +1 dose de poison par coup. |
+| 7 | Ent protecteur | Soutien | 85 | 0 | 1 | 0 | 1,5 | Ne tire pas. Tours voisines : +12 % de portée et +1 dose de poison par coup. |
 | 8 | Tireur des cimes | Anti-boss | 130 | 54 | 1,8 | 30 | 4,4 | Très longue portée, vise le monstre le plus résistant. Dégâts ×1,5 sur un enraciné. |
-| 9 | Arbre-Mère | Ultime | 250 | 36 | 10 | 4 | 3,6 | Ultime, une seule par terrain. Toutes les 10 s, enracine tout à sa portée ; toutes tes tours grandissent trois fois plus vite. |
+| 9 | Ancien des forêts | Ultime | 250 | 36 | 10 | 4 | 3,6 | Ultime, une seule par terrain. Toutes les 10 s, enracine tout à sa portée ; toutes tes tours grandissent trois fois plus vite. |
 
-#### Nains de Hautroc
-⚒️ *Forge, runes et artillerie lourde : la race de l’armure brisée et de la chauffe.* (ex-Nains)
+#### Robots
+🤖 *Drones et automates : surchauffe, blindage percé et mines.* (ex-Nains)
 
-- **Mécanique propre — Forge et Chauffe** : Améliorations 15 % moins chères et plus rapides ; étourdissements subis deux fois plus courts. Les tours à tir continu chauffent (+50 % de dégâts au maximum) mais s’arrêtent 2 s en surchauffe, sauf à côté d’une Enclume runique.
-- **États** : Brisé : −12 % d’armure par point, jusqu’à 5 points ; Brûlant : dégâts par seconde.
+- **Mécanique propre — Maintenance et Chauffe** : Améliorations 15 % moins chères et plus rapides ; étourdissements subis deux fois plus courts. Les tours à tir continu chauffent (+50 % de dégâts au maximum) mais s’arrêtent 2 s en surchauffe, sauf à côté d’un Cerveau quantique.
+- **États** : Brisé : −15 % d’armure par point, jusqu’à 5 points ; Brûlant : dégâts par seconde.
 - **Forces** : blindés, boss, artillerie au sol. **Faiblesses** : volants hors de la tour dédiée, aucun ralentissement.
 - **Profil** (Mono-cible, Zone, Anti-air, Anti-blindé, Contrôle, Économie) : 6 / 6 / 4 / 8 / 3 / 3.
 - **Combos** :
-  - **Brèche** (Baliste perce-plaque + Mortier runique) : La Baliste perce-plaque brise l’armure ; à 5 points, le Mortier runique (et Grondeterre) font +40 %.
-  - **Fusion** (Gueule de forge + Marteau-pilon) : Un monstre Brûlant frappé par le Marteau-pilon perd 2 points d’armure de plus.
-  - **Forge froide** (Enclume runique + Arbalète à répétition) : À côté de l’Enclume runique, l’Arbalète à répétition et la Gueule de forge ne surchauffent plus.
-- **IA, version renforcée** (`up`) : Marteau-pilon → Gueule de forge, Mortier runique → Champ de mines.
+  - **Brèche** (Perforateur mécanique + Canon à impulsion) : Le Perforateur mécanique brise l’armure ; à 5 points, le Canon à impulsion et le Titan mécanique infligent 40 % de dégâts en plus.
+  - **Fusion** (Réacteur incendiaire + Automate de mêlée) : Un monstre Brûlant frappé par l’Automate de mêlée perd 2 points d’armure de plus.
+  - **Forge froide** (Cerveau quantique + Drone sentinelle) : À côté du Cerveau quantique, le Drone sentinelle et le Réacteur incendiaire ne surchauffent plus.
+- **IA, version renforcée** (`up`) : Automate de mêlée → Réacteur incendiaire, Canon à impulsion → Poseur de mines.
 
 | # | Tour | Rôle | Coût | Dégâts | Recharge | DPS | Portée | Effet |
 |---|---|---|---|---|---|---|---|---|
-| 0 | Arbalète à répétition | Base | 20 | 5,6 | 0,3 | 19 | 2,7 | Tir très rapide au sol et dans les airs, qui monte en Chauffe. |
-| 1 | Marteau-pilon | Proximité | 35 | 25 | 0,9 | 28 | 1,4 | Onde de choc autour de lui, au sol, qui sonne les monstres 0,2 s. |
-| 2 | Baliste perce-plaque | Contrôle | 45 | 17,5 | 0,8 | 22 | 2,9 | Brise l’armure : −12 % par coup, jusqu’à 5 points. |
-| 3 | Mortier runique | Zone | 60 | 32,5 | 1,6 | 20 | 3,4 | Obus runique en zone, longue portée, au sol. |
-| 4 | Canon antiaérien à éclats | Anti-aérien | 60 | 23,8 | 0,6 | 40 | 3,2 | Ne vise que les volants : éclats qui explosent en l’air. |
-| 5 | Phare runique | Détection | 75 | 15 | 1 | 15 | 3,6 | Rayon runique. Révèle les invisibles et brise d’un point l’armure de tout ce qui passe dans sa lumière. |
-| 6 | Gueule de forge | Signature | 70 | 4 | 0,12 | 33 | 2 | Souffle de flammes en cône qui rend les monstres Brûlants, et monte en Chauffe. |
-| 7 | Enclume runique | Soutien | 90 | 0 | 1 | 0 | 1,5 | Ne tire pas. Tours voisines : +15 % de dégâts, et elles ne surchauffent plus. |
-| 8 | Champ de mines | Anti-boss | 110 | 68,8 | 2,5 | 28 | 2,2 | Pose jusqu’à 4 mines runiques sur le chemin à sa portée ; elles explosent au passage. |
-| 9 | Grondeterre | Ultime | 280 | 275 | 6 | 46 | 5 | Ultime, une seule par terrain. Canon de siège : toutes les 6 s, un tir en ligne qui traverse tout et ignore l’armure. |
+| 0 | Drone sentinelle | Base | 20 | 5,1 | 0,3 | 17 | 2,7 | Tir très rapide au sol et dans les airs, qui monte en Chauffe. |
+| 1 | Automate de mêlée | Proximité | 35 | 25 | 0,9 | 28 | 1,4 | Onde de choc autour de lui, au sol, qui sonne les monstres 0,2 s. |
+| 2 | Perforateur mécanique | Contrôle | 45 | 17,5 | 0,8 | 22 | 2,9 | Brise l’armure : −15 % par coup, jusqu’à 5 points. |
+| 3 | Canon à impulsion | Zone | 60 | 32,5 | 1,6 | 20 | 3,4 | Obus runique en zone, longue portée, au sol. |
+| 4 | Drone antiaérien | Anti-aérien | 60 | 23,8 | 0,6 | 40 | 3,2 | Ne vise que les volants : éclats qui explosent en l’air. |
+| 5 | Module à plasma | Détection | 75 | 15 | 1 | 15 | 3,6 | Rayon runique. Révèle les invisibles et brise d’un point l’armure de tout ce qui passe dans sa lumière. |
+| 6 | Réacteur incendiaire | Signature | 70 | 4 | 0,12 | 33 | 2 | Souffle de flammes en cône qui rend les monstres Brûlants, et monte en Chauffe. |
+| 7 | Cerveau quantique | Soutien | 90 | 0 | 1 | 0 | 1,5 | Ne tire pas. Tours voisines : +15 % de dégâts, et elles ne surchauffent plus. |
+| 8 | Poseur de mines | Anti-boss | 110 | 68,8 | 2,5 | 28 | 2,2 | Pose jusqu’à 4 mines runiques sur le chemin à sa portée ; elles explosent au passage. |
+| 9 | Titan mécanique | Ultime | 280 | 275 | 6 | 46 | 5 | Ultime, une seule par terrain. Canon de siège : toutes les 6 s, un tir en ligne qui traverse tout et ignore l’armure. |
 
-#### Cour des Ossements
+#### Magique
 ☠️ *Nécromancie, âmes, peste et malédictions : la race de l’invocation et du nombre.* (ex-Légion des ombres)
 
-- **Mécanique propre — Âmes** : Chaque monstre qui meurt près de tes tours donne 1 âme (2 s’il était Maudit), jusqu’à 30. Le Nécromancien et le Colosse d’os les dépensent ; le Puits des âmes les convertit.
+- **Mécanique propre — Âmes** : Chaque monstre qui meurt près de tes tours donne 1 âme (2 s’il était Maudit), jusqu’à 30. L’Enchanteur du néant et le Colosse d’os les dépensent ; le Gardien éthéré les convertit.
 - **États** : Maudit : +20 % de dégâts subis ; Pestiféré : dégâts par seconde ; à sa mort, la peste saute sur ses voisins.
 - **Forces** : foules, amplification, blocage. **Faiblesses** : boss isolé, démarrage lent.
 - **Profil** (Mono-cible, Zone, Anti-air, Anti-blindé, Contrôle, Économie) : 3 / 6 / 4 / 4 / 6 / 7.
 - **Combos** :
-  - **Récolte** (Obélisque de malédiction + Tour des archers squelettes) : Un monstre Maudit par l’Obélisque qui meurt donne 2 âmes au lieu d’une.
-  - **Épidémie** (Autel de peste + Obélisque de malédiction) : La peste de l’Autel fait deux fois plus de dégâts sur un monstre Maudit.
-  - **Armée des morts** (Nécromancien + Autel de peste) : Avec un Autel de peste, les morts relevés par le Nécromancien répandent la peste en frappant.
-- **IA, version renforcée** (`up`) : Tour des archers squelettes → Faucheuse, Ossuaire → Nécromancien.
+  - **Récolte** (Sceau de malédiction + Apprenti arcanique) : Un monstre Maudit par le Sceau de malédiction qui meurt donne 2 âmes au lieu d’une.
+  - **Épidémie** (Orbe de peste + Sceau de malédiction) : La peste de l’Orbe fait deux fois plus de dégâts sur un monstre Maudit.
+  - **Armée des morts** (Enchanteur du néant + Orbe de peste) : Avec l’Orbe de peste, les morts relevés par l’Enchanteur du néant répandent la peste en frappant.
+- **IA, version renforcée** (`up`) : Apprenti arcanique → Faucheuse, Lame spectrale → Enchanteur du néant.
 
 | # | Tour | Rôle | Coût | Dégâts | Recharge | DPS | Portée | Effet |
 |---|---|---|---|---|---|---|---|---|
-| 0 | Tour des archers squelettes | Base | 20 | 7,8 | 0,5 | 16 | 2,8 | Flèches d’os au sol et dans les airs. |
-| 1 | Ossuaire | Proximité | 35 | 8 | 3 | 3 | 1,8 | Des squelettes sortent de la neige et retiennent un monstre 1,5 s. |
-| 2 | Obélisque de malédiction | Contrôle | 40 | 3 | 0,9 | 3 | 2,6 | Malédiction en zone : Maudit, +20 % de dégâts subis pendant 3 s. |
-| 3 | Autel de peste | Zone | 55 | 4 | 1,2 | 3 | 2,4 | Nuage de peste en zone : dégâts dans la durée, qui sautent sur les voisins à la mort. |
+| 0 | Apprenti arcanique | Base | 20 | 7,8 | 0,5 | 16 | 2,8 | Flèches d’os au sol et dans les airs. |
+| 1 | Lame spectrale | Proximité | 35 | 8 | 3 | 3 | 1,8 | Des squelettes sortent de la neige et retiennent un monstre 1,5 s. |
+| 2 | Sceau de malédiction | Contrôle | 40 | 3 | 0,9 | 3 | 2,6 | Malédiction en zone : Maudit, +20 % de dégâts subis pendant 3 s. |
+| 3 | Orbe de peste | Zone | 55 | 4 | 1,2 | 3 | 2,4 | Nuage de peste en zone : dégâts dans la durée, qui sautent sur les voisins à la mort. |
 | 4 | Perchoir des gargouilles | Anti-aérien | 60 | 18 | 0,7 | 26 | 3 | Les gargouilles harcèlent les volants : dégâts ×2 contre eux. |
-| 5 | Œil du Voile | Détection | 85 | 24 | 1,3 | 18 | 3,2 | Révèle les invisibles et maudit sa cible. |
-| 6 | Nécromancien | Signature | 95 | 10 | 1,2 | 8 | 2,8 | Dépense 1 âme pour relever un monstre tué à sa portée : le mort remonte le chemin et frappe. |
-| 7 | Puits des âmes | Soutien | 80 | 0 | 1 | 0 | 1,5 | Ne tire pas. Tours voisines : +2 % de cadence par tranche de 5 âmes. Âmes au maximum : 5 âmes deviennent de l’or. |
+| 5 | Œil des arcanes | Détection | 85 | 24 | 1,3 | 18 | 3,2 | Révèle les invisibles et maudit sa cible. |
+| 6 | Enchanteur du néant | Signature | 95 | 10 | 1,2 | 8 | 2,8 | Dépense 1 âme pour relever un monstre tué à sa portée : le mort remonte le chemin et frappe. |
+| 7 | Gardien éthéré | Soutien | 80 | 0 | 1 | 0 | 1,5 | Ne tire pas. Tours voisines : +2 % de cadence par tranche de 5 âmes. Âmes au maximum : 5 âmes deviennent de l’or. |
 | 8 | Faucheuse | Anti-boss | 130 | 50 | 1,4 | 36 | 2,6 | Exécute les monstres sous 12 % de PV. Contre un boss : +50 % de dégâts sous 25 %. |
 | 9 | Colosse d’os | Ultime | 260 | 0 | 45 | 0 | 3 | Ultime, un seul par terrain. Dépense 15 âmes : un colosse d’os remonte le chemin et écrase tout autour de lui. |
 
@@ -949,6 +950,7 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 - **Neige sur les modèles** (thème « Winter Realms », depuis la 2.9) : `communs/neige.py`, `enneiger(racine)`, appelé à la fin de chaque tour (`tour()`), du portail et du château. Une couche blanc bleuté (`#eef4fb`) recouvre les faces tournées vers le ciel : les surfaces planes (créneaux, socles, plates-formes, chapiteaux) presque entièrement, les **pentes** (toits, dômes) seulement sur leur partie haute (55 % depuis le sommet), pour que l'avant-toit garde la couleur de la faction. Pas de neige sur les personnages, les pièces animées ni les pièces lumineuses. Le nombre de triangles ajoutés est plafonné pour rester sous le budget (2 990 pour une tour) : les plus grandes faces passent en premier. Les monstres n'ont pas de neige.
 
 ### 15.2 Rendu 3D dans le jeu (`rendu3d.js`, depuis la 2.7)
+- **Tirs lisibles** (2.42) : le point de départ voyage avec les projectiles en multijoueur. La traînée se raccourcit au-delà de 18 et 35 projectiles sur le terrain et devient plus transparente au-delà de 35. Les projectiles et effets libèrent leurs ressources graphiques à leur disparition.
 - **Activation** : **par défaut depuis la 2.8** (adresse sans paramètre). `?rendu=2d` dans l'adresse garde la 2D (depuis la 2.22, l'accueil n'a plus de lien vers elle). Depuis la 2.29, les tests (parcours, captures, bilan visuel) se font en 3D, et un test vérifie le secours 2D. Si WebGL ou le module manquent, le jeu revient en 2D avec un message.
 - **Chargement** : `index.html` déclare un *importmap* (`three` → `vendor/three/three.module.min.js`, `three/addons/` → `vendor/three/addons/`) et importe `rendu3d.js` à la demande (`charger3D`). Pas d'étape de build. Les modèles des factions en jeu et tous les monstres sont préchargés ; les autres au besoin.
 - **Repli** : si un modèle manque (fichier absent ou illisible), le jeu affiche une forme simple à la couleur de la tour ou du monstre (règle de §15).
@@ -1074,3 +1076,4 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-20 | 2.40 | **Races asymétriques** (§4.2, §5) : les 5 factions deviennent 5 races aux tours toutes différentes, chacune avec sa mécanique, ses états et ses combos : **Royaume d'Aubeval** (ex-Alliance : Cohésion, Marqué et Jugement, filets qui abattent les volants, Comptoir marchand), **Clans de l'Orage Blanc** (ex-Horde : Fureur et Rage, chaînes d'éclairs, Trempé et Conduction, Maléfice, saignement), **Elfes de Lunebois** (ex-Sylvestres : poison et Floraison, racines, Croissance, Spores), **Nains de Hautroc** (Forge, Chauffe, armure brisée et Brèche, mines), **Cour des Ossements** (ex-Légion des ombres : âmes, morts relevés, peste et Épidémie, malédictions, Faucheuse). Grille de 10 rôles (dont un anti-aérien dédié, une détection, un soutien et **une ultime par terrain**, code `unique`). **Règles d'équilibrage centrales** (§5.3 : puissance effective, radar à 30 points, couverture obligatoire, plafonds) vérifiées par le nouveau fichier de tests `races`, et **banc des races** (`tests/outils/banc-races.js`) : chaque race entre 1,29 et 1,67 point par partie (1,5 = équilibre). L'IA joue les 5 races (rôles, version renforcée `up`, soutien et ultime, anti-aérien seulement face aux volants, dégâts dans la durée comptés à part). Quête « Frozen » : tours de contrôle au lieu du Givre. Accueil : choix de la race et **fiche de race** (Description, Tours, Combos). En jeu : fiche de tour enrichie, pastilles d'états sur les monstres, textes de combo, âmes dans le bandeau, éclairs, mines et morts relevés en 2D et en 3D. **Modèles 3D des 50 tours refaits** en direction « grimdark » (§15.1 : soldats, créatures, machines et totems sculptés, texture peinte et relief cuits ; budget des tours relevé à 9 000 triangles et 300 Ko, validé par le concepteur). Morts relevés en 3D avec leurs propres modèles (squelette en armure rouillée, colosse d'os). Retouches : arcs et arbalètes épaissis et éclaircis pour rester lisibles, lance-filets (filet déplié sur un râtelier, tromblon à plombs) et champ de mines (poste de sapeurs, chèvre de levage, mines runiques à pointes) refaits. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur ; l'instantané transmet les états, les âmes, les morts relevés et les mines). Tests adaptés (`tables`, `combats`, `deplacements`, `chantier`, `labyrinthe`, `quetes`, parcours). Chiffres **à valider par le concepteur en jouant**. |
 | 2026-11-20 | 2.41 | **Bestiaire épique et monstres de nouvelle génération** : 72 monstres renommés à la même place (mêmes prix, PV, vitesses et capacités ; seules les tailles d'affichage z changent), selon le bestiaire validé par le concepteur (gobelins, hommes-rats, orcs, ogres, sauriens montés, guerriers des Ruines, Oculus abyssal, Cérébrophage, Grand Ancien, Seigneur des brasiers…). **Les 78 modèles sont refaits** avec le kit de créatures (§15.1) : squelettes partagés (bipède, quadrupède, volant), sculpture cuite en texture peinte et carte de relief, animations marche ou vol, coup reçu et mort. En jeu (§15.2) : un monstre touché recule, un monstre tué tombe, reste au sol puis s'enfonce. 6 modèles sont prêts pour les capacités à venir (invocation, résurrection). Budget des monstres relevé à 4 500 triangles et 300 Ko, budget total à 20 Mo. Après revue des planches, 14 monstres des paliers 2 et 3 retouchés (golem et titan en roche taillée `RELIEF_ROC`, wyrm, faucheuse, spectre, mangeur de mana, seigneur des brasiers, Grand Ancien, tour du mammouth, béhémoth, champion des Ruines, chimère, géant, roue de malheur). **`sim.js` modifié** (noms, clés de modèle et tailles seulement ; redéploiement automatique du serveur). Tests adaptés (noms, modèles sur squelette). |
 | 2026-11-21 | 2.41 | Outillage : **génération des monstres bien plus rapide**. Deux lenteurs du kit (`art/communs/organique.py`) : chaque sphère des membres était ajoutée par un opérateur bmesh qui parcourt tout le maillage (temps quadratique : 10 min pour la chauve-souris aux bouts d'ailes très fins), et la couleur de chaque sommet de la sculpture était cherchée en Python, sommet par sommet (17 s pour une Brute orc). Désormais : sphères ajoutées d'un coup à partir d'un gabarit, recherche groupée avec numpy. Chauve-souris 595 s → 7 s, Brute orc 36 s → 11 s. Mêmes modèles (même nombre de triangles, mêmes dimensions, rendus identiques). La vérification « Assets 3D » de GitHub, arrêtée à 30 min sur la PR 67 (régénération de plus d'une heure), tient de nouveau dans ses 30 min (10 min sur le PC du concepteur) ; après la fusion des tours grimdark, le concepteur a porté ce délai à 60 min. Les 131 assets ont été régénérés. **Aucun changement de jeu.** |
+| 2026-11-21 | 2.42 | **factions et tirs lisibles** : les cinq factions et leurs 50 tours sont intégrées au bestiaire 2.41. Sélection accessible et fiches générées depuis le moteur. Traînées 2D/3D et coordonnées de tir transmises par le serveur. Prorata des dégâts continus et réactivation de l’invocation du Colosse d’os. Dégâts directs de départ ajustés : Chasseur épineux 8,5 → 9, Drone sentinelle 5,6 → 5,1. `sim.js` et `server/` modifiés, redéploiement à la fusion. |

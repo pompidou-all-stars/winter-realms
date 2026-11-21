@@ -216,6 +216,7 @@ void main() {
     return cache.get(url);
   }
   /* noms des fichiers : voir art/LISEZMOI.md (tours/<faction>-<j>, monstres/<clé g de CR>) */
+  const tourProcedurale = k => [1, 3].includes(TW[k].faction);
   const urlTour = k => `assets/3d/tours/${FAC[TW[k].faction]}-${k % 10}.glb`;
   const urlMonstre = k => `assets/3d/monstres/${CR[k].g}.glb`;
   /* plusieurs monstres peuvent partager un modèle (le Petit limon et la Gelée mutante) : le jeu le met à l'échelle de z */
@@ -228,7 +229,7 @@ void main() {
        les paliers 2 et 3 se chargent en fond juste après (un monstre pas encore chargé apparaît dès que son modèle arrive) */
     for (let k = 0; k < CR.length; k++) if (CR[k].t === 1) l.push(charger(urlMonstre(k)));
     setTimeout(() => { for (let k = 0; k < CR.length; k++) if (CR[k].t !== 1) charger(urlMonstre(k)) }, 1500);
-    for (const f of factions) for (let j = 0; j < 10; j++) l.push(charger(urlTour(f * 10 + j)));
+    for (const f of factions) for (let j = 0; j < 10; j++) if (!tourProcedurale(f * 10 + j)) l.push(charger(urlTour(f * 10 + j)));
     /* 2.40 : morts relevés, seulement si la Cour des Ossements (race 4) est en jeu */
     if (factions.includes(4)) l.push(charger('assets/3d/decor/mort-squelette.glb'), charger('assets/3d/decor/mort-colosse.glb'));
     return Promise.all(l);
@@ -442,12 +443,63 @@ void main() {
   const tours = new Map();
   const pipGeo = new THREE.SphereGeometry(.035, 8, 6);
   /* formes de repli quand un modèle manque (règle d'art/LISEZMOI.md : le jeu fonctionne sans le fichier 3D) */
+  const formesTours = new Map();
   function repliTour(k) {
-    const g = new THREE.Group(), m = mat(TW[k].col);
-    const socle = new THREE.Mesh(new THREE.CylinderGeometry(.38, .4, .1, 12), mat('#8a8f99')); socle.position.y = .05;
-    const fut = new THREE.Mesh(new THREE.CylinderGeometry(.18, .24, .6, 10), m); fut.position.y = .4;
-    for (const o of [socle, fut]) { o.castShadow = o.receiveShadow = true; g.add(o) }
-    return g;
+    let g = formesTours.get(k);
+    if (g) return g.clone(true);
+    const T = TW[k], robot = T.faction === 3, creature = T.faction === 1;
+    const accent = mat(T.col), sombre = mat(robot ? '#263c53' : '#543025');
+    const clair = mat(robot ? '#b4f4ff' : '#ffdb89');
+    g = new THREE.Group();
+    function piece(parent, geo, material, position, scale) {
+      const mesh = new THREE.Mesh(geo, material);
+      mesh.position.set(...position); mesh.scale.set(...scale);
+      mesh.castShadow = mesh.receiveShadow = true; parent.add(mesh);
+      return mesh;
+    }
+    piece(g, G.boite, sombre, [0, .07, 0], [.69, .14, .65]);
+    const tete = new THREE.Group(); tete.name = 'Tourelle'; tete.position.y = .61; g.add(tete);
+    if (robot) {
+      for (const x of [-.22, .22]) piece(g, G.boite, sombre, [x, .23, 0], [.14, .32, .29]);
+      piece(g, G.boite, accent, [0, .44, 0], [.43, .35, .34]);
+      piece(tete, G.boite, sombre, [0, .1, 0], [.37, .23, .33]);
+      piece(tete, G.boite, clair, [0, .13, .18], [.28, .075, .045]);
+    } else if (creature) {
+      piece(g, G.sphere, accent, [0, .36, 0], [.31, .27, .34]);
+      piece(tete, G.sphere, sombre, [0, .08, .03], [.24, .21, .25]);
+      for (const x of [-.15, .15]) {
+        piece(tete, G.sphere, clair, [x, .12, .24], [.055, .06, .05]);
+        piece(tete, G.ico, accent, [x, .27, -.06], [.07, .21, .07]);
+      }
+    } else {
+      piece(g, G.boite, accent, [0, .39, 0], [.39, .62, .39]);
+    }
+
+    switch (T.j) {
+      case 0: piece(tete, G.boite, clair, [0, -.05, .3], [.1, .08, .3]); break;
+      case 1:
+        for (const x of [-.31, .31]) piece(tete, G.ico, accent, [x, -.14, .18], [.16, .21, .26]);
+        break;
+      case 2: piece(tete, G.octa, clair, [0, .03, .38], [.1, .1, .46]); break;
+      case 3: piece(tete, G.boite, accent, [0, .05, .36], [.28, .24, .49]); break;
+      case 4:
+        for (const x of [-.28, .28]) piece(tete, G.ico, accent, [x, .02, -.04], [.28, .07, .21]);
+        break;
+      case 5: piece(g, G.octa, clair, [0, 1.03, 0], [.15, .19, .15]).name = 'Cristal'; break;
+      case 6:
+        for (const x of [-.17, .17]) piece(tete, G.sphere, mat(robot ? '#ff7a3d' : '#9fe0ff'), [x, -.08, .3], [.1, .1, .16]);
+        break;
+      case 7: piece(g, G.sphere, clair, [0, 1.1, 0], [.21, .15, .21]).name = 'Orbe'; break;
+      case 8:
+        for (const x of [-.28, .28]) piece(g, G.ico, accent, [x, .38, .06], [.18, .28, .2]);
+        break;
+      case 9:
+        for (const x of [-.28, .28]) piece(tete, G.ico, accent, [x, .25, -.06], [.24, .16, .34]);
+        piece(g, G.octa, clair, [0, 1.14, 0], [.19, .24, .19]).name = 'Cristal';
+        break;
+    }
+    formesTours.set(k, g);
+    return g.clone(true);
   }
   function repliMonstre(k) {
     const T = CR[k], h = .4 * Math.pow(T.z, 1.8), o = new THREE.Mesh(G.sphere, mat(T.col));
@@ -468,7 +520,7 @@ void main() {
     return g;
   }
   function creerTour(t, fantome) {
-    const g = modele(urlTour(t.k)); if (g === undefined) return null;
+    const g = tourProcedurale(t.k) ? null : modele(urlTour(t.k)); if (g === undefined) return null;
     const o = g ? g.scene.clone(true) : repliTour(t.k);
     if (fantome) o.traverse(m => { if (m.userData.contour) m.visible = false; else if (m.isMesh) { m.material = m.material.clone(); m.material.transparent = true; m.material.opacity = .55; m.material.depthWrite = false; m.castShadow = false } });
     const r = new THREE.Group(); r.add(o);
@@ -612,14 +664,37 @@ void main() {
     if (skin == 0) { r.add(new THREE.Mesh(G.fleche, M.bois), new THREE.Mesh(G.pointe, M.blanc)) }
     else if (skin == 1) { const m = new THREE.Mesh(G.sphere, M.fer); m.scale.setScalar(.08); m.castShadow = true; r.add(m) }
     else { const m = new THREE.Mesh(G.octa, skin == 2 ? M.givre : M.arcane); m.scale.set(.07, .07, .12); r.add(m) }
-    scene.add(r); return {r, skin};
+    const T = TW[p.k];
+    const trace = new THREE.Line(new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(new Float32Array(6), 3)),
+      new THREE.LineBasicMaterial({color: T.pz ? '#79ad30' : T.pe ? '#9470d1' : T.col, transparent: true, depthWrite: false}));
+    trace.frustumCulled = false;
+    scene.add(r, trace);
+    return {r, skin, trace};
   }
-  function majProj(Pj, p) {
+  function retirerProj(Pj) {
+    scene.remove(Pj.r, Pj.trace);
+    Pj.trace.geometry.dispose();
+    Pj.trace.material.dispose();
+  }
+  function majProj(Pj, p, densite) {
     const q = Math.max(0, Math.min(1, 1 - Math.hypot(p.tx - p.x, p.ty - p.y) / (p.tot || 1)));
     let h = 1.0 + (.3 - 1.0) * q; if (Pj.skin == 1) h += Math.sin(q * Math.PI) * .8;
-    Pj.r.position.set(p.x, h, p.y + .3 * (1 - q));
+    const z = p.y + .3 * (1 - q);
+    Pj.r.position.set(p.x, h, z);
     Pj.r.rotation.y = Math.atan2(p.tx - p.x, p.ty - p.y);
     if (Pj.skin >= 2) Pj.r.rotation.z += .2;
+
+    // Le segment est dans le repère de la scène, indépendamment de la rotation du projectile.
+    const dx = (p.sx ?? p.x) - p.x, dz = (p.sy ?? p.y) + .3 - z;
+    const distance = Math.hypot(dx, dz);
+    const limite = densite > 35 ? .18 : densite > 18 ? .32 : .52;
+    const ratio = distance > .01 ? Math.min(1, limite / distance) : 0;
+    const positions = Pj.trace.geometry.attributes.position;
+    positions.setXYZ(0, p.x, h, z);
+    positions.setXYZ(1, p.x + dx * ratio, h, z + dz * ratio);
+    positions.needsUpdate = true;
+    Pj.trace.visible = ratio > 0;
+    Pj.trace.material.opacity = densite > 35 ? .35 : .65;
   }
 
   /* ---------- effets ---------- */
@@ -643,6 +718,10 @@ void main() {
       default: return null;
     }
     o.renderOrder = 3; scene.add(o); return o;
+  }
+  function retirerEffet(o) {
+    scene.remove(o);
+    o.traverse(m => { if (m.material) m.material.dispose(); if (m.isLine) m.geometry.dispose() });
   }
   function majEffet(o, f) {
     const p = 1 - f.t / f.d, fade = Math.max(0, 1 - p);
@@ -695,7 +774,11 @@ void main() {
   }
   function creerMine() { const r = new THREE.Group(), d = new THREE.Mesh(G.disque, matMine); d.scale.setScalar(.22); r.add(d); const c = new THREE.Mesh(G.octa, mat('#ffb347', {emissive: '#ff6a1a', emissiveIntensity: .8})); c.scale.setScalar(.07); c.position.y = .08; r.add(c); r.renderOrder = 2; scene.add(r); return {r, c} }
   function vider() {
-    for (const m of [tours, monstres, projs, effets, allies, mines]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
+    for (const p of projs.values()) retirerProj(p);
+    projs.clear();
+    for (const o of effets.values()) retirerEffet(o);
+    effets.clear();
+    for (const m of [tours, monstres, allies, mines]) { for (const o of m.values()) retirerGroupe(o); m.clear() }
     for (const Mo of mourants) retirerGroupe(Mo); mourants.length = 0;
   }
   function dessiner(b, temps, etat) {
@@ -710,11 +793,11 @@ void main() {
       (T, t) => majTour(T, t, temps), retirerGroupe);
     synchro(monstres, b.cr, c => c.id, c => { const Mo = creerMonstre(c); if (Mo) scene.add(Mo.r); return Mo }, (Mo, c) => majMonstre(Mo, c, dt, temps), retirerMonstre);
     majMourants(dt);
-    synchro(projs, b.pr, p => p.id, creerProj, majProj, retirerGroupe);
+    synchro(projs, b.pr, p => p.id, creerProj, (o, p) => majProj(o, p, b.pr.length), retirerProj);
     synchro(allies, (b.al || []).map((a, i) => ({id: 'a' + (a.id ?? i) + (a.g ? 'g' : ''), m: a.g ? 'co' : 'sq', x: a.x, y: a.y})), c => c.id,
       creerMort, (Mo, c) => majMort(Mo, c, dt, temps), retirerGroupe);
     synchro(mines, b.mi || [], m => m.id ?? (m.x + ',' + m.y), creerMine, (o, m) => { o.r.position.set(m.x + .5, .03, m.y + .5); o.c.rotation.y = temps * 2; o.c.position.y = .08 + Math.sin(temps * 4) * .02 }, retirerGroupe);
-    synchro(effets, b.fx, f => f, creerEffet, majEffet, o => scene.remove(o));
+    synchro(effets, b.fx, f => f, creerEffet, majEffet, retirerEffet);
 
     /* sélection : tour touchée ou projet de construction */
     const sel = etat.projet || etat.pick;
@@ -751,7 +834,10 @@ void main() {
   let rv = null; const vignettes = new Map();
   function vignette(type, k, w, h) {
     const cle = type + k + '|' + w + 'x' + h; if (vignettes.has(cle)) return vignettes.get(cle);
-    const p = charger(type === 'tour' ? urlTour(k) : urlMonstre(k)).then(g => {
+    const modeleVignette = type === 'tour' && tourProcedurale(k)
+      ? Promise.resolve({scene: repliTour(k)})
+      : charger(type === 'tour' ? urlTour(k) : urlMonstre(k));
+    const p = modeleVignette.then(g => {
       if (!g) return null;
       if (!rv) {
         rv = {r: new THREE.WebGLRenderer({antialias: true, alpha: true, preserveDrawingBuffer: true}), s: new THREE.Scene(), c: new THREE.PerspectiveCamera(26, 1, .05, 60)};
