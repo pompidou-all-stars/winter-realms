@@ -1,4 +1,4 @@
-# Winter Realms — Tower Wars (Édition 2.40)
+# Winter Realms — Tower Wars (Édition 2.41)
 
 Jeu de type « tower wars » dans le navigateur : chaque joueur défend son propre terrain avec des tours et envoie des vagues de monstres chez ses adversaires. Le joueur affronte 3 IA, sur 4 terrains en parallèle.
 
@@ -435,79 +435,79 @@ Vitesse en cases par seconde. Dans chaque palier, les monstres sont rangés par 
 | Monstre | Catégorie | Coût | +revenu | PV de base | Vitesse | Palier | Capacité |
 |---|---|---|---|---|---|---|---|
 | Sapeur gobelin | Sol | 10 | +1 | 12 | 1,6 | 1 | — |
-| Rat des neiges | Sol | 20 | +2 | 20 | 2,2 | 1 | — |
-| Warg | Sol | 30 | +3 | 33 | 2,4 | 1 | — |
-| Kobold | Sol | 40 | +4 | 48 | 1,6 | 1 | — |
-| Squelette du givre | Sol | 50 | +5 | 60 | 1,5 | 1 | — |
-| Sanglier de guerre | Sol | 60 | +6 | 69 | 2 | 1 | — |
-| Gnoll | Sol | 70 | +7 | 87 | 1,6 | 1 | — |
-| Brute orc | Sol | 80 | +8 | 101 | 1,4 | 1 | — |
-| Maraudeur | Sol | 90 | +9 | 114 | 1,5 | 1 | — |
-| Myconide | Sol | 100 | +11 | 135 | 1,1 | 1 | — |
-| Yéti | Sol | 110 | +12 | 149 | 1,3 | 1 | — |
+| Warg | Sol | 20 | +2 | 20 | 2,2 | 1 | — |
+| Homme-rat pilleur | Sol | 30 | +3 | 33 | 2,4 | 1 | — |
+| Chevaucheur de sanglier | Sol | 40 | +4 | 48 | 1,6 | 1 | — |
+| Brute orc | Sol | 50 | +5 | 60 | 1,5 | 1 | — |
+| Chevaucheur de raptor | Sol | 60 | +6 | 69 | 2 | 1 | — |
+| Yéti | Sol | 70 | +7 | 87 | 1,6 | 1 | — |
+| Ours de guerre | Sol | 80 | +8 | 101 | 1,4 | 1 | — |
+| Grand-orc des forges | Sol | 90 | +9 | 114 | 1,5 | 1 | — |
+| Ettin | Sol | 100 | +11 | 135 | 1,1 | 1 | — |
+| Ogre | Sol | 110 | +12 | 149 | 1,3 | 1 | — |
 | Troll des glaces | Sol | 120 | +13 | 160 | 1,5 | 1 | — |
-| Chauve-souris | Volant | 30 | +2 | 16 | 2 | 1 | Vol |
-| Guêpe des glaces | Volant | 50 | +3 | 26 | 2,3 | 1 | Vol |
-| Harpie | Volant | 90 | +6 | 55 | 1,9 | 1 | Vol |
-| Chaman de guerre | Magique | 80 | +5 | 70 | 1,5 | 1 | **Hâte** : les alliés à moins de 1,7 case vont 1,4 fois plus vite |
-| Prêtresse | Magique | 100 | +7 | 80 | 1,4 | 1 | **Soin** : les alliés à moins de 1,7 case regagnent 5 % de leurs PV max par seconde |
-| Lutin des glaces | Magique | 110 | +7 | 70 | 1,5 | 1 | **Accéléré** : vitesse × (1 + 0,1 × secondes de vie), au plus × 2 |
-| Gelée mutante | Magique | 140 | +9 | 90 | 1,3 | 1 | **Se divise** en 2 Petit limon à sa mort |
-| Spectre | Magique | 150 | +10 | 90 | 1,5 | 1 | **Invisible** sauf à portée d'une tour Mage |
-| Tortue | Magique | 160 | +10 | 140 | 1,1 | 1 | **Blindé** : armure 5 |
+| Chauve-souris géante | Volant | 30 | +2 | 16 | 2 | 1 | Vol |
+| Esprit du blizzard | Volant | 50 | +3 | 26 | 2,3 | 1 | Vol |
+| Griffon sauvage | Volant | 90 | +6 | 55 | 1,9 | 1 | Vol |
+| Chaman orc sur warg | Magique | 80 | +5 | 70 | 1,5 | 1 | **Hâte** : les alliés à moins de 1,7 case vont 1,4 fois plus vite |
+| Ancien taurin | Magique | 100 | +7 | 80 | 1,4 | 1 | **Soin** : les alliés à moins de 1,7 case regagnent 5 % de leurs PV max par seconde |
+| Chevaucheur de warg | Magique | 110 | +7 | 70 | 1,5 | 1 | **Accéléré** : vitesse × (1 + 0,1 × secondes de vie), au plus × 2 |
+| Gelée ocre | Magique | 140 | +9 | 90 | 1,3 | 1 | **Se divise** en 2 Fragments de gelée à sa mort |
+| Spectre des glaces | Magique | 150 | +10 | 90 | 1,5 | 1 | **Invisible** sauf à portée d'une tour Mage |
+| Ankylosaure de guerre | Magique | 160 | +10 | 140 | 1,1 | 1 | **Blindé** : armure 5 |
 | Briseur de runes | Magique | 170 | +11 | 120 | 1,4 | 1 | **Anti-magie** : insensible au Givre et au Mage |
-| Saboteur gobelin | Magique | 190 | +12 | 110 | 1,5 | 1 | **Étourdit** la tour la plus proche |
-| Roi gobelin | Boss | 450 | +29 | 900 | 1 | 1 | **Boss** : armure 2 et étourdissement |
-| Homme-lézard | Sol | 150 | +16 | 200 | 1,6 | 2 | — |
-| Chevalier noir | Sol | 180 | +20 | 250 | 1,2 | 2 | — |
+| Canon-foudre des hommes-rats | Magique | 190 | +12 | 110 | 1,5 | 1 | **Étourdit** la tour la plus proche |
+| Grizzak, roi gobelin | Boss | 450 | +29 | 900 | 1 | 1 | **Boss** : armure 2 et étourdissement |
+| Loup-garou | Sol | 150 | +16 | 200 | 1,6 | 2 | — |
+| Guerrier des Ruines | Sol | 180 | +20 | 250 | 1,2 | 2 | — |
 | Gargouille | Sol | 210 | +23 | 285 | 1,3 | 2 | — |
-| Loup-garou | Sol | 240 | +27 | 310 | 1,9 | 2 | — |
-| Ours de guerre | Sol | 270 | +30 | 370 | 1,5 | 2 | — |
+| Ogre-rat mutant | Sol | 240 | +27 | 310 | 1,9 | 2 | — |
+| Basilic | Sol | 270 | +30 | 370 | 1,5 | 2 | — |
 | Golem runique | Sol | 300 | +34 | 420 | 1 | 2 | — |
-| Ogre | Sol | 330 | +38 | 460 | 1,1 | 2 | — |
-| Minotaure | Sol | 370 | +42 | 500 | 1,4 | 2 | — |
-| Automate blindé | Sol | 410 | +47 | 580 | 1 | 2 | — |
+| Minotaure | Sol | 330 | +38 | 460 | 1,1 | 2 | — |
+| Rejeton difforme | Sol | 370 | +42 | 500 | 1,4 | 2 | — |
+| Horreur recousue | Sol | 410 | +47 | 580 | 1 | 2 | — |
 | Wendigo | Sol | 450 | +52 | 610 | 1,6 | 2 | — |
-| Rhinocéros de guerre | Sol | 500 | +58 | 720 | 1,5 | 2 | — |
-| Mammouth de guerre | Sol | 600 | +70 | 900 | 0,9 | 2 | — |
-| Griffon corrompu | Volant | 150 | +10 | 95 | 1,9 | 2 | Vol |
-| Vouivre | Volant | 260 | +17 | 180 | 1,8 | 2 | Vol |
+| Roue foudroyante | Sol | 500 | +58 | 720 | 1,5 | 2 | — |
+| Mammouth de bataille à tour | Sol | 600 | +70 | 900 | 0,9 | 2 | — |
+| Vouivre | Volant | 150 | +10 | 95 | 1,9 | 2 | Vol |
+| Oculus abyssal | Volant | 260 | +17 | 180 | 1,8 | 2 | Vol |
 | Manticore | Volant | 380 | +25 | 290 | 1,6 | 2 | Vol |
-| Tambour de guerre | Magique | 300 | +20 | 300 | 1,4 | 2 | **Hâte** : les alliés à moins de 1,7 case vont 1,4 fois plus vite |
-| Druidesse | Magique | 330 | +21 | 280 | 1,4 | 2 | **Soin** : les alliés à moins de 1,7 case regagnent 5 % de leurs PV max par seconde |
-| Centaure messager | Magique | 340 | +22 | 260 | 1,6 | 2 | **Accéléré** : vitesse × (1 + 0,1 × secondes de vie), au plus × 2 |
-| Assassin des ombres | Magique | 380 | +25 | 300 | 1,6 | 2 | **Invisible** sauf à portée d'une tour Mage |
-| Golem de boue | Magique | 400 | +26 | 320 | 1,2 | 2 | **Se divise** en 2 Petite boue à sa mort |
-| Scarabée cuirassé | Magique | 430 | +28 | 380 | 1,2 | 2 | **Blindé** : armure 12 |
-| Inquisiteur | Magique | 450 | +29 | 380 | 1,3 | 2 | **Anti-magie** : insensible au Givre et au Mage |
-| Ingénieur nain renégat | Magique | 480 | +31 | 360 | 1,4 | 2 | **Étourdit** la tour la plus proche |
+| Tambour de guerre ogre | Magique | 300 | +20 | 300 | 1,4 | 2 | **Hâte** : les alliés à moins de 1,7 case vont 1,4 fois plus vite |
+| Prêtre-crapaud | Magique | 330 | +21 | 280 | 1,4 | 2 | **Soin** : les alliés à moins de 1,7 case regagnent 5 % de leurs PV max par seconde |
+| Chasseur sauvage | Magique | 340 | +22 | 260 | 1,6 | 2 | **Accéléré** : vitesse × (1 + 0,1 × secondes de vie), au plus × 2 |
+| Caméléon géant | Magique | 380 | +25 | 300 | 1,6 | 2 | **Invisible** sauf à portée d'une tour Mage |
+| Protoplasme aux mille yeux | Magique | 400 | +26 | 320 | 1,2 | 2 | **Se divise** en 2 Blobs de protoplasme à sa mort |
+| Stégosaure de guerre | Magique | 430 | +28 | 380 | 1,2 | 2 | **Blindé** : armure 12 |
+| Taureau d'airain | Magique | 450 | +29 | 380 | 1,3 | 2 | **Anti-magie** : insensible au Givre et au Mage |
+| Cérébrophage | Magique | 480 | +31 | 360 | 1,4 | 2 | **Étourdit** la tour la plus proche |
 | Cyclope des cendres | Boss | 1400 | +91 | 2800 | 1 | 2 | **Boss** : armure 6 et étourdissement |
-| Roi-liche | Sol | 900 | +107 | 1200 | 1,2 | 3 | — |
-| Seigneur de guerre orc | Sol | 1000 | +120 | 1350 | 1,3 | 3 | — |
+| Seigneur de guerre orc | Sol | 900 | +107 | 1200 | 1,2 | 3 | — |
+| Élu des Ruines | Sol | 1000 | +120 | 1350 | 1,3 | 3 | — |
 | Élémentaire de feu | Sol | 1100 | +132 | 1400 | 1,5 | 3 | — |
-| Démon des abysses | Sol | 1250 | +151 | 1700 | 1,4 | 3 | — |
-| Golem de lave | Sol | 1400 | +170 | 2000 | 0,9 | 3 | — |
-| Ver des neiges | Sol | 1550 | +188 | 2100 | 1,2 | 3 | — |
-| Chimère | Sol | 1700 | +207 | 2250 | 1,5 | 3 | — |
-| Géant du givre | Sol | 1900 | +233 | 2700 | 1 | 3 | — |
-| Sylvain corrompu | Sol | 2100 | +258 | 3000 | 0,9 | 3 | — |
-| Mastodonte de fer | Sol | 2400 | +297 | 3500 | 0,8 | 3 | — |
-| Béhémoth | Sol | 2700 | +335 | 3900 | 1,1 | 3 | — |
-| Colosse de pierre | Sol | 3000 | +374 | 4500 | 0,85 | 3 | — |
+| Carnosaure monté | Sol | 1250 | +151 | 1700 | 1,4 | 3 | — |
+| Ver des neiges | Sol | 1400 | +170 | 2000 | 0,9 | 3 | — |
+| Chimère | Sol | 1550 | +188 | 2100 | 1,2 | 3 | — |
+| Géant du givre | Sol | 1700 | +207 | 2250 | 1,5 | 3 | — |
+| Abomination des fosses | Sol | 1900 | +233 | 2700 | 1 | 3 | — |
+| Titan déchu | Sol | 2100 | +258 | 3000 | 0,9 | 3 | — |
+| Béhémoth | Sol | 2400 | +297 | 3500 | 0,8 | 3 | — |
+| Seigneur des brasiers | Sol | 2700 | +335 | 3900 | 1,1 | 3 | — |
+| Grand Ancien des abysses | Sol | 3000 | +374 | 4500 | 0,85 | 3 | — |
 | Dragon ancien | Volant | 900 | +59 | 800 | 1,3 | 3 | Vol |
 | Phénix de givre | Volant | 1200 | +78 | 1000 | 1,6 | 3 | Vol |
-| Oiseau-roc | Volant | 1600 | +104 | 1400 | 1,4 | 3 | Vol |
-| Héraut de guerre | Magique | 1100 | +72 | 1100 | 1,3 | 3 | **Hâte** : les alliés à moins de 1,7 case vont 1,4 fois plus vite |
+| Dracoliche | Volant | 1600 | +104 | 1400 | 1,4 | 3 | Vol |
+| Prince des Ruines | Magique | 1100 | +72 | 1100 | 1,3 | 3 | **Hâte** : les alliés à moins de 1,7 case vont 1,4 fois plus vite |
 | Destrier de cauchemar | Magique | 1200 | +78 | 950 | 1,6 | 3 | **Accéléré** : vitesse × (1 + 0,1 × secondes de vie), au plus × 2 |
-| Grande prêtresse de sang | Magique | 1250 | +81 | 1000 | 1,3 | 3 | **Soin** : les alliés à moins de 1,7 case regagnent 5 % de leurs PV max par seconde |
+| Seigneur vampire | Magique | 1250 | +81 | 1000 | 1,3 | 3 | **Soin** : les alliés à moins de 1,7 case regagnent 5 % de leurs PV max par seconde |
 | Faucheuse | Magique | 1300 | +85 | 1050 | 1,5 | 3 | **Invisible** sauf à portée d'une tour Mage |
 | Hydre | Magique | 1400 | +91 | 1100 | 1,1 | 3 | **Se divise** en 2 Tête d’hydre à sa mort |
 | Dévoreur de mana | Magique | 1500 | +98 | 1300 | 1,2 | 3 | **Anti-magie** : insensible au Givre et au Mage |
 | Tortue-dragon | Magique | 1600 | +104 | 1400 | 1 | 3 | **Blindé** : armure 25 |
-| Golem du tonnerre | Magique | 1700 | +111 | 1400 | 1,1 | 3 | **Étourdit** la tour la plus proche |
+| Géant des tempêtes | Magique | 1700 | +111 | 1400 | 1,1 | 3 | **Étourdit** la tour la plus proche |
 | Azh'Khar, seigneur des lames | Boss | 3500 | +228 | 7000 | 1,02 | 3 | **Boss** : armure 15 et étourdissement |
-| Petit limon | Né d'une division | 20 | +1 | 35 | 1,6 | 1 | — |
-| Petite boue | Né d'une division | 60 | +4 | 110 | 1,4 | 2 | — |
+| Fragment de gelée | Né d'une division | 20 | +1 | 35 | 1,6 | 1 | — |
+| Blob de protoplasme | Né d'une division | 60 | +4 | 110 | 1,4 | 2 | — |
 | Tête d'hydre | Né d'une division | 200 | +13 | 380 | 1,3 | 3 | — |
 
 Les « nés d'une division » ne s'envoient pas : ils apparaissent par 2 à la mort de leur parent, avec ses PV multipliés de la même façon.
@@ -919,8 +919,8 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 - **Un script Python Blender par asset** dans `art/` : c'est la **source** du modèle. `art/outils/generer.py` l'exécute dans une scène vide, exporte `assets/3d/<asset>.glb` et met à jour `assets/3d/manifeste.json` (taille, triangles, empreinte du script). Le même programme fonctionne sur le PC du concepteur (Blender 5.3) et dans le cloud (module `bpy==5.3.0`, sans écran ni carte graphique).
 - **Noms** : `tours/<faction>-<j>` pour `TW[faction × 10 + j]`, `monstres/<g>` pour le monstre de clé `CR[…].g`, `decor/<nom>`, `exemples/<nom>` (non utilisés par le jeu) ; pièces partagées dans `art/communs/`.
 - **Conventions** : 1 unité = 1 case, origine au sol au centre de la case, couleurs de faction lues dans `FACTIONS` ; un seul modèle par tour et par monstre (niveaux et petites animations gérés par le jeu).
-- **Budgets** (`art/budgets.json`) : tour ≤ 9 000 triangles et 300 Ko (depuis la 2.40, validé par le concepteur), monstre ≤ 3 000 triangles et 150 Ko, décor ≤ 6 000 triangles et 300 Ko, total ≤ 16 Mo (8 Mo avant la 2.40).
-- **Contrôles** : `tests/simulation/assets3d.test.js` (chaque PR, sans Blender : manifeste complet, aucun fichier en retard sur son script, GLB valides, budgets) ; action GitHub **« Assets 3D »** (`.github/workflows/assets-3d.yml`, PR qui touchent `art/` ou `assets/3d/`) : régénère tout avec Blender 5.3, vérifie et joint les images d'aperçu.
+- **Budgets** (`art/budgets.json`) : tour ≤ 9 000 triangles et 300 Ko (depuis la 2.40, validé par le concepteur), monstre ≤ 4 500 triangles et 300 Ko (depuis la 2.41 : squelette et texture peinte, validé par le concepteur), décor ≤ 6 000 triangles et 300 Ko, total ≤ 24 Mo (depuis la 2.41 : tours grimdark ≈ 7 Mo et 78 monstres ≈ 14,5 Mo, chargés par palier ; validé par le concepteur ; 8 Mo avant la 2.40, 16 Mo en 2.40).
+- **Contrôles** : `tests/simulation/assets3d.test.js` (chaque PR, sans Blender : manifeste complet, aucun fichier en retard sur son script, GLB valides, budgets) ; action GitHub **« Assets 3D »** (`.github/workflows/assets-3d.yml`, PR qui touchent `art/` ou `assets/3d/`) : régénère tout avec Blender 5.3 (60 min au plus depuis la 2.41 ; environ 15 à 30 min avec les tours grimdark et les 78 monstres), vérifie et joint les images d'aperçu.
 - **Qui fait quoi** : la conception d'un nouveau modèle ou d'un nouveau style se fait de préférence sur le PC du concepteur (Blender + MCP, en direct ou via Remote Control) ; les retouches mineures peuvent être faites par n'importe quel contributeur ou une session cloud, en modifiant le script puis en régénérant.
 - **Repli obligatoire** : le jeu doit fonctionner même si un modèle manque (un contributeur peut ajouter un monstre avant son modèle 3D).
 - **Fins de ligne** : `.gitattributes` impose LF dans le dépôt (les empreintes vérifiées par les tests en dépendent) et traite les fichiers 3D et images comme binaires. Les fichiers `.blend` ne sont pas versionnés.
@@ -933,7 +933,12 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
   - `communs/peuples_hd.py` : corps humain paramétrable (gabarits **humain, orc, elfe, nain**), poses (arbalète, arme d'hast, bras levés, lancer, arc), rapaces (aigle, chouette).
   - Neige : un pivot `SansNeige` protège l'eau, les braises et les intérieurs (`neige.py`). `export_jeu.cuire` laisse intacts les matériaux « Peau » et « Peint ».
 - **Ancien système de tours** (2.7 à 2.39, plus utilisé par le jeu) : `communs/tours_communes.py` déclinait les **6 archétypes** selon le `STYLE` de la faction.
-- **Monstres** : `art/monstres/<g>.py` (17 scripts, un par clé `CR[…].g` ; le Petit limon utilise le modèle `slime`, réduit par le jeu). Tailles dans `communs/echelles.py` : `hauteur = 0,40 × z^1,8` (z de `CR`) : Sapeur gobelin 0,24 case, Brute orc 0,36, Troll 0,47, Golem 0,55, Cyclope 0,83 ; les tours font 1,1 à 1,4 case.
+- **Monstres : le bestiaire épique et le kit de créatures** (depuis la 2.41, procédé validé par le concepteur sur la Brute orc et le Warg) : `art/monstres/<g>.py` (78 scripts : un par clé `CR[…].g`, plus 6 monstres prêts pour l'invocation et la résurrection, pas encore dans le jeu : `ratpriest`, `deadcart`, `spiderqueen`, `tombcart`, `broodmother`, `archlich`). Les monstres nés d'une division utilisent le modèle de leur parent, réduit par le jeu. Les scripts de l'Orc et du Warg (pilote) sont écrits à la main ; les autres sont des **fiches de réglages** pour le kit `communs/creatures.py` :
+  - trois familles : `bipede` (squelette BIPEDE de 19 os ; tête orc, humain, rat, loup, lézard, taureau, crâne, cyclope, crapaud, démon, tentacules ; jambes, robe ou traîne flottante ; queue), `bete` (QUADRUPEDE de 19 os ; tête loup, sanglier, ours, félin, lézard, taureau, mammouth, cheval ; cavalier assis, engins et chars sans pattes, pattes en plus pour l'araignée, têtes en plus pour l'hydre), `volant` (VOLANT de 15 os, ailes en deux parties, membrane ou plumes ; têtes chauve-souris, bec, dragon, félin, crâne) ;
+  - une bibliothèque de pièces : casques (cornu, pointe, heaume, couronne, capuche), épaulières, armes (hache, épée, masse, marteau, gourdin, lance, bâton à orbe, faux, fouet), bouclier, ceinture et pagne, cape, brassards, genouillères, collier de crocs, cornes, défenses, ailes dans le dos, crinière, plaques dorsales, griffes, cavalier et lance de cavalier ;
+  - fabrication commune (`organique.py`, squelettes et clips dans `squelettes.py`) : corps fait de volumes fondus (remaillage en voxels, lissé, allégé à environ 1 700 triangles) ; **sculpture détaillée** (`corps_haut` : relief de peau, de poil, de pierre ou d'écailles) dont la peinture (couleur, occlusion, arêtes, dégradé, marbrures) et la **carte de relief** (normal map) sont cuites sur le modèle léger ; peau liée aux os par la distance aux volumes ; clips **marche** (ou **vol**), **touche**, **mort** ;
+  - tailles : `hauteur = 0,40 × z^1,8` (z de `CR`), × 1,3 par défaut pour les bêtes ; les volants volent et tombent de 0,5 case.
+- **Monstres sur squelette en jeu** (`rendu3d.js`, depuis la 2.41) : `cloner()` relie la copie de chaque monstre (et son contour) à ses propres os ; un monstre touché joue « touche » par-dessus sa marche (au plus toutes les 0,6 s) ; un monstre tué (pas celui qui atteint le château) joue « mort », reste au sol 1,6 s puis s'enfonce.
 - **Monstres des paliers (préparés pour la PR B, pas encore dans `sim.js`)** : 3 paliers de **24 monstres** chacun (12 au sol, 3 volants, 8 magiques : aura de vitesse, invisible, se divise, accéléré, anti-magie, soin, armure, étourdissement ; 1 boss), soit 72 monstres. La liste, les clés `CR[…].g` proposées et les tailles `z` sont dans **`art/monstres/PALIERS.md`**. Les nouveaux modèles ne sont pas utilisés par le jeu tant que `CR` ne les déclare pas ; leur `z` est écrit dans leur script (à reporter dans `CR` et `echelles.py` avec la PR B). Noms, clés et tailles : **propositions à valider** par le concepteur.
 - **Décor** : `art/decor/portail.py` et `art/decor/chateau.py` (drapeau recoloré par le jeu à la couleur du joueur).
 - **Pièces communes** (`art/communs/`) : `outils.py` (formes, matériaux, peinture des sommets, budget de facettes), `factions.py` (palettes et socles des 5 factions), `personnages.py` (personnage caricatural paramétrable et armes), `betes.py` (quadrupèdes, volants, gelées), `animations.py` (animations par pièces, sans squelette : `marche`, `trot`, `saut`, `flotte`, `vol`), `echelles.py`, `neige.py` (neige sur les modèles, 2.9), `tours_communes.py`, `decor.py`, `export_jeu.py`, `rendu.py` (rendus de validation).
@@ -1067,3 +1072,5 @@ Le mode d'emploi complet est dans **`art/LISEZMOI.md`**. L'essentiel :
 | 2026-11-19 | 2.38 | **quêtes bonus** : **10 quêtes bonus** au titre décalé (§2), une à la fois, la première à 1:30 puis toutes les 3 à 4 min, tirées sans remise : courses (« Clicker fou » : 10 tours de plus, jamais en fin de partie ; « Le facteur sonne toujours 4 fois » : faire passer 4 de ses monstres, chaque monstre retenant son envoyeur ; « Gonflette » ; « Frozen » ; « Le gros cadeau ») et photos (« Qui a la plus grosse ? » : plus long labyrinthe ; « Picsou » ; « Pigeons voyageurs » ; « Bling-bling » ; « Mamie Gâteau » : le plus petit revenu). Aucune course n'est gagnée d'avance. Récompense : 8 × le revenu moyen (au moins 100 or), partagée en cas d'égalité. Bannière au début et à la fin, pastille de suivi (score, rang, chrono), colonne Quêtes en fin de partie. Les IA jouent les quêtes (50 / 75 / 100 % selon la difficulté) en adaptant constructions, améliorations, économies et envois (§8). **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur ; l'instantané transmet la quête). Nouveau fichier de tests `quetes`, test ajouté au parcours mobile. Choix des quêtes, récompense et rythme validés par le concepteur ; équilibrage **à valider en jouant**. |
 | 2026-11-20 | 2.39 | **Style peint commun en 3D** (§15.2) : ombres en paliers, liseré de lumière froide et contour sombre sur toutes les tours, tous les monstres, le portail et le château, ajoutés au chargement des modèles (`rendu3d.js`, aucun modèle régénéré). Les silhouettes se détachent mieux de la neige sur téléphone. `?style=0` garde l'ancien rendu. Coût : ≈ 1,7 fois plus d'appels de dessin, **à vérifier sur un téléphone modeste**. Visuel uniquement : `sim.js` non modifié (pas de redéploiement du serveur). |
 | 2026-11-20 | 2.40 | **Races asymétriques** (§4.2, §5) : les 5 factions deviennent 5 races aux tours toutes différentes, chacune avec sa mécanique, ses états et ses combos : **Royaume d'Aubeval** (ex-Alliance : Cohésion, Marqué et Jugement, filets qui abattent les volants, Comptoir marchand), **Clans de l'Orage Blanc** (ex-Horde : Fureur et Rage, chaînes d'éclairs, Trempé et Conduction, Maléfice, saignement), **Elfes de Lunebois** (ex-Sylvestres : poison et Floraison, racines, Croissance, Spores), **Nains de Hautroc** (Forge, Chauffe, armure brisée et Brèche, mines), **Cour des Ossements** (ex-Légion des ombres : âmes, morts relevés, peste et Épidémie, malédictions, Faucheuse). Grille de 10 rôles (dont un anti-aérien dédié, une détection, un soutien et **une ultime par terrain**, code `unique`). **Règles d'équilibrage centrales** (§5.3 : puissance effective, radar à 30 points, couverture obligatoire, plafonds) vérifiées par le nouveau fichier de tests `races`, et **banc des races** (`tests/outils/banc-races.js`) : chaque race entre 1,29 et 1,67 point par partie (1,5 = équilibre). L'IA joue les 5 races (rôles, version renforcée `up`, soutien et ultime, anti-aérien seulement face aux volants, dégâts dans la durée comptés à part). Quête « Frozen » : tours de contrôle au lieu du Givre. Accueil : choix de la race et **fiche de race** (Description, Tours, Combos). En jeu : fiche de tour enrichie, pastilles d'états sur les monstres, textes de combo, âmes dans le bandeau, éclairs, mines et morts relevés en 2D et en 3D. **Modèles 3D des 50 tours refaits** en direction « grimdark » (§15.1 : soldats, créatures, machines et totems sculptés, texture peinte et relief cuits ; budget des tours relevé à 9 000 triangles et 300 Ko, validé par le concepteur). Morts relevés en 3D avec leurs propres modèles (squelette en armure rouillée, colosse d'os). Retouches : arcs et arbalètes épaissis et éclaircis pour rester lisibles, lance-filets (filet déplié sur un râtelier, tromblon à plombs) et champ de mines (poste de sapeurs, chèvre de levage, mines runiques à pointes) refaits. **`sim.js` et `server/` modifiés** (redéploiement automatique du serveur ; l'instantané transmet les états, les âmes, les morts relevés et les mines). Tests adaptés (`tables`, `combats`, `deplacements`, `chantier`, `labyrinthe`, `quetes`, parcours). Chiffres **à valider par le concepteur en jouant**. |
+| 2026-11-20 | 2.41 | **Bestiaire épique et monstres de nouvelle génération** : 72 monstres renommés à la même place (mêmes prix, PV, vitesses et capacités ; seules les tailles d'affichage z changent), selon le bestiaire validé par le concepteur (gobelins, hommes-rats, orcs, ogres, sauriens montés, guerriers des Ruines, Oculus abyssal, Cérébrophage, Grand Ancien, Seigneur des brasiers…). **Les 78 modèles sont refaits** avec le kit de créatures (§15.1) : squelettes partagés (bipède, quadrupède, volant), sculpture cuite en texture peinte et carte de relief, animations marche ou vol, coup reçu et mort. En jeu (§15.2) : un monstre touché recule, un monstre tué tombe, reste au sol puis s'enfonce. 6 modèles sont prêts pour les capacités à venir (invocation, résurrection). Budget des monstres relevé à 4 500 triangles et 300 Ko, budget total à 20 Mo. Après revue des planches, 14 monstres des paliers 2 et 3 retouchés (golem et titan en roche taillée `RELIEF_ROC`, wyrm, faucheuse, spectre, mangeur de mana, seigneur des brasiers, Grand Ancien, tour du mammouth, béhémoth, champion des Ruines, chimère, géant, roue de malheur). **`sim.js` modifié** (noms, clés de modèle et tailles seulement ; redéploiement automatique du serveur). Tests adaptés (noms, modèles sur squelette). |
+| 2026-11-21 | 2.41 | Outillage : **génération des monstres bien plus rapide**. Deux lenteurs du kit (`art/communs/organique.py`) : chaque sphère des membres était ajoutée par un opérateur bmesh qui parcourt tout le maillage (temps quadratique : 10 min pour la chauve-souris aux bouts d'ailes très fins), et la couleur de chaque sommet de la sculpture était cherchée en Python, sommet par sommet (17 s pour une Brute orc). Désormais : sphères ajoutées d'un coup à partir d'un gabarit, recherche groupée avec numpy. Chauve-souris 595 s → 7 s, Brute orc 36 s → 11 s. Mêmes modèles (même nombre de triangles, mêmes dimensions, rendus identiques). La vérification « Assets 3D » de GitHub, arrêtée à 30 min sur la PR 67 (régénération de plus d'une heure), tient de nouveau dans ses 30 min (10 min sur le PC du concepteur) ; après la fusion des tours grimdark, le concepteur a porté ce délai à 60 min. Les 131 assets ont été régénérés. **Aucun changement de jeu.** |

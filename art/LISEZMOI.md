@@ -72,7 +72,7 @@ Puis commiter **le script, le `.glb` et `assets/3d/manifeste.json` ensemble**.
 - `assets/3d/manifeste.json` note pour chaque asset : son fichier, ses triangles, sa taille et l'**empreinte de son script** (script + `art/communs/`).
 - `tests/simulation/assets3d.test.js` (sur chaque PR, sans Blender) : chaque script a son fichier, aucun fichier n'est en retard sur son script, chaque fichier est un GLB valide et respecte son budget.
 - Action GitHub « Assets 3D » (sur les PR qui touchent `art/` ou `assets/3d/`) : régénère tout avec Blender 5.3, vérifie, et joint les images d'aperçu (onglet *Actions → Artifacts → apercus-3d*).
-- Budgets par fichier dans `art/budgets.json` : tour et monstre ≤ 3 000 triangles et 150 Ko, décor ≤ 6 000 triangles et 300 Ko, total ≤ 8 Mo. Le jeu doit rester fluide sur téléphone.
+- Budgets par fichier dans `art/budgets.json` : tour et monstre ≤ 3 000 triangles et 150 Ko, décor ≤ 6 000 triangles et 300 Ko, total ≤ 20 Mo depuis la 2.40 (monstres ≤ 4 500 triangles et 300 Ko). Le jeu doit rester fluide sur téléphone.
 - Modifier un fichier de `art/communs/` change l'empreinte de **tous** les assets : il faut alors tout régénérer (`python art/outils/generer.py`).
 
 ## Modèles du jeu (depuis la 2.7)

@@ -126,14 +126,16 @@ def generer(bpy, id_, dossier, jeu, apercus=None):
     fichier = os.path.join(dossier, id_ + '.glb')
     os.makedirs(os.path.dirname(fichier), exist_ok=True)
     # maillages ET objets vides : les vides sont les pivots nommés que le jeu anime (Tourelle, Tete, BrasG…)
+    # 2.30 : et les squelettes (ARMATURE) des monstres « organiques » (maillage déformé par les os)
     for o in bpy.context.scene.objects:
-        o.select_set(o.type in ('MESH', 'EMPTY'))
+        o.select_set(o.type in ('MESH', 'EMPTY', 'ARMATURE'))
     animee = any(o.animation_data and o.animation_data.nla_tracks for o in bpy.context.scene.objects)
-    # animations : une par piste NLA (« marche », « vol ») ; compression meshopt (fichiers 2 à 3 fois plus légers)
+    # animations : une par piste NLA (« marche », « vol », « touche », « mort ») ; compression meshopt (fichiers 2 à 3 fois
+    # plus légers) ; textures peintes en WebP (lues nativement par three.js)
     bpy.ops.export_scene.gltf(filepath=fichier, export_format='GLB', use_selection=True, export_apply=True,
                               export_cameras=False, export_lights=False,
                               export_animations=animee, export_animation_mode='NLA_TRACKS', export_force_sampling=True,
-                              export_image_format='WEBP', export_image_quality=85,   # 2.40 : textures peintes des créatures en WebP
+                              export_def_bones=True, export_image_format='WEBP', export_image_quality=85, export_optimize_animation_size=True,
                               export_meshopt_compression_enable=True)
     compresser_si_besoin(fichier)
     if apercus:

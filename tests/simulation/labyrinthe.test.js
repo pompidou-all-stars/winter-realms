@@ -50,7 +50,7 @@ test('Répartition : sans menace connue, l\'IA garde le type prévu par son plan
  assert.equal(S.choixType(b,i,0,10),0,'menace inconnue : type du plan');
  const base=b.classId*10,x=i%C,y=i/C|0;G.time=300;b.gold=1e7;for(const j of M.ord)b.place(j%C,j/C|0,base);
  S.observer(b);b.menace.fill(0);b.menace[S.NORM[5]]=1000;const ord=S.contreMenace(b,base,x,y);
- b.menace.fill(0);b.menace[S.CR.findIndex(T=>T.n.startsWith('Scarab'))]=1000;const bl=S.contreMenace(b,base,x,y);
+ b.menace.fill(0);b.menace[S.CR.findIndex(T=>T.tag=='blindé'&&T.t==2)]=1000;const bl=S.contreMenace(b,base,x,y);
  assert.ok(bl<ord/2,`Archer : ${bl.toFixed(3)} contre des blindés, ${ord.toFixed(3)} contre des monstres ordinaires`);
  assert.notEqual(S.choixType(b,i,0,10),0,'face à des blindés, autre chose qu\'un Archer');
 });

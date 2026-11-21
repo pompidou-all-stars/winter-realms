@@ -1,37 +1,18 @@
-"""Élémentaire de feu (palier 3, sol) : torse de braises et de flammes orange qui flotte au ras du sol,
-cœur blanc incandescent, bras de feu, couronne de flammes. Clé CR « fireel »."""
-import math
-from communs.outils import collection, dans, pivot, peindre, sphere, cone, cylindre, boite, prisme, anneau, descendants
-from communs.betes import yeux_bete
-from communs.animations import flotte
-from communs.export_jeu import preparer
-
-# taille selon le facteur z proposé pour CR (même formule que communs/echelles.py) ; voir PALIERS.md
-Z = 1.4
-def hauteur(): return .40 * Z ** 1.8
-def piece(r, nom): return next(o for o in descendants(r) if o.name.split('.')[0] == nom)
-
+"""Élémentaire de feu (palier 3, sol) — kit 2.40 : colosse de roche en fusion, flammes en guise de chevelure et d'épaules,
+fissures incandescentes, poings de lave, traîne de feu."""
+from communs.creatures import *
 INFOS = {'categorie': 'monstre', 'titre': "Élémentaire de feu"}
 
-def fabriquer():
-    c = collection('elementaire_feu'); dans(c)
-    r = pivot('elementaire_feu'); H = hauteur()
-    corps = pivot('Corps', (0, 0, H * .1), r)
-    cone('Base', '#d8401a', H * .22, H * .5, 10, (0, 0, H * .42), corps, (math.pi, 0, 0), emis=1.5)
-    sphere('Torse', '#ff7a1a', H * .26, (0, 0, H * .45), (1, .85, 1.1), 12, 8, corps, emis=2)
-    sphere('Coeur', '#fff2b0', H * .1, (0, -H * .2, H * .45), (1, .6, 1), 8, 6, corps, emis=4)
-    T = pivot('Tete', (0, 0, H * .78), corps)
-    sphere('Crane', '#ff9a2a', H * .14, (0, 0, 0), (1, 1, 1.1), 10, 8, T, emis=2)
-    for k in range(5):
-        a = k * 2 * math.pi / 5
-        cone(f'Flamme{k}', '#ffcf4a', H * .05, H * .2, 5, (math.cos(a) * H * .08, math.sin(a) * H * .08, H * .1), T, (math.sin(a) * .7, -math.cos(a) * .7, 0), emis=3)
-    yeux_bete(T, H * .03, -H * .12, H * .02, H * .05, '#ffffff', False)
-    for s, n in ((-1, 'G'), (1, 'D')):
-        b = pivot(f'Bras{n}', (s * H * .26, 0, H * .55), corps); b.rotation_euler = (-.4, s * .4, 0)
-        cone(f'BrasFeu{n}', '#ff7a1a', H * .08, H * .35, 6, (0, 0, -H * .35), b, emis=2)
-    peindre(r, sol=.9)
-    flotte(r, duree=1.2, ampl=H * .05, roulis=.1)
-    return r
+def pieces(K):
+    t, e, p = K.j('tete'), K.j('epaule.L'), K.j('poitrine')
+    K.lueurs += [cone(f'Flamme{k}', '#ffb347', 'Tete', (x, t.y + .02, t.z + .12), .05, .002, .2 + .05 * (k % 2), rot=(-.4, x * 3, 0), seg=5)
+                 for k, x in enumerate((-.06, 0, .06))]
+    K.lueurs += [cone(f'FlammeE{k}.{n}', '#ffb347', f'Bras.{n}', (s * e.x, e.y + .02 * k, e.z + .05), .045, .002, .16, rot=(-.3, s * .4, 0), seg=5)
+                 for s, n in ((1, 'L'), (-1, 'R')) for k in range(2)]
+    K.lueurs += [plaque(f'Fissure{k}', '#ffcf3a', 'Torse', (x, -.17, p.z + z), .06, .01, .01, rot=(0, 0, a)) for k, (x, z, a) in enumerate(((-.07, .03, .6), (.06, -.03, -.5)))]
+    return []
 
 def construire(ctx):
-    preparer(fabriquer())
+    bipede('elementaire_feu', dict(z=1.4, peau=('#4a2a20', '#6a3a28', '#2a1a14'), bas='#ff7a1a', tete='demon', tete_r=.85,
+                                   bas_du_corps='traine', carrure=1.35, bras=1.2, muscle=.6, voute=.4, relief=RELIEF_PIERRE,
+                                   oeil='#ffb347', pieces=pieces))

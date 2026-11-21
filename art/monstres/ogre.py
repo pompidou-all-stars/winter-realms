@@ -1,30 +1,11 @@
-"""Ogre (palier 2, sol) : grosse brute ventrue à peau jaune-brun, petite tête, mâchoire énorme, sourcils
-épais, pagne de peau et massue à clous. Clé CR « ogre »."""
-import math
-from communs.outils import collection, dans, pivot, peindre, sphere, cone, cylindre, boite, prisme, anneau, descendants
-from communs.personnages import humanoide, epee, hache, marteau, gourdin, baton, bouclier, lame_courbe, bombe
-from communs.animations import marche
-from communs.export_jeu import preparer
-
-# taille selon le facteur z proposé pour CR (même formule que communs/echelles.py) ; voir PALIERS.md
-Z = 1.2
-def hauteur(): return .40 * Z ** 1.8
-def piece(r, nom): return next(o for o in descendants(r) if o.name.split('.')[0] == nom)
-
+"""Ogre (palier 1, sol) — kit 2.40 : ventre énorme, petite tête, masse cloutée, crâne-trophée, épaulières de cuir."""
+from communs.creatures import *
 INFOS = {'categorie': 'monstre', 'titre': "Ogre"}
 
-def fabriquer():
-    c = collection('ogre'); dans(c)
-    r = pivot('ogre'); H = hauteur()
-    humanoide(r, dict(peau='#c2a86a', peau2='#d8c088', tissu='#7a5634', torse='#c2a86a', cuir='#4a321f', botte='#6b4a2f',
-                      carrure=1.5, tete=.1, jambes=.3, voute=.2, machoire=1, sourcils=1, nez=('rond', .3), defenses=1,
-                      oreilles=.3, yeux='#ffffff', cheveux='chignon', harnais=1,
-                      arme=lambda p, HH: gourdin(p, HH, '#6b4a2f')), H)
-    B = piece(r, 'Buste')
-    sphere('Bedaine', '#d8c088', H * .19, (0, -H * .09, H * .08), (1, .85, .9), 12, 8, B)
-    peindre(r)
-    marche(r, duree=1.0, ampl_jambe=.4, ampl_bras=.4, rebond=H * .04, roulis=.12)
-    return r
+def pieces(K):
+    return (arme(K, 'masse', taille=1.3) + ceinture(K, pagne='#7a3a2a', crane=True) +
+            epaulieres(K, col=CUIR, taille=.9, pointes=0, bord=None) + brassards(K, col=CUIR))
 
 def construire(ctx):
-    preparer(fabriquer())
+    bipede('ogre', dict(z=1.1, peau=('#c2a06a', '#d8b885', '#9a7c4a'), bas='#6a4a2a', botte='#4a3420', tete='orc', tete_r=.8,
+                        ventre=1.6, carrure=1.4, muscle=.4, voute=.6, jambes=.34, oeil='#ffb03a', lourd=1.4, pieces=pieces))

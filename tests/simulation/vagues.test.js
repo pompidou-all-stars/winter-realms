@@ -38,7 +38,7 @@ test('Accéléré (2.13) : la vitesse grandit avec le temps de vie, jusqu’au p
  const y0=c.y;b.update(.05);const v0=(c.y-y0)/.05;c.age=100;const y1=c.y;b.update(.05);const v1=(c.y-y1)/.05;
  assert.ok(Math.abs(v1/v0-2)<.05,'vitesse ×2 au plafond, obtenu ×'+(v1/v0).toFixed(2));
 });
-test('Le Petit limon ne peut pas être envoyé (« bad »)',()=>{const G=partie(S);G.B[0].gold=1e6;assert.equal(G.action(0,{type:'send',k:S.KID}),'bad')});
+test('Le Fragment de gelée (né d’une division) ne peut pas être envoyé (« bad »)',()=>{const G=partie(S);G.B[0].gold=1e6;assert.equal(G.action(0,{type:'send',k:S.KID}),'bad')});
 
 test('IA : chaque IA agit pour la première fois à 1 s + 0,2 s × son numéro de terrain, avec jusqu\'à 3 actions',()=>{const G=partie(S,{ia:[0,1,1,1]});
  avancer(G,1.15);assert.equal(G.B[1].t.length,0);avancer(G,.1);assert.equal(G.B[1].t.length,3,'IA 1 à 1,2 s : jusqu\'à 3 actions, donc 3 tours');assert.equal(G.B[2].t.length,0);avancer(G,.2);assert.equal(G.B[2].t.length,3,'IA 2 à 1,4 s');

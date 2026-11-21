@@ -1,8 +1,8 @@
 {
- "_explication": "Limites par fichier 3D livré au jeu (doit rester fluide sur téléphone). Modifiables par décision du concepteur. 2.40 : tour relevée à 9 000 triangles et 300 Ko (créatures sculptées à texture peinte et carte de relief, direction « grimdark »), total relevé à 16 Mo, validés par le concepteur.",
+ "_explication": "Limites par fichier 3D livré au jeu (doit rester fluide sur téléphone). Modifiables par décision du concepteur. 2.40 : tour relevée à 9 000 triangles et 300 Ko (créatures sculptées à texture peinte et carte de relief, direction « grimdark »), validé par le concepteur. 2.41 : monstre relevé à 4 500 triangles et 300 Ko (squelette, texture peinte et carte de relief), validé par le concepteur. Total relevé à 24 Mo (tours grimdark ≈ 7 Mo + 78 monstres ≈ 14,5 Mo, chargés par palier : le palier 1 d'abord, les autres 1,5 s plus tard), validé par le concepteur.",
  "tour": {"triangles": 9000, "octets": 307200},
- "monstre": {"triangles": 3000, "octets": 153600},
+ "monstre": {"triangles": 4500, "octets": 307200},
  "decor": {"triangles": 6000, "octets": 307200},
  "exemple": {"triangles": 1000, "octets": 51200},
- "total_octets": 16777216
+ "total_octets": 25165824
 }

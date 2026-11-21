@@ -1,38 +1,22 @@
-"""Chimère (palier 3, sol) : lion à crinière fauve, tête de bouc noir aux cornes torsadées sur le dos
-et serpent vert en guise de queue. Clé CR « chimera »."""
-import math
-from communs.outils import collection, dans, pivot, peindre, sphere, cone, cylindre, boite, prisme, anneau, descendants
-from communs.betes import quadrupede, yeux_bete
-from communs.animations import trot
-from communs.export_jeu import preparer
-
-# taille selon le facteur z proposé pour CR (même formule que communs/echelles.py) ; voir PALIERS.md
-Z = 1.5
-def hauteur(): return .40 * Z ** 1.8
-def piece(r, nom): return next(o for o in descendants(r) if o.name.split('.')[0] == nom)
-
+"""Chimère (palier 3, sol) — kit 2.40 : lion fauve à crinière, tête de bouc cornue sur le dos, queue terminée en serpent
+(mythologie grecque)."""
+from communs.creatures import *
 INFOS = {'categorie': 'monstre', 'titre': "Chimère"}
 
-def fabriquer():
-    c = collection('chimere'); dans(c)
-    r = pivot('chimere'); H = hauteur()
-    corps = quadrupede(r, dict(poil='#d9a441', poil2='#e8b85a', ventre='#f0d08a', patte='#b8862f', yeux='#ff7a2a',
-                               museau='tortue', tete=.25, oreilles=1, queue='#4f9a3a', largeur=.22, pattes=.45, epaisseur=.25,
-                               lqueue=.55), H * .75, H * 1.3)
-    T = piece(r, 'Tete'); rt = H * .75 * .25
-    sphere('Criniere', '#8a4a1a', rt * 1.35, (0, rt * .3, 0), (1.1, .9, 1.1), 12, 8, T)
-    sphere('Truffe', '#3a2a1c', rt * .2, (0, -rt * 1.1, -rt * .1), (1.2, .8, .8), 6, 4, T)
-    bouc = pivot('Bouc', (0, H * .12, H * .3), corps)
-    cylindre('CouBouc', '#2b2b30', H * .06, H * .05, H * .18, 8, (0, 0, 0), bouc)
-    sphere('TeteBouc', '#2b2b30', H * .09, (0, -H * .04, H * .22), (1, 1.2, 1), 10, 6, bouc)
-    for s in (-1, 1): cone(f'CorneBouc{s}', '#cfc5a8', H * .03, H * .2, 5, (s * H * .05, 0, H * .28), bouc, (.6, s * .6, 0))
-    yeux_bete(bouc, H * .02, -H * .11, H * .24, H * .04, '#ffd34d', False)
-    q = piece(r, 'Queue')
-    sphere('TeteSerpent', '#4f9a3a', H * .07, (0, H * .5, H * .08), (1, 1.3, .8), 8, 6, q)
-    yeux_bete(q, H * .015, H * .44, H * .11, H * .03, '#ffd34d', False)
-    peindre(r)
-    trot(r, duree=.6, ampl=.55, rebond=H * .03, queue=.5)
-    return r
+def vols(K):
+    nu, ga = K.j('nuque'), K.j('garrot')
+    return [V('Cou', '#8a5a2a', c=(0, nu.y + .06, nu.z - .02), r=(.15, .1, .15), prio=1),                 # crinière
+            V('Dos', '#c8c0b0', a=(0, ga.y + .15, ga.z + .1), b=(.05, ga.y + .1, ga.z + .3), ra=.06, rb=.055),  # cou du bouc
+            V('Dos', '#c8c0b0', c=(.06, ga.y + .04, ga.z + .36), r=(.085, .11, .08))]
+
+def pieces(K):
+    ga, q2 = K.j('garrot'), K.j('queue2')
+    K.oeil('OeilBouc', 'Dos', (.09, ga.y + .0, ga.z + .36), .014)
+    K.oeil('OeilSerpent', 'Queue2', (q2.x + .02, q2.y + .02, q2.z + .03), .012, col='#7aff5a')
+    return ([corne(f'CorneBouc.{n}', '#3a3330', 'Dos', (.06 + s * .03, ga.y + .08, ga.z + .4), .02, .14, 2.0, rot=(-.8, s * .4, 0), n=5) for s, n in ((1, 'L'), (-1, 'R'))] +
+            [boule('TeteSerpent', '#3a8a3a', 'Queue2', tuple(q2), .05, ech=(1, 1.6, .8), seg=8)] + griffes(K))
 
 def construire(ctx):
-    preparer(fabriquer())
+    bete('chimere', dict(z=1.5, poil=('#d9a441', '#e8c070', '#f0dcb0'), patte='#a87a2a', crete='#3a8a3a', tete='felin', tete_r=1.45,
+                         longueur=1.0, pattes=1.05, epaisseur=1.2, cou=.95, queue=1.2, relief=RELIEF_POIL, oeil='#ffcf3a', ech=1.0,
+                         duree=.45, volumes=vols, pieces=pieces))

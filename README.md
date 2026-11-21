@@ -80,6 +80,12 @@ The multiplayer server runs on Cloudflare Workers (free plan), in [`server/`](se
 
 ## Changelog
 
+### 2.41 — bestiaire épique — 2026-11-21
+- New epic bestiary: the 72 monsters are renamed in place (same costs, HP, speeds and abilities; only display sizes change): goblins, rat-men, orcs, ogres, mounted saurians, Ruin warriors, Abyssal Oculus, Brain-eater, Abyssal Elder, Lord of Embers…
+- All 78 monster models are rebuilt with the new creature kit: shared skeletons (biped, quadruped, flyer), a detailed sculpt baked into a painted texture and a normal map, walk or fly, hit and death animations. In game, a hit monster flinches; a killed monster falls, stays on the ground, then sinks. 6 models are ready for upcoming abilities (summoning, resurrection). After reviewing the boards, 14 tier 2 and 3 monsters were retouched (carved rock for the golem and titan, wyrm, reaper, spectre, mana eater, Lord of Embers, Abyssal Elder, mammoth tower, behemoth, Ruin champion, chimera, giant, doom wheel). Total 3D budget raised to 20 MB (78 monsters loaded by tier).
+- `sim.js` changed (names, model keys and sizes only; the server redeploys automatically).
+- Tooling: monster generation is much faster (bat 595 s → 7 s, orc 36 s → 11 s; same models). The GitHub "Assets 3D" check, stopped at 30 min, fits in its time limit again (10 min for all 131 assets locally).
+
 ### 2.40 — races asymétriques — 2026-11-20
 - The 5 factions become 5 asymmetric races with 10 different towers each, their own mechanic, status effects and combos: Royaume d'Aubeval (cohesion, judgement seal, nets that ground flyers, trading post), Clans de l'Orage Blanc (fury and rage, chain lightning, soaked and conduction, hex, bleeding), Elfes de Lunebois (stacking poison and bloom, roots, growth, spores), Nains de Hautroc (forge, heat and overheat, armour break, mines), Cour des Ossements (souls, raised dead, plague and epidemic, curses, reaper).
 - 10 roles per race (base, close range, control, area, dedicated anti-air, detection, signature, support, anti-boss, ultimate — one ultimate per field).

@@ -118,11 +118,11 @@ test.describe('Parcours mobile en 3D — portrait',()=>{
  test('Onglet « Spéciaux » : paliers de monstres ; le palier 2 s’ouvre contre son prix et montre ses monstres',async()=>{
   await N.toucher(p,'#tabs button[data-t="s"]');assert.equal(await p.isVisible('#paliers'),true);
   assert.match(await p.textContent('#paliers button:has-text("Palier 2")'),/300 or/);
-  await N.toucherCarte(p,'Tortue');assert.match((await N.etat(p)).fiche,/blindée/);
+  await N.toucherCarte(p,'Ankylosaure de guerre');assert.match((await N.etat(p)).fiche,/blindée/);
   await N.toucher(p,'#paliers button:has-text("Palier 2")');assert.equal(await p.evaluate(()=>P.tier),1,'pas assez d’or : palier fermé');
   await p.evaluate(()=>{P.gold+=300});const or=await p.evaluate(()=>P.gold);await N.toucher(p,'#paliers button:has-text("Palier 2")');
   assert.equal(await p.evaluate(()=>P.tier),2);assert.equal(await p.evaluate(()=>P.gold),or-300);
-  assert.equal(await p.locator('#bar button[aria-label^="Golem de boue,"]').count(),1,'monstres du palier 2 affichés');
+  assert.equal(await p.locator('#bar button[aria-label^="Protoplasme aux mille yeux,"]').count(),1,'monstres du palier 2 affichés');
   await N.toucher(p,'#tabs button[data-t="t"]');assert.equal(await p.isVisible('#paliers'),false);
  });
  test('Bouton Adversaires : une vignette affiche le terrain d\'une IA (lecture seule), puis on revient au sien',async()=>{
